@@ -66,7 +66,11 @@ namespace OCCPort
         {
             return v.Added(y);
         }
-
+        public static gp_XYZ operator -(gp_XYZ v, gp_XYZ y)
+        {
+            throw new NotImplementedException();
+            //return v.Added(y);
+        }
         //! @code
         //! New.X() = <me>.X() * theScalar;
         //! New.Y() = <me>.Y() * theScalar;
@@ -117,6 +121,37 @@ namespace OCCPort
         }
 
         internal void Reverse()
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void Add(object value)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void Multiply(gp_Mat matrix)
+        {
+            throw new NotImplementedException();
+        }
+        internal void Multiply(double theScalar)
+        {
+            x *= theScalar;
+            y *= theScalar;
+            z *= theScalar;
+        }
+
+        internal gp_XYZ Multiplied(gp_Mat matrix)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal gp_XYZ Reversed()
+        {
+            throw new NotImplementedException();
+        }
+
+        internal gp_XYZ Normalized()
         {
             throw new NotImplementedException();
         }

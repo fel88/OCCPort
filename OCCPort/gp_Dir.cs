@@ -94,5 +94,22 @@ namespace OCCPort
             aV.coord.Reverse();
             return aV;
         }
+
+        internal void Transform(gp_Trsf T)
+        {
+            if (T.Form() == gp_TrsfForm.gp_Identity || T.Form() == gp_TrsfForm.gp_Translation) { }
+            else if (T.Form() == gp_TrsfForm.gp_PntMirror) { coord.Reverse(); }
+            else if (T.Form() == gp_TrsfForm.gp_Scale)
+            {
+                if (T.ScaleFactor() < 0.0) { coord.Reverse(); }
+            }
+            else
+            {
+                coord.Multiply(T.HVectorialPart());
+                double D = coord.Modulus();
+                coord.Divide(D);
+                if (T.ScaleFactor() < 0.0) { coord.Reverse(); }
+            }
+        }
     }
 }

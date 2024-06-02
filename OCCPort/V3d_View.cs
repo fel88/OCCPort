@@ -23,7 +23,11 @@ namespace OCCPort
         //! Returns camera object of the view.
         //! @return: handle to camera object, or NULL if 3D view does not use
         //! the camera approach.
-        Graphic3d_Camera Camera;
+        Graphic3d_Camera _camera;
+        Graphic3d_Camera Camera()
+        {
+            return _camera;
+        }
 
         gp_Vec myXscreenAxis;
         gp_Vec myYscreenAxis;
@@ -50,7 +54,7 @@ namespace OCCPort
 
         //! Converts the PIXEL value
         //! to a value in the projection plane.
-        double Convert(int Vp)
+        double Convert(double Vp)
         {
             int aDxw, aDyw;
 
@@ -59,7 +63,7 @@ namespace OCCPort
             MyWindow.Size(out aDxw, out aDyw);
             double aValue;
 
-            var aViewDims = Camera.ViewDimensions();
+            var aViewDims = Camera().ViewDimensions();
             aValue = aViewDims.X() * (float)Vp / (float)aDxw;
 
             return aValue;
@@ -84,7 +88,7 @@ namespace OCCPort
             if (Az > 0.0) while (Az > DEUXPI) Az -= DEUXPI;
             else if (Az < 0.0) while (Az < -DEUXPI) Az += DEUXPI;
 
-            var aCamera = Camera;
+            var aCamera = Camera();
 
             if (Start)
             {
@@ -134,74 +138,72 @@ namespace OCCPort
         //=======================================================================
         gp_Pnt GravityPoint()
         {
-            /*Graphic3d_MapOfStructure aSetOfStructures;
-            myView.DisplayedStructures(aSetOfStructures);
+            Graphic3d_MapOfStructure[] aSetOfStructures;
+            myView.DisplayedStructures(out aSetOfStructures);
 
             bool hasSelection = false;
-            for (Graphic3d_MapIteratorOfMapOfStructure aStructIter (aSetOfStructures);
-                 aStructIter.More(); aStructIter.Next())
+            foreach (var aStructIter in aSetOfStructures)
             {
-                if (aStructIter.Key()->IsHighlighted()
-                 && aStructIter.Key()->IsVisible())
+                if (aStructIter.Key().IsHighlighted()
+                 && aStructIter.Key().IsVisible())
                 {
                     hasSelection = true;
                     break;
                 }
             }
-            */
+
             double Xmin, Ymin, Zmin, Xmax, Ymax, Zmax;
             int aNbPoints = 0;
             gp_XYZ aResult = new gp_XYZ(0.0, 0.0, 0.0);
-            //        for (Graphic3d_MapIteratorOfMapOfStructure aStructIter (aSetOfStructures);
-            //             aStructIter.More(); aStructIter.Next())
-            //        {
-            //            Graphic3dStructure aStruct = aStructIter.Key();
-            //            if (!aStruct->IsVisible()
-            //              || aStruct->IsInfinite()
-            //              || (hasSelection && !aStruct->IsHighlighted()))
-            //            {
-            //                continue;
-            //            }
+            foreach (var aStructIter in aSetOfStructures)
+            {
+                var aStruct = aStructIter.Key();
+                if (!aStruct.IsVisible()
+                  || aStruct.IsInfinite()
+                  || (hasSelection && !aStruct.IsHighlighted()))
+                {
+                    continue;
+                }
 
-            //            Graphic3dBndBox3d aBox = aStruct->CStructure()->BoundingBox();
-            //            if (!aBox.IsValid())
-            //            {
-            //                continue;
-            //            }
+                Graphic3d_BndBox3d aBox = aStruct.CStructure().BoundingBox();
+                if (!aBox.IsValid())
+                {
+                    continue;
+                }
 
-            //            // skip transformation-persistent objects
-            //            if (!aStruct.TransformPersistence().IsNull())
-            //            {
-            //                continue;
-            //            }
+                // skip transformation-persistent objects
+                if (aStruct.TransformPersistence() != null)
+                {
+                    continue;
+                }
 
-            //            // use camera projection to find gravity point
-            //            Xmin = aBox.CornerMin().x();
-            //            Ymin = aBox.CornerMin().y();
-            //            Zmin = aBox.CornerMin().z();
-            //            Xmax = aBox.CornerMax().x();
-            //            Ymax = aBox.CornerMax().y();
-            //            Zmax = aBox.CornerMax().z();
-            //            gp_Pnt[] aPnts = new gp_Pnt[THE_NB_BOUND_POINTS]
-            //            {
-            // new gp_Pnt (Xmin, Ymin, Zmin),new  gp_Pnt (Xmin, Ymin, Zmax),
-            //new  gp_Pnt (Xmin, Ymax, Zmin), new gp_Pnt (Xmin, Ymax, Zmax),
-            // new gp_Pnt (Xmax, Ymin, Zmin), new gp_Pnt (Xmax, Ymin, Zmax),
-            // new gp_Pnt (Xmax, Ymax, Zmin), new gp_Pnt (Xmax, Ymax, Zmax)
-            //};
+                // use camera projection to find gravity point
+                Xmin = aBox.CornerMin().x();
+                Ymin = aBox.CornerMin().y();
+                Zmin = aBox.CornerMin().z();
+                Xmax = aBox.CornerMax().x();
+                Ymax = aBox.CornerMax().y();
+                Zmax = aBox.CornerMax().z();
+                gp_Pnt[] aPnts = new gp_Pnt[THE_NB_BOUND_POINTS]
+                {
+             new gp_Pnt (Xmin, Ymin, Zmin),new  gp_Pnt (Xmin, Ymin, Zmax),
+            new  gp_Pnt (Xmin, Ymax, Zmin), new gp_Pnt (Xmin, Ymax, Zmax),
+             new gp_Pnt (Xmax, Ymin, Zmin), new gp_Pnt (Xmax, Ymin, Zmax),
+             new gp_Pnt (Xmax, Ymax, Zmin), new gp_Pnt (Xmax, Ymax, Zmax)
+    };
 
-            //            for (int aPntIt = 0; aPntIt < THE_NB_BOUND_POINTS; ++aPntIt)
-            //            {
-            //                gp_Pnt aBndPnt = aPnts[aPntIt];
-            //                gp_Pnt aProjected = Camera.Project(aBndPnt);
-            //                if (Math.Abs(aProjected.X()) <= 1.0
-            //                 && Math.Abs(aProjected.Y()) <= 1.0)
-            //                {
-            //                    aResult += aBndPnt.XYZ();
-            //                    ++aNbPoints;
-            //                }
-            //            }
-            //        }
+                for (int aPntIt = 0; aPntIt < THE_NB_BOUND_POINTS; ++aPntIt)
+                {
+                    gp_Pnt aBndPnt = aPnts[aPntIt];
+                    gp_Pnt aProjected = Camera().Project(aBndPnt);
+                    if (Math.Abs(aProjected.X()) <= 1.0
+                     && Math.Abs(aProjected.Y()) <= 1.0)
+                    {
+                        aResult += aBndPnt.XYZ();
+                        ++aNbPoints;
+                    }
+                }
+            }
 
             if (aNbPoints == 0)
             {
@@ -250,7 +252,7 @@ namespace OCCPort
                              double zRotationThreshold = 0)
         {
             sx = X; sy = Y;
-            int x, y;
+            double x, y;
             Size(out x, out y);
             rx = Convert(x);
             ry = Convert(y);
@@ -270,9 +272,13 @@ namespace OCCPort
 
         }
 
-        private void Size(out int x, out int y)
+        private void Size(out double Width, out double Height)
         {
-            throw new NotImplementedException();
+            var aViewDims = Camera().ViewDimensions();
+
+            Width = aViewDims.X();
+            Height = aViewDims.Y();
         }
     }
+
 }

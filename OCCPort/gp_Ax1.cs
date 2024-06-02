@@ -1,4 +1,6 @@
-﻿namespace OCCPort
+﻿using System;
+
+namespace OCCPort
 {
     internal class gp_Ax1
     {
@@ -9,6 +11,16 @@
         {
             this.aRCenter = aRCenter;
             this.aYAxis = aYAxis;
+        }
+
+        internal gp_Dir Direction()
+        {
+            throw new NotImplementedException();
+        }
+
+        internal gp_Pnt Location()
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -34,5 +34,20 @@ namespace OCCPort
 
         //! For this point, returns its three coordinates as a XYZ object.
         public gp_XYZ XYZ() { return coord; }
+
+        internal bool IsEqual(gp_Pnt theEye, double v)
+        {
+            return coord.IsEqual(theEye.coord, v);            
+        }
+
+        internal double Distance(gp_Pnt theCenter)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void Transform(gp_Trsf theTrsf)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

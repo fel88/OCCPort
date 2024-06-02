@@ -43,11 +43,20 @@
   <ItemGroup>
     <Compile Include="AspectWindow.cs" />
     <Compile Include="Bnd_Box.cs" />
+    <Compile Include="BVH_Box.cs" />
+    <Compile Include="BVH_VecNt.cs" />
+    <Compile Include="gp.cs" />
     <Compile Include="gp_Ax1.cs" />
+    <Compile Include="gp_Mat.cs" />
     <Compile Include="gp_Trsf.cs" />
     <Compile Include="gp_Vec.cs" />
     <Compile Include="gp_XYZ.cs" />
+    <Compile Include="Graphic3d_BndBox3d.cs" />
+    <Compile Include="Graphic3d_CStructure.cs" />
     <Compile Include="Graphic3d_CView.cs" />
+    <Compile Include="Graphic3d_MapOfStructure.cs" />
+    <Compile Include="Graphic3d_Structure.cs" />
+    <Compile Include="Graphic3d_TransformPers.cs" />
     <Compile Include="Graphic3d_Vertex.cs" />
     <Compile Include="TransformMatrices.cs" />
     <Compile Include="V3d_View.cs" />

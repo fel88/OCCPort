@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices.ComTypes;
 
 namespace OCCPort
 {
@@ -25,7 +26,7 @@ namespace OCCPort
         //! - FocusType_Absolute : focus is specified as absolute value.
         //! - FocusType_Relative : focus is specified relative to
         //! (as coefficient of) camera focal length.
-        public  enum FocusType
+        public enum FocusType
         {
             FocusType_Absolute,
             FocusType_Relative
@@ -90,14 +91,59 @@ namespace OCCPort
         private gp_Pnt myEye;      //!< Camera eye position
         private double myDistance; //!< distance from Eye to Center
 
+        double myFOVyTan;  //!< Field Of View as Tan(DTR_HALF * myFOVy)
+        double myZNear;    //!< Distance to near clipping plane.
+        double myZFar;     //!< Distance to far clipping plane.
+        double myAspect;   //!< Width to height display ratio.
+        bool myIsZeroToOneDepth; //!< use [0, 1] depth range or [-1, 1]
+
+        double myScale;      //!< Specifies parallel scale for orthographic projection.
+        double myZFocus;     //!< Stereographic focus value.
+        FocusType myZFocusType; //!< Stereographic focus definition type.
+
         private gp_XYZ myAxialScale; //!< World axial scale.
 
         //! Get camera Up direction vector.
         //! @return Camera's Up direction vector.
+        //! Get distance of Eye from camera Center.
+        //! @return the distance.
+        double Distance() { return myDistance; }
 
-        internal gp_Pnt ViewDimensions()
+        //! Check that the camera projection is orthographic.
+        //! @return boolean flag that indicates whether the camera's projection is
+        //! orthographic or not.
+        bool IsOrthographic()
         {
-            return new gp_Pnt();
+            return (myProjType == Projection.Projection_Orthographic);
+        }
+
+        internal gp_XYZ ViewDimensions()
+        {
+            return ViewDimensions(Distance());
+        }
+
+        //! Calculate view plane size at center point with specified Z offset
+        //! and distance between ZFar and ZNear planes.
+        //! @param theZValue [in] the distance from the eye in eye-to-center direction
+        //! @return values in form of gp_Pnt (Width, Height, Depth).
+        public gp_XYZ ViewDimensions(double theZValue)
+        {
+            // view plane dimensions
+            double aSize = IsOrthographic() ? myScale : (2.0 * theZValue * myFOVyTan);
+            double aSizeX, aSizeY;
+            if (myAspect > 1.0)
+            {
+                aSizeX = aSize * myAspect;
+                aSizeY = aSize;
+            }
+            else
+            {
+                aSizeX = aSize;
+                aSizeY = aSize / myAspect;
+            }
+
+            // and frustum depth
+            return new gp_XYZ(aSizeX, aSizeY, myZFar - myZNear);
         }
 
         internal gp_Pnt Project(gp_Pnt aBndPnt)
@@ -105,19 +151,27 @@ namespace OCCPort
             throw new NotImplementedException();
         }
 
-        internal void Transform(gp_Trsf aTrsf)
+        internal void Transform(gp_Trsf theTrsf)
         {
+            if (theTrsf.Form() == gp_TrsfForm.gp_Identity)
+            {
+                return;
+            }
 
+            myUp.Transform(theTrsf);
+            myDirection.Transform(theTrsf);
+            myEye.Transform(theTrsf);
+            InvalidateOrientation();
         }
 
         internal gp_Dir Direction()
         {
-            throw new NotImplementedException();
+            return myDirection;
         }
 
         internal gp_Pnt Eye()
         {
-            throw new NotImplementedException();
+            return myEye;
         }
 
         //! Get Center of the camera, e.g. the point where camera looks at.
@@ -153,14 +207,47 @@ namespace OCCPort
             //myWorldViewProjState.WorldViewState() = (Standard_Size)Standard_Atomic_Increment(&THE_STATE_COUNTER);
         }
 
-        internal void SetDirectionFromEye(gp_Dir myCamStartOpDir)
+        internal void SetDirectionFromEye(gp_Dir theDir)
         {
-            throw new NotImplementedException();
+            if (myDirection.IsEqual(theDir, 0.0))
+            {
+                return;
+            }
+
+            myDirection = theDir;
+            InvalidateOrientation();
         }
 
-        internal void SetEyeAndCenter(gp_Pnt myCamStartOpEye, gp_Pnt myCamStartOpCenter)
+        public void SetEyeAndCenter(gp_Pnt theEye,
+                                         gp_Pnt theCenter)
         {
-            throw new NotImplementedException();
+            if (Eye().IsEqual(theEye, 0.0)
+             && Center().IsEqual(theCenter, 0.0))
+            {
+                return;
+            }
+
+            myEye = theEye;
+            myDistance = theEye.Distance(theCenter);
+            if (myDistance > gp.Resolution())
+            {
+                myDirection = new gp_Dir(theCenter.XYZ() - theEye.XYZ());
+            }
+            InvalidateOrientation();
         }
     }
+    //! Identifies the type of a geometric transformation.
+    public enum gp_TrsfForm
+    {
+        gp_Identity,     //!< No transformation (matrix is identity)
+        gp_Rotation,     //!< Rotation
+        gp_Translation,  //!< Translation
+        gp_PntMirror,    //!< Central symmetry
+        gp_Ax1Mirror,    //!< Rotational symmetry
+        gp_Ax2Mirror,    //!< Bilateral symmetry
+        gp_Scale,        //!< Scale
+        gp_CompoundTrsf, //!< Combination of the above transformations
+        gp_Other         //!< Transformation with not-orthogonal matrix
+    };
+
 }
