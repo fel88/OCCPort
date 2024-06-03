@@ -6,6 +6,25 @@ namespace OCCPort
     {
         double[][] myMat = new double[3][];
         //! creates  a matrix with null coefficients.
+        public gp_Mat(double theA11, double theA12, double theA13,
+                        double theA21, double theA22, double theA23,
+                        double theA31, double theA32, double theA33)
+        {
+
+            for (int i = 0; i < 3; i++)
+            {
+                myMat[i] = new double[3];
+            }
+            myMat[0][0] = theA11;
+            myMat[0][1] = theA12;
+            myMat[0][2] = theA13;
+            myMat[1][0] = theA21;
+            myMat[1][1] = theA22;
+            myMat[1][2] = theA23;
+            myMat[2][0] = theA31;
+            myMat[2][1] = theA32;
+            myMat[2][2] = theA33;
+        }
 
         public gp_Mat()
         {
@@ -92,9 +111,17 @@ namespace OCCPort
             myMat[2][2] += theOther.myMat[2][2];
         }
 
-        private void Multiply(double v)
+        public void Multiply(double theScalar)
         {
-            throw new NotImplementedException();
+            myMat[0][0] *= theScalar;
+            myMat[0][1] *= theScalar;
+            myMat[0][2] *= theScalar;
+            myMat[1][0] *= theScalar;
+            myMat[1][1] *= theScalar;
+            myMat[1][2] *= theScalar;
+            myMat[2][0] *= theScalar;
+            myMat[2][1] *= theScalar;
+            myMat[2][2] *= theScalar;
         }
 
         private void SetRow(int theRow, gp_XYZ theValue)
@@ -114,6 +141,12 @@ namespace OCCPort
             {
                 myMat[2][0] = theValue.X(); myMat[2][1] = theValue.Y(); myMat[2][2] = theValue.Z();
             }
+        }
+
+        internal double Value(int theRow, int theCol)
+        {
+            //Standard_OutOfRange_Raise_if(theRow < 1 || theRow > 3 || theCol < 1 || theCol > 3, " ");
+            return myMat[theRow - 1][theCol - 1];
         }
     }
 }

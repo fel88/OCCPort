@@ -2,10 +2,12 @@
 {
     public class AspectWindow
     {
+        public int Width = 800;
+        public int Height = 600;
         public void Size(out int x, out int y)
         {
-            x = 1;
-            y = 2;
+            x = Width;
+            y = Height;
         }
     }
 }

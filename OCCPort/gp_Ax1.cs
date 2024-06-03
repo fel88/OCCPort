@@ -3,24 +3,25 @@
 namespace OCCPort
 {
     internal class gp_Ax1
-    {
-        private gp_Pnt aRCenter;
-        private gp_Dir aYAxis;
+    {       
+
+        gp_Pnt loc;
+        gp_Dir vdir;
 
         public gp_Ax1(gp_Pnt aRCenter, gp_Dir aYAxis)
         {
-            this.aRCenter = aRCenter;
-            this.aYAxis = aYAxis;
+            this.loc = aRCenter;
+            this.vdir = aYAxis;
         }
 
         internal gp_Dir Direction()
         {
-            throw new NotImplementedException();
+            return vdir;
         }
 
         internal gp_Pnt Location()
         {
-            throw new NotImplementedException();
+            return loc;
         }
     }
 }

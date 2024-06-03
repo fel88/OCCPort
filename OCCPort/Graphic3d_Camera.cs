@@ -50,7 +50,7 @@ namespace OCCPort
         //! Type (Orthographic); FOVy (45); Scale (1000); IsStereo(false);
         //! ZNear (0.001); ZFar (3000.0); Aspect(1);
         //! ZFocus(1.0); ZFocusType(Relative); IOD(0.05); IODType(Relative)
-        Graphic3d_Camera()
+        public Graphic3d_Camera()
         {
             myUp = new gp_Dir(0.0, 1.0, 0.0);
             myDirection = new gp_Dir(0.0, 0.0, 1.0);
@@ -198,8 +198,8 @@ namespace OCCPort
             InvalidateOrientation();
         }
 
-        TransformMatrices<double> myMatricesD;
-        TransformMatrices<float> myMatricesF;
+        TransformMatrices<double> myMatricesD = new TransformMatrices<double>();
+        TransformMatrices<float> myMatricesF = new TransformMatrices<float>();
         private void InvalidateOrientation()
         {
             myMatricesD.ResetOrientation();
@@ -234,6 +234,26 @@ namespace OCCPort
                 myDirection = new gp_Dir(theCenter.XYZ() - theEye.XYZ());
             }
             InvalidateOrientation();
+        }
+
+        internal void SetEye(gp_Pnt myCamStartOpEye)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void SetCenter(gp_Pnt myCamStartOpCenter)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void SetScale(object value)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal double Scale()
+        {
+            throw new NotImplementedException();
         }
     }
     //! Identifies the type of a geometric transformation.

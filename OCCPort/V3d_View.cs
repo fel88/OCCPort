@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.AccessControl;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -8,6 +9,190 @@ namespace OCCPort
 {
     public class V3d_View
     {
+        public void Rotation(int X,
+                          int Y)
+        {
+            if (rx == 0.0 || ry == 0.0)
+            {
+                StartRotation(X, Y);
+                return;
+            }
+            double dx = 0.0, dy = 0.0, dz = 0.0;
+            if (myZRotation)
+            {
+                dz = Math.Atan2((double)(X) - rx / 2.0, ry / 2.0 - (double)(Y)) -
+                  Math.Atan2(sx - rx / 2.0, ry / 2.0 - sy);
+            }
+            else
+            {
+                dx = ((double)(X) - sx) * Math.PI / rx;
+                dy = (sy - (double)(Y)) * Math.PI / ry;
+            }
+
+            Rotate(dx, dy, dz,
+                    myRotateGravity.X(), myRotateGravity.Y(), myRotateGravity.Z(),
+                    false);
+        }
+
+        public V3d_View()
+        {
+            //myView = theViewer->Driver()->CreateView(theViewer->StructureManager());
+            myView = new Graphic3d_CView();
+            //myView.SetBackground(theViewer->GetBackgroundColor());
+            //  myView->SetGradientBackground(theViewer->GetGradientBackground());
+
+            // ChangeRenderingParams() = theViewer->DefaultRenderingParams();
+
+            // camera init
+            var aCamera = new Graphic3d_Camera();
+            /*aCamera.SetFOVy(45.0);
+            aCamera.SetIOD(Graphic3d_Camera::IODType_Relative, 0.05);
+            aCamera.SetZFocus(Graphic3d_Camera::FocusType_Relative, 1.0);
+            aCamera.SetProjectionType((theType == V3d_ORTHOGRAPHIC)
+              ? Graphic3d_Camera::Projection_Orthographic
+              : Graphic3d_Camera::Projection_Perspective);*/
+
+            myDefaultCamera = new Graphic3d_Camera();
+
+            myImmediateUpdate = false;
+            /*  SetAutoZFitMode(true, 1.0);
+              SetBackFacingModel(V3d_TOBM_AUTOMATIC);*/
+            SetCamera(aCamera);/*
+            SetAxis(0., 0., 0., 1., 1., 1.);
+            SetVisualization(theViewer->DefaultVisualization());
+            SetTwist(0.);
+            SetAt(0.0, 0.0, 0.0);
+            SetProj(theViewer->DefaultViewProj());
+            SetSize(theViewer->DefaultViewSize());
+            Standard_Real zsize = theViewer->DefaultViewSize();
+            SetZSize(2.* zsize);
+            SetDepth(theViewer->DefaultViewSize() / 2.0);
+            SetViewMappingDefault();
+            SetViewOrientationDefault();
+            theViewer->AddView(this);*/
+            Init();
+            myImmediateUpdate = true;
+        }
+        public void Pan(int theDXp,
+                     int theDYp,
+                     double theZoomFactor,
+                     bool theToStart)
+        {
+            Panning(Convert(theDXp), Convert(theDYp), theZoomFactor, theToStart);
+        }
+
+        public void Panning(double theDXv,
+                         double theDYv,
+                         double theZoomFactor,
+                         bool theToStart)
+        {
+            //Standard_ASSERT_RAISE(theZoomFactor > 0.0, "Bad zoom factor");
+
+            var aCamera = Camera();
+
+            if (theToStart)
+            {
+                myCamStartOpDir = aCamera.Direction();
+                myCamStartOpEye = aCamera.Eye();
+                myCamStartOpCenter = aCamera.Center();
+            }
+
+            bool wasUpdateEnabled = SetImmediateUpdate(false);
+
+            var aViewDims = aCamera.ViewDimensions();
+
+            aCamera.SetEyeAndCenter(myCamStartOpEye, myCamStartOpCenter);
+            aCamera.SetDirectionFromEye(myCamStartOpDir);
+            Translate(aCamera, -theDXv, -theDYv);
+            Scale(aCamera, aViewDims.X() / theZoomFactor, aViewDims.Y() / theZoomFactor);
+
+            SetImmediateUpdate(wasUpdateEnabled);
+
+            ImmediateUpdate();
+        }
+
+        private void Scale(Graphic3d_Camera aCamera, double v1, double v2)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void Translate(Graphic3d_Camera aCamera, double v1, double v2)
+        {
+            throw new NotImplementedException();
+        }
+
+        bool SetImmediateUpdate(bool theImmediateUpdate)
+        {
+            bool aPreviousMode = myImmediateUpdate;
+            myImmediateUpdate = theImmediateUpdate;
+            return aPreviousMode;
+        }
+
+        public void Zoom(int theXp1,
+                      int theYp1,
+                      int theXp2,
+                      int theYp2)
+        {
+            int aDx = theXp2 - theXp1;
+            int aDy = theYp2 - theYp1;
+            if (aDx != 0 || aDy != 0)
+            {
+                double aCoeff = Math.Sqrt((double)(aDx * aDx + aDy * aDy)) / 100.0 + 1.0;
+                aCoeff = (aDx > 0) ? aCoeff : 1.0 / aCoeff;
+                SetZoom(aCoeff, true);
+            }
+        }
+
+        private void SetZoom(double theCoef, bool theToStart)
+        {
+            //V3d_BadValue_Raise_if(theCoef <= 0., "V3d_View::SetZoom, bad coefficient");
+
+            var aCamera = Camera();
+
+            if (theToStart)
+            {
+                myCamStartOpEye = aCamera.Eye();
+                myCamStartOpCenter = aCamera.Center();
+            }
+
+            var aViewWidth = aCamera.ViewDimensions().X();
+            var aViewHeight = aCamera.ViewDimensions().Y();
+
+            // ensure that zoom will not be too small or too big
+            var aCoef = theCoef;
+            if (aViewWidth < aCoef * Precision.Confusion())
+            {
+                aCoef = aViewWidth / Precision.Confusion();
+            }
+            else if (aViewWidth > aCoef * 1e12)
+            {
+                aCoef = aViewWidth / 1e12;
+            }
+            if (aViewHeight < aCoef * Precision.Confusion())
+            {
+                aCoef = aViewHeight / Precision.Confusion();
+            }
+            else if (aViewHeight > aCoef * 1e12)
+            {
+                aCoef = aViewHeight / 1e12;
+            }
+
+            aCamera.SetEye(myCamStartOpEye);
+            aCamera.SetCenter(myCamStartOpCenter);
+            aCamera.SetScale(aCamera.Scale() / aCoef);
+
+            ImmediateUpdate();
+        }
+
+        private void SetCamera(Graphic3d_Camera aCamera)
+        {
+            _camera = aCamera;
+        }
+
+        public void Init()
+        {
+            myGravityReferencePoint = new Graphic3d_Vertex();
+        }
 
         double myOldMouseX;
         double myOldMouseY;
@@ -40,7 +225,7 @@ namespace OCCPort
         //  V3d_ListOfLight myActiveLights;
         //  gp_Dir myDefaultViewAxis;
         //gp_Pnt myDefaultViewPoint;
-        AspectWindow MyWindow;
+        AspectWindow MyWindow = new AspectWindow();
         int sx;
         int sy;
         double rx;
@@ -114,6 +299,10 @@ namespace OCCPort
 
             gp_Trsf[] aRot = new gp_Trsf[3];
             gp_Trsf aTrsf = new gp_Trsf();
+            for (int i = 0; i < 3; i++)
+            {
+                aRot[i] = new gp_Trsf();
+            }
             aRot[0].SetRotation(new gp_Ax1(aRCenter, aYAxis), -Ax);
             aRot[1].SetRotation(new gp_Ax1(aRCenter, aXAxis), Ay);
             aRot[2].SetRotation(new gp_Ax1(aRCenter, aZAxis), Az);
@@ -240,7 +429,7 @@ namespace OCCPort
 
         private void ImmediateUpdate()
         {
-            throw new NotImplementedException();
+
         }
 
         //=============================================================================

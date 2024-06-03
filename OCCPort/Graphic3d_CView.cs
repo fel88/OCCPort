@@ -7,12 +7,12 @@ namespace OCCPort
     {
         internal void DisplayedStructures(out Graphic3d_MapOfStructure[] aSetOfStructures)
         {
-            throw new NotImplementedException();
+            aSetOfStructures = new Graphic3d_MapOfStructure[0];
         }
 
         internal Bnd_Box MinMaxValues()
         {
-            throw new NotImplementedException();
+            return new Bnd_Box();
         }
     }
 }

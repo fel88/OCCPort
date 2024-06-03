@@ -5,6 +5,13 @@ namespace OCCPort
     internal class gp_Trsf
     {
 
+        public gp_Trsf()
+        {
+            scale = (1.0);
+            shape = gp_TrsfForm.gp_Identity;
+            matrix = new gp_Mat(1, 0, 0, 0, 1, 0, 0, 0, 1);
+            loc = new gp_XYZ(0.0, 0.0, 0.0);
+        }
 
         private double scale;
         private gp_TrsfForm shape;
@@ -165,5 +172,20 @@ namespace OCCPort
         //! The coefficients of this matrix must be multiplied by the
         //! scale factor to obtain the coefficients of the transformation.
         public gp_Mat HVectorialPart() { return matrix; }
+
+        internal gp_XYZ TranslationPart()
+        {
+            return loc;
+        }
+
+        internal void Transforms(gp_XYZ theCoord)
+        {
+            theCoord.Multiply(matrix);
+            if (scale != 1.0)
+            {
+                theCoord.Multiply(scale);
+            }
+            theCoord.Add(loc);
+        }
     }
 }

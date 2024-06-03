@@ -37,17 +37,34 @@ namespace OCCPort
 
         internal bool IsEqual(gp_Pnt theEye, double v)
         {
-            return coord.IsEqual(theEye.coord, v);            
+            return coord.IsEqual(theEye.coord, v);
         }
 
-        internal double Distance(gp_Pnt theCenter)
+        internal double Distance(gp_Pnt theOther)
         {
-            throw new NotImplementedException();
+            double aD = 0, aDD;
+            gp_XYZ aXYZ = theOther.coord;
+            aDD = coord.X(); aDD -= aXYZ.X(); aDD *= aDD; aD += aDD;
+            aDD = coord.Y(); aDD -= aXYZ.Y(); aDD *= aDD; aD += aDD;
+            aDD = coord.Z(); aDD -= aXYZ.Z(); aDD *= aDD; aD += aDD;
+            return Math.Sqrt(aD);
         }
 
-        internal void Transform(gp_Trsf theTrsf)
+        internal void Transform(gp_Trsf T)
         {
-            throw new NotImplementedException();
+            if (T.Form() == gp_TrsfForm.gp_Identity) { }
+            else if (T.Form() == gp_TrsfForm.gp_Translation) { coord.Add(T.TranslationPart()); }
+            else if (T.Form() == gp_TrsfForm.gp_Scale)
+            {
+                coord.Multiply(T.ScaleFactor());
+                coord.Add(T.TranslationPart());
+            }
+            else if (T.Form() == gp_TrsfForm.gp_PntMirror)
+            {
+                coord.Reverse();
+                coord.Add(T.TranslationPart());
+            }
+            else { T.Transforms(coord); }
         }
     }
 }

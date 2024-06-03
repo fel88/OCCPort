@@ -6,7 +6,7 @@ namespace OCCPort
     {
         internal void ResetOrientation()
         {
-            throw new NotImplementedException();
+            
         }
     }
 }

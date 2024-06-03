@@ -122,7 +122,9 @@ namespace OCCPort
 
         internal void Reverse()
         {
-            throw new NotImplementedException();
+            x = -x;
+            y = -y;
+            z = -z;
         }
 
         internal void Add(object value)
@@ -130,9 +132,13 @@ namespace OCCPort
             throw new NotImplementedException();
         }
 
-        internal void Multiply(gp_Mat matrix)
+        internal void Multiply(gp_Mat theMatrix)
         {
-            throw new NotImplementedException();
+            var aXresult = theMatrix.Value(1, 1) * x + theMatrix.Value(1, 2) * y + theMatrix.Value(1, 3) * z;
+            var anYresult = theMatrix.Value(2, 1) * x + theMatrix.Value(2, 2) * y + theMatrix.Value(2, 3) * z;
+            z = theMatrix.Value(3, 1) * x + theMatrix.Value(3, 2) * y + theMatrix.Value(3, 3) * z;
+            x = aXresult;
+            y = anYresult;
         }
         internal void Multiply(double theScalar)
         {
@@ -141,19 +147,23 @@ namespace OCCPort
             z *= theScalar;
         }
 
-        internal gp_XYZ Multiplied(gp_Mat matrix)
+        internal gp_XYZ Multiplied(gp_Mat theMatrix)
         {
-            throw new NotImplementedException();
+            return new gp_XYZ(theMatrix.Value(1, 1) * x + theMatrix.Value(1, 2) * y + theMatrix.Value(1, 3) * z,
+                   theMatrix.Value(2, 1) * x + theMatrix.Value(2, 2) * y + theMatrix.Value(2, 3) * z,
+                   theMatrix.Value(3, 1) * x + theMatrix.Value(3, 2) * y + theMatrix.Value(3, 3) * z);
         }
 
         internal gp_XYZ Reversed()
         {
-            throw new NotImplementedException();
+            return new gp_XYZ(-x, -y, -z);
         }
 
         internal gp_XYZ Normalized()
         {
-            throw new NotImplementedException();
+            var aD = Modulus();
+            //Standard_ConstructionError_Raise_if(aD <= gp::Resolution(), "gp_XYZ::Normalized() - vector has zero norm");
+            return new gp_XYZ(x / aD, y / aD, z / aD);
         }
 
         public gp_XYZ(double v1, double v2, double v3)

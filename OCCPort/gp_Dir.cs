@@ -14,7 +14,7 @@ namespace OCCPort
         //! Normalizes the vector theV and creates a direction. Raises ConstructionError if theV.Magnitude() <= Resolution.
         public gp_Dir(gp_Vec theV)
         {
-
+            //coord=new gp_XYZ (theV.x)
         }
         //! Normalizes the vector theV and creates a direction. Raises ConstructionError if theV.Magnitude() <= Resolution.
         public gp_Dir(gp_Dir theV)
@@ -24,7 +24,7 @@ namespace OCCPort
         //! Creates a direction from a triplet of coordinates. Raises ConstructionError if theCoord.Modulus() <= Resolution from gp.
         public gp_Dir(gp_XYZ theCoord)
         {
-
+            coord = new gp_XYZ(theCoord);
         }
 
         //! Creates a direction with its 3 cartesian coordinates. Raises ConstructionError if Sqrt(theXv*theXv + theYv*theYv + theZv*theZv) <= Resolution
@@ -35,7 +35,7 @@ namespace OCCPort
         //! exception ConstructionError.
         public gp_Dir(double theXv, double theYv, double theZv)
         {
-
+            coord = new gp_XYZ(theXv, theYv, theZv);
         }
 
         //! for this unit vector, returns  its three coordinates as a number triplea.
