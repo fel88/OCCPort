@@ -10,6 +10,16 @@ namespace OCCPort
             aSetOfStructures = new Graphic3d_MapOfStructure[0];
         }
 
+        internal void Invalidate()
+        {
+            throw new NotImplementedException();
+        }
+
+        internal bool IsDefined()
+        {
+            throw new NotImplementedException();
+        }
+
         internal Bnd_Box MinMaxValues()
         {
             return new Bnd_Box();

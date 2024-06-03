@@ -47,6 +47,7 @@
     <Compile Include="BVH_VecNt.cs" />
     <Compile Include="gp.cs" />
     <Compile Include="gp_Ax1.cs" />
+    <Compile Include="gp_Ax3.cs" />
     <Compile Include="gp_Mat.cs" />
     <Compile Include="gp_Trsf.cs" />
     <Compile Include="gp_Vec.cs" />

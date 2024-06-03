@@ -148,5 +148,11 @@ namespace OCCPort
             //Standard_OutOfRange_Raise_if(theRow < 1 || theRow > 3 || theCol < 1 || theCol > 3, " ");
             return myMat[theRow - 1][theCol - 1];
         }
+
+        internal void SetIdentity()
+        {
+            myMat[0][0] = myMat[1][1] = myMat[2][2] = 1.0;
+            myMat[0][1] = myMat[0][2] = myMat[1][0] = myMat[1][2] = myMat[2][0] = myMat[2][1] = 0.0;
+        }
     }
 }

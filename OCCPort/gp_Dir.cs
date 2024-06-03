@@ -11,6 +11,11 @@ namespace OCCPort
             coord = new gp_XYZ(1.0, 0.0, 0.0);
         }
 
+        public static gp_Dir operator ^(gp_Dir v, gp_Dir theRight)
+        {
+
+            return v.Crossed(theRight);
+        }
         //! Normalizes the vector theV and creates a direction. Raises ConstructionError if theV.Magnitude() <= Resolution.
         public gp_Dir(gp_Vec theV)
         {
@@ -110,6 +115,22 @@ namespace OCCPort
                 coord.Divide(D);
                 if (T.ScaleFactor() < 0.0) { coord.Reverse(); }
             }
+        }
+
+        internal void CrossCross(gp_Dir theV1, gp_Dir theV2)
+        {
+            coord.CrossCross(theV1.coord, theV2.coord);
+            var aD = coord.Modulus();
+            //Standard_ConstructionError_Raise_if(aD <= gp::Resolution(), "gp_Dir::CrossCross() - result vector has zero norm");
+            coord.Divide(aD);
+        }
+
+        internal void Cross(gp_Dir theRight)
+        {
+            coord.Cross(theRight.coord);
+            var aD = coord.Modulus();
+            //Standard_ConstructionError_Raise_if(aD <= gp::Resolution(), "gp_Dir::Cross() - result vector has zero norm");
+            coord.Divide(aD);
         }
     }
 }

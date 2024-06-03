@@ -187,5 +187,13 @@ namespace OCCPort
             }
             theCoord.Add(loc);
         }
+
+        internal void SetTranslation(gp_Vec theV)
+        {
+            shape = gp_TrsfForm.gp_Translation;
+            scale = 1.0;
+            matrix.SetIdentity();
+            loc = theV.XYZ();
+        }
     }
 }

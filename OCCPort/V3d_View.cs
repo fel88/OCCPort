@@ -116,9 +116,33 @@ namespace OCCPort
             throw new NotImplementedException();
         }
 
-        private void Translate(Graphic3d_Camera aCamera, double v1, double v2)
+     
+
+    private void Translate(Graphic3d_Camera theCamera, double theDXv, double theDYv)
         {
-            throw new NotImplementedException();
+            gp_Pnt aCenter = theCamera.Center();
+            gp_Dir aDir = theCamera.Direction();
+            gp_Dir anUp = theCamera.Up();
+            gp_Ax3 aCameraCS = new gp_Ax3(aCenter, aDir.Reversed(), aDir ^ anUp);
+
+            gp_Vec aCameraPanXv = new gp_Vec(aCameraCS.XDirection()) * theDXv;
+            gp_Vec aCameraPanYv = new gp_Vec(aCameraCS.YDirection()) * theDYv;
+            gp_Vec aCameraPan = aCameraPanXv + aCameraPanYv;
+            gp_Trsf aPanTrsf = new gp_Trsf();
+            aPanTrsf.SetTranslation(aCameraPan);
+
+            theCamera.Transform(aPanTrsf);
+            Invalidate();
+        }
+
+        private void Invalidate()
+        {
+            if (!myView.IsDefined())
+            {
+                return;
+            }
+
+            myView.Invalidate();
         }
 
         bool SetImmediateUpdate(bool theImmediateUpdate)

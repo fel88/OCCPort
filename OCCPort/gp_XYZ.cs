@@ -66,10 +66,14 @@ namespace OCCPort
         {
             return v.Added(y);
         }
+        public gp_XYZ Subtracted(gp_XYZ theOther)
+        {
+            return new gp_XYZ(x - theOther.x, y - theOther.y, z - theOther.z);
+        }
+
         public static gp_XYZ operator -(gp_XYZ v, gp_XYZ y)
         {
-            throw new NotImplementedException();
-            //return v.Added(y);
+            return v.Subtracted(y);
         }
         //! @code
         //! New.X() = <me>.X() * theScalar;
@@ -164,6 +168,18 @@ namespace OCCPort
             var aD = Modulus();
             //Standard_ConstructionError_Raise_if(aD <= gp::Resolution(), "gp_XYZ::Normalized() - vector has zero norm");
             return new gp_XYZ(x / aD, y / aD, z / aD);
+        }
+
+        internal void CrossCross(gp_XYZ theCoord1, gp_XYZ theCoord2)
+        {
+            var aXresult = y * (theCoord1.x * theCoord2.y - theCoord1.y * theCoord2.x) -
+                           z * (theCoord1.z * theCoord2.x - theCoord1.x * theCoord2.z);
+            var anYresult = z * (theCoord1.y * theCoord2.z - theCoord1.z * theCoord2.y) -
+                                      x * (theCoord1.x * theCoord2.y - theCoord1.y * theCoord2.x);
+            z = x * (theCoord1.z * theCoord2.x - theCoord1.x * theCoord2.z) -
+                y * (theCoord1.y * theCoord2.z - theCoord1.z * theCoord2.y);
+            x = aXresult;
+            y = anYresult;
         }
 
         public gp_XYZ(double v1, double v2, double v3)
