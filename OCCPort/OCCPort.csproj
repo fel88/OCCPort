@@ -55,6 +55,7 @@
     <Compile Include="Graphic3d_BndBox3d.cs" />
     <Compile Include="Graphic3d_CStructure.cs" />
     <Compile Include="Graphic3d_CView.cs" />
+    <Compile Include="Graphic3d_DataStructureManager.cs" />
     <Compile Include="Graphic3d_MapOfStructure.cs" />
     <Compile Include="Graphic3d_Structure.cs" />
     <Compile Include="Graphic3d_TransformPers.cs" />

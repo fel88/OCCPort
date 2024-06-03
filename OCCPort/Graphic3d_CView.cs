@@ -3,7 +3,8 @@ using System.Collections.Generic;
 
 namespace OCCPort
 {
-    internal class Graphic3d_CView
+    internal class Graphic3d_CView: Graphic3d_DataStructureManager
+
     {
         internal void DisplayedStructures(out Graphic3d_MapOfStructure[] aSetOfStructures)
         {
@@ -12,12 +13,12 @@ namespace OCCPort
 
         internal void Invalidate()
         {
-            throw new NotImplementedException();
+            
         }
 
-        internal bool IsDefined()
+        public virtual bool IsDefined()
         {
-            throw new NotImplementedException();
+            return true;
         }
 
         internal Bnd_Box MinMaxValues()

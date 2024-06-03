@@ -111,14 +111,24 @@ namespace OCCPort
             ImmediateUpdate();
         }
 
-        private void Scale(Graphic3d_Camera aCamera, double v1, double v2)
+        private void Scale(Graphic3d_Camera theCamera, double theSizeXv, double theSizeYv)
         {
-            throw new NotImplementedException();
+            var anAspect = theCamera.Aspect();
+            if (anAspect > 1.0)
+            {
+                theCamera.SetScale(Math.Max(theSizeXv / anAspect, theSizeYv));
+            }
+            else
+            {
+                theCamera.SetScale(Math.Max(theSizeXv, theSizeYv * anAspect));
+            }
+            Invalidate();
+
         }
 
-     
 
-    private void Translate(Graphic3d_Camera theCamera, double theDXv, double theDYv)
+
+        private void Translate(Graphic3d_Camera theCamera, double theDXv, double theDYv)
         {
             gp_Pnt aCenter = theCamera.Center();
             gp_Dir aDir = theCamera.Direction();

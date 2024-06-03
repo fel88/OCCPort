@@ -18,8 +18,7 @@ namespace OCCPort.Tester
             V3d_View view = new V3d_View();
             view.StartRotation(0, 0);
             view.Rotation(0, 0);
-            view.Pan(0, 0,1,false);
-
+            view.Pan(0, 0, 1, false);
         }
     }
 }

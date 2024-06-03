@@ -61,10 +61,19 @@ namespace OCCPort
             myFOVy = (45.0);
             myFOVx = (45.0);
             myFOV2d = (180.0);
-            /*myFOVyTan(Tan(DTR_HALF * 45.0)),
-            myZNear(DEFAULT_ZNEAR),
-            myZFar(DEFAULT_ZFAR),
-            myAspect(1.0),
+
+            // (degrees -> radians) * 0.5
+            const double DTR_HALF = 0.5 * 0.0174532925;
+
+            // default property values
+            const double DEFAULT_ZNEAR = 0.001;
+            const double DEFAULT_ZFAR = 3000.0;
+
+            myFOVyTan = (Math.Tan(DTR_HALF * 45.0));
+
+            myZNear = (DEFAULT_ZNEAR);
+            myZFar = (DEFAULT_ZFAR);
+            myAspect = (1.0);/*
             myIsZeroToOneDepth(false),
             myScale(1000.0),
             myZFocus(1.0),
@@ -246,14 +255,77 @@ namespace OCCPort
             throw new NotImplementedException();
         }
 
-        internal void SetScale(object value)
+        internal void SetScale(double theScale)
         {
-            throw new NotImplementedException();
+            if (Scale() == theScale)
+            {
+                return;
+            }
+
+            myScale = theScale;
+
+            switch (myProjType)
+            {
+                case Projection.Projection_Perspective:
+                case Projection.Projection_Stereo:
+                case Projection.Projection_MonoLeftEye:
+                case Projection.Projection_MonoRightEye:
+                    {
+                        var aDistance = theScale * 0.5 / myFOVyTan;
+                        SetDistance(aDistance);
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            InvalidateProjection();
+
         }
 
-        internal double Scale()
+        private void InvalidateProjection()
         {
-            throw new NotImplementedException();
+            myMatricesD.ResetProjection();
+            myMatricesF.ResetProjection();
+            //myWorldViewProjState.ProjectionState() = (Standard_Size)Standard_Atomic_Increment(&THE_STATE_COUNTER);
+
+        }
+
+        private void SetDistance(double theDistance)
+        {
+            if (myDistance == theDistance)
+            {
+                return;
+            }
+
+            gp_Pnt aCenter = Center();
+            myDistance = theDistance;
+            myEye = new gp_Pnt(aCenter.XYZ() - myDirection.XYZ() * myDistance);
+            InvalidateOrientation();
+
+        }
+
+        public double Scale()
+        {
+            switch (myProjType)
+            {
+                case Projection.Projection_Orthographic:
+                    return myScale;
+
+                // case Projection_Perspective  :
+                // case Projection_Stereo       :
+                // case Projection_MonoLeftEye  :
+                // case Projection_MonoRightEye :
+                default:
+                    return Distance() * 2.0 * myFOVyTan;
+            }
+
+        }
+
+        internal double Aspect()
+        {
+            return myAspect;
+
         }
     }
     //! Identifies the type of a geometric transformation.

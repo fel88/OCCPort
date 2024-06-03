@@ -8,5 +8,10 @@ namespace OCCPort
         {
             
         }
+
+        internal void ResetProjection()
+        {
+            
+        }
     }
 }
