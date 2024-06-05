@@ -178,7 +178,7 @@ namespace OCCPort
             return loc;
         }
 
-        internal void Transforms(gp_XYZ theCoord)
+        internal void Transforms(ref gp_XYZ theCoord)
         {
             theCoord.Multiply(matrix);
             if (scale != 1.0)

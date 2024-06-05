@@ -75,8 +75,8 @@ namespace OCCPort
         }
         public void Pan(int theDXp,
                      int theDYp,
-                     double theZoomFactor,
-                     bool theToStart)
+                     double theZoomFactor = 1,
+                     bool theToStart = true)
         {
             Panning(Convert(theDXp), Convert(theDYp), theZoomFactor, theToStart);
         }
@@ -287,6 +287,28 @@ namespace OCCPort
 
             return aValue;
         }
+
+        public gp_Pnt Eye()
+        {
+            var r = Camera().Eye();
+            return r;
+        }
+        public gp_Pnt At()
+        {
+            var r = Camera().Center();
+            return r;
+        }
+        public gp_Dir Up()
+        {
+            var r = Camera().Up();
+            return r;
+        }
+        public double ViewX()
+        {
+            var r = Camera().ViewDimensions().X();
+            return r;
+        }
+
         double DEUXPI = (2.0 * Math.PI);
         //=============================================================================
         //function : Rotate
@@ -501,6 +523,11 @@ namespace OCCPort
 
             Width = aViewDims.X();
             Height = aViewDims.Y();
+        }
+
+        public void MoveTo(int x, int y)
+        {
+            throw new NotImplementedException();
         }
     }
 

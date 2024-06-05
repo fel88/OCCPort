@@ -1,6 +1,6 @@
 ﻿namespace OCCPort
 {
-    internal class gp_Vec
+    public struct gp_Vec
     {
         gp_XYZ coord;
         //! Multiplies a vector by a scalar

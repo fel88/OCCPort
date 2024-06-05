@@ -74,8 +74,8 @@ namespace OCCPort
             myZNear = (DEFAULT_ZNEAR);
             myZFar = (DEFAULT_ZFAR);
             myAspect = (1.0);/*
-            myIsZeroToOneDepth(false),
-            myScale(1000.0),
+            myIsZeroToOneDepth(false),*/
+            myScale = (1000.0);/*
             myZFocus(1.0),
             myZFocusType(FocusType_Relative),
             myIOD(0.05),

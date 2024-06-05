@@ -2,24 +2,31 @@
 
 namespace OCCPort
 {
-    internal class gp_Dir
+    public struct gp_Dir
     {
         private gp_XYZ coord;
         //! Creates a direction corresponding to X axis.
-        public gp_Dir()
-        {
-            coord = new gp_XYZ(1.0, 0.0, 0.0);
-        }
+        
 
         public static gp_Dir operator ^(gp_Dir v, gp_Dir theRight)
         {
-
             return v.Crossed(theRight);
         }
+
         //! Normalizes the vector theV and creates a direction. Raises ConstructionError if theV.Magnitude() <= Resolution.
         public gp_Dir(gp_Vec theV)
         {
-            //coord=new gp_XYZ (theV.x)
+            gp_XYZ aXYZ = theV.XYZ();
+            double aX = aXYZ.X();
+            double aY = aXYZ.Y();
+            double aZ = aXYZ.Z();
+            double aD = Math.Sqrt(aX * aX + aY * aY + aZ * aZ);
+            //Standard_ConstructionError_Raise_if(aD <= gp::Resolution(), "gp_Dir() - input vector has zero norm");
+            coord = new gp_XYZ();
+            coord.SetX(aX / aD);
+            coord.SetY(aY / aD);
+            coord.SetZ(aZ / aD);
+
         }
         //! Normalizes the vector theV and creates a direction. Raises ConstructionError if theV.Magnitude() <= Resolution.
         public gp_Dir(gp_Dir theV)
@@ -27,9 +34,18 @@ namespace OCCPort
             coord = new gp_XYZ(theV.coord);
         }
         //! Creates a direction from a triplet of coordinates. Raises ConstructionError if theCoord.Modulus() <= Resolution from gp.
-        public gp_Dir(gp_XYZ theCoord)
+        public gp_Dir(gp_XYZ theXYZ)
         {
-            coord = new gp_XYZ(theCoord);
+            double aX = theXYZ.X();
+            double aY = theXYZ.Y();
+            double aZ = theXYZ.Z();
+            double aD = Math.Sqrt(aX * aX + aY * aY + aZ * aZ);
+            //Standard_ConstructionError_Raise_if(aD <= gp::Resolution(), "gp_Dir() - input vector has zero norm");
+            coord = new gp_XYZ();
+            coord.SetX(aX / aD);
+            coord.SetY(aY / aD);
+            coord.SetZ(aZ / aD);
+
         }
 
         //! Creates a direction with its 3 cartesian coordinates. Raises ConstructionError if Sqrt(theXv*theXv + theYv*theYv + theZv*theZv) <= Resolution
@@ -40,7 +56,13 @@ namespace OCCPort
         //! exception ConstructionError.
         public gp_Dir(double theXv, double theYv, double theZv)
         {
-            coord = new gp_XYZ(theXv, theYv, theZv);
+            double aD = Math.Sqrt(theXv * theXv + theYv * theYv + theZv * theZv);
+            //Standard_ConstructionError_Raise_if(aD <= gp::Resolution(), "gp_Dir() - input vector has zero norm");
+            coord = new gp_XYZ();
+            coord.SetX(theXv / aD);
+            coord.SetY(theYv / aD);
+            coord.SetZ(theZv / aD);
+
         }
 
         //! for this unit vector, returns  its three coordinates as a number triplea.

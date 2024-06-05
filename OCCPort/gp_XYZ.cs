@@ -3,7 +3,7 @@ using System.ComponentModel;
 
 namespace OCCPort
 {
-    public class gp_XYZ
+    public struct gp_XYZ
     {
         private double x;
         private double y;
@@ -181,6 +181,17 @@ namespace OCCPort
             x = aXresult;
             y = anYresult;
         }
+
+
+        //! Assigns the given value to the X coordinate
+        public void SetX(double theX) { x = theX; }
+
+        //! Assigns the given value to the Y coordinate
+        public void SetY(double theY) { y = theY; }
+
+        //! Assigns the given value to the Z coordinate
+        public void SetZ(double theZ) { z = theZ; }
+
 
         public gp_XYZ(double v1, double v2, double v3)
         {

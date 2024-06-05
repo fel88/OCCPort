@@ -64,7 +64,7 @@ namespace OCCPort
                 coord.Reverse();
                 coord.Add(T.TranslationPart());
             }
-            else { T.Transforms(coord); }
+            else { T.Transforms(ref coord); }
         }
     }
 }
