@@ -8,6 +8,7 @@ namespace OCCPort.Tester
     public class GravityCameraViewManager : CameraViewManager
     {
         OCCPort.V3d_View view = new V3d_View();
+        public OCCPort.V3d_View View => view;
         public override void Update()
         {
             
@@ -55,6 +56,7 @@ namespace OCCPort.Tester
         bool isDrag;
         private void Control_MouseWheel(object sender, MouseEventArgs e)
         {
+            view.Zoom(0, 0, e.Delta / 8, 0);
             return;
             float zoomK = 20;
             var cur = Control.PointToClient(Cursor.Position);
