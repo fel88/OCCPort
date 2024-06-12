@@ -27,7 +27,7 @@ namespace OCCPort.Tester
             evwrapper = new EventWrapperGlControl(glControl);
 
             glControl.Paint += Gl_Paint;
-            ViewManager = new GravityCameraViewManager();
+            ViewManager = GravityViewManager = new GravityCameraViewManager();
             ViewManager.Attach(evwrapper, camera1);
 
             Controls.Add(glControl);
@@ -35,7 +35,7 @@ namespace OCCPort.Tester
 
         }
 
-
+        GravityCameraViewManager GravityViewManager;
         public CameraViewManager ViewManager;
         Camera camera1 = new Camera() { IsOrtho = true };
         private EventWrapperGlControl evwrapper;
@@ -152,6 +152,13 @@ namespace OCCPort.Tester
         private void timer1_Tick(object sender, EventArgs e)
         {
             glControl.Invalidate();
+        }
+
+        private void toolStripButton1_Click(object sender, EventArgs e)
+        {
+            GravityViewManager.View.StartRotation(glControl.Width / 2, glControl.Height / 2);
+            GravityViewManager.View.Rotation(glControl.Width / 2, glControl.Height / 2 - 20);
+
         }
     }
 }
