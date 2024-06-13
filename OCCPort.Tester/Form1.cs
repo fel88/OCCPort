@@ -1,4 +1,5 @@
-﻿using OpenTK;
+﻿using AutoDialog;
+using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using System;
 using System.ComponentModel;
@@ -242,6 +243,32 @@ namespace OCCPort.Tester
 		private void toolStripButton6_Click(object sender, EventArgs e)
 		{
 			GravityViewManager.View.myView.Items.Clear();
+		}
+
+		private void toolStripButton7_Click(object sender, EventArgs e)
+		{
+			var d = DialogHelpers.StartDialog();
+			d.Text = "New box";
+			d.AddNumericField("w", "Width", 50);
+			d.AddNumericField("l", "Length", 50);
+			d.AddNumericField("h", "Height", 50);
+
+			if (!d.ShowDialog())
+				return;
+
+			var w = d.GetNumericField("w");
+			var h = d.GetNumericField("h");
+			var l = d.GetNumericField("l");
+			gp_Pnt p1 = new gp_Pnt(0, 0, 0);
+			gp_Pnt p2 = new gp_Pnt(w, h, l);
+			BRepPrimAPI_MakeBox box = new BRepPrimAPI_MakeBox(p1, p2);
+			box.Build();
+			var solid = box.Solid();
+			var shape = new AIS_Shape(solid);
+			//myAISContext()->Display(shape, Standard_True);
+			//	myAISContext()->SetDisplayMode(shape, AIS_Shaded, false);
+			//auto hn = GetHandle(*shape);
+			//hh->FromObjHandle(hn);
 		}
 	}
 }

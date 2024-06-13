@@ -157,7 +157,7 @@ namespace OCCPort
             }
         }
 
-        internal void CrossCross(gp_Dir theV1, gp_Dir theV2)
+        public void CrossCross(gp_Dir theV1, gp_Dir theV2)
         {
             coord.CrossCross(theV1.coord, theV2.coord);
             var aD = coord.Modulus();
@@ -165,7 +165,7 @@ namespace OCCPort
             coord.Divide(aD);
         }
 
-        internal void Cross(gp_Dir theRight)
+        public void Cross(gp_Dir theRight)
         {
             coord.Cross(theRight.coord);
             var aD = coord.Modulus();
