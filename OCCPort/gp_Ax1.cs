@@ -2,7 +2,7 @@
 
 namespace OCCPort
 {
-    internal class gp_Ax1
+    internal struct gp_Ax1
     {       
 
         gp_Pnt loc;

@@ -6,12 +6,22 @@ namespace OCCPort
     {
 
 
-        protected
+		public
 
   BVH_VecNt myMinPoint; //!< Minimum point of bounding box
-        protected BVH_VecNt myMaxPoint; //!< Maximum point of bounding box
+		public BVH_VecNt myMaxPoint; //!< Maximum point of bounding box
         protected bool myIsInited; //!< Is bounding box initialized?
 
+		public Graphic3d_BndBox3d()
+		{
+			myIsInited = false;
+		}
+		public Graphic3d_BndBox3d(BVH_VecNt min, BVH_VecNt max)
+		{
+			myIsInited = true;
+			myMaxPoint = max;
+			myMinPoint = min;
+		}
 
 
         //! Returns minimum point of bounding box.
@@ -21,9 +31,8 @@ namespace OCCPort
         public BVH_VecNt CornerMax() { return myMaxPoint; }
 
 
-        internal bool IsValid()
-        {
-            throw new NotImplementedException();
-        }
+		//! Is bounding box valid?
+		public bool IsValid() { return myIsInited; }
+
     }
 }

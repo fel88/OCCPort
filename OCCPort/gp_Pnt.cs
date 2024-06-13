@@ -2,13 +2,13 @@
 
 namespace OCCPort
 {
-    public class gp_Pnt
+    public struct gp_Pnt
     {
         public gp_XYZ coord;
 
 
         //! Creates a point with zero coordinates.
-        public gp_Pnt() { }
+        //public gp_Pnt() { }
 
         //! Creates a point from a XYZ object.
         public gp_Pnt(gp_XYZ theCoord)

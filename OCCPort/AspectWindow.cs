@@ -1,6 +1,6 @@
 ﻿namespace OCCPort
 {
-    public class AspectWindow
+    public class Aspect_Window
     {
         public int Width = 800;
         public int Height = 600;

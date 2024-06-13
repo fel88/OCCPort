@@ -1,6 +1,6 @@
 ﻿namespace OCCPort
 {
-    internal class Graphic3d_DataStructureManager
+    public class Graphic3d_DataStructureManager
     {
     }
 }

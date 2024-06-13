@@ -9,7 +9,7 @@ namespace OCCPort
             return myCStructure;
         }
 
-        Graphic3d_CStructure myCStructure;
+		public Graphic3d_CStructure myCStructure;
 
 
         //! Returns the highlight indicator for this structure.
