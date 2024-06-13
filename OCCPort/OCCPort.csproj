@@ -50,6 +50,7 @@
     <Compile Include="gp_Ax3.cs" />
     <Compile Include="gp_Mat.cs" />
     <Compile Include="gp_Trsf.cs" />
+    <Compile Include="gp_TrsfForm.cs" />
     <Compile Include="gp_Vec.cs" />
     <Compile Include="gp_XYZ.cs" />
     <Compile Include="Graphic3d_BndBox3d.cs" />
@@ -57,11 +58,19 @@
     <Compile Include="Graphic3d_CView.cs" />
     <Compile Include="Graphic3d_DataStructureManager.cs" />
     <Compile Include="Graphic3d_MapOfStructure.cs" />
+    <Compile Include="Graphic3d_Mat4d.cs" />
     <Compile Include="Graphic3d_Structure.cs" />
     <Compile Include="Graphic3d_TransformPers.cs" />
+    <Compile Include="Graphic3d_Vec3d.cs" />
+    <Compile Include="Graphic3d_Vec4d.cs" />
     <Compile Include="Graphic3d_Vertex.cs" />
+    <Compile Include="NCollection_Mat4.cs" />
+    <Compile Include="NCollection_Vec3.cs" />
+    <Compile Include="NCollection_Vec4.cs" />
     <Compile Include="Precision.cs" />
     <Compile Include="TransformMatrices.cs" />
+    <Compile Include="V3d.cs" />
+    <Compile Include="V3d_TypeOfOrientation.cs" />
     <Compile Include="V3d_View.cs" />
     <Compile Include="gp_Dir.cs" />
     <Compile Include="gp_Pnt.cs" />

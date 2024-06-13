@@ -4,9 +4,6 @@ namespace OCCPort
 {
     internal class Precision
     {
-        internal static double Confusion()
-        {
-            throw new NotImplementedException();
-        }
-    }
+		public static double Confusion() { return 1e-7; }
+	}
 }

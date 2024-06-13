@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OCCPort
 {
-    public class V3d_View
+	public class V3d_View
     {
         public void Rotation(int X,
                           int Y)
@@ -81,11 +81,11 @@ namespace OCCPort
             Panning(Convert(theDXp), Convert(theDYp), theZoomFactor, theToStart);
         }
 
-        public void Panning(double theDXv,
-                         double theDYv,
-                         double theZoomFactor,
-                         bool theToStart)
-        {
+		public void Panning(double theDXv,
+					  double theDYv,
+					  double theZoomFactor = 1,
+					  bool theToStart = true)
+		{
             //Standard_ASSERT_RAISE(theZoomFactor > 0.0, "Bad zoom factor");
 
             var aCamera = Camera();
@@ -529,6 +529,57 @@ namespace OCCPort
         {
             throw new NotImplementedException();
         }
-    }
 
+		public void SetProj(V3d_TypeOfOrientation theOrientation,
+
+						 bool theIsYup = false)
+		{
+			Graphic3d_Vec3d anUp = theIsYup ? new Graphic3d_Vec3d(0.0, 1.0, 0.0) : new Graphic3d_Vec3d(0.0, 0.0, 1.0);
+			if (theIsYup)
+			{
+				if (theOrientation == V3d_TypeOfOrientation.V3d_Ypos
+				 || theOrientation == V3d_TypeOfOrientation.V3d_Yneg)
+				{
+					anUp.SetValues(0.0, 0.0, -1.0);
+				}
+			}
+			else
+			{
+				if (theOrientation == V3d_TypeOfOrientation.V3d_Zpos)
+				{
+					anUp.SetValues(0.0, 1.0, 0.0);
+				}
+				else if (theOrientation == V3d_TypeOfOrientation.V3d_Zneg)
+				{
+					anUp.SetValues(0.0, -1.0, 0.0);
+				}
+			}
+
+			gp_Dir aBck = V3d.GetProjAxis(theOrientation);
+
+			// retain camera panning from origin when switching projection
+			Graphic3d_Camera aCamera = Camera();
+			gp_Pnt anOriginVCS = aCamera.ConvertWorld2View(gp.Origin());
+
+			double aNewDist = aCamera.Eye().Distance(new gp_Pnt(0, 0, 0));
+			aCamera.SetEyeAndCenter(new gp_Pnt(new gp_XYZ(0, 0, 0) + aBck.XYZ() * aNewDist),
+				new gp_Pnt(new gp_XYZ(0, 0, 0)));
+			aCamera.SetDirectionFromEye(-aBck);
+			aCamera.SetUp(new gp_Dir(anUp.x(), anUp.y(), anUp.z()));
+			aCamera.OrthogonalizeUp();
+
+			Panning(anOriginVCS.X(), anOriginVCS.Y());
+
+			ImmediateUpdate();
+		}
+		public void FrontView()
+		{
+			SetProj(V3d_TypeOfOrientation.V3d_Yneg);
+		}
+
+		public void TopView()
+		{
+			SetProj(V3d_TypeOfOrientation.V3d_Zpos);
+		}
+	}
 }
