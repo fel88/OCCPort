@@ -160,5 +160,15 @@ namespace OCCPort.Tester
             GravityViewManager.View.Rotation(glControl.Width / 2, glControl.Height / 2 - 20);
 
         }
-    }
+
+		private void frontToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			GravityViewManager.FrontView();
+		}
+
+		private void topToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			GravityViewManager.TopView();
+		}
+	}
 }

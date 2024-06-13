@@ -11,16 +11,13 @@ namespace OCCPort.Tester
         public OCCPort.V3d_View View => view;
         public override void Update()
         {
-            
-
             var cc1 = view.Eye();
             var cc2 = view.At();
             var cc3 = view.Up().XYZ();
             Camera.CamFrom = new Vector3d(cc1.X(), cc1.Y(), cc1.Z());
             Camera.CamTo = new Vector3d(cc2.X(), cc2.Y(), cc2.Z());
             Camera.CamUp = new Vector3d(cc3.X(), cc3.Y(), cc3.Z());
-            //Camera.OrthoWidth = view.ViewX();
-
+            Camera.OrthoWidth = view.ViewX();
         }
 
         public float AlongRotate = 0;
@@ -199,5 +196,14 @@ namespace OCCPort.Tester
                // _currentTool.MouseUp(e);
             }
         }
-    }
+
+		internal void FrontView()
+		{
+			view.FrontView();
+		}
+		internal void TopView()
+		{
+			view.TopView();
+		}
+	}
 }
