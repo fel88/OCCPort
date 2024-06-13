@@ -41,15 +41,27 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AIS_Shape.cs" />
     <Compile Include="AspectWindow.cs" />
     <Compile Include="Aspect_FrustumLRBT.cs" />
     <Compile Include="Bnd_Box.cs" />
+    <Compile Include="BRepBuilderAPI_Command.cs" />
+    <Compile Include="BRepBuilderAPI_MakeShape.cs" />
+    <Compile Include="BRepPrimAPI_MakeBox.cs" />
+    <Compile Include="BRepPrim_Builder.cs" />
+    <Compile Include="BRepPrim_GWedge.cs" />
+    <Compile Include="BRepPrim_Wedge.cs" />
+    <Compile Include="BRep_Builder.cs" />
     <Compile Include="BVH_Box.cs" />
     <Compile Include="BVH_VecNt.cs" />
+    <Compile Include="ElSLib.cs" />
     <Compile Include="gp.cs" />
     <Compile Include="gp_Ax1.cs" />
+    <Compile Include="gp_Ax2.cs" />
     <Compile Include="gp_Ax3.cs" />
+    <Compile Include="gp_Lin.cs" />
     <Compile Include="gp_Mat.cs" />
+    <Compile Include="gp_Pln.cs" />
     <Compile Include="gp_Trsf.cs" />
     <Compile Include="gp_TrsfForm.cs" />
     <Compile Include="gp_Vec.cs" />
@@ -73,6 +85,14 @@
     <Compile Include="NCollection_Vec4.cs" />
     <Compile Include="OpenGl_Structure.cs" />
     <Compile Include="Precision.cs" />
+    <Compile Include="TopoDS.cs" />
+    <Compile Include="TopoDS_Edge.cs" />
+    <Compile Include="TopoDS_Face.cs" />
+    <Compile Include="TopoDS_Shape.cs" />
+    <Compile Include="TopoDS_Shell.cs" />
+    <Compile Include="TopoDS_Solid.cs" />
+    <Compile Include="TopoDS_Vertex.cs" />
+    <Compile Include="TopoDS_Wire.cs" />
     <Compile Include="TransformMatrices.cs" />
     <Compile Include="V3d.cs" />
     <Compile Include="V3d_TypeOfOrientation.cs" />

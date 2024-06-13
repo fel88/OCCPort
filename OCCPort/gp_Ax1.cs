@@ -2,7 +2,7 @@
 
 namespace OCCPort
 {
-    internal struct gp_Ax1
+    public struct gp_Ax1
     {       
 
         gp_Pnt loc;
@@ -14,7 +14,7 @@ namespace OCCPort
             this.vdir = aYAxis;
         }
 
-        internal gp_Dir Direction()
+        public gp_Dir Direction()
         {
             return vdir;
         }

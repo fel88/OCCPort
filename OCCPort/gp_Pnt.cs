@@ -66,17 +66,22 @@ namespace OCCPort
             }
             else { T.Transforms(ref coord); }
         }
-		internal void SetX(double v)
+		public void SetX(double v)
 		{
 			throw new NotImplementedException();
 		}
 
-		internal void SetY(double v)
+		public void SetY(double v)
 		{
 			throw new NotImplementedException();
 		}
 
-		internal void SetZ(double v)
+		public void SetZ(double v)
+		{
+			throw new NotImplementedException();
+		}
+
+		public void Translate(object value)
 		{
 			throw new NotImplementedException();
 		}
