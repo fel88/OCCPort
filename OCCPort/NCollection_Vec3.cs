@@ -1,4 +1,6 @@
-﻿namespace OCCPort
+﻿using System;
+
+namespace OCCPort
 {
 	internal class NCollection_Vec3
 	{
@@ -33,8 +35,23 @@
 
 		public void Normalize()
 		{
-
+			double aModulus = Modulus();
+			if (aModulus != (0.0)) // just avoid divide by zero
+			{
+				v[0] = x() / aModulus;
+				v[1] = y() / aModulus;
+				v[2] = z() / aModulus;
+			}
 		}
+
+
+		//! Computes the vector modulus (magnitude, length).
+		double Modulus()
+		{
+			return Math.Sqrt(x() * x() + y() * y() + z() * z());
+		}
+
+
 		internal double x()
 		{
 			return v[0];

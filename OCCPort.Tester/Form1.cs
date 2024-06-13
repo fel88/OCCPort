@@ -27,13 +27,22 @@ namespace OCCPort.Tester
             evwrapper = new EventWrapperGlControl(glControl);
 
             glControl.Paint += Gl_Paint;
-            ViewManager = GravityViewManager = new GravityCameraViewManager();
+			ViewManager = GravityViewManager = new GravityCameraViewManager(glControl);
             ViewManager.Attach(evwrapper, camera1);
-
+			GravityViewManager.View.myView.Items.Add(new Graphic3d_MapOfStructure(
+				new Graphic3d_Structure()
+				{
+					myCStructure = new OpenGl_Structure()
+					{
+						visible = 1,
+						myBndBox = new Graphic3d_BndBox3d(new BVH_VecNt(0, 0, 0),
+							 new BVH_VecNt(50, 50, 50))
+					}
+				}));
             Controls.Add(glControl);
             glControl.Dock = DockStyle.Fill;
-
         }
+
 
         GravityCameraViewManager GravityViewManager;
         public CameraViewManager ViewManager;
@@ -56,6 +65,10 @@ namespace OCCPort.Tester
 
         void Redraw()
         {
+
+			GravityViewManager.View.MyWindow.Width = glControl.Width;
+			GravityViewManager.View.MyWindow.Height = glControl.Height;
+
             ViewManager.Update();
 
             GL.ClearColor(Color.LightGray);
@@ -169,6 +182,66 @@ namespace OCCPort.Tester
 		private void topToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			GravityViewManager.TopView();
+		}
+
+		private void toolStripButton2_Click(object sender, EventArgs e)
+		{
+			var d = AutoDialog.DialogHelpers.StartDialog();
+			d.AddBoolField("zoomInPoint", "Zoom in point", GravityViewManager.ZoomInPointMode);
+			if (!d.ShowDialog())
+				return;
+
+			GravityViewManager.ZoomInPointMode = d.GetBoolField("zoomInPoint");
+		}
+
+		private void toolStripButton3_Click(object sender, EventArgs e)
+		{
+			GravityViewManager.View.FrontView();
+			var res1 = GravityViewManager.View.Convert(40);
+			var d1 = GravityViewManager.View.Camera().Distance();
+
+
+
+
+
+			GravityViewManager.View.Camera().SetScale(3000);
+			var res2 = GravityViewManager.View.Convert(40);
+			var d2 = GravityViewManager.View.Camera().Distance();
+			GravityViewManager.View.Rotate(0, 0.5, 0, 0, 0, 0, true);
+			var res3 = GravityViewManager.View.Convert(40);
+
+		}
+
+		private void toolStripButton4_Click(object sender, EventArgs e)
+		{
+			GravityViewManager.View.FrontView();
+			GravityViewManager.View.Camera().SetScale(1000);
+			GravityViewManager.View.Rotate(0, 0.5, 0, 0, 0, 0, true);
+		}
+
+		private void toolStripButton5_Click(object sender, EventArgs e)
+		{
+			var proxy = GravityViewManager.View;
+
+			//proxy.Camera().SetScale(1000);
+			proxy.FrontView();
+
+			proxy.StartZoomAtPoint(glControl.Width / 2, glControl.Height / 3);
+			var p = new System.Drawing.Point(0, 0);
+			double delta = (double)(120) / (15 * 8);
+			int x = p.X;
+			int y = p.Y;
+			int x1 = (int)(p.X + glControl.Width * delta / 100);
+			int y1 = (int)(p.Y + glControl.Height * delta / 100);
+			proxy.ZoomAtPoint(x, y, x1, y1);
+
+			var res1 = proxy.Convert(40);
+
+		}
+
+		private void toolStripButton6_Click(object sender, EventArgs e)
+		{
+			GravityViewManager.View.myView.Items.Clear();
 		}
 	}
 }

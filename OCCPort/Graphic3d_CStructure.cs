@@ -2,11 +2,11 @@
 
 namespace OCCPort
 {
-    public class Graphic3d_CStructure
+	public abstract class Graphic3d_CStructure
     {
-        protected Graphic3d_BndBox3d myBndBox;
+		public Graphic3d_BndBox3d myBndBox;
         internal int highlight;
-        internal int visible;
+		public int visible;
 
         public bool IsInfinite { get; internal set; }
 

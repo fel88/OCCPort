@@ -24,23 +24,36 @@ namespace OCCPort
 		}
 
 
-
 		public Graphic3d_Mat4d Orientation { get; internal set; }
+
+		//! Invalidate orientation.
+		public void ResetOrientation() { myIsOrientationValid = false; }
+
+		//! Invalidate projection.
+		public void ResetProjection() { myIsProjectionValid = false; }
 
 
 
 		//! Return true if Orientation was not invalidated.
 		public bool IsOrientationValid() { return myIsOrientationValid; }
 
+		//! Return true if Projection was not invalidated.
+		public bool IsProjectionValid() { return myIsProjectionValid; }
 
-		internal void ResetOrientation()
+		public NCollection_Mat4 MProjection;
+		public NCollection_Mat4 LProjection;
+		public NCollection_Mat4 RProjection;
+
+		//! Initialize projection.
+		public void InitProjection()
 		{
-
-		}
-
-		internal void ResetProjection()
-		{
-
+			myIsProjectionValid = true;
+			MProjection = new NCollection_Mat4();
+			LProjection = new NCollection_Mat4();
+			RProjection = new NCollection_Mat4();
+			MProjection.InitIdentity();
+			LProjection.InitIdentity();
+			RProjection.InitIdentity();
 		}
 	}
 }

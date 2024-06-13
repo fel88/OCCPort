@@ -51,8 +51,23 @@ namespace OCCPort.Tester
         }
         Point startDrag;
         bool isDrag;
+		GLControl glControl;
+		public bool ZoomInPointMode = true;
         private void Control_MouseWheel(object sender, MouseEventArgs e)
         {
+			if (ZoomInPointMode)
+			{
+				var p = e.Location;
+
+				View.StartZoomAtPoint(p.X, p.Y);
+				double delta = (double)(e.Delta) / (15 * 8);
+				int x = p.X;
+				int y = p.Y;
+				int x1 = (int)(p.X + glControl.Width * delta / 100);
+				int y1 = (int)(p.Y + glControl.Height * delta / 100);
+				View.ZoomAtPoint(x, y, x1, y1);
+			}
+			else
             view.Zoom(0, 0, e.Delta / 8, 0);
             return;
             float zoomK = 20;
@@ -185,6 +200,11 @@ namespace OCCPort.Tester
         }
         protected bool drag = false;
         protected bool drag2 = false;
+
+		public GravityCameraViewManager(GLControl glControl)
+		{
+			this.glControl = glControl;
+		}
 
         private void Control_MouseUp(object sender, MouseEventArgs e)
         {

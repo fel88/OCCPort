@@ -3,8 +3,128 @@ using System.Runtime.InteropServices.ComTypes;
 
 namespace OCCPort
 {
-	internal class Graphic3d_Camera
+	public class Graphic3d_Camera
 	{
+		Graphic3d_Mat4d myCustomProjMatM;
+		Graphic3d_Mat4d myCustomProjMatL;
+		Graphic3d_Mat4d myCustomProjMatR;
+		Graphic3d_Mat4d myCustomHeadToEyeMatL;
+		Graphic3d_Mat4d myCustomHeadToEyeMatR;
+		Aspect_FrustumLRBT myCustomFrustumL;
+		Aspect_FrustumLRBT myCustomFrustumR;
+
+		public void stereoEyeProj(NCollection_Mat4 theOutMx,
+
+											   Aspect_FrustumLRBT theLRBT,
+											   double theNear,
+
+											   double theFar,
+
+											   double theIOD,
+
+											   double theZFocus,
+
+											   Aspect_Eye theEyeIndex)
+		{
+			var aDx = theEyeIndex ==Aspect_Eye.  Aspect_Eye_Left ? (0.5) * theIOD : (-0.5) * theIOD;
+			var aDXStereoShift = aDx * theNear / theZFocus;
+
+			// construct eye projection matrix
+			Aspect_FrustumLRBT aLRBT = theLRBT;
+			aLRBT.Left = theLRBT.Left + aDXStereoShift;
+			aLRBT.Right = theLRBT.Right + aDXStereoShift;
+			perspectiveProj(theOutMx, aLRBT, theNear, theFar);
+		}
+
+
+		public void orthoProj(NCollection_Mat4 theOutMx,
+
+											 Aspect_FrustumLRBT theLRBT,
+											 double theNear,
+
+											 double theFar)
+		{
+			// row 0
+			theOutMx.ChangeValue(0, 0) .Assign( (2.0) / (theLRBT.Right - theLRBT.Left));
+			theOutMx.ChangeValue(0, 1) .Assign (0.0);
+			theOutMx.ChangeValue(0, 2).Assign(0.0);
+			theOutMx.ChangeValue(0, 3).Assign ( -(theLRBT.Right + theLRBT.Left) / (theLRBT.Right - theLRBT.Left));
+
+			// row 1
+			theOutMx.ChangeValue(1, 0).Assign(0.0);
+			theOutMx.ChangeValue(1, 1).Assign((2.0) / (theLRBT.Top - theLRBT.Bottom));
+			theOutMx.ChangeValue(1, 2).Assign(0.0);
+			theOutMx.ChangeValue(1, 3).Assign(-(theLRBT.Top + theLRBT.Bottom) / (theLRBT.Top - theLRBT.Bottom));
+
+			// row 2
+			theOutMx.ChangeValue(2, 0).Assign(0.0);
+			theOutMx.ChangeValue(2, 1).Assign(0.0);
+			if (myIsZeroToOneDepth)
+			{
+				theOutMx.ChangeValue(2, 2).Assign((-1.0) / (theFar - theNear));
+				theOutMx.ChangeValue(2, 3).Assign(-theNear / (theFar - theNear));
+			}
+			else
+			{
+				theOutMx.ChangeValue(2, 2).Assign((-2.0) / (theFar - theNear));
+				theOutMx.ChangeValue(2, 3).Assign(-(theFar + theNear) / (theFar - theNear));
+			}
+
+			// row 3
+			theOutMx.ChangeValue(3, 0).Assign(0.0);
+			theOutMx.ChangeValue(3, 1).Assign(0.0);
+			theOutMx.ChangeValue(3, 2).Assign(0.0);
+			theOutMx.ChangeValue(3, 3).Assign(1.0);
+
+
+		}
+
+		public void perspectiveProj(NCollection_Mat4 theOutMx,
+
+										 Aspect_FrustumLRBT theLRBT,
+										 double theNear,
+
+										 double theFar)
+		{
+			// column 0
+			theOutMx.ChangeValue(0, 0, ((2.0) * theNear) / (theLRBT.Right - theLRBT.Left));
+			theOutMx.ChangeValue(1, 0, 0.0);
+			theOutMx.ChangeValue(2, 0, 0.0);
+			theOutMx.ChangeValue(3, 0, 0.0);
+
+			// column 1
+			theOutMx.ChangeValue(0, 1, 0.0);
+			theOutMx.ChangeValue(1, 1, ((2.0) * theNear) / (theLRBT.Top - theLRBT.Bottom));
+			theOutMx.ChangeValue(2, 1, 0.0);
+			theOutMx.ChangeValue(3, 1, 0.0);
+
+			// column 2
+			theOutMx.ChangeValue(0, 2).Assign((theLRBT.Right + theLRBT.Left) / (theLRBT.Right - theLRBT.Left));
+			theOutMx.ChangeValue(1, 2).Assign((theLRBT.Top + theLRBT.Bottom) / (theLRBT.Top - theLRBT.Bottom));
+			if (myIsZeroToOneDepth)
+			{
+				theOutMx.ChangeValue(2, 2).Assign(theFar / (theNear - theFar));
+			}
+			else
+			{
+				theOutMx.ChangeValue(2, 2).Assign(-(theFar + theNear) / (theFar - theNear));
+			}
+			theOutMx.ChangeValue(3, 2).Assign(-1.0);
+
+			// column 3
+			theOutMx.ChangeValue(0, 3).Assign(0.0);
+			theOutMx.ChangeValue(1, 3).Assign(0.0);
+			if (myIsZeroToOneDepth)
+			{
+				theOutMx.ChangeValue(2, 3).Assign(-(theFar * theNear) / (theFar - theNear));
+			}
+			else
+			{
+				theOutMx.ChangeValue(2, 3).Assign(-((2.0) * theFar * theNear) / (theFar - theNear));
+			}
+			theOutMx.ChangeValue(3, 3).Assign(0.0);
+		}
+
 
 
 		//! Enumerates supported monographic projections.
@@ -77,13 +197,19 @@ namespace OCCPort
             myIsZeroToOneDepth(false),*/
 			myScale = (1000.0);/*
             myZFocus(1.0),
-            myZFocusType(FocusType_Relative),
-            myIOD(0.05),
-            myIODType(IODType_Relative),
-            myIsCustomProjMatM(false),
-            myIsCustomProjMatLR(false),
-            myIsCustomFrustomLR(false)*/
+            myZFocusType(FocusType_Relative),*/
+			myIOD = (0.05);
+			myIODType = IODType.IODType_Relative;
+			myIsCustomProjMatM = (false);
+			myIsCustomProjMatLR = (false);
+			myIsCustomFrustomLR = (false);
 		}
+
+		Graphic3d_CameraTile myTile;
+		bool myIsCustomProjMatM;  //!< flag indicating usage of custom projection matrix
+		bool myIsCustomProjMatLR; //!< flag indicating usage of custom stereo projection matrices
+		bool myIsCustomFrustomLR; //!< flag indicating usage of custom stereo frustums
+
 		public gp_Dir Up()
 		{
 			return myUp;
@@ -110,13 +236,16 @@ namespace OCCPort
 		double myZFocus;     //!< Stereographic focus value.
 		FocusType myZFocusType; //!< Stereographic focus definition type.
 
+		double myIOD;     //!< Intraocular distance value.
+		IODType myIODType; //!< Intraocular distance definition type.
+
 		private gp_XYZ myAxialScale; //!< World axial scale.
 
 		//! Get camera Up direction vector.
 		//! @return Camera's Up direction vector.
 		//! Get distance of Eye from camera Center.
 		//! @return the distance.
-		double Distance() { return myDistance; }
+		public double Distance() { return myDistance; }
 
 		//! Check that the camera projection is orthographic.
 		//! @return boolean flag that indicates whether the camera's projection is
@@ -155,9 +284,21 @@ namespace OCCPort
 			return new gp_XYZ(aSizeX, aSizeY, myZFar - myZNear);
 		}
 
-		internal gp_Pnt Project(gp_Pnt aBndPnt)
+		internal gp_Pnt Project(gp_Pnt thePnt)
 		{
-			throw new NotImplementedException();
+			Graphic3d_Mat4d aViewMx = OrientationMatrix();
+			var aProjMx = ProjectionMatrix();
+
+			// use compatible type of point
+			var aPnt = safePointCast(thePnt);
+
+			aPnt = aViewMx * aPnt; // convert to view coordinate space
+			aPnt = aProjMx * aPnt; // convert to projection coordinate space
+
+			double aInvW = 1.0 / (aPnt.w());
+
+			return new gp_Pnt(aPnt.x() * aInvW, aPnt.y() * aInvW, aPnt.z() * aInvW);
+
 		}
 
 		internal void Transform(gp_Trsf theTrsf)
@@ -278,7 +419,7 @@ namespace OCCPort
 			InvalidateOrientation();
 		}
 
-		internal void SetScale(double theScale)
+		public void SetScale(double theScale)
 		{
 			if (Scale() == theScale)
 			{
@@ -341,6 +482,10 @@ namespace OCCPort
 		Graphic3d_Mat4d OrientationMatrix()
 		{
 			return UpdateOrientation(myMatricesD).Orientation;
+		}
+		NCollection_Mat4 ProjectionMatrix()
+		{
+			return UpdateProjection(myMatricesD).MProjection;
 		}
 		private TransformMatrices<double> UpdateOrientation(TransformMatrices<double> theMatrices)
 		{
@@ -436,9 +581,9 @@ namespace OCCPort
 			Graphic3d_Mat4d aViewMx = OrientationMatrix();
 
 			// use compatible type of point
-			Graphic3d_Vec4d aPnt = safePointCast(thePnt);
+			NCollection_Vec4 aPnt = safePointCast(thePnt);
 
-			//aPnt = aViewMx * aPnt; // convert to view coordinate space
+			aPnt = aViewMx * aPnt; // convert to view coordinate space
 
 			double aInvW = 1.0 / (double)(aPnt.w());
 
@@ -446,7 +591,7 @@ namespace OCCPort
 
 		}
 
-		private Graphic3d_Vec4d safePointCast(gp_Pnt thePnt)
+		private NCollection_Vec4 safePointCast(gp_Pnt thePnt)
 		{
 			double aLim = 1e15f;
 
@@ -461,7 +606,7 @@ namespace OCCPort
 				aSafePoint.SetZ(aSafePoint.Z() >= 0 ? aBigFloat : -aBigFloat);
 
 			// convert point
-			Graphic3d_Vec4d aPnt = new Graphic3d_Vec4d(aSafePoint.X(), aSafePoint.Y(), aSafePoint.Z(), 1.0);
+			NCollection_Vec4 aPnt = new NCollection_Vec4(aSafePoint.X(), aSafePoint.Y(), aSafePoint.Z(), 1.0);
 
 			return aPnt;
 
@@ -481,5 +626,194 @@ namespace OCCPort
 			// recompute up as: up = left x direction
 			return aLeft.Crossed(aDir);
 		}
+
+		
+
+		public void computeProjection(NCollection_Mat4 theProjM,
+										NCollection_Mat4 theProjL,
+										NCollection_Mat4 theProjR,
+										bool theToAddHeadToEye)
+		{
+			theProjM.InitIdentity();
+			theProjL.InitIdentity();
+			theProjR.InitIdentity();
+
+			// sets top of frustum based on FOVy and near clipping plane
+			double aScale = (myScale);
+			double aZNear = (myZNear);
+			double aZFar = (myZFar);
+			double anAspect = (myAspect);
+			double aDXHalf = 0.0, aDYHalf = 0.0;
+			if (IsOrthographic())
+			{
+				aDXHalf = aDYHalf = aScale * (0.5);
 	}
+			else
+			{
+				aDXHalf = aDYHalf = aZNear * (myFOVyTan);
+			}
+
+			if (anAspect > 1.0)
+			{
+				aDXHalf *= anAspect;
+			}
+			else
+			{
+				aDYHalf /= anAspect;
+			}
+
+			myTile = new Graphic3d_CameraTile();
+			// sets right of frustum based on aspect ratio
+			Aspect_FrustumLRBT anLRBT = new Aspect_FrustumLRBT();
+			anLRBT.Left = -aDXHalf;
+			anLRBT.Right = aDXHalf;
+			anLRBT.Bottom = -aDYHalf;
+			anLRBT.Top = aDYHalf;
+
+			double aIOD = myIODType == IODType.IODType_Relative
+			  ? (myIOD * Distance())
+			  : (myIOD);
+
+			double aFocus = myZFocusType == FocusType.FocusType_Relative
+			  ? (myZFocus * Distance())
+			  : (myZFocus);
+
+			if (myTile.IsValid())
+			{
+				double aDXFull = (2) * aDXHalf;
+				double aDYFull = (2) * aDYHalf;
+				var anOffset = myTile.OffsetLowerLeft();
+				anLRBT.Left = -aDXHalf + aDXFull * (anOffset.x()) / (myTile.TotalSize.x());
+				anLRBT.Right = -aDXHalf + aDXFull * (anOffset.x() + myTile.TileSize.x()) / (myTile.TotalSize.x());
+				anLRBT.Bottom = -aDYHalf + aDYFull * (anOffset.y()) / (myTile.TotalSize.y());
+				anLRBT.Top = -aDYHalf + aDYFull * (anOffset.y() + myTile.TileSize.y()) / (myTile.TotalSize.y());
+			}
+
+			if (myIsCustomProjMatM)
+			{
+				theProjM.ConvertFrom(myCustomProjMatM);
+			}
+
+			switch (myProjType)
+			{
+				case Projection.Projection_Orthographic:
+					{
+						if (!myIsCustomProjMatM)
+						{
+							orthoProj(theProjM, anLRBT, aZNear, aZFar);
+						}
+						break;
+					}
+				case Projection.Projection_Perspective:
+					{
+						if (!myIsCustomProjMatM)
+						{
+							perspectiveProj(theProjM, anLRBT, aZNear, aZFar);
+						}
+						break;
+					}
+				case Projection.Projection_MonoLeftEye:
+				case Projection.Projection_MonoRightEye:
+				case Projection.Projection_Stereo:
+					{
+						if (!myIsCustomProjMatM)
+						{
+							perspectiveProj(theProjM, anLRBT, aZNear, aZFar);
+						}
+						if (myIsCustomProjMatLR)
+						{
+							if (theToAddHeadToEye)
+							{
+								theProjL.ConvertFrom(myCustomProjMatL * myCustomHeadToEyeMatL);
+								theProjR.ConvertFrom(myCustomProjMatR * myCustomHeadToEyeMatR);
+							}
+							else
+							{
+								theProjL.ConvertFrom(myCustomProjMatL);
+								theProjR.ConvertFrom(myCustomProjMatR);
+							}
+						}
+						else if (myIsCustomFrustomLR)
+						{
+							anLRBT = new Aspect_FrustumLRBT(myCustomFrustumL).Multiplied(aZNear);
+							perspectiveProj(theProjL, anLRBT, aZNear, aZFar);
+
+							anLRBT = new Aspect_FrustumLRBT(myCustomFrustumR).Multiplied(aZNear);
+							perspectiveProj(theProjR, anLRBT, aZNear, aZFar);
+						}
+						else
+						{
+							stereoEyeProj(theProjL,
+										   anLRBT, aZNear, aZFar, aIOD, aFocus,
+										Aspect_Eye.Aspect_Eye_Left);
+							stereoEyeProj(theProjR,
+										   anLRBT, aZNear, aZFar, aIOD, aFocus,
+										Aspect_Eye.Aspect_Eye_Right);
+						}
+
+						if (theToAddHeadToEye
+						&& !myIsCustomProjMatLR
+						&& aIOD != (0.0))
+						{
+							// X translation to cancel parallax
+							theProjL.Translate(new NCollection_Vec3((0.5) * aIOD, (0.0), (0.0)));
+							theProjR.Translate(new NCollection_Vec3((-0.5) * aIOD, (0.0), (0.0)));
+						}
+						break;
+					}
+			}
+			if (myProjType == Projection.Projection_MonoLeftEye)
+			{
+				theProjM = theProjL;
+			}
+			else if (myProjType == Projection.Projection_MonoRightEye)
+			{
+				theProjM = theProjR;
+			}
+		}
+
+		//! Compute projection matrices.
+		//! @param theMatrices [in] the matrices data container.
+
+		TransformMatrices<T> UpdateProjection<T>(TransformMatrices<T> theMatrices)
+		{
+			if (!theMatrices.IsProjectionValid())
+			{
+				theMatrices.InitProjection();
+				computeProjection(theMatrices.MProjection, theMatrices.LProjection, theMatrices.RProjection, true);
+			}
+			return theMatrices;
+		}
+
+		public gp_Pnt ConvertProj2View(gp_Pnt thePnt)
+		{
+			var aProjMx = ProjectionMatrix();
+
+			NCollection_Mat4 aInvProj;
+
+			// this case should never happen, but...
+			if (!aProjMx.Inverted(out aInvProj))
+			{
+				return new gp_Pnt(0, 0, 0);
+			}
+
+			// use compatible type of point
+			var aPnt = safePointCast(thePnt);
+
+			aPnt = aInvProj * aPnt; // convert to view coordinate space
+
+			double aInvW = 1.0 / (aPnt.w());
+
+			return new gp_Pnt(aPnt.x() * aInvW, aPnt.y() * aInvW, aPnt.z() * aInvW);
+		}
+
+	}
+
+	//! Camera eye index within stereoscopic pair.
+	public enum Aspect_Eye
+	{
+		Aspect_Eye_Left,
+		Aspect_Eye_Right
+	};
+
 }

@@ -1,0 +1,7 @@
+diff a/OCCPort/Graphic3d_CStructure.cs b/OCCPort/Graphic3d_CStructure.cs	(rejected hunks)
+@@ -22,4 +22,5 @@ namespace OCCPort
+ 			return myTrsfPers;
+ 		}
+ 	}
++
+ }
