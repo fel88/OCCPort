@@ -5,6 +5,7 @@ using System;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -28,18 +29,19 @@ namespace OCCPort.Tester
             evwrapper = new EventWrapperGlControl(glControl);
 
             glControl.Paint += Gl_Paint;
-			ViewManager = GravityViewManager = new GravityCameraViewManager(glControl);
+            V3d_View.CreateView = () => new OpenGL.OpenGl_View();
+            ViewManager = GravityViewManager = new GravityCameraViewManager(glControl);
             ViewManager.Attach(evwrapper, camera1);
-			GravityViewManager.View.myView.Items.Add(new Graphic3d_MapOfStructure(
-				new Graphic3d_Structure()
-				{
-					myCStructure = new OpenGl_Structure()
-					{
-						visible = 1,
-						myBndBox = new Graphic3d_BndBox3d(new BVH_VecNt(0, 0, 0),
-							 new BVH_VecNt(50, 50, 50))
-					}
-				}));
+            GravityViewManager.View.myView.Items.Add(new Graphic3d_MapOfStructure(
+                new Graphic3d_Structure()
+                {
+                    myCStructure = new OpenGl_Structure()
+                    {
+                        visible = 1,
+                        myBndBox = new Graphic3d_BndBox3d(new BVH_VecNt(0, 0, 0),
+                             new BVH_VecNt(50, 50, 50))
+                    }
+                }));
             Controls.Add(glControl);
             glControl.Dock = DockStyle.Fill;
         }
@@ -67,8 +69,8 @@ namespace OCCPort.Tester
         void Redraw()
         {
 
-			GravityViewManager.View.MyWindow.Width = glControl.Width;
-			GravityViewManager.View.MyWindow.Height = glControl.Height;
+            GravityViewManager.View.MyWindow.Width = glControl.Width;
+            GravityViewManager.View.MyWindow.Height = glControl.Height;
 
             ViewManager.Update();
 
@@ -175,100 +177,101 @@ namespace OCCPort.Tester
 
         }
 
-		private void frontToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			GravityViewManager.FrontView();
-		}
+        private void frontToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            GravityViewManager.FrontView();
+        }
 
-		private void topToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			GravityViewManager.TopView();
-		}
+        private void topToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            GravityViewManager.TopView();
+        }
 
-		private void toolStripButton2_Click(object sender, EventArgs e)
-		{
-			var d = AutoDialog.DialogHelpers.StartDialog();
-			d.AddBoolField("zoomInPoint", "Zoom in point", GravityViewManager.ZoomInPointMode);
-			if (!d.ShowDialog())
-				return;
+        private void toolStripButton2_Click(object sender, EventArgs e)
+        {
+            var d = AutoDialog.DialogHelpers.StartDialog();
+            d.AddBoolField("zoomInPoint", "Zoom in point", GravityViewManager.ZoomInPointMode);
+            if (!d.ShowDialog())
+                return;
 
-			GravityViewManager.ZoomInPointMode = d.GetBoolField("zoomInPoint");
-		}
+            GravityViewManager.ZoomInPointMode = d.GetBoolField("zoomInPoint");
+        }
 
-		private void toolStripButton3_Click(object sender, EventArgs e)
-		{
-			GravityViewManager.View.FrontView();
-			var res1 = GravityViewManager.View.Convert(40);
-			var d1 = GravityViewManager.View.Camera().Distance();
-
-
+        private void toolStripButton3_Click(object sender, EventArgs e)
+        {
+            GravityViewManager.View.FrontView();
+            var res1 = GravityViewManager.View.Convert(40);
+            var d1 = GravityViewManager.View.Camera().Distance();
 
 
 
-			GravityViewManager.View.Camera().SetScale(3000);
-			var res2 = GravityViewManager.View.Convert(40);
-			var d2 = GravityViewManager.View.Camera().Distance();
-			GravityViewManager.View.Rotate(0, 0.5, 0, 0, 0, 0, true);
-			var res3 = GravityViewManager.View.Convert(40);
 
-		}
 
-		private void toolStripButton4_Click(object sender, EventArgs e)
-		{
-			GravityViewManager.View.FrontView();
-			GravityViewManager.View.Camera().SetScale(1000);
-			GravityViewManager.View.Rotate(0, 0.5, 0, 0, 0, 0, true);
-		}
+            GravityViewManager.View.Camera().SetScale(3000);
+            var res2 = GravityViewManager.View.Convert(40);
+            var d2 = GravityViewManager.View.Camera().Distance();
+            GravityViewManager.View.Rotate(0, 0.5, 0, 0, 0, 0, true);
+            var res3 = GravityViewManager.View.Convert(40);
 
-		private void toolStripButton5_Click(object sender, EventArgs e)
-		{
-			var proxy = GravityViewManager.View;
+        }
 
-			//proxy.Camera().SetScale(1000);
-			proxy.FrontView();
+        private void toolStripButton4_Click(object sender, EventArgs e)
+        {
+            GravityViewManager.View.FrontView();
+            GravityViewManager.View.Camera().SetScale(1000);
+            GravityViewManager.View.Rotate(0, 0.5, 0, 0, 0, 0, true);
+        }
 
-			proxy.StartZoomAtPoint(glControl.Width / 2, glControl.Height / 3);
-			var p = new System.Drawing.Point(0, 0);
-			double delta = (double)(120) / (15 * 8);
-			int x = p.X;
-			int y = p.Y;
-			int x1 = (int)(p.X + glControl.Width * delta / 100);
-			int y1 = (int)(p.Y + glControl.Height * delta / 100);
-			proxy.ZoomAtPoint(x, y, x1, y1);
+        private void toolStripButton5_Click(object sender, EventArgs e)
+        {
+            var proxy = GravityViewManager.View;
 
-			var res1 = proxy.Convert(40);
+            //proxy.Camera().SetScale(1000);
+            proxy.FrontView();
 
-		}
+            proxy.StartZoomAtPoint(glControl.Width / 2, glControl.Height / 3);
+            var p = new System.Drawing.Point(0, 0);
+            double delta = (double)(120) / (15 * 8);
+            int x = p.X;
+            int y = p.Y;
+            int x1 = (int)(p.X + glControl.Width * delta / 100);
+            int y1 = (int)(p.Y + glControl.Height * delta / 100);
+            proxy.ZoomAtPoint(x, y, x1, y1);
 
-		private void toolStripButton6_Click(object sender, EventArgs e)
-		{
-			GravityViewManager.View.myView.Items.Clear();
-		}
+            var res1 = proxy.Convert(40);
 
-		private void toolStripButton7_Click(object sender, EventArgs e)
-		{
-			var d = DialogHelpers.StartDialog();
-			d.Text = "New box";
-			d.AddNumericField("w", "Width", 50);
-			d.AddNumericField("l", "Length", 50);
-			d.AddNumericField("h", "Height", 50);
+        }
 
-			if (!d.ShowDialog())
-				return;
+        private void toolStripButton6_Click(object sender, EventArgs e)
+        {
+            GravityViewManager.View.myView.Items.Clear();
+        }
 
-			var w = d.GetNumericField("w");
-			var h = d.GetNumericField("h");
-			var l = d.GetNumericField("l");
-			gp_Pnt p1 = new gp_Pnt(0, 0, 0);
-			gp_Pnt p2 = new gp_Pnt(w, h, l);
-			BRepPrimAPI_MakeBox box = new BRepPrimAPI_MakeBox(p1, p2);
-			box.Build();
-			var solid = box.Solid();
-			var shape = new AIS_Shape(solid);
-			//myAISContext()->Display(shape, Standard_True);
-			//	myAISContext()->SetDisplayMode(shape, AIS_Shaded, false);
-			//auto hn = GetHandle(*shape);
-			//hh->FromObjHandle(hn);
-		}
-	}
+        private void toolStripButton7_Click(object sender, EventArgs e)
+        {
+            var d = DialogHelpers.StartDialog();
+            d.Text = "New box";
+            d.AddNumericField("w", "Width", 50);
+            d.AddNumericField("l", "Length", 50);
+            d.AddNumericField("h", "Height", 50);
+
+            if (!d.ShowDialog())
+                return;
+
+            var w = d.GetNumericField("w");
+            var h = d.GetNumericField("h");
+            var l = d.GetNumericField("l");
+            gp_Pnt p1 = new gp_Pnt(0, 0, 0);
+            gp_Pnt p2 = new gp_Pnt(w, h, l);
+            BRepPrimAPI_MakeBox box = new BRepPrimAPI_MakeBox(p1, p2);
+            box.Build();
+            var solid = box.Solid();
+            var shape = new AIS_Shape(solid);
+            //myAISContext()->Display(shape, Standard_True);
+            //	myAISContext()->SetDisplayMode(shape, AIS_Shaded, false);
+            //auto hn = GetHandle(*shape);
+            //hh->FromObjHandle(hn);
+        }
+    }
+
 }

@@ -2,7 +2,7 @@
 
 namespace OCCPort.Tester
 {
-	internal class BRepPrim_Builder
+    internal class BRepPrim_Builder
 	{
 		public BRepPrim_Builder()
 		{

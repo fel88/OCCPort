@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OCCPort", "OCCPort\OCCPort.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OCCPort.Tester", "OCCPort.Tester\OCCPort.Tester.csproj", "{79D87737-0F8F-49B6-BD76-169D94CD0F49}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OCCPort.OpenGL", "OCCPort.OpenGL\OCCPort.OpenGL.csproj", "{A668587E-3C75-4AFB-9DDC-984ABB80F9E4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{79D87737-0F8F-49B6-BD76-169D94CD0F49}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{79D87737-0F8F-49B6-BD76-169D94CD0F49}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{79D87737-0F8F-49B6-BD76-169D94CD0F49}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A668587E-3C75-4AFB-9DDC-984ABB80F9E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A668587E-3C75-4AFB-9DDC-984ABB80F9E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A668587E-3C75-4AFB-9DDC-984ABB80F9E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A668587E-3C75-4AFB-9DDC-984ABB80F9E4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

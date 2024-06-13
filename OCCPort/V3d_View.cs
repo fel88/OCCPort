@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace OCCPort
 {
-	public class V3d_View
+    public class V3d_View
     {
         public void Rotation(int X,
                           int Y)
@@ -35,10 +35,11 @@ namespace OCCPort
                     false);
         }
 
+        public static Func<Graphic3d_CView> CreateView;
         public V3d_View()
         {
             //myView = theViewer->Driver()->CreateView(theViewer->StructureManager());
-			myView = new OpenGl_View();
+            myView = CreateView();
             //myView.SetBackground(theViewer->GetBackgroundColor());
             //  myView->SetGradientBackground(theViewer->GetGradientBackground());
 
@@ -82,11 +83,11 @@ namespace OCCPort
             Panning(Convert(theDXp), Convert(theDYp), theZoomFactor, theToStart);
         }
 
-		public void Panning(double theDXv,
-					  double theDYv,
-					  double theZoomFactor = 1,
-					  bool theToStart = true)
-		{
+        public void Panning(double theDXv,
+                      double theDYv,
+                      double theZoomFactor = 1,
+                      bool theToStart = true)
+        {
             //Standard_ASSERT_RAISE(theZoomFactor > 0.0, "Bad zoom factor");
 
             var aCamera = Camera();
@@ -236,7 +237,7 @@ namespace OCCPort
         gp_Pnt myCamStartOpEye;
         gp_Pnt myCamStartOpCenter;
         Graphic3d_Camera myDefaultCamera;
-		public Graphic3d_CView myView;
+        public Graphic3d_CView myView;
         bool myImmediateUpdate;
         //mutable Standard_Boolean myIsInvalidatedImmediate;
 
@@ -244,7 +245,7 @@ namespace OCCPort
         //! @return: handle to camera object, or NULL if 3D view does not use
         //! the camera approach.
         Graphic3d_Camera _camera;
-		public Graphic3d_Camera Camera()
+        public Graphic3d_Camera Camera()
         {
             return _camera;
         }
@@ -260,7 +261,7 @@ namespace OCCPort
         //  V3d_ListOfLight myActiveLights;
         //  gp_Dir myDefaultViewAxis;
         //gp_Pnt myDefaultViewPoint;
-		public Aspect_Window MyWindow = new Aspect_Window();
+        public Aspect_Window MyWindow = new Aspect_Window();
         int sx;
         int sy;
         double rx;
@@ -269,32 +270,32 @@ namespace OCCPort
         bool myComputedMode;
         bool SwitchSetFront;
         bool myZRotation;
-		int MyZoomAtPointX;
-		int MyZoomAtPointY;
+        int MyZoomAtPointX;
+        int MyZoomAtPointY;
 
-		public void Convert(
-						int Xp,
-						int Yp,
-						ref double Xv,
-						ref double Yv)
-		{
-			int aDxw, aDyw;
+        public void Convert(
+                        int Xp,
+                        int Yp,
+                        ref double Xv,
+                        ref double Yv)
+        {
+            int aDxw, aDyw;
 
-			//V3d_UnMapped_Raise_if(!myView->IsDefined(), "view has no window");
+            //V3d_UnMapped_Raise_if(!myView->IsDefined(), "view has no window");
 
-			MyWindow.Size(out aDxw, out aDyw);
+            MyWindow.Size(out aDxw, out aDyw);
 
-			gp_Pnt aPoint = new gp_Pnt(Xp * 2.0 / aDxw - 1.0, (aDyw - Yp) * 2.0 / aDyw - 1.0, 0.0);
-			aPoint = Camera().ConvertProj2View(aPoint);
+            gp_Pnt aPoint = new gp_Pnt(Xp * 2.0 / aDxw - 1.0, (aDyw - Yp) * 2.0 / aDyw - 1.0, 0.0);
+            aPoint = Camera().ConvertProj2View(aPoint);
 
-			Xv = aPoint.X();
-			Yv = aPoint.Y();
-		}
+            Xv = aPoint.X();
+            Yv = aPoint.Y();
+        }
 
 
         //! Converts the PIXEL value
         //! to a value in the projection plane.
-		public int Convert(double Vv)
+        public int Convert(double Vv)
         {
             int aDxw, aDyw;
 
@@ -304,24 +305,24 @@ namespace OCCPort
 
 
             var aViewDims = Camera().ViewDimensions();
-			//aValue = aViewDims.X() * (float)Vp / (float)aDxw;
-			var aValue = (aDxw * Vv / (aViewDims.X()));
+            //aValue = aViewDims.X() * (float)Vp / (float)aDxw;
+            var aValue = (aDxw * Vv / (aViewDims.X()));
 
-			return (int)aValue;
+            return (int)aValue;
         }
-		public double Convert(int Vp)
-		{
-			int aDxw, aDyw;
+        public double Convert(int Vp)
+        {
+            int aDxw, aDyw;
 
-			//V3d_UnMapped_Raise_if(!myView->IsDefined(), "view has no window");
+            //V3d_UnMapped_Raise_if(!myView->IsDefined(), "view has no window");
 
-			MyWindow.Size(out aDxw, out aDyw);
+            MyWindow.Size(out aDxw, out aDyw);
 
-			var aViewDims = Camera().ViewDimensions();
-			var aValue = aViewDims.X() * (float)Vp / (float)aDxw;
+            var aViewDims = Camera().ViewDimensions();
+            var aValue = aViewDims.X() * (float)Vp / (float)aDxw;
 
-			return aValue;
-		}
+            return aValue;
+        }
         public gp_Pnt Eye()
         {
             var r = Camera().Eye();
@@ -531,7 +532,7 @@ namespace OCCPort
                              double zRotationThreshold = 0)
         {
             sx = X; sy = Y;
-			//Standard_Real x,y;
+            //Standard_Real x,y;
             double x, y;
 
             Size(out x, out y);
@@ -566,120 +567,123 @@ namespace OCCPort
             throw new NotImplementedException();
         }
 
-		public void SetProj(V3d_TypeOfOrientation theOrientation,
+        public void SetProj(V3d_TypeOfOrientation theOrientation,
 
-						 bool theIsYup = false)
-		{
-			Graphic3d_Vec3d anUp = theIsYup ? new Graphic3d_Vec3d(0.0, 1.0, 0.0) : new Graphic3d_Vec3d(0.0, 0.0, 1.0);
-			if (theIsYup)
-			{
-				if (theOrientation == V3d_TypeOfOrientation.V3d_Ypos
-				 || theOrientation == V3d_TypeOfOrientation.V3d_Yneg)
-				{
-					anUp.SetValues(0.0, 0.0, -1.0);
-				}
-			}
-			else
-			{
-				if (theOrientation == V3d_TypeOfOrientation.V3d_Zpos)
-				{
-					anUp.SetValues(0.0, 1.0, 0.0);
-				}
-				else if (theOrientation == V3d_TypeOfOrientation.V3d_Zneg)
-				{
-					anUp.SetValues(0.0, -1.0, 0.0);
-				}
-			}
+                         bool theIsYup = false)
+        {
+            Graphic3d_Vec3d anUp = theIsYup ? new Graphic3d_Vec3d(0.0, 1.0, 0.0) : new Graphic3d_Vec3d(0.0, 0.0, 1.0);
+            if (theIsYup)
+            {
+                if (theOrientation == V3d_TypeOfOrientation.V3d_Ypos
+                 || theOrientation == V3d_TypeOfOrientation.V3d_Yneg)
+                {
+                    anUp.SetValues(0.0, 0.0, -1.0);
+                }
+            }
+            else
+            {
+                if (theOrientation == V3d_TypeOfOrientation.V3d_Zpos)
+                {
+                    anUp.SetValues(0.0, 1.0, 0.0);
+                }
+                else if (theOrientation == V3d_TypeOfOrientation.V3d_Zneg)
+                {
+                    anUp.SetValues(0.0, -1.0, 0.0);
+                }
+            }
 
-			gp_Dir aBck = V3d.GetProjAxis(theOrientation);
+            gp_Dir aBck = V3d.GetProjAxis(theOrientation);
 
-			// retain camera panning from origin when switching projection
-			Graphic3d_Camera aCamera = Camera();
-			gp_Pnt anOriginVCS = aCamera.ConvertWorld2View(gp.Origin());
+            // retain camera panning from origin when switching projection
+            Graphic3d_Camera aCamera = Camera();
+            gp_Pnt anOriginVCS = aCamera.ConvertWorld2View(gp.Origin());
 
-			double aNewDist = aCamera.Eye().Distance(new gp_Pnt(0, 0, 0));
-			aCamera.SetEyeAndCenter(new gp_Pnt(new gp_XYZ(0, 0, 0) + aBck.XYZ() * aNewDist),
-				new gp_Pnt(new gp_XYZ(0, 0, 0)));
-			aCamera.SetDirectionFromEye(-aBck);
-			aCamera.SetUp(new gp_Dir(anUp.x(), anUp.y(), anUp.z()));
-			aCamera.OrthogonalizeUp();
+            double aNewDist = aCamera.Eye().Distance(new gp_Pnt(0, 0, 0));
+            aCamera.SetEyeAndCenter(new gp_Pnt(new gp_XYZ(0, 0, 0) + aBck.XYZ() * aNewDist),
+                new gp_Pnt(new gp_XYZ(0, 0, 0)));
+            aCamera.SetDirectionFromEye(-aBck);
+            aCamera.SetUp(new gp_Dir(anUp.x(), anUp.y(), anUp.z()));
+            aCamera.OrthogonalizeUp();
 
-			Panning(anOriginVCS.X(), anOriginVCS.Y());
+            Panning(anOriginVCS.X(), anOriginVCS.Y());
 
-			ImmediateUpdate();
-		}
-		public void FrontView()
-		{
-			SetProj(V3d_TypeOfOrientation.V3d_Yneg);
-		}
+            ImmediateUpdate();
+        }
+        public void FrontView()
+        {
+            SetProj(V3d_TypeOfOrientation.V3d_Yneg);
+        }
 
-		public void TopView()
-		{
-			SetProj(V3d_TypeOfOrientation.V3d_Zpos);
-		}
+        public void TopView()
+        {
+            SetProj(V3d_TypeOfOrientation.V3d_Zpos);
+        }
 
-		public void StartZoomAtPoint(int theXp, int theYp)
-		{
-			MyZoomAtPointX = theXp;
-			MyZoomAtPointY = theYp;
-		}
+        public void StartZoomAtPoint(int theXp, int theYp)
+        {
+            MyZoomAtPointX = theXp;
+            MyZoomAtPointY = theYp;
+        }
 
-		//=======================================================================
-		//function : ZoomAtPoint
-		//purpose  :
-		//=======================================================================
-		public void ZoomAtPoint(int theMouseStartX,
-							 int theMouseStartY,
-							 int theMouseEndX,
-							 int theMouseEndY)
-		{
-			bool wasUpdateEnabled = SetImmediateUpdate(false);
+        //=======================================================================
+        //function : ZoomAtPoint
+        //purpose  :
+        //=======================================================================
+        public void ZoomAtPoint(int theMouseStartX,
+                             int theMouseStartY,
+                             int theMouseEndX,
+                             int theMouseEndY)
+        {
+            bool wasUpdateEnabled = SetImmediateUpdate(false);
 
-			// zoom
-			double aDxy = ((theMouseEndX + theMouseEndY) - (theMouseStartX + theMouseStartY));
-			double aDZoom = Math.Abs(aDxy) / 100.0 + 1.0;
-			aDZoom = (aDxy > 0.0) ? aDZoom : 1.0 / aDZoom;
+            // zoom
+            double aDxy = ((theMouseEndX + theMouseEndY) - (theMouseStartX + theMouseStartY));
+            double aDZoom = Math.Abs(aDxy) / 100.0 + 1.0;
+            aDZoom = (aDxy > 0.0) ? aDZoom : 1.0 / aDZoom;
 
-			//V3d_BadValue_Raise_if(aDZoom <= 0.0, "V3d_View::ZoomAtPoint, bad coefficient");
+            //V3d_BadValue_Raise_if(aDZoom <= 0.0, "V3d_View::ZoomAtPoint, bad coefficient");
 
-			var aCamera = Camera();
+            var aCamera = Camera();
 
-			double aViewWidth = aCamera.ViewDimensions().X();
-			double aViewHeight = aCamera.ViewDimensions().Y();
+            double aViewWidth = aCamera.ViewDimensions().X();
+            double aViewHeight = aCamera.ViewDimensions().Y();
 
-			// ensure that zoom will not be too small or too big.
-			double aCoef = aDZoom;
-			if (aViewWidth < aCoef * Precision.Confusion())
-			{
-				aCoef = aViewWidth / Precision.Confusion();
-			}
-			else if (aViewWidth > aCoef * 1e12)
-			{
-				aCoef = aViewWidth / 1e12;
-			}
-			if (aViewHeight < aCoef * Precision.Confusion())
-			{
-				aCoef = aViewHeight / Precision.Confusion();
-			}
-			else if (aViewHeight > aCoef * 1e12)
-			{
-				aCoef = aViewHeight / 1e12;
-			}
+            // ensure that zoom will not be too small or too big.
+            double aCoef = aDZoom;
+            if (aViewWidth < aCoef * Precision.Confusion())
+            {
+                aCoef = aViewWidth / Precision.Confusion();
+            }
+            else if (aViewWidth > aCoef * 1e12)
+            {
+                aCoef = aViewWidth / 1e12;
+            }
+            if (aViewHeight < aCoef * Precision.Confusion())
+            {
+                aCoef = aViewHeight / Precision.Confusion();
+            }
+            else if (aViewHeight > aCoef * 1e12)
+            {
+                aCoef = aViewHeight / 1e12;
+            }
 
-			double aZoomAtPointXv = 0.0;
-			double aZoomAtPointYv = 0.0;
-			Convert(MyZoomAtPointX, MyZoomAtPointY, ref aZoomAtPointXv, ref aZoomAtPointYv);
+            double aZoomAtPointXv = 0.0;
+            double aZoomAtPointYv = 0.0;
+            Convert(MyZoomAtPointX, MyZoomAtPointY, ref aZoomAtPointXv, ref aZoomAtPointYv);
 
-			double aDxv = aZoomAtPointXv / aCoef;
-			double aDyv = aZoomAtPointYv / aCoef;
+            double aDxv = aZoomAtPointXv / aCoef;
+            double aDyv = aZoomAtPointYv / aCoef;
 
-			aCamera.SetScale(aCamera.Scale() / aCoef);
-			Translate(aCamera, aZoomAtPointXv - aDxv, aZoomAtPointYv - aDyv);
+            aCamera.SetScale(aCamera.Scale() / aCoef);
+            Translate(aCamera, aZoomAtPointXv - aDxv, aZoomAtPointYv - aDyv);
 
-			SetImmediateUpdate(wasUpdateEnabled);
+            SetImmediateUpdate(wasUpdateEnabled);
 
-			ImmediateUpdate();
-		}
+            ImmediateUpdate();
+        }
 
-	}
+        //! Returns the Aspect Window associated with the view.
+        public Aspect_Window Window() { return MyWindow; }
+
+    }
 }
