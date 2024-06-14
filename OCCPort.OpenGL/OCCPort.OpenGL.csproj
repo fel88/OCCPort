@@ -44,8 +44,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Graphic3d_ShaderManager.cs" />
+    <Compile Include="OpenGl_Context.cs" />
+    <Compile Include="OpenGl_Element.cs" />
     <Compile Include="OpenGl_FrameBuffer.cs" />
     <Compile Include="OpenGl_LayerList.cs" />
+    <Compile Include="OpenGl_NamedResource.cs" />
+    <Compile Include="OpenGl_PrimitiveArray.cs" />
+    <Compile Include="OpenGl_Resource.cs" />
+    <Compile Include="OpenGl_ResourcesMap.cs" />
+    <Compile Include="OpenGl_ShaderProgram.cs" />
+    <Compile Include="OpenGl_ShaderProgramList.cs" />
     <Compile Include="OpenGl_Structure.cs" />
     <Compile Include="OpenGl_View.cs" />
     <Compile Include="OpenGl_Window.cs" />

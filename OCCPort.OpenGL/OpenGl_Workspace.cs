@@ -2,9 +2,9 @@
 
 namespace OCCPort.OpenGL
 {
-    internal class OpenGl_Workspace
+    public class OpenGl_Workspace
     {
-        internal object GetGlContext()
+        public OpenGl_Context GetGlContext()
         {
             throw new NotImplementedException();
         }
