@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using System.Security.Cryptography;
 
 namespace OCCPort
@@ -29,7 +30,7 @@ namespace OCCPort
         TopoDS_Face[] myFaces = new TopoDS_Face[6];
         bool[] FacesBuilt = new bool[6];
         bool[] myInfinite = new bool[6];
-
+        
         public TopoDS_Shell Shell()
         {
             if (IsDegeneratedShape())
@@ -469,7 +470,42 @@ new[]                      { 8,10, 4, 6,-1,-1},
             X2Min = (0);
             X2Max = dx;
 
+            for (int i = 0; i < NBFACES; i++) { myInfinite[i] = false; }
+
+            BRepPrim_Wedge_Init(ref ShellBuilt, VerticesBuilt, EdgesBuilt,
+                WiresBuilt, FacesBuilt);
         }
+
+
+      const  int NBFACES = 6;
+          const int NBWIRES = 6;
+        const int NBEDGES = 12;
+        const int NBVERTICES = 8;
+        //=======================================================================
+        //function : BRepPrim_Wedge_Init
+        //purpose  : Set arrays to Standard_False
+        //=======================================================================
+
+        static void BRepPrim_Wedge_Init(ref bool S,
+                  bool[] V,
+                  bool[] E,
+                  bool[] W,
+                  bool[] F)
+        {
+            int i;
+            S = false;
+            for (i = 0; i < NBVERTICES; i++)
+                V[i] = false;
+            for (i = 0; i < NBEDGES; i++)
+                E[i] = false;
+            for (i = 0; i < NBWIRES; i++)
+                W[i] = false;
+            for (i = 0; i < NBFACES; i++)
+                F[i] = false;
+        }
+
+        
+
     }
 
     public enum BRepPrim_Direction

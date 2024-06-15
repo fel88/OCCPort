@@ -4,9 +4,6 @@ namespace OCCPort.Tester
 {
     public class BRepPrimAPI_MakeBox : BRepBuilderAPI_MakeShape
     {
-
-
-
         BRepPrim_Wedge myWedge;
 
         public gp_Pnt pmin(gp_Pnt p,

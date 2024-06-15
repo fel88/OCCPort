@@ -195,5 +195,10 @@ namespace OCCPort
             matrix.SetIdentity();
             loc = theV.XYZ();
         }
+
+        internal bool IsNegative()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

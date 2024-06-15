@@ -141,6 +141,7 @@
     <Compile Include="Helpers.cs" />
     <Compile Include="Image_PixMap.cs" />
     <Compile Include="Interface_InterfaceModel.cs" />
+    <Compile Include="Message_ProgressRange.cs" />
     <Compile Include="NCollection_Mat4.cs" />
     <Compile Include="NCollection_Vec2.cs" />
     <Compile Include="NCollection_Vec2i.cs" />
@@ -167,6 +168,7 @@
     <Compile Include="ShaderVariable.cs" />
     <Compile Include="Standard_DomainError.cs" />
     <Compile Include="Standard_Integer.cs" />
+    <Compile Include="StdFail_NotDone.cs" />
     <Compile Include="StdPrs_ToolTriangulatedShape.cs" />
     <Compile Include="StdSelect_ViewerSelector3d.cs" />
     <Compile Include="STEPControl_Reader.cs" />
@@ -186,6 +188,7 @@
     <Compile Include="TopoDS_Shell.cs" />
     <Compile Include="TopoDS_Solid.cs" />
     <Compile Include="TopoDS_TShape.cs" />
+    <Compile Include="TopoDS_TSolid.cs" />
     <Compile Include="TopoDS_UnCompatibleShapes.cs" />
     <Compile Include="TopoDS_Vertex.cs" />
     <Compile Include="TopoDS_Wire.cs" />

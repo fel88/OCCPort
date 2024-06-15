@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.Remoting.Messaging;
 
 namespace OCCPort
 {
@@ -24,14 +25,30 @@ namespace OCCPort
         //! Returns a handle to the actual shape implementation.
         public TopoDS_TShape TShape() { return myTShape; }
 
-        internal TopLoc_Location Location()
+        //! Sets the shape local coordinate system.
+        public void Location(TopLoc_Location theLoc, bool theRaiseExc = true)
         {
-            throw new NotImplementedException();
+            gp_Trsf aTrsf = theLoc.Transformation();
+            if ((Math.Abs(Math.Abs(aTrsf.ScaleFactor()) - 1.0) > TopLoc_Location.ScalePrec() || aTrsf.IsNegative()) && theRaiseExc)
+            {
+                //Exception
+                throw new Standard_DomainError("Location with scaling transformation is forbidden");
+            }
+            else
+            {
+                myLocation = theLoc;
+            }
         }
 
-        internal TopAbs_Orientation Orientation()
+        //! Returns the shape local coordinate system.
+        public TopLoc_Location Location() { return myLocation; }
+
+        //! Sets the shape orientation.
+        public void Orientation(TopAbs_Orientation theOrient) { myOrient = theOrient; }
+
+        public TopAbs_Orientation Orientation()
         {
-            throw new NotImplementedException();
+            return myOrient;
         }
 
         internal void Reverse()

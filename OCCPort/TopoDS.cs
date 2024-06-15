@@ -10,8 +10,16 @@ namespace OCCPort.Tester
         //! Standard_TypeMismatch if S cannot be cast to this return type.
         public static TopoDS_Solid Solid(TopoDS_Shape S)
         {
-            return null;
+            if (S is TopoDS_Solid)
+            {
+                return S as TopoDS_Solid;
+            }
+            throw new ArgumentException("\"TopoDS::Solid\"");
+            //Standard_TypeMismatch_Raise_if(TopoDS_Mismatch(S, TopAbs_SOLID), "TopoDS::Solid");
+            //return *(TopoDS_Solid*)&S;
         }
+
+
 
         internal static TopoDS_Shell Shell(TopoDS_Shape myShape)
         {

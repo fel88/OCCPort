@@ -121,9 +121,6 @@ namespace OCCPort
             throw new NotImplementedException();
         }
 
-        internal void MakeSolid(object value)
-        {
-            throw new NotImplementedException();
-        }
+        
     }
 }
