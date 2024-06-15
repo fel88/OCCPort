@@ -6,6 +6,11 @@ namespace OCCPort.OpenGL
 {
     public class OpenGl_Context
     {
+        public OpenGl_ArbFBO arbFBO;             //!< GL_ARB_framebuffer_object
+        public OpenGl_ArbFBOBlit arbFBOBlit;         //!< glBlitFramebuffer function, moved out from OpenGl_ArbFBO structure for compatibility with OpenGL ES 2.0
+        bool arbSampleShading;   //!< GL_ARB_sample_shading
+        bool arbDepthClamp;      //!< GL_ARB_depth_clamp (on desktop 
+
         //! @name public properties tracking current state
 
         public OpenGl_MatrixState<float> ModelWorldState; //!< state of orientation matrix
@@ -77,6 +82,16 @@ namespace OCCPort.OpenGL
 
         //! Return cached viewport definition (x, y, width, height).
         public int[] Viewport() { return myViewport; }
+
+        internal bool IsFeedback()
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void SetFrameBufferSRGB(bool v)
+        {
+            throw new NotImplementedException();
+        }
 
         int[] myViewport = new int[4];     //!< current viewport
         int[] myViewportVirt = new int[4]; //!< virtual viewport

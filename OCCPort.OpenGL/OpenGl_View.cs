@@ -1,5 +1,6 @@
 ﻿using OpenTK.Graphics.OpenGL;
 using System;
+using System.Xml.Linq;
 
 namespace OCCPort.OpenGL
 {
@@ -93,11 +94,11 @@ namespace OCCPort.OpenGL
                 // - either background texture is no specified or it is drawn in Aspect_FM_CENTERED mode
                 if (myBackgrounds[(int)Graphic3d_TypeOfBackground.Graphic3d_TOB_GRADIENT].IsDefined()
                   && (!myTextureParams.Aspect().ToMapTexture()
-                    || myBackgrounds[(int)Graphic3d_TypeOfBackground.Graphic3d_TOB_TEXTURE].TextureFillMethod() == Aspect_FillMethod. Aspect_FM_CENTERED
+                    || myBackgrounds[(int)Graphic3d_TypeOfBackground.Graphic3d_TOB_TEXTURE].TextureFillMethod() == Aspect_FillMethod.Aspect_FM_CENTERED
                     || myBackgrounds[(int)Graphic3d_TypeOfBackground.Graphic3d_TOB_TEXTURE].TextureFillMethod() == Aspect_FillMethod.Aspect_FM_NONE))
                 {
                     if (myBackgrounds[(int)Graphic3d_TypeOfBackground.Graphic3d_TOB_GRADIENT].GradientFillMethod() >= Aspect_GradientFillMethod.Aspect_GradientFillMethod_Corner1
-                     && myBackgrounds[(int)Graphic3d_TypeOfBackground.Graphic3d_TOB_GRADIENT].GradientFillMethod() <= Aspect_GradientFillMethod. Aspect_GradientFillMethod_Corner4)
+                     && myBackgrounds[(int)Graphic3d_TypeOfBackground.Graphic3d_TOB_GRADIENT].GradientFillMethod() <= Aspect_GradientFillMethod.Aspect_GradientFillMethod_Corner4)
                     {
                         OpenGl_Aspects anOldAspectFace = theWorkspace.SetAspects(myColoredQuadParams);
 
@@ -142,6 +143,48 @@ namespace OCCPort.OpenGL
         {
             throw new NotImplementedException();
         }
+        //! Framebuffers for OpenGL output.
+        OpenGl_FrameBuffer myOpenGlFBO;
+        OpenGl_FrameBuffer myOpenGlFBO2;
+        int myFboColorFormat;        //!< sized format for color attachments
+        int myFboDepthFormat;        //!< sized format for depth-stencil 
+
+        public enum RaytraceUpdateMode
+        {
+
+            //Describes update mode(state).
+
+            OpenGl_GUM_CHECK,
+
+            //check geometry state
+            OpenGl_GUM_PREPARE,
+
+            //collect unchanged objects
+            OpenGl_GUM_REBUILD,
+
+            //rebuild changed and new objects
+        }
+        public enum RaytraceInitStatus
+        {
+            //Result of OpenGL shaders initialization.
+            OpenGl_RT_NONE,
+            OpenGl_RT_INIT,
+            OpenGl_RT_FAIL
+        }
+        //! @name fields related to ray-tracing
+
+        //! Result of RT/PT shaders initialization.
+        protected RaytraceInitStatus myRaytraceInitStatus;
+
+        //! Is ray-tracing geometry data valid?
+        protected bool myIsRaytraceDataValid;
+
+        //! True if warning about missing extension GL_ARB_bindless_texture has been displayed.
+        protected bool myIsRaytraceWarnTextures;
+
+        //! 3D scene geometry data for ray-tracing.
+        protected OpenGl_RaytraceGeometry myRaytraceGeometry;
+
 
         //=======================================================================
         public void renderStructs(Graphic3d_Camera.Projection theProjection,
@@ -149,7 +192,115 @@ namespace OCCPort.OpenGL
                                          OpenGl_FrameBuffer theOitAccumFbo,
                                   bool theToDrawImmediate)
         {
+            if (myIsSubviewComposer)
+            {
+                return;
+            }
 
+            myZLayers.UpdateCulling(myWorkspace, theToDrawImmediate);
+            if (myZLayers.NbStructures() <= 0)
+            {
+                return;
+            }
+
+            OpenGl_Context aCtx = myWorkspace.GetGlContext();
+            bool toRenderGL = theToDrawImmediate ||
+              myRenderParams.Method != Graphic3d_RenderingMode.Graphic3d_RM_RAYTRACING ||
+              myRaytraceInitStatus == RaytraceInitStatus.OpenGl_RT_FAIL ||
+              aCtx.IsFeedback();
+
+            if (!toRenderGL)
+            {
+                Graphic3d_Vec2i aSizeXY = theReadDrawFbo != null
+                                              ? theReadDrawFbo.GetVPSize()
+                                              : new Graphic3d_Vec2i(myWindow.Width(), myWindow.Height());
+
+                toRenderGL = !initRaytraceResources(aSizeXY.x(), aSizeXY.y(), aCtx)
+                          || !updateRaytraceGeometry(RaytraceUpdateMode.OpenGl_GUM_CHECK, myId, aCtx);
+
+                toRenderGL |= !myIsRaytraceDataValid; // if no ray-trace data use OpenGL
+
+                if (!toRenderGL)
+                {
+                    myOpenGlFBO.InitLazy(aCtx, aSizeXY, myFboColorFormat, myFboDepthFormat, 0);
+                    if (theReadDrawFbo != null)
+                    {
+                        theReadDrawFbo.UnbindBuffer(aCtx);
+                    }
+
+                    // Prepare preliminary OpenGL output
+                    if (aCtx.arbFBOBlit != null)
+                    {
+                        // Render bottom OSD layer
+                        myZLayers.Render(myWorkspace, theToDrawImmediate, OpenGl_LayerFilter.OpenGl_LF_Bottom, theReadDrawFbo, theOitAccumFbo);
+
+                        int aPrevFilter = myWorkspace.RenderFilter() & ~(int)(OpenGl_RenderFilter.OpenGl_RenderFilter_NonRaytraceableOnly);
+                        myWorkspace.SetRenderFilter(aPrevFilter | (int)OpenGl_RenderFilter.OpenGl_RenderFilter_NonRaytraceableOnly);
+                        {
+                            {
+                                if (theReadDrawFbo != null)
+                                {
+                                    theReadDrawFbo.BindDrawBuffer(aCtx);
+                                }
+                                else
+                                {
+                                    aCtx.arbFBO.glBindFramebuffer(All.DrawFramebuffer, 0);
+                                    aCtx.SetFrameBufferSRGB(false);
+                                }
+
+                                // Render non-polygonal elements in default layer
+                                myZLayers.Render(myWorkspace, theToDrawImmediate, OpenGl_LayerFilter.OpenGl_LF_RayTracable, theReadDrawFbo, theOitAccumFbo);
+                            }
+                            myWorkspace.SetRenderFilter(aPrevFilter);
+                        }
+
+                        if (theReadDrawFbo != null)
+                        {
+                            theReadDrawFbo.BindBuffer(aCtx);
+                        }
+                        else
+                        {
+                            aCtx.arbFBO.glBindFramebuffer(All.Framebuffer, 0);
+                            aCtx.SetFrameBufferSRGB(false);
+                        }
+
+                        // Reset OpenGl aspects state to default to avoid enabling of
+                        // backface culling which is not supported in ray-tracing.
+                        myWorkspace.ResetAppliedAspect();
+
+                        // Ray-tracing polygonal primitive arrays
+                        raytrace(aSizeXY.x(), aSizeXY.y(), theProjection, theReadDrawFbo, aCtx);
+
+                        // Render upper (top and topmost) OpenGL layers
+                        myZLayers.Render(myWorkspace, theToDrawImmediate, OpenGl_LayerFilter.OpenGl_LF_Upper, theReadDrawFbo, theOitAccumFbo);
+                    }
+                }
+
+                // Redraw 3D scene using OpenGL in standard
+                // mode or in case of ray-tracing failure
+                if (toRenderGL)
+                {
+                    myZLayers.Render(myWorkspace, theToDrawImmediate, OpenGl_LayerFilter.OpenGl_LF_All, theReadDrawFbo, theOitAccumFbo);
+
+                    // Set flag that scene was redrawn by standard pipeline
+                    myWasRedrawnGL = true;
+                }
+            }
+        }
+
+        private void raytrace(double v1, double v2, Graphic3d_Camera.Projection theProjection, OpenGl_FrameBuffer theReadDrawFbo, OpenGl_Context aCtx)
+        {
+            throw new NotImplementedException();
+        }
+
+        private bool updateRaytraceGeometry(object openGl_GUM_CHECK, int myId, OpenGl_Context aCtx)
+        {
+            throw new NotImplementedException();
+        }
+
+        private bool initRaytraceResources(double v1, double v2, OpenGl_Context aCtx)
+        {
+            throw new NotImplementedException();
         }
 
         public override void Redraw()
@@ -229,6 +380,7 @@ namespace OCCPort.OpenGL
         public override bool IsDefined()
         { return myWindow != null; }
         OpenGl_LayerList myZLayers; //!< main list of displayed structure, sorted by layers
+
 
         public override Graphic3d_Layer[] Layers()
         {

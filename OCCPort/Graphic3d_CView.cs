@@ -6,7 +6,7 @@ namespace OCCPort
 
     {
         protected Graphic3d_TextureMap myBackgroundImage;
-
+        protected bool myIsSubviewComposer;        //!< flag to skip rendering of viewer contents
         protected Graphic3d_CubeMap    myCubeMapBackground;  //!< Cubemap displayed at background
         protected Graphic3d_StructureManager myStructureManager;
         protected Graphic3d_Camera myCamera;
@@ -48,7 +48,7 @@ namespace OCCPort
         public abstract Aspect_Window Window();
 
 
-        int myId;
+        protected int myId;
         protected Graphic3d_RenderingParams myRenderParams;
 
         public virtual bool IsDefined()

@@ -25,14 +25,14 @@ namespace OCCPort.OpenGL
             OpenGl_Context aCtx = theWorkspace.GetGlContext();
             int aViewSizeX = aCtx.Viewport()[2];
             int aViewSizeY = aCtx.Viewport()[3];
-            Graphic3d_Vec2i aTileOffset, aTileSize;
+            NCollection_Vec2i aTileOffset, aTileSize;
 
             if (aCtx.Camera().Tile().IsValid())
             {
                 aViewSizeX = (int)aCtx.Camera().Tile().TotalSize.x();
                 aViewSizeY = (int)aCtx.Camera().Tile().TotalSize.y();
 
-                aTileOffset = (Graphic3d_Vec2i)aCtx.Camera().Tile().OffsetLowerLeft();
+                aTileOffset = aCtx.Camera().Tile().OffsetLowerLeft();
                 aTileSize = aCtx.Camera().Tile().TileSize;
             }
             if (myToUpdate

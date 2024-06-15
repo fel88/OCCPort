@@ -1,4 +1,7 @@
-﻿namespace OCCPort
+﻿using OCCPort.OpenGL;
+using System;
+
+namespace OCCPort
 {
     //! Class implements FrameBuffer Object (FBO) resource
     //! intended for off-screen rendering.
@@ -6,6 +9,31 @@
     {
         //! Number of multisampling samples.
         public int NbSamples() { return myNbSamples; }
+
+        internal void BindBuffer(OpenGl_Context aCtx)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void BindDrawBuffer(OpenGl_Context aCtx)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void UnbindBuffer(OpenGl_Context aCtx)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal Graphic3d_Vec2i GetVPSize()
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void InitLazy(OpenGl_Context aCtx, Graphic3d_Vec2i aSizeXY, int myFboColorFormat, int myFboDepthFormat, int v)
+        {
+            throw new NotImplementedException();
+        }
 
         int myInitVPSizeX;         //!< viewport width  specified during initialization (kept even on failure)
         int myInitVPSizeY;         //!< viewport height specified during initialization (kept even on failure)

@@ -24,9 +24,9 @@ namespace OCCPort
 
 		}
 
-		public NCollection_Vec2 OffsetLowerLeft()
+		public NCollection_Vec2i OffsetLowerLeft()
 		{
-			return new NCollection_Vec2(Offset.x(),
+			return new NCollection_Vec2i(Offset.x(),
 						   !IsTopDown
 						   ? Offset.y()
 						   : TotalSize.y() - Offset.y() - 1);

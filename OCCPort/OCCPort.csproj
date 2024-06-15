@@ -63,6 +63,7 @@
     <Compile Include="BRep_Builder.cs" />
     <Compile Include="BVH_Box.cs" />
     <Compile Include="BVH_VecNt.cs" />
+    <Compile Include="Constants.cs" />
     <Compile Include="ElSLib.cs" />
     <Compile Include="gp.cs" />
     <Compile Include="gp_Ax1.cs" />
@@ -121,8 +122,11 @@
     <Compile Include="Interface_InterfaceModel.cs" />
     <Compile Include="NCollection_Mat4.cs" />
     <Compile Include="NCollection_Vec2.cs" />
+    <Compile Include="NCollection_Vec2i.cs" />
     <Compile Include="NCollection_Vec3.cs" />
     <Compile Include="NCollection_Vec4.cs" />
+    <Compile Include="OpenGl_LayerFilter.cs" />
+    <Compile Include="OpenGl_RenderFilter.cs" />
     <Compile Include="Precision.cs" />
     <Compile Include="SelectMgr_EntityOwner.cs" />
     <Compile Include="SelectMgr_IndexedDataMapOfOwnerCriterion.cs" />

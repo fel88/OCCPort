@@ -2,7 +2,7 @@
 
 namespace OCCPort
 {
-	public class NCollection_Vec2
+    public class NCollection_Vec2
 	{
 		//! Per-component constructor.
 		public NCollection_Vec2(double theX,

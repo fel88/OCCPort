@@ -19,7 +19,22 @@ namespace OCCPort.OpenGL
             throw new NotImplementedException();
         }
 
+        internal int RenderFilter()
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void ResetAppliedAspect()
+        {
+            throw new NotImplementedException();
+        }
+
         internal OpenGl_Aspects SetAspects(OpenGl_Aspects myCubeMapParams)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void SetRenderFilter(int aPrevFilter)
         {
             throw new NotImplementedException();
         }
