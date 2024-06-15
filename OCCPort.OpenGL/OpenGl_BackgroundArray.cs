@@ -15,6 +15,10 @@ namespace OCCPort.OpenGL
         int myViewHeight;     //!< view height used for array initialization
         bool myToUpdate;       //!< Shows if array parameters were changed and data (myAttribs storage) is to be updated
 
+        public OpenGl_BackgroundArray(OpenGl_GraphicDriver aDriver, Graphic3d_TypeOfPrimitiveArray theType, Graphic3d_IndexBuffer theIndices, Graphic3d_Buffer theAttribs, Graphic3d_BoundBuffer theBounds) : base(aDriver, theType, theIndices, theAttribs, theBounds)
+        {
+        }
+
         // =======================================================================
         // method  : Render
         // purpose :

@@ -2,7 +2,7 @@
 
 namespace OCCPort
 {
-    internal class PrsMgr_PresentationManager
+    public  class PrsMgr_PresentationManager
     {
         internal void Display(AIS_InteractiveObject theIObj, int theDispMode)
         {

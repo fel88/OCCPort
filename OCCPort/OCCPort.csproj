@@ -41,7 +41,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AIS_ColoredDrawer.cs" />
+    <Compile Include="AIS_ColoredShape.cs" />
     <Compile Include="AIS_DataMapOfIOStatus.cs" />
+    <Compile Include="AIS_DataMapOfShapeDrawer.cs" />
+    <Compile Include="AIS_DisplayMode.cs" />
     <Compile Include="AIS_GlobalStatus.cs" />
     <Compile Include="AIS_InteractiveContext.cs" />
     <Compile Include="AIS_InteractiveObject.cs" />
@@ -68,6 +72,7 @@
     <Compile Include="BVH_Box.cs" />
     <Compile Include="BVH_VecNt.cs" />
     <Compile Include="Constants.cs" />
+    <Compile Include="DataMapOfDrawerCompd.cs" />
     <Compile Include="ElSLib.cs" />
     <Compile Include="Geom_ElementarySurface.cs" />
     <Compile Include="Geom_Plane.cs" />
@@ -85,6 +90,8 @@
     <Compile Include="gp_Vec.cs" />
     <Compile Include="gp_XYZ.cs" />
     <Compile Include="Graphic3d_BndBox3d.cs" />
+    <Compile Include="Graphic3d_BoundBuffer.cs" />
+    <Compile Include="Graphic3d_Buffer.cs" />
     <Compile Include="Graphic3d_CameraTile.cs" />
     <Compile Include="Graphic3d_CStructure.cs" />
     <Compile Include="Graphic3d_CubeMap.cs" />
@@ -92,12 +99,16 @@
     <Compile Include="Graphic3d_CView.cs" />
     <Compile Include="Graphic3d_DataStructureManager.cs" />
     <Compile Include="Graphic3d_GraduatedTrihedron.cs" />
+    <Compile Include="Graphic3d_Group.cs" />
+    <Compile Include="Graphic3d_IndexBuffer.cs" />
     <Compile Include="Graphic3d_Layer.cs" />
+    <Compile Include="Graphic3d_MapOfObject.cs" />
     <Compile Include="Graphic3d_MapOfStructure.cs" />
     <Compile Include="Graphic3d_Mat4.cs" />
     <Compile Include="Graphic3d_Mat4d.cs" />
     <Compile Include="Graphic3d_RenderingMode.cs" />
     <Compile Include="Graphic3d_RenderingParams.cs" />
+    <Compile Include="Graphic3d_SequenceOfHClipPlane.cs" />
     <Compile Include="Graphic3d_SequenceOfStructure.cs" />
     <Compile Include="Graphic3d_ShaderAttributeList.cs" />
     <Compile Include="Graphic3d_ShaderFlags.cs" />
@@ -115,6 +126,7 @@
     <Compile Include="Graphic3d_TransformPers.cs" />
     <Compile Include="Graphic3d_TypeOfBackfacingModel.cs" />
     <Compile Include="Graphic3d_TypeOfBackground.cs" />
+    <Compile Include="Graphic3d_TypeOfPrimitiveArray.cs" />
     <Compile Include="Graphic3d_TypeOfShaderObject.cs" />
     <Compile Include="Graphic3d_TypeOfTexture.cs" />
     <Compile Include="Graphic3d_TypeOfVisualization.cs" />
@@ -137,9 +149,11 @@
     <Compile Include="OpenGl_RenderFilter.cs" />
     <Compile Include="Precision.cs" />
     <Compile Include="Prs3d_Drawer.cs" />
+    <Compile Include="Prs3d_Presentation.cs" />
     <Compile Include="PrsMgr_DisplayStatus.cs" />
     <Compile Include="PrsMgr_PresentableObject.cs" />
     <Compile Include="PrsMgr_PresentationManager.cs" />
+    <Compile Include="PrsMgr_Presentations.cs" />
     <Compile Include="SelectMgr_AndOrFilter.cs" />
     <Compile Include="SelectMgr_EntityOwner.cs" />
     <Compile Include="SelectMgr_IndexedDataMapOfOwnerCriterion.cs" />
@@ -151,10 +165,12 @@
     <Compile Include="SelectMgr_ViewerSelector.cs" />
     <Compile Include="ShaderVariable.cs" />
     <Compile Include="Standard_Integer.cs" />
+    <Compile Include="StdPrs_ToolTriangulatedShape.cs" />
     <Compile Include="StdSelect_ViewerSelector3d.cs" />
     <Compile Include="STEPControl_Reader.cs" />
     <Compile Include="TColStd_Array1OfInteger.cs" />
     <Compile Include="TColStd_SequenceOfTransient.cs" />
+    <Compile Include="TopAbs_ShapeEnum.cs" />
     <Compile Include="TopoDS.cs" />
     <Compile Include="TopoDS_Edge.cs" />
     <Compile Include="TopoDS_Face.cs" />

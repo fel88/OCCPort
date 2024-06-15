@@ -18,8 +18,10 @@ namespace OCCPort.OpenGL
 
         Standard_Size myUID; //!< Unique ID of primitive array. 
 
+        public OpenGl_PrimitiveArray(OpenGl_GraphicDriver aDriver, Graphic3d_TypeOfPrimitiveArray theType, Graphic3d_IndexBuffer theIndices, Graphic3d_Buffer theAttribs, Graphic3d_BoundBuffer theBounds)
+        {
+        }
 
-        
         public void Render(OpenGl_Workspace theWorkspace)
         {
             OpenGl_Aspects anAspectFace = theWorkspace.Aspects();

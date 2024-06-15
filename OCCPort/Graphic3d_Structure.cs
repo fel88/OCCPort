@@ -4,7 +4,7 @@ namespace OCCPort
 {
     public class Graphic3d_Structure
     {
-        internal Graphic3d_CStructure CStructure()
+        public Graphic3d_CStructure CStructure()
         {
             return myCStructure;
         }

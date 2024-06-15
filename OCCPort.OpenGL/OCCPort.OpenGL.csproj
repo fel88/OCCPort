@@ -52,6 +52,7 @@
     <Compile Include="Graphic3d_MarkerImage.cs" />
     <Compile Include="Graphic3d_ShaderManager.cs" />
     <Compile Include="Graphic3d_TextureSet.cs" />
+    <Compile Include="Graphic3d_TypeOfPrimitiveArray.cs" />
     <Compile Include="Graphic3d_TypeOfShadingModel.cs" />
     <Compile Include="Graphic3d_ZLayerId.cs" />
     <Compile Include="OpenGl_ArbFBO.cs" />
@@ -68,9 +69,11 @@
     <Compile Include="OpenGl_Context.cs" />
     <Compile Include="OpenGl_DepthPeeling.cs" />
     <Compile Include="OpenGl_Element.cs" />
+    <Compile Include="OpenGl_ElementNode.cs" />
     <Compile Include="OpenGl_FrameBuffer.cs" />
     <Compile Include="OpenGl_GradientParameters.cs" />
     <Compile Include="OpenGl_GraphicDriver.cs" />
+    <Compile Include="OpenGl_Group.cs" />
     <Compile Include="OpenGl_IndexBuffer.cs" />
     <Compile Include="OpenGl_IndexBufferCompat.cs" />
     <Compile Include="OpenGl_LayerList.cs" />
@@ -78,6 +81,7 @@
     <Compile Include="OpenGl_MatrixState.cs" />
     <Compile Include="OpenGl_NamedResource.cs" />
     <Compile Include="OpenGl_PrimitiveArray.cs" />
+    <Compile Include="OpenGl_Raytrace.cs" />
     <Compile Include="OpenGl_RaytraceGeometry.cs" />
     <Compile Include="OpenGl_Resource.cs" />
     <Compile Include="OpenGl_ResourcesMap.cs" />

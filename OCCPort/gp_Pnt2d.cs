@@ -1,6 +1,6 @@
 ﻿namespace OCCPort
 {
-    internal class gp_Pnt2d
+    public class gp_Pnt2d
     {
         
 

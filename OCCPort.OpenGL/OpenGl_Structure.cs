@@ -1,4 +1,6 @@
-﻿namespace OCCPort.OpenGL
+﻿using System;
+
+namespace OCCPort.OpenGL
 {
     //! Implementation of low-level graphic structure.
     public class OpenGl_Structure : Graphic3d_CStructure
@@ -18,6 +20,16 @@
                 return;
             }
 
+        }
+
+        internal OpenGl_GraphicDriver GlDriver()
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void UpdateStateIfRaytracable(bool v)
+        {
+            throw new NotImplementedException();
         }
     }
 }

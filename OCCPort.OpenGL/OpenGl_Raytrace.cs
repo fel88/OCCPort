@@ -2,9 +2,9 @@
 
 namespace OCCPort.OpenGL
 {
-    public  class OpenGl_GraphicDriver
+    internal class OpenGl_Raytrace
     {
-        internal void setDeviceLost()
+        internal static bool IsRaytracedElement(OpenGl_ElementNode aNode)
         {
             throw new NotImplementedException();
         }

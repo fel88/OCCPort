@@ -2,7 +2,7 @@
 
 namespace OCCPort
 {
-    internal class Bnd_Box
+    public class Bnd_Box
     {
         //! Bit flags.
         [Flags]

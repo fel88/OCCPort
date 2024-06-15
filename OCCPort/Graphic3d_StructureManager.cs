@@ -4,9 +4,20 @@ namespace OCCPort
 {
     public class Graphic3d_StructureManager
     {
-        internal void RegisterObject(AIS_InteractiveObject theIObj, Graphic3d_ViewAffinity graphic3d_ViewAffinity)
+
+        public void RegisterObject(object theObject,
+                                                  Graphic3d_ViewAffinity theAffinity)
         {
-            throw new NotImplementedException();
+            Graphic3d_ViewAffinity aResult;
+            if (myRegisteredObjects.Find(theObject, out aResult)
+             && aResult == theAffinity)
+            {
+                return;
+            }
+
+            myRegisteredObjects.Bind(theObject, theAffinity);
         }
+
+        protected Graphic3d_MapOfObject myRegisteredObjects;
     }
 }
