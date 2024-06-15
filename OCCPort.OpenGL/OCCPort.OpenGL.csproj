@@ -44,10 +44,22 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Aspect_GraphicsLibrary.cs" />
+    <Compile Include="Graphic3d_BoundBuffer.cs" />
+    <Compile Include="Graphic3d_Buffer.cs" />
+    <Compile Include="Graphic3d_IndexBuffer.cs" />
     <Compile Include="Graphic3d_ShaderManager.cs" />
+    <Compile Include="OpenGl_Aspects.cs" />
+    <Compile Include="OpenGl_Buffer.cs" />
+    <Compile Include="OpenGl_BufferCompatT.cs" />
+    <Compile Include="OpenGl_Caps.cs" />
+    <Compile Include="OpenGl_ColorFormats.cs" />
     <Compile Include="OpenGl_Context.cs" />
     <Compile Include="OpenGl_Element.cs" />
     <Compile Include="OpenGl_FrameBuffer.cs" />
+    <Compile Include="OpenGl_GraphicDriver.cs" />
+    <Compile Include="OpenGl_IndexBuffer.cs" />
+    <Compile Include="OpenGl_IndexBufferCompat.cs" />
     <Compile Include="OpenGl_LayerList.cs" />
     <Compile Include="OpenGl_NamedResource.cs" />
     <Compile Include="OpenGl_PrimitiveArray.cs" />
@@ -56,10 +68,16 @@
     <Compile Include="OpenGl_ShaderProgram.cs" />
     <Compile Include="OpenGl_ShaderProgramList.cs" />
     <Compile Include="OpenGl_Structure.cs" />
+    <Compile Include="OpenGl_Texture.cs" />
+    <Compile Include="OpenGl_TextureArray.cs" />
+    <Compile Include="OpenGl_VertexBuffer.cs" />
+    <Compile Include="OpenGl_VertexBufferCompat.cs" />
+    <Compile Include="OpenGl_VertexBufferT.cs" />
     <Compile Include="OpenGl_View.cs" />
     <Compile Include="OpenGl_Window.cs" />
     <Compile Include="OpenGl_Workspace.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Standard_Size.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\OCCPort\OCCPort.csproj">

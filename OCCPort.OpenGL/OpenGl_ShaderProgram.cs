@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace OCCPort
+namespace OCCPort.OpenGL
 {
     public class OpenGl_ShaderProgram: OpenGl_NamedResource
     {

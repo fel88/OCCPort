@@ -10,6 +10,13 @@ namespace OCCPort.OpenGL
             myZLayers = new OpenGl_LayerList();
         }
 
+        OpenGl_GraphicDriver myDriver;
+        OpenGl_Window myWindow;
+        OpenGl_Workspace myWorkspace;
+        OpenGl_Caps myCaps;
+        bool myWasRedrawnGL;
+
+
         //=======================================================================
         //function : drawBackground
         //purpose  :
@@ -41,10 +48,11 @@ namespace OCCPort.OpenGL
             //      Step 1: Prepare for render
             // ==================================
 
-            /*const Handle(OpenGl_Context)& aContext = myWorkspace->GetGlContext();
-                  aContext->SetAllowSampleAlphaToCoverage(myRenderParams.ToEnableAlphaToCoverage
-                                                        && theOutputFBO != NULL
-                                                        && theOutputFBO->NbSamples() != 0);*/
+            OpenGl_Context aContext = myWorkspace.GetGlContext();
+
+            aContext.SetAllowSampleAlphaToCoverage(myRenderParams.ToEnableAlphaToCoverage
+                                                  && theOutputFBO != null
+                                                  && theOutputFBO.NbSamples() != 0);
             // ====================================
             //      Step 2: Redraw background
             // ====================================
@@ -80,7 +88,7 @@ namespace OCCPort.OpenGL
             return myZLayers.Layers();
 
         }
-        OpenGl_Window myWindow;
+
 
         public override Aspect_Window Window()
         {

@@ -20,6 +20,8 @@ namespace OCCPort
         {
             
         }
+        int myId;
+        protected Graphic3d_RenderingParams myRenderParams;
 
         public virtual bool IsDefined()
         {

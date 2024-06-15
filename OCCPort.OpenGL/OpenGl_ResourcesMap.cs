@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace OCCPort
+namespace OCCPort.OpenGL
 {
     /*
      * 

@@ -9,6 +9,11 @@ namespace OCCPort.OpenGL
             throw new NotImplementedException();
         }
 
+        internal OpenGl_Aspects Aspects()
+        {
+            throw new NotImplementedException();
+        }
+
         internal bool SetUseZBuffer(bool v)
         {
             throw new NotImplementedException();

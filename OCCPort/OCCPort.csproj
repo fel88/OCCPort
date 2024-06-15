@@ -80,6 +80,7 @@
     <Compile Include="Graphic3d_Layer.cs" />
     <Compile Include="Graphic3d_MapOfStructure.cs" />
     <Compile Include="Graphic3d_Mat4d.cs" />
+    <Compile Include="Graphic3d_RenderingParams.cs" />
     <Compile Include="Graphic3d_ShaderFlags.cs" />
     <Compile Include="Graphic3d_ShaderObject.cs" />
     <Compile Include="Graphic3d_ShaderProgram.cs" />

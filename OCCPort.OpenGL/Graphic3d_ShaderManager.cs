@@ -3,7 +3,7 @@ using System;
 using System.Linq;
 using System.Runtime.Remoting.Contexts;
 
-namespace OCCPort
+namespace OCCPort.OpenGL
 {
     //! This class is responsible for generation of shader programs.
     public class Graphic3d_ShaderManager
