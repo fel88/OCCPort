@@ -16,7 +16,7 @@ namespace OCCPort
 		public Graphic3d_Vec2i TileSize;  //!< size of the Tile, in pixels
 		public Graphic3d_Vec2i Offset;    //!< the lower-left corner of the Tile relative to the View area (or upper-left if IsTopDown is true), in pixels
 		public  bool IsTopDown; //!< 
-		internal bool IsValid()
+		public bool IsValid()
 		{
 
 			return TotalSize.x() > 0 && TotalSize.y() > 0

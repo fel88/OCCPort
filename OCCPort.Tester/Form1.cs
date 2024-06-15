@@ -62,8 +62,14 @@ namespace OCCPort.Tester
             {
                 glControl.MakeCurrent();
             }
+            try
+            {
+                GravityViewManager.View.myView.Redraw();
+            }
+            catch (Exception ex)
+            {
 
-
+            }
             Redraw();
         }
 

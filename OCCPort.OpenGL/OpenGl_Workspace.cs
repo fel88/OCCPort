@@ -9,7 +9,17 @@ namespace OCCPort.OpenGL
             throw new NotImplementedException();
         }
 
+        internal bool Activate()
+        {
+            throw new NotImplementedException();
+        }
+
         internal OpenGl_Aspects Aspects()
+        {
+            throw new NotImplementedException();
+        }
+
+        internal OpenGl_Aspects SetAspects(OpenGl_Aspects myCubeMapParams)
         {
             throw new NotImplementedException();
         }

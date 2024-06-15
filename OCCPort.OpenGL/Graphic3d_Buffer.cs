@@ -2,7 +2,7 @@
 
 namespace OCCPort.OpenGL
 {
-    internal class Graphic3d_Buffer
+    public class Graphic3d_Buffer
     {
         public int Stride;       //!< the distance to the attributes of the next vertex within interleaved array
         public int NbElements;   //!< number of the elements (@sa NbMaxElements() specifying the number of initially allocated number of elements)

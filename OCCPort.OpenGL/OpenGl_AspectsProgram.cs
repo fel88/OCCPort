@@ -1,6 +1,6 @@
 ﻿namespace OCCPort.OpenGL
 {
-    public class OpenGl_VertexBuffer
+    internal class OpenGl_AspectsProgram
     {
     }
 }

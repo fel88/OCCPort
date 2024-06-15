@@ -6,6 +6,12 @@ namespace OCCPort.OpenGL
 {
     public class OpenGl_Context
     {
+        //! @name public properties tracking current state
+
+        public OpenGl_MatrixState<float> ModelWorldState; //!< state of orientation matrix
+        public OpenGl_MatrixState<float> WorldViewState;  //!< state of orientation matrix
+        public OpenGl_MatrixState<float> ProjectionState; //!< state of projection  matrix
+
         internal bool GetResource<T>(string theShareKey, T theProgram)
         {
             throw new NotImplementedException();
@@ -54,7 +60,43 @@ namespace OCCPort.OpenGL
             throw new NotImplementedException();
         }
 
+        internal Graphic3d_Camera Camera()
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void ApplyProjectionMatrix()
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void ApplyModelViewMatrix()
+        {
+            throw new NotImplementedException();
+        }
+
+        //! Return cached viewport definition (x, y, width, height).
+        public int[] Viewport() { return myViewport; }
+
+        int[] myViewport = new int[4];     //!< current viewport
+        int[] myViewportVirt = new int[4]; //!< virtual viewport
+        int myPointSpriteOrig; //!< GL_POINT_SPRITE_COORD_ORIGIN state (
+
         OpenGl_ResourcesMap mySharedResources; //!< shared resources with unique identification key
         public OpenGl_Caps caps; //!< context options
+        internal _core11fwd core11fwd;
+    }
+
+    public class _core11fwd
+    {
+        internal void glDisable(int v)
+        {
+            GL.Disable((EnableCap)v);
+        }
+
+        internal void glEnable(All v)
+        {
+            GL.Enable((EnableCap)v);
+        }
     }
 }

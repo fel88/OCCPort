@@ -2,7 +2,7 @@
 
 namespace OCCPort.OpenGL
 {
-    internal class Graphic3d_IndexBuffer : Graphic3d_Buffer
+    public class Graphic3d_IndexBuffer : Graphic3d_Buffer
     {
         //! Access index at specified position
         public int Index(int theIndex)

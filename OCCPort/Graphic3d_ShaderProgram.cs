@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.Contracts;
 
 namespace OCCPort
 {
@@ -42,5 +43,34 @@ namespace OCCPort
         {
             throw new NotImplementedException();
         }
+
+        //! Pushes int uniform.
+        public bool PushVariableInt(string theName, int theValue)
+        {
+            return PushVariable<int>(theName, theValue);
+        }
+
+
+        
+        Graphic3d_ShaderObjectList myShaderObjects; //!< the list of attached shader objects
+        Graphic3d_ShaderVariableList myVariables;     //!< the list of custom uniform variables
+        Graphic3d_ShaderAttributeList myAttributes;    //!< the list of custom vertex attributes
+        string myHeader;        //!< GLSL header with version code and used extensions
+
+        bool PushVariable<T>(string theName,
+                                                         T theValue)
+        {
+            Graphic3d_ShaderVariable aVariable = Graphic3d_ShaderVariable.Create(theName, theValue);
+            if (aVariable == null || !aVariable.IsDone())
+            {
+                return false;
+            }
+
+            myVariables.Append(aVariable);
+            return true;
+        }
+
+
+
     }
 }

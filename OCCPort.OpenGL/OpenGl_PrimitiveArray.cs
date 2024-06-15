@@ -7,19 +7,19 @@ namespace OCCPort.OpenGL
     {
 
         OpenGl_IndexBuffer myVboIndices;
-        OpenGl_VertexBuffer myVboAttribs;
+        protected OpenGl_VertexBuffer myVboAttribs;
 
-        Graphic3d_IndexBuffer myIndices;
-        Graphic3d_Buffer myAttribs;
+        protected Graphic3d_IndexBuffer myIndices;
+        protected Graphic3d_Buffer myAttribs;
         Graphic3d_BoundBuffer myBounds;
         short myDrawMode;
         bool myIsFillType;
         bool myIsVboInit;
 
         Standard_Size myUID; //!< Unique ID of primitive array. 
-        
-        
 
+
+        
         public void Render(OpenGl_Workspace theWorkspace)
         {
             OpenGl_Aspects anAspectFace = theWorkspace.Aspects();
