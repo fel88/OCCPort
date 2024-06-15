@@ -9,7 +9,12 @@ namespace OCCPort.Tester
 			throw new NotImplementedException();
 		}
 
-		internal void MakeSolid(object value)
+        internal void MakeFace(TopoDS_Face f, Geom_Plane geom_Plane, double v)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void MakeSolid(object value)
 		{
 			throw new NotImplementedException();
 		}

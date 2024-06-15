@@ -1,4 +1,6 @@
-﻿using System;
+﻿using OCCPort;
+using System;
+using System.Net.NetworkInformation;
 
 namespace OCCPort
 {
@@ -13,11 +15,185 @@ namespace OCCPort
         {
             return mgrSelector.Selector();
         }
+        //! @name internal fields
+
+        protected AIS_DataMapOfIOStatus myObjects;
+
+        PrsMgr_PresentationManager myMainPM;
+        V3d_Viewer myMainVwr;
+        V3d_View myLastActiveView;
+        SelectMgr_EntityOwner myLastPicked;
+        bool myToHilightSelected;
+        AIS_Selection mySelection;
+        SelectMgr_AndOrFilter myFilters; //!< context filter (the content active filters
+                                         //!  can be applied with AND or OR operation)
+        Prs3d_Drawer myDefaultDrawer;
+        //Prs3d_Drawer myStyles[Prs3d_TypeOfHighlight_NB];
+        int[] myDetectedSeq;
+        int myCurDetected;
+        int myCurHighlighted;
+        SelectMgr_PickingStrategy myPickingStrategy; //!< picking strategy to be applied within MoveTo()
+        bool myAutoHilight;
+        bool myIsAutoActivateSelMode;
+
+        //=======================================================================
+        //function : Display
+        //purpose  :
+        //=======================================================================
+        public void Display(AIS_InteractiveObject theIObj,
+                                       bool theToUpdateViewer)
+        {
+            if (theIObj == null)
+            {
+                return;
+            }
+
+            int aDispMode = 0, aHiMod = -1, aSelMode = -1;
+            GetDefModes(theIObj, ref aDispMode, ref aHiMod, ref aSelMode);
+            Display(theIObj, aDispMode, myIsAutoActivateSelMode ? aSelMode : -1, theToUpdateViewer);
+        }
+
+        public void GetDefModes(AIS_InteractiveObject theIObj,
+                                         ref int theDispMode,
+                                          ref int theHiMode,
+                                          ref int theSelMode)
+        {
+            if (theIObj == null)
+            {
+                return;
+            }
+
+            theDispMode = theIObj.HasDisplayMode()
+                        ? theIObj.DisplayMode()
+                        : (theIObj.AcceptDisplayMode(myDefaultDrawer.DisplayMode())
+                         ? myDefaultDrawer.DisplayMode()
+                         : 0);
+            theHiMode = theIObj.HasHilightMode() ? theIObj.HilightMode() : theDispMode;
+            theSelMode = theIObj.GlobalSelectionMode();
+        }
+
+
+        //=======================================================================
+        //function : Display
+        //purpose  :
+        //=======================================================================
+        public void Display(AIS_InteractiveObject theIObj,
+                                           int theDispMode,
+                                           int theSelectionMode,
+                                           bool theToUpdateViewer,
+                                           PrsMgr_DisplayStatus theDispStatus = PrsMgr_DisplayStatus.PrsMgr_DisplayStatus_None)
+        {
+            if (theIObj == null)
+            {
+                return;
+            }
+
+            if (theDispStatus == PrsMgr_DisplayStatus.PrsMgr_DisplayStatus_Erased)
+            {
+                Erase(theIObj, theToUpdateViewer);
+                Load(theIObj, theSelectionMode);
+                AIS_GlobalStatus aStatusPtr = myObjects.ChangeSeek(theIObj);
+                if (aStatusPtr != null)
+                {
+                    aStatusPtr.SetDisplayMode(theDispMode);
+                }
+                return;
+            }
+
+            setContextToObject(theIObj);
+            if (!myObjects.IsBound(theIObj))
+            {
+                setObjectStatus(theIObj, PrsMgr_DisplayStatus.PrsMgr_DisplayStatus_Displayed, theDispMode, theSelectionMode);
+                theIObj.ViewAffinity().SetVisible(true); // reset view affinity mask
+                myMainVwr.StructureManager().RegisterObject(theIObj, theIObj.ViewAffinity());
+                myMainPM.Display(theIObj, theDispMode);
+                if (theSelectionMode != -1)
+                {
+                    SelectMgr_SelectableObject anObj = theIObj; // to avoid ambiguity
+                    if (!mgrSelector.Contains(anObj))
+                    {
+                        mgrSelector.Load(theIObj);
+                    }
+                    mgrSelector.Activate(theIObj, theSelectionMode);
+                }
+            }
+            else
+            {
+                AIS_GlobalStatus aStatus = myObjects[theIObj];
+
+                // Mark the presentation modes hidden of interactive object different from aDispMode.
+                // Then make sure aDispMode is displayed and maybe highlighted.
+                // Finally, activate selection mode <SelMode> if not yet activated.
+                int anOldMode = aStatus.DisplayMode();
+                if (anOldMode != theDispMode)
+                {
+                    if (myMainPM.IsHighlighted(theIObj, anOldMode))
+                    {
+                        unhighlightGlobal(theIObj);
+                    }
+                    myMainPM.SetVisibility(theIObj, anOldMode, false);
+                }
+
+                aStatus.SetDisplayMode(theDispMode);
+
+                theIObj.SetDisplayStatus(PrsMgr_DisplayStatus.PrsMgr_DisplayStatus_Displayed);
+                myMainPM.Display(theIObj, theDispMode);
+                if (aStatus.IsHilighted())
+                {
+                    highlightGlobal(theIObj, aStatus.HilightStyle(), theDispMode);
+                }
+                if (theSelectionMode != -1)
+                {
+                    SelectMgr_SelectableObject anObj = theIObj; // to avoid ambiguity
+                    if (!mgrSelector.Contains(anObj))
+                    {
+                        mgrSelector.Load(theIObj);
+                    }
+                    if (!mgrSelector.IsActivated(theIObj, theSelectionMode))
+                    {
+                        aStatus.AddSelectionMode(theSelectionMode);
+                        mgrSelector.Activate(theIObj, theSelectionMode);
+                    }
+                }
+            }
+
+            if (theToUpdateViewer)
+            {
+                myMainVwr.Update();
+            }
+        }
+
+        private void Erase(AIS_InteractiveObject theIObj, bool theToUpdateViewer)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void setObjectStatus(AIS_InteractiveObject theIObj, PrsMgr_DisplayStatus prsMgr_DisplayStatus_Displayed, int theDispMode, int theSelectionMode)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void setContextToObject(AIS_InteractiveObject theIObj)
+        {
+            throw new NotImplementedException();
+        }
+
+
+
+        private void unhighlightGlobal(AIS_InteractiveObject theIObj)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void highlightGlobal(AIS_InteractiveObject theIObj, object value, int theDispMode)
+        {
+            throw new NotImplementedException();
+        }
 
         public AIS_StatusOfPick SelectRectangle(Graphic3d_Vec2i thePntMin,
-                                                               Graphic3d_Vec2i thePntMax,
-                                                               V3d_View theView,
-                                                               AIS_SelectionScheme theSelScheme)
+                                                                   Graphic3d_Vec2i thePntMax,
+                                                                   V3d_View theView,
+                                                                   AIS_SelectionScheme theSelScheme)
         {
             //if (theView.Viewer() != myMainVwr)
             {
@@ -80,6 +256,37 @@ namespace OCCPort
             {
                 Load(anIter.Value(), -1);
                 Activate(anIter.Value(), theMode, theIsForce);
+            }
+        }
+
+        //=======================================================================
+        //function : Load
+        //purpose  :
+        //=======================================================================
+        public void Load(AIS_InteractiveObject theIObj,
+                                    int theSelMode)
+        {
+            if (theIObj == null)
+            {
+                return;
+            }
+
+            setContextToObject(theIObj);
+            if (!myObjects.IsBound(theIObj))
+            {
+                //int aDispMode, aHiMod, aSelModeDef;                
+                int aDispMode = 0, aHiMod = -1, aSelModeDef = -1;
+                GetDefModes(theIObj, ref aDispMode, ref aHiMod, ref aSelModeDef);
+                setObjectStatus(theIObj, PrsMgr_DisplayStatus.PrsMgr_DisplayStatus_Erased, aDispMode, theSelMode != -1 ? theSelMode : aSelModeDef);
+                theIObj.ViewAffinity().SetVisible(true); // reset view affinity mask
+                myMainVwr.StructureManager().RegisterObject(theIObj, theIObj.ViewAffinity());
+            }
+
+            // Register theIObj in the selection manager to prepare further activation of selection
+            SelectMgr_SelectableObject anObj = theIObj; // to avoid ambiguity
+            if (!mgrSelector.Contains(anObj))
+            {
+                mgrSelector.Load(theIObj);
             }
         }
 

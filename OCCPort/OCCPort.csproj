@@ -41,9 +41,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AIS_DataMapOfIOStatus.cs" />
+    <Compile Include="AIS_GlobalStatus.cs" />
     <Compile Include="AIS_InteractiveContext.cs" />
+    <Compile Include="AIS_InteractiveObject.cs" />
     <Compile Include="AIS_ListOfInteractive.cs" />
     <Compile Include="AIS_NArray1OfEntityOwner.cs" />
+    <Compile Include="AIS_Selection.cs" />
     <Compile Include="AIS_SelectionScheme.cs" />
     <Compile Include="AIS_Shape.cs" />
     <Compile Include="AIS_StatusOfPick.cs" />
@@ -65,6 +69,9 @@
     <Compile Include="BVH_VecNt.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="ElSLib.cs" />
+    <Compile Include="Geom_ElementarySurface.cs" />
+    <Compile Include="Geom_Plane.cs" />
+    <Compile Include="Geom_Surface.cs" />
     <Compile Include="gp.cs" />
     <Compile Include="gp_Ax1.cs" />
     <Compile Include="gp_Ax2.cs" />
@@ -117,6 +124,7 @@
     <Compile Include="Graphic3d_Vec3d.cs" />
     <Compile Include="Graphic3d_Vec4d.cs" />
     <Compile Include="Graphic3d_Vertex.cs" />
+    <Compile Include="Graphic3d_ViewAffinity.cs" />
     <Compile Include="Helpers.cs" />
     <Compile Include="Image_PixMap.cs" />
     <Compile Include="Interface_InterfaceModel.cs" />
@@ -128,8 +136,15 @@
     <Compile Include="OpenGl_LayerFilter.cs" />
     <Compile Include="OpenGl_RenderFilter.cs" />
     <Compile Include="Precision.cs" />
+    <Compile Include="Prs3d_Drawer.cs" />
+    <Compile Include="PrsMgr_DisplayStatus.cs" />
+    <Compile Include="PrsMgr_PresentableObject.cs" />
+    <Compile Include="PrsMgr_PresentationManager.cs" />
+    <Compile Include="SelectMgr_AndOrFilter.cs" />
     <Compile Include="SelectMgr_EntityOwner.cs" />
     <Compile Include="SelectMgr_IndexedDataMapOfOwnerCriterion.cs" />
+    <Compile Include="SelectMgr_PickingStrategy.cs" />
+    <Compile Include="SelectMgr_SelectableObject.cs" />
     <Compile Include="SelectMgr_SelectingVolumeManager.cs" />
     <Compile Include="SelectMgr_SelectionManager.cs" />
     <Compile Include="SelectMgr_ToleranceMap.cs" />
