@@ -1,4 +1,5 @@
 ﻿using OCCPort;
+using OCCPort.Tester;
 using System;
 using System.Net.NetworkInformation;
 
@@ -311,6 +312,11 @@ namespace OCCPort
         }
 
         private AIS_StatusOfPick Select(AIS_NArray1OfEntityOwner aPickedOwners, AIS_SelectionScheme theSelScheme)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetDisplayMode(AIS_Shape shape, AIS_DisplayMode aIS_Shaded, bool v)
         {
             throw new NotImplementedException();
         }

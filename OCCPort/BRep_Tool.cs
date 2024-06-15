@@ -2,9 +2,9 @@
 
 namespace OCCPort
 {
-    public class TopoDS_Shell : TopoDS_Shape
+    internal class BRep_Tool
     {
-        internal void Closed(bool v)
+        internal static bool IsClosed(TopoDS_Shell myShell)
         {
             throw new NotImplementedException();
         }

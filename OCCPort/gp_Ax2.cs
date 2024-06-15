@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace OCCPort.Tester
+namespace OCCPort
 {
 	internal class gp_Ax2
 	{

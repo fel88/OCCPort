@@ -1,4 +1,4 @@
-﻿namespace OCCPort.Tester
+﻿namespace OCCPort
 {
     internal class Geom_Plane: Geom_ElementarySurface
     {

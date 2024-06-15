@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Security.Cryptography;
 
-namespace OCCPort.Tester
+namespace OCCPort
 {
     internal class BRepPrim_GWedge
     {
@@ -30,14 +30,63 @@ namespace OCCPort.Tester
         bool[] FacesBuilt = new bool[6];
         bool[] myInfinite = new bool[6];
 
+        public TopoDS_Shell Shell()
+        {
+            if (IsDegeneratedShape())
+                throw new Standard_DomainError();
+
+            if (!ShellBuilt)
+            {
+                myBuilder.MakeShell(myShell);
+
+                if (HasFace(BRepPrim_Direction.BRepPrim_XMin))
+                    myBuilder.AddShellFace(myShell, Face(BRepPrim_Direction.BRepPrim_XMin));
+                if (HasFace(BRepPrim_Direction.BRepPrim_XMax))
+                    myBuilder.AddShellFace(myShell, Face(BRepPrim_Direction.BRepPrim_XMax));
+                if (HasFace(BRepPrim_Direction.BRepPrim_YMin))
+                    myBuilder.AddShellFace(myShell, Face(BRepPrim_Direction.BRepPrim_YMin));
+                if (HasFace(BRepPrim_Direction.BRepPrim_YMax))
+                    myBuilder.AddShellFace(myShell, Face(BRepPrim_Direction.BRepPrim_YMax));
+                if (HasFace(BRepPrim_Direction.BRepPrim_ZMin))
+                    myBuilder.AddShellFace(myShell, Face(BRepPrim_Direction.BRepPrim_ZMin));
+                if (HasFace(BRepPrim_Direction.BRepPrim_ZMax))
+                    myBuilder.AddShellFace(myShell, Face(BRepPrim_Direction.BRepPrim_ZMax));
+
+                myShell.Closed(BRep_Tool.IsClosed(myShell));
+                myBuilder.CompleteShell(myShell);
+                ShellBuilt = true;
+            }
+            return myShell;
+        }
+
+        private bool IsDegeneratedShape()
+        {
+            throw new NotImplementedException();
+        }
+
+
+
+        //=======================================================================
+        //function : HasFace 
+        //purpose  : true if the face exist in one direction
+        //=======================================================================
+
+        public bool HasFace(BRepPrim_Direction d1)
+        {
+            bool state = !myInfinite[BRepPrim_Wedge_NumDir1(d1)];
+            if (d1 == BRepPrim_Direction.BRepPrim_YMax) state = state && (Z2Max != Z2Min)
+                                                       && (X2Max != X2Min);
+            return state;
+        }
+
         //=======================================================================
         //function : BRepPrim_Wedge_NumDir2
         //purpose  : when giving two directions return the range of the edge
         //=======================================================================
 
         static int BRepPrim_Wedge_NumDir2
-          (BRepPrim_Direction d1,
-    BRepPrim_Direction d2)
+                      (BRepPrim_Direction d1,
+                BRepPrim_Direction d2)
         {
             int i1 = BRepPrim_Wedge_NumDir1(d1);
             int i2 = BRepPrim_Wedge_NumDir1(d2);

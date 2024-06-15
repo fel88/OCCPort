@@ -64,7 +64,7 @@ namespace OCCPort.Tester
             }
             try
             {
-                GravityViewManager.View.myView.Redraw();
+                //GravityViewManager.View.myView.Redraw();
             }
             catch (Exception ex)
             {
@@ -253,8 +253,8 @@ namespace OCCPort.Tester
         {
             GravityViewManager.View.myView.Items.Clear();
         }
-
-        private void toolStripButton7_Click(object sender, EventArgs e)
+        AIS_InteractiveContext myAISContext;
+        public void AddBox()
         {
             var d = DialogHelpers.StartDialog();
             d.Text = "New box";
@@ -274,10 +274,15 @@ namespace OCCPort.Tester
             box.Build();
             var solid = box.Solid();
             var shape = new AIS_Shape(solid);
-            //myAISContext()->Display(shape, Standard_True);
-            //	myAISContext()->SetDisplayMode(shape, AIS_Shaded, false);
+            myAISContext.Display(shape, true);
+            myAISContext.SetDisplayMode(shape, AIS_DisplayMode. AIS_Shaded, false);
             //auto hn = GetHandle(*shape);
             //hh->FromObjHandle(hn);
+        }
+
+        private void toolStripButton7_Click(object sender, EventArgs e)
+        {
+            AddBox();
         }
     }
 

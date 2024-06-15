@@ -1,4 +1,4 @@
-﻿namespace OCCPort.Tester
+﻿namespace OCCPort
 {
 	internal class TopoDS_Wire
 	{

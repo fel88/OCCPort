@@ -1,11 +1,16 @@
 ﻿using System;
 
-namespace OCCPort.Tester
+namespace OCCPort
 {
     internal class BRepPrim_Builder
     {
         public BRepPrim_Builder()
         {
+        }
+        public void MakeShell(TopoDS_Shell S)
+        {
+            myBuilder.MakeShell(S);
+            S.Closed(true);
         }
 
         internal void AddFaceWire(TopoDS_Face topoDS_Face, object value)
@@ -26,5 +31,17 @@ namespace OCCPort.Tester
         {
             throw new NotImplementedException();
         }
+
+        internal void CompleteShell(TopoDS_Shell myShell)
+        {
+            throw new NotImplementedException();
+        }
+        public void AddShellFace(TopoDS_Shell S,
+
+                     TopoDS_Face F)
+        {
+            myBuilder.Add(S, F);
+        }
+
     }
 }

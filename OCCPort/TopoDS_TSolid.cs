@@ -1,6 +1,6 @@
 ﻿namespace OCCPort
 {
-    internal class Geom_Surface
+    internal class TopoDS_TSolid
     {
     }
 }
