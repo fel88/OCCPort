@@ -110,17 +110,80 @@ namespace OCCPort
             }
         }
 
-
-        internal void MakeFace(TopoDS_Face f, Geom_Plane geom_Plane, double v)
+        internal void Add(TopoDS_Edge e, TopoDS_Vertex vV)
         {
             throw new NotImplementedException();
         }
 
-        internal void MakeShell(TopoDS_Shell s)
+        internal void Add(TopoDS_Wire w, TopoDS_Edge eE)
         {
             throw new NotImplementedException();
         }
 
-        
+        internal void Add(TopoDS_Face f, TopoDS_Wire w)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void MakeEdge(TopoDS_Edge E, Geom_Curve C, double Tol)
+        {
+            throw new NotImplementedException();
+        }
+        public void MakeEdge(TopoDS_Edge E)
+        {
+            BRep_TEdge TE = new BRep_TEdge();
+            if (E != null && E.Locked())
+            {
+                throw new TopoDS_LockedShape("BRep_Builder::MakeEdge");
+            }
+            MakeShape(E, TE);
+        }
+
+        private void MakeShape(TopoDS_Edge e, BRep_TEdge tE)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void MakeFace(TopoDS_Face F, Geom_Surface S,
+                    double Tol)
+        {
+            BRep_TFace TF = new BRep_TFace();
+            if (F != null && F.Locked())
+            {
+                throw new TopoDS_LockedShape("BRep_Builder::MakeFace");
+            }
+            TF.Surface(S);
+            TF.Tolerance(Tol);
+            MakeShape(F, TF);
+        }
+
+        private void MakeShape(TopoDS_Face f, BRep_TFace tF)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void MakeFace(TopoDS_Face F)
+        {
+            BRep_TFace TF = new BRep_TFace();
+            MakeShape(F, TF);
+        }
+
+
+        internal void UpdateEdge(TopoDS_Edge e, Geom2d_Line geom2d_Line, TopoDS_Face f, double v)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void UpdateVertex(TopoDS_Vertex V,
+            double Par, TopoDS_Edge E, double F, double Tol)
+        {
+            TopLoc_Location l = new TopLoc_Location();
+            //UpdateVertex(V, Par, E, BRep_Tool.Surface(F, l), l, Tol);
+        }
+
+        internal void UpdateVertex(TopoDS_Vertex vV, double p, TopoDS_Edge e, double v)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

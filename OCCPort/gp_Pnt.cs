@@ -85,5 +85,10 @@ namespace OCCPort
 		{
 			throw new NotImplementedException();
 		}
-	}
+
+        internal gp_Pnt Transformed(gp_Trsf t)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

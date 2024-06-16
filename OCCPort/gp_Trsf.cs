@@ -200,5 +200,10 @@ namespace OCCPort
         {
             throw new NotImplementedException();
         }
+
+        internal void SetTransformation(gp_Ax3 pos)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

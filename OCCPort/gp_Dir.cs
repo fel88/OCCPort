@@ -5,34 +5,43 @@ namespace OCCPort
     public struct gp_Dir
     {
         private gp_XYZ coord;
-		//! Creates a direction corresponding to X axis.
+        //! Creates a direction corresponding to X axis.
 
-		internal double X()
-		{
-			return coord.X();
-		}
-		internal double Y()
-		{
-			return coord.Y();
-		}
-		internal double Z()
-		{
-			return coord.Z();
-		}
+        internal double X()
+        {
+            return coord.X();
+        }
+        internal double Y()
+        {
+            return coord.Y();
+        }
+        internal double Z()
+        {
+            return coord.Z();
+        }
 
-		public static gp_Dir operator ^(gp_Dir v, gp_Dir theRight)
+        public static gp_Dir operator ^(gp_Dir v, gp_Dir theRight)
         {
             return v.Crossed(theRight);
         }
-		
 
-		public static gp_Dir operator -(gp_Dir temp)
-		{
-			return temp.Reversed();
-		}
 
-		//! Normalizes the vector theV and creates a direction. Raises ConstructionError if theV.Magnitude() <= Resolution.
-		public gp_Dir(gp_Vec theV)
+        //! Computes the scalar product
+        double Dot(gp_Dir theOther) { return coord.Dot(theOther.coord); }
+
+        public static double operator *(gp_Dir v, gp_Dir theOther)
+        {
+            return v.Dot(theOther);
+        }
+
+
+        public static gp_Dir operator -(gp_Dir temp)
+        {
+            return temp.Reversed();
+        }
+
+        //! Normalizes the vector theV and creates a direction. Raises ConstructionError if theV.Magnitude() <= Resolution.
+        public gp_Dir(gp_Vec theV)
         {
             gp_XYZ aXYZ = theV.XYZ();
             double aX = aXYZ.X();

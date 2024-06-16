@@ -2,14 +2,14 @@
 
 namespace OCCPort
 {
-    public class TopoDS_Edge
+    internal class BRep_TFace
     {
-        internal bool Locked()
+        internal void Surface(Geom_Surface s)
         {
             throw new NotImplementedException();
         }
 
-        internal void Reverse()
+        internal void Tolerance(double tol)
         {
             throw new NotImplementedException();
         }

@@ -19,6 +19,11 @@
         }
 
 
+        public void MakeShell(TopoDS_Shell S)
+        {
+            TopoDS_TShell TS = new TopoDS_TShell();
+            MakeShape(S, TS);
+        }
 
     }
 }

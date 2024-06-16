@@ -6,6 +6,11 @@ namespace OCCPort
     {
         internal TopoDS_ListOfShape myShapes;
 
+        internal void Checked(bool v)
+        {
+            throw new NotImplementedException();
+        }
+
         internal bool Free()
         {
             throw new NotImplementedException();

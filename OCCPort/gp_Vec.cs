@@ -27,7 +27,10 @@
         {
             return v.Multiplied(theScalar);
         }
-
+        public static gp_Vec operator *(double theScalar, gp_Vec v)
+        {
+            return v.Multiplied(theScalar);
+        }
         public static gp_Vec operator +(gp_Vec v, gp_Vec theOther)
         {
             return v.Added(theOther);
