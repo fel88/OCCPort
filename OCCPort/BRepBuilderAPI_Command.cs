@@ -13,12 +13,12 @@ namespace OCCPort
             myDone = true;
         }
         public void Check()
-{
-  if (!myDone)
-    throw new StdFail_NotDone("BRep_API: command not done");
-    }
+        {
+            if (!myDone)
+                throw new StdFail_NotDone("BRep_API: command not done");
+        }
 
-    public bool IsDone()
+        public bool IsDone()
         {
             return myDone;
         }

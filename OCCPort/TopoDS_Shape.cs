@@ -5,6 +5,16 @@ namespace OCCPort
 {
     public class TopoDS_Shape
     {
+
+        //! Sets the closedness flag.
+        public void Closed(bool theIsClosed) { myTShape.Closed(theIsClosed); }
+
+        //! Returns the closedness flag.
+        public bool Closed()
+        {
+            return myTShape.Closed();
+        }
+
         //! Returns the free flag.
         public bool Free() { return myTShape.Free(); }
 

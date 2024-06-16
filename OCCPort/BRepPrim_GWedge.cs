@@ -6,6 +6,10 @@ namespace OCCPort
 {
     internal class BRepPrim_GWedge
     {
+        public BRepPrim_GWedge()
+        {
+            myShell = new TopoDS_Shell();
+        }
         static int[] num = { 0, 1, 2, 3, 4, 5 };
         protected BRepPrim_Builder myBuilder;
         protected gp_Ax2 myAxes;
@@ -62,7 +66,14 @@ namespace OCCPort
 
         private bool IsDegeneratedShape()
         {
-            throw new NotImplementedException();
+            if ((XMax - XMin <= Precision.Confusion()) ||
+   (YMax - YMin <= Precision.Confusion()) ||
+   (ZMax - ZMin <= Precision.Confusion()) ||
+   (Z2Max - Z2Min < 0) ||
+   (X2Max - X2Min < 0))
+                return true;
+            else
+                return false;
         }
 
 
@@ -812,6 +823,8 @@ new[]                      { 8,10, 4, 6,-1,-1},
 
             BRepPrim_Wedge_Init(ref ShellBuilt, VerticesBuilt, EdgesBuilt,
                 WiresBuilt, FacesBuilt);
+
+            myShell = new TopoDS_Shell();
         }
 
 

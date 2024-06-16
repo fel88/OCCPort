@@ -187,7 +187,11 @@
     <Compile Include="TopAbs_Orientation.cs" />
     <Compile Include="TopAbs_Orientation1.cs" />
     <Compile Include="TopAbs_ShapeEnum.cs" />
+    <Compile Include="TopLoc_Datum3D.cs" />
+    <Compile Include="TopLoc_ItemLocation.cs" />
     <Compile Include="TopLoc_Location.cs" />
+    <Compile Include="TopLoc_SListNodeOfItemLocation.cs" />
+    <Compile Include="TopLoc_SListOfItemLocation.cs" />
     <Compile Include="TopoDS.cs" />
     <Compile Include="TopoDS_Builder.cs" />
     <Compile Include="TopoDS_Edge.cs" />
