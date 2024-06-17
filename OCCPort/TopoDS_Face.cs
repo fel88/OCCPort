@@ -1,4 +1,6 @@
-﻿namespace OCCPort
+﻿using System;
+
+namespace OCCPort
 {
 
     //! Describes a face which
@@ -11,6 +13,14 @@
     public class TopoDS_Face : TopoDS_Shape
 
     {
+        internal bool Checked()
+        {
+            throw new NotImplementedException();
+        }
 
+        internal bool Locked()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

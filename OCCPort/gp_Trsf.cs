@@ -2,7 +2,7 @@
 
 namespace OCCPort
 {
-    internal class gp_Trsf
+    public class gp_Trsf
     {
 
         public gp_Trsf()
@@ -196,9 +196,22 @@ namespace OCCPort
             loc = theV.XYZ();
         }
 
-        internal bool IsNegative()
+        //! Returns true if the determinant of the vectorial part of
+        //! this transformation is negative.
+        public bool IsNegative() { return (scale < 0.0); }
+
+
+        internal void SetTransformation(gp_Ax3 A3)
         {
-            throw new NotImplementedException();
+            shape = gp_TrsfForm.gp_CompoundTrsf;
+            scale = 1.0;
+            matrix.SetRows(A3.XDirection().XYZ(),
+                            A3.YDirection().XYZ(),
+                            A3.Direction().XYZ());
+            loc = A3.Location().XYZ();
+            loc.Multiply(matrix);
+            loc.Reverse();
+
         }
     }
 }

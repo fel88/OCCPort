@@ -2,7 +2,7 @@
 
 namespace OCCPort
 {
-    internal class gp_Mat
+    public class gp_Mat
     {
         double[][] myMat = new double[3][];
         //! creates  a matrix with null coefficients.
@@ -153,6 +153,14 @@ namespace OCCPort
         {
             myMat[0][0] = myMat[1][1] = myMat[2][2] = 1.0;
             myMat[0][1] = myMat[0][2] = myMat[1][0] = myMat[1][2] = myMat[2][0] = myMat[2][1] = 0.0;
+        }
+
+        internal void SetRows(gp_XYZ theRow1, gp_XYZ theRow2, gp_XYZ theRow3)
+        {
+            myMat[0][0] = theRow1.X(); myMat[0][1] = theRow1.Y(); myMat[0][2] = theRow1.Z();
+            myMat[1][0] = theRow2.X(); myMat[1][1] = theRow2.Y(); myMat[1][2] = theRow2.Z();
+            myMat[2][0] = theRow3.X(); myMat[2][1] = theRow3.Y(); myMat[2][2] = theRow3.Z();
+
         }
     }
 }

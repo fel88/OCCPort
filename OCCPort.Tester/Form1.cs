@@ -272,6 +272,7 @@ namespace OCCPort.Tester
             gp_Pnt p1 = new gp_Pnt(0, 0, 0);
             gp_Pnt p2 = new gp_Pnt(w, h, l);
             BRepPrimAPI_MakeBox box = new BRepPrimAPI_MakeBox(p1, p2);
+            
             box.Build();
             var solid = box.Solid();
             var shape = new AIS_Shape(solid);

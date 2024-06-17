@@ -5,7 +5,10 @@ namespace OCCPort.Tester
     public class BRepPrimAPI_MakeBox : BRepBuilderAPI_MakeShape
     {
         BRepPrim_Wedge myWedge;
-
+        public BRepPrimAPI_MakeBox()
+        {
+            myShape = new TopoDS_Solid();
+        }
         public gp_Pnt pmin(gp_Pnt p,
             double dx,
             double dy,
@@ -40,7 +43,7 @@ namespace OCCPort.Tester
                 Math.Abs(P2.X() - P1.X()),
                 Math.Abs(P2.Y() - P1.Y()),
                 Math.Abs(P2.Z() - P1.Z()));
-
+            myShape = new TopoDS_Solid();
         }
 
         public TopoDS_Shell Shell()
