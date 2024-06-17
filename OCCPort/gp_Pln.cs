@@ -30,29 +30,34 @@ namespace OCCPort
             if (Babs <= Aabs && Babs <= Cabs)
             {
                 if (Aabs > Cabs) pos = new gp_Ax3(P, V, new gp_Dir(-C, 0.0, A));
-                else pos =new  gp_Ax3(P, V, new gp_Dir(C, 0.0, -A));
+                else pos = new gp_Ax3(P, V, new gp_Dir(C, 0.0, -A));
             }
             else if (Aabs <= Babs && Aabs <= Cabs)
             {
                 if (Babs > Cabs) pos = new gp_Ax3(P, V, new gp_Dir(0.0, -C, B));
-                else pos =new gp_Ax3(P, V, new gp_Dir(0.0, C, -B));
+                else pos = new gp_Ax3(P, V, new gp_Dir(0.0, C, -B));
             }
             else
             {
-                if (Aabs > Babs) pos =new gp_Ax3(P, V, new gp_Dir(-B, A, 0.0));
+                if (Aabs > Babs) pos = new gp_Ax3(P, V, new gp_Dir(-B, A, 0.0));
                 else pos = new gp_Ax3(P, V, new gp_Dir(B, -A, 0.0));
             }
         }
 
 
-        internal gp_Ax2 XAxis()
+
+        //! Returns the X axis of the plane.
+        public gp_Ax1 XAxis()
         {
-            throw new NotImplementedException();
+            return new gp_Ax1(pos.Location(), pos.XDirection());
         }
 
-        internal gp_Ax2 YAxis()
+        //! Returns the Y axis  of the plane.
+        public gp_Ax1 YAxis()
         {
-            throw new NotImplementedException();
+            return new gp_Ax1(pos.Location(), pos.YDirection());
         }
+
+
     }
 }

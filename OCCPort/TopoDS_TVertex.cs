@@ -5,5 +5,9 @@
 
     public class TopoDS_TVertex : TopoDS_TShape
     {
+        public override TopAbs_ShapeEnum ShapeType()
+        {
+            return TopAbs_ShapeEnum.TopAbs_VERTEX;
+        }
     }
 }

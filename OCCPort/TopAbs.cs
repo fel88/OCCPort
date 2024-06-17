@@ -14,6 +14,10 @@ namespace OCCPort
 			return TopAbs_Table_Reverse[(int)Ori];
 		}
 
-	}
+        internal static TopAbs_Orientation Compose(TopAbs_Orientation myOrientation, TopAbs_Orientation topAbs_Orientation)
+        {
+            throw new NotImplementedException();
+        }
+    }
 
 }

@@ -9,6 +9,12 @@
             throw new Standard_DomainError("BRep_CurveRepresentation");
         }
 
+        public bool IsCurveOnSurface(Geom_Surface a, TopLoc_Location f)
+        {
+            return false;
+        }
+
+
         public void Curve3D(Geom_Curve cc)
         {
             throw new Standard_DomainError("BRep_CurveRepresentation");

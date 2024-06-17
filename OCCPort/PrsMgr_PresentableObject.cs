@@ -56,7 +56,12 @@
 		bool myHasOwnPresentations;     //!< flag indicating if object should have own presentations
 
 		bool myToPropagateVisualState;  //!< flag indicating if visual state (display/erase/color) should be propagated to all children
-    }
+
+
+        //! Returns true if the Interactive Object has display mode setting overriding global setting (within Interactive Context).
+        public bool HasDisplayMode()  { return myDrawer.DisplayMode() != -1; }
+
+}
 
 
 }

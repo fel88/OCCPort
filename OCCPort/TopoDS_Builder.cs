@@ -29,7 +29,8 @@ namespace OCCPort
             // Note that freezing aComponent before testing if aShape is free
             // prevents from self-insertion
             // but aShape will be frozen when the Exception is raised
-            if (aShape.Free())
+            //if (aShape.Free())
+            if (true)
             {
                 uint[] aTb =                 {
       //COMPOUND to:

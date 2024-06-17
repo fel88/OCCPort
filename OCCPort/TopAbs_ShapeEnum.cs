@@ -1,6 +1,6 @@
 ﻿namespace OCCPort
 {
-    enum TopAbs_ShapeEnum
+    public enum TopAbs_ShapeEnum
     {
         TopAbs_COMPOUND,
         TopAbs_COMPSOLID,

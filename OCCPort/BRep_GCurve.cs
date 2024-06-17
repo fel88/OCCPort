@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace OCCPort
 {
@@ -17,6 +18,14 @@ namespace OCCPort
         {
 
         }
+        public void SetRange(double First,
+
+                   double Last)
+        {
+            myFirst = First;
+            myLast = Last;
+            Update();
+        }
 
         protected double myFirst;
         protected double myLast;
@@ -25,14 +34,15 @@ namespace OCCPort
         {
         }
 
-        internal void Range(double f, double l)
+        //=======================================================================
+
+        public void Range(double First,
+                           double Last)
         {
-            throw new NotImplementedException();
+            First = myFirst;
+            Last = myLast;
         }
 
-        internal bool IsCurveOnSurface(Geom_Surface s, TopLoc_Location l)
-        {
-            throw new NotImplementedException();
-        }
-    }//! Root class for the curve representations. Contains
+
+    }//! Root class for the curve repre ntations. Contains
 }

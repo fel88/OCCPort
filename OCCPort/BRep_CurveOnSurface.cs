@@ -24,9 +24,6 @@ namespace OCCPort
 
 
 
-        internal void SetRange(double aFCur, double aLCur)
-        {
-            throw new NotImplementedException();
-        }
+        
     }
 }

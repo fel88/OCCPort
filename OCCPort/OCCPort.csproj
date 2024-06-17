@@ -62,6 +62,7 @@
     <Compile Include="Aspect_GradientFillMethod.cs" />
     <Compile Include="Aspect_SkydomeBackground.cs" />
     <Compile Include="Aspect_TypeOfFacingModel.cs" />
+    <Compile Include="Aspect_TypeOfHighlightMethod.cs" />
     <Compile Include="Bnd_Box.cs" />
     <Compile Include="BRepBuilderAPI_Command.cs" />
     <Compile Include="BRepBuilderAPI_MakeShape.cs" />
@@ -113,6 +114,7 @@
     <Compile Include="gp_Vec.cs" />
     <Compile Include="gp_XY.cs" />
     <Compile Include="gp_XYZ.cs" />
+    <Compile Include="Graphic3d_AspectFillArea3d.cs" />
     <Compile Include="Graphic3d_BndBox3d.cs" />
     <Compile Include="Graphic3d_BoundBuffer.cs" />
     <Compile Include="Graphic3d_Buffer.cs" />
@@ -130,6 +132,7 @@
     <Compile Include="Graphic3d_MapOfStructure.cs" />
     <Compile Include="Graphic3d_Mat4.cs" />
     <Compile Include="Graphic3d_Mat4d.cs" />
+    <Compile Include="Graphic3d_PresentationAttributes.cs" />
     <Compile Include="Graphic3d_RenderingMode.cs" />
     <Compile Include="Graphic3d_RenderingParams.cs" />
     <Compile Include="Graphic3d_SequenceOfHClipPlane.cs" />
@@ -161,10 +164,12 @@
     <Compile Include="Graphic3d_Vec4d.cs" />
     <Compile Include="Graphic3d_Vertex.cs" />
     <Compile Include="Graphic3d_ViewAffinity.cs" />
+    <Compile Include="Graphic3d_ZLayerId.cs" />
     <Compile Include="Helpers.cs" />
     <Compile Include="Image_PixMap.cs" />
     <Compile Include="Interface_InterfaceModel.cs" />
     <Compile Include="Message_ProgressRange.cs" />
+    <Compile Include="NCollection_Map.cs" />
     <Compile Include="NCollection_Mat4.cs" />
     <Compile Include="NCollection_Vec2.cs" />
     <Compile Include="NCollection_Vec2i.cs" />
@@ -183,6 +188,7 @@
     <Compile Include="PrsMgr_PresentationManager.cs" />
     <Compile Include="PrsMgr_Presentations.cs" />
     <Compile Include="PrsMgr_TypeOfPresentation3d.cs" />
+    <Compile Include="Quantity_ColorRGBA.cs" />
     <Compile Include="SelectMgr_AndOrFilter.cs" />
     <Compile Include="SelectMgr_EntityOwner.cs" />
     <Compile Include="SelectMgr_IndexedDataMapOfOwnerCriterion.cs" />
@@ -206,6 +212,9 @@
     <Compile Include="TopAbs_Orientation.cs" />
     <Compile Include="TopAbs_Orientation1.cs" />
     <Compile Include="TopAbs_ShapeEnum.cs" />
+    <Compile Include="TopExp.cs" />
+    <Compile Include="TopExp_Explorer.cs" />
+    <Compile Include="TopExp_Stack.cs" />
     <Compile Include="TopLoc_Datum3D.cs" />
     <Compile Include="TopLoc_ItemLocation.cs" />
     <Compile Include="TopLoc_Location.cs" />
@@ -216,6 +225,8 @@
     <Compile Include="TopoDS_Edge.cs" />
     <Compile Include="TopoDS_Face.cs" />
     <Compile Include="TopoDS_FrozenShape.cs" />
+    <Compile Include="TopoDS_Iterator.cs" />
+    <Compile Include="TopoDS_ListIteratorOfListOfShape.cs" />
     <Compile Include="TopoDS_ListOfShape.cs" />
     <Compile Include="TopoDS_LockedShape.cs" />
     <Compile Include="TopoDS_Shape.cs" />
@@ -231,6 +242,7 @@
     <Compile Include="TopoDS_UnCompatibleShapes.cs" />
     <Compile Include="TopoDS_Vertex.cs" />
     <Compile Include="TopoDS_Wire.cs" />
+    <Compile Include="TopTools_ShapeMapHasher.cs" />
     <Compile Include="TransformMatrices.cs" />
     <Compile Include="V3d.cs" />
     <Compile Include="V3d_TypeOfOrientation.cs" />

@@ -20,7 +20,7 @@ namespace OCCPort.Tester
             InitializeComponent();
             glControl = new OpenTK.GLControl(new OpenTK.Graphics.GraphicsMode(32, 24, 0, 8));
 
-
+            myAISContext = new AIS_InteractiveContext(new V3d_Viewer ());
 
 
             if (glControl.Context.GraphicsMode.Samples == 0)

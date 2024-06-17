@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace OCCPort.Tester
+namespace OCCPort
 {
-    internal class TopoDS
+    public class TopoDS
     {
 
         //! Casts shape S to the more specialized return type, Solid.
@@ -19,7 +19,10 @@ namespace OCCPort.Tester
             //return *(TopoDS_Solid*)&S;
         }
 
-
+        internal static TopoDS_Edge Edge(TopoDS_Shape theShape)
+        {
+            throw new NotImplementedException();
+        }
 
         internal static TopoDS_Shell Shell(TopoDS_Shape myShape)
         {

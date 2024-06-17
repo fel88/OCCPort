@@ -1,15 +1,58 @@
-﻿using System;
+﻿using OCCPort;
+using System;
+using System.Collections.Generic;
 
 namespace OCCPort
 {
     internal class BRep_Tool
     {
-        internal static bool IsClosed(TopoDS_Shell myShell)
+
+        public static bool IsClosed(TopoDS_Shape theShape)
         {
-            throw new NotImplementedException();
+            if (theShape.ShapeType() == TopAbs_ShapeEnum.TopAbs_SHELL)
+            {
+                //Dictionary<TopoDS_Shape, TopTools_ShapeMapHasher> aMap(101, new NCollection_IncAllocator);
+                NCollection_Map aMap = new NCollection_Map();
+                TopExp_Explorer exp = new TopExp_Explorer(theShape.Oriented(TopAbs_Orientation.TopAbs_FORWARD), TopAbs_ShapeEnum.TopAbs_EDGE);
+                bool hasBound = false;
+                for (; exp.More(); exp.Next())
+                {
+                    TopoDS_Edge E = TopoDS.Edge(exp.Current());
+                    if (BRep_Tool.Degenerated(E) || E.Orientation() == TopAbs_Orientation.TopAbs_INTERNAL || E.Orientation() == TopAbs_Orientation.TopAbs_EXTERNAL)
+                        continue;
+                    hasBound = true;
+                    if (!aMap.Add(E))
+                        aMap.Remove(E);
+                }
+                return hasBound && aMap.IsEmpty();
+            }
+            else if (theShape.ShapeType() == TopAbs_ShapeEnum.TopAbs_WIRE)
+            {
+                //NCollection_Map<TopoDS_Shape, TopTools_ShapeMapHasher> aMap(101, new NCollection_IncAllocator);
+                NCollection_Map aMap = new NCollection_Map();
+                TopExp_Explorer exp = new TopExp_Explorer(theShape.Oriented(TopAbs_Orientation.TopAbs_FORWARD), TopAbs_ShapeEnum.TopAbs_VERTEX);
+                bool hasBound = false;
+                for (; exp.More(); exp.Next())
+                {
+                    TopoDS_Shape V = exp.Current();
+                    if (V.Orientation() == TopAbs_Orientation.TopAbs_INTERNAL || V.Orientation() == TopAbs_Orientation.TopAbs_EXTERNAL)
+                        continue;
+                    hasBound = true;
+                    if (!aMap.Add(V))
+                        aMap.Remove(V);
+                }
+                return hasBound && aMap.IsEmpty();
+            }
+            else if (theShape.ShapeType() == TopAbs_ShapeEnum.TopAbs_EDGE)
+            {
+                TopoDS_Vertex aVFirst, aVLast;
+                TopExp.Vertices(TopoDS.Edge(theShape), out aVFirst, out aVLast);
+                return !aVFirst.IsNull() && aVFirst.IsSame(aVLast);
+            }
+            return theShape.Closed();
         }
 
-        internal static bool IsClosed(TopoDS_Wire w)
+        private static bool Degenerated(TopoDS_Edge e)
         {
             throw new NotImplementedException();
         }

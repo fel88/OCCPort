@@ -2,14 +2,26 @@
 
 namespace OCCPort
 {
-    public class TopoDS_TShape
+    public abstract class TopoDS_TShape
     {
-        internal TopoDS_ListOfShape myShapes;
-
-        internal void Checked(bool v)
+        public TopoDS_TShape()
         {
-            throw new NotImplementedException();
+            myShapes = new TopoDS_ListOfShape();
         }
+        internal TopoDS_ListOfShape myShapes;
+        //! Returns the type as a term of the ShapeEnum enum :
+        //! VERTEX, EDGE, WIRE, FACE, ....
+        public abstract TopAbs_ShapeEnum ShapeType();
+
+
+
+        //! Returns the checked flag.
+        public bool Checked()  { return ((myFlags & (int)TopoDS_TShape_Flags.TopoDS_TShape_Flags_Checked) != 0); }
+
+
+    //! Sets the checked flag.
+    public void Checked(bool theIsChecked) { setFlag(TopoDS_TShape_Flags.TopoDS_TShape_Flags_Checked, theIsChecked); }
+
 
         //! Sets the closedness flag.
         public void Closed(bool theIsClosed) { setFlag(TopoDS_TShape_Flags.TopoDS_TShape_Flags_Closed, theIsClosed); }

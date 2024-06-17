@@ -5,6 +5,10 @@ namespace OCCPort
     internal class BRep_TFace : TopoDS_TFace
     {
 
+        public BRep_TFace()
+        {
+            myLocation = new TopLoc_Location();
+        }
         //! Returns face surface.
         public Geom_Surface Surface() { return mySurface; }
 
@@ -25,9 +29,8 @@ namespace OCCPort
         //! Sets the tolerance for this face.
         public void Tolerance(double theTolerance) { myTolerance = theTolerance; }
 
-        internal TopLoc_Location Location()
-        {
-            throw new NotImplementedException();
-        }
-    }
+        //! Returns the face location.
+        public  TopLoc_Location Location()  { return myLocation; }
+
+}
 }

@@ -2,14 +2,11 @@
 
 namespace OCCPort
 {
-    public class Prs3d_Drawer
+    public class Prs3d_Drawer: Graphic3d_PresentationAttributes
     {
-        internal int DisplayMode()
-        {
-            throw new NotImplementedException();
-        }
+        
 
-        internal bool IsAutoTriangulation()
+    internal bool IsAutoTriangulation()
         {
             throw new NotImplementedException();
         }
@@ -19,9 +16,6 @@ namespace OCCPort
             throw new NotImplementedException();
         }
 
-		internal void SetDisplayMode(int v)
-        {
-            throw new NotImplementedException();
-        }
+		
     }
 }

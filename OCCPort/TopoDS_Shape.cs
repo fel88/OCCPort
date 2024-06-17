@@ -10,8 +10,20 @@ namespace OCCPort
         {
             myOrient = TopAbs_Orientation.TopAbs_EXTERNAL;
         }
-        //! Returns the locked flag.
-        public bool Locked()
+
+
+        //! Returns the checked flag.
+        public bool Checked()  { return myTShape.Checked();
+    }
+
+    //! Sets the checked flag.
+    public void Checked(bool theIsChecked) { myTShape.Checked(theIsChecked); }
+
+
+
+
+    //! Returns the locked flag.
+    public bool Locked()
         {
             return myTShape.Locked();
         }
@@ -50,10 +62,13 @@ namespace OCCPort
         //! Sets the free flag.
         public void Free(bool theIsFree) { myTShape.Free(theIsFree); }
 
-        internal uint ShapeType()
-        {
-            throw new NotImplementedException();
-        }
+        //! Returns the value of the TopAbs_ShapeEnum
+        //! enumeration that corresponds to this shape, for
+        //! example VERTEX, EDGE, and so on.
+        //! Exceptions
+        //! Standard_NullObject if this shape is null.
+        public TopAbs_ShapeEnum ShapeType() { return myTShape.ShapeType(); }
+
         public void TShape(TopoDS_TShape theTShape) { myTShape = theTShape; }
 
         TopoDS_TShape myTShape;
@@ -100,5 +115,17 @@ namespace OCCPort
         {
             throw new NotImplementedException();
         }
+
+
+        //! Returns  a    shape  similar  to  <me>   with  the
+        //! orientation set to <Or>.
+        public TopoDS_Shape Oriented(TopAbs_Orientation theOrient)
+        {
+            TopoDS_Shape aShape = (TopoDS_Shape)MemberwiseClone();
+            aShape.Orientation(theOrient);
+            return aShape;
+        }
+
+
     }
 }

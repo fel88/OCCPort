@@ -28,10 +28,7 @@ namespace OCCPort
             throw new NotImplementedException();
         }
 
-        internal bool HasDisplayMode()
-        {
-            throw new NotImplementedException();
-        }
+        
 
         internal bool HasHilightMode()
         {
