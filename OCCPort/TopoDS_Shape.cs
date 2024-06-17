@@ -43,6 +43,8 @@ namespace OCCPort
         //! Returns the shape local coordinate system.
         public TopLoc_Location Location() { return myLocation; }
 
+
+
         //! Sets the shape orientation.
         public void Orientation(TopAbs_Orientation theOrient) { myOrient = theOrient; }
 
@@ -50,11 +52,10 @@ namespace OCCPort
         {
             return myOrient;
         }
+		//! Reverses the orientation, using the Reverse method
+		//! from the TopAbs package.
+		public void Reverse() { myOrient = TopAbs.Reverse(myOrient); }
 
-        internal void Reverse()
-        {
-            throw new NotImplementedException();
-        }
 
         internal void Move(object v1, bool v2)
         {

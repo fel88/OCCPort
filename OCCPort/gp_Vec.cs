@@ -1,5 +1,7 @@
 ﻿namespace OCCPort
 {
+	//! Defines a non-persistent vector in 3D space.
+
     public struct gp_Vec
     {
         gp_XYZ coord;
@@ -37,5 +39,6 @@
         {
             coord = theV.XYZ();
         }
+        
     }
 }

@@ -1,0 +1,14 @@
+diff a/OCCPort/TopoDS_Builder.cs b/OCCPort/TopoDS_Builder.cs	(rejected hunks)
+@@ -25,5 +112,11 @@
+ 			MakeShape(S, TS);
+ 		}
+ 
++		public void MakeWire(TopoDS_Wire W)
++		{
++			TopoDS_TWire TW = new TopoDS_TWire();
++			MakeShape(W, TW);
++		}
++
+ 	}
+ }
+\ No newline at end of file

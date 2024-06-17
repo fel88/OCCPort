@@ -1,6 +1,6 @@
 ﻿namespace OCCPort
 {
-    internal class Geom_Surface
+    public class Geom_Surface
     {
     }
 }

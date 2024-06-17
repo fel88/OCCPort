@@ -61,6 +61,7 @@
     <Compile Include="Aspect_FrustumLRBT.cs" />
     <Compile Include="Aspect_GradientFillMethod.cs" />
     <Compile Include="Aspect_SkydomeBackground.cs" />
+    <Compile Include="Aspect_TypeOfFacingModel.cs" />
     <Compile Include="Bnd_Box.cs" />
     <Compile Include="BRepBuilderAPI_Command.cs" />
     <Compile Include="BRepBuilderAPI_MakeShape.cs" />
@@ -149,10 +150,13 @@
     <Compile Include="NCollection_Vec4.cs" />
     <Compile Include="OpenGl_LayerFilter.cs" />
     <Compile Include="OpenGl_RenderFilter.cs" />
+    <Compile Include="Poly_ListOfTriangulation.cs" />
+    <Compile Include="Poly_Triangulation.cs" />
     <Compile Include="Precision.cs" />
     <Compile Include="Prs3d_Drawer.cs" />
     <Compile Include="Prs3d_Presentation.cs" />
     <Compile Include="PrsMgr_DisplayStatus.cs" />
+    <Compile Include="PrsMgr_ListOfPresentableObjects.cs" />
     <Compile Include="PrsMgr_PresentableObject.cs" />
     <Compile Include="PrsMgr_PresentationManager.cs" />
     <Compile Include="PrsMgr_Presentations.cs" />
@@ -163,6 +167,7 @@
     <Compile Include="SelectMgr_SelectableObject.cs" />
     <Compile Include="SelectMgr_SelectingVolumeManager.cs" />
     <Compile Include="SelectMgr_SelectionManager.cs" />
+    <Compile Include="SelectMgr_SequenceOfSelection.cs" />
     <Compile Include="SelectMgr_ToleranceMap.cs" />
     <Compile Include="SelectMgr_ViewerSelector.cs" />
     <Compile Include="ShaderVariable.cs" />
@@ -174,6 +179,7 @@
     <Compile Include="STEPControl_Reader.cs" />
     <Compile Include="TColStd_Array1OfInteger.cs" />
     <Compile Include="TColStd_SequenceOfTransient.cs" />
+    <Compile Include="TopAbs.cs" />
     <Compile Include="TopAbs_Orientation.cs" />
     <Compile Include="TopAbs_Orientation1.cs" />
     <Compile Include="TopAbs_ShapeEnum.cs" />
