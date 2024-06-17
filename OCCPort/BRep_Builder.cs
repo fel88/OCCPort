@@ -167,7 +167,7 @@ namespace OCCPort
         public void MakeEdge(TopoDS_Edge E)
         {
             BRep_TEdge TE = new BRep_TEdge();
-            if (E != null && E.Locked())
+            if (!E.IsNull() && E.Locked())
             {
                 throw new TopoDS_LockedShape("BRep_Builder::MakeEdge");
             }

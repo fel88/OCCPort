@@ -30,7 +30,7 @@ namespace OCCPort
         }
         public void Clear()
         {
-            
+
         }
         public TopLoc_ItemLocation Value()
         {
@@ -43,10 +43,14 @@ namespace OCCPort
             throw new NotImplementedException();
         }
 
-        internal bool More()
+
+        //! Returns True if the iterator  has a current value.
+        //! This is !IsEmpty()
+        public bool More()
         {
-            throw new NotImplementedException();
+            return !IsEmpty();
         }
+
 
         internal void Next()
         {

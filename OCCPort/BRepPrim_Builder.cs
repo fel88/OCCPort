@@ -98,9 +98,11 @@ namespace OCCPort
             BRepTools.Update(E);
         }
 
-        internal void MakeVertex(TopoDS_Vertex topoDS_Vertex, object v)
+        internal void MakeVertex(TopoDS_Vertex V,
+            gp_Pnt P)
         {
-            throw new NotImplementedException();
+            myBuilder.MakeVertex(V, P, Precision.Confusion());
+
         }
     }
 }

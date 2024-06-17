@@ -10,8 +10,15 @@
         // ------------------------------------------------------------------
         // IntegerFirst : Returns the minimum value of an integer
         // ------------------------------------------------------------------
-        public static  int  IntegerFirst()
+        public static int IntegerFirst()
         { return int.MinValue; }
+
+    }
+
+    public static class Standard_Real
+    {
+        public static double RealEpsilon()
+        { return double.Epsilon; }
 
     }
 

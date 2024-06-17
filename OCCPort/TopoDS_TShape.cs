@@ -21,7 +21,7 @@ namespace OCCPort
             else myFlags &= ~(int)theFlag;
         }
 
-        
+
 
 
         //! Returns the closedness flag.
@@ -42,29 +42,35 @@ namespace OCCPort
 
         int myFlags;
 
-        internal bool Free()
+        //! Returns the free flag.
+        public bool Free()  { return ((myFlags & (int)TopoDS_TShape_Flags.TopoDS_TShape_Flags_Free) != 0); }
+
+    //! Sets the free flag.
+    public void Free(bool theIsFree) { setFlag(TopoDS_TShape_Flags.TopoDS_TShape_Flags_Free, theIsFree); }
+
+
+
+
+    //! Sets the modification flag.
+    public void Modified(bool theIsModified)
         {
-            throw new NotImplementedException();
+            setFlag(TopoDS_TShape_Flags.TopoDS_TShape_Flags_Modified, theIsModified);
+            if (theIsModified)
+            {
+                setFlag(TopoDS_TShape_Flags.TopoDS_TShape_Flags_Checked, false); // when a TShape is modified it is also unchecked
+            }
         }
 
-        internal void Free(bool theIsFree)
-        {
-            throw new NotImplementedException();
-        }
 
-        internal void Modified(bool v)
-        {
-            throw new NotImplementedException();
-        }
+        //! Returns the modification flag.
+        public bool Modified() { return ((myFlags &(int) TopoDS_TShape_Flags.TopoDS_TShape_Flags_Modified) != 0); }
 
-        internal bool Locked(bool theIsLocked)
-        {
-            throw new NotImplementedException();
-        }
+        //! Returns the locked flag.
+        public bool Locked() { return ((myFlags & (int)TopoDS_TShape_Flags.TopoDS_TShape_Flags_Locked) != 0); }
 
-        internal bool Locked()
-        {
-            throw new NotImplementedException();
-        }
+        //! Sets the locked flag.
+        public void Locked(bool theIsLocked) { setFlag(TopoDS_TShape_Flags.TopoDS_TShape_Flags_Locked, theIsLocked); }
+
+
     }
 }

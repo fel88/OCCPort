@@ -512,10 +512,15 @@ new[]                      { 8,10, 4, 6,-1,-1},
             return myVertices[i];
         }
 
-        private bool HasVertex(BRepPrim_Direction d1, BRepPrim_Direction d2, BRepPrim_Direction dd1)
+        private bool HasVertex(BRepPrim_Direction d1,
+
+            BRepPrim_Direction d2, BRepPrim_Direction d3)
         {
-            throw new NotImplementedException();
+            return !(myInfinite[BRepPrim_Wedge_NumDir1(d1)] ||
+       myInfinite[BRepPrim_Wedge_NumDir1(d2)] ||
+       myInfinite[BRepPrim_Wedge_NumDir1(d3)]);
         }
+
 
         private void initAll()
         {
@@ -810,7 +815,7 @@ new[]                      { 8,10, 4, 6,-1,-1},
             P.Translate(X * new gp_Vec(myAxes.XDirection()));
             P.Translate(Y * new gp_Vec(myAxes.YDirection()));
             P.Translate(Z * new gp_Vec(myAxes.Direction()));
-            return new gp_Lin(new gp_Ax1(P, D));            
+            return new gp_Lin(new gp_Ax1(P, D));
         }
 
         public bool HasEdge(BRepPrim_Direction d1,
