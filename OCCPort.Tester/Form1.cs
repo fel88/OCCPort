@@ -253,6 +253,7 @@ namespace OCCPort.Tester
         {
             GravityViewManager.View.myView.Items.Clear();
         }
+
         AIS_InteractiveContext myAISContext;
         public void AddBox()
         {

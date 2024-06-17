@@ -18,5 +18,10 @@ namespace OCCPort
         {
             throw new NotImplementedException();
         }
+
+		internal void SetDisplayMode(int v)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

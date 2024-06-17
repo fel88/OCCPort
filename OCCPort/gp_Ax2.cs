@@ -1,8 +1,9 @@
-﻿using System;
+﻿using OCCPort;
+using System;
 
 namespace OCCPort
 {
-	internal class gp_Ax2
+	internal struct gp_Ax2
 	{
 
 
@@ -16,15 +17,15 @@ namespace OCCPort
 		}
 
 
-		internal gp_Dir Direction()
-		{
-			throw new NotImplementedException();
-		}
 
-		internal gp_Pnt Location()
-		{
-			throw new NotImplementedException();
-		}
+		//! Returns the main direction of <me>.
+		public gp_Dir Direction() { return axis.Direction(); }
+
+		//! Returns the "Location" point (origin) of <me>.
+		public gp_Pnt Location() { return axis.Location(); }
+
+		//! Returns the "XDirection" of <me>.
+
 
 		gp_Ax1 axis;
 		gp_Dir vydir;

@@ -86,16 +86,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\OCCPort.OpenGL\OCCPort.OpenGL.csproj">
-      <Project>{a668587e-3c75-4afb-9ddc-984abb80f9e4}</Project>
-      <Name>OCCPort.OpenGL</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\OCCPort\OCCPort.csproj">
-      <Project>{26bf7edf-d7e8-4e6c-b77a-efb585cab6a1}</Project>
-      <Name>OCCPort</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="AutoDialog">
       <Version>1.0.0.4</Version>
     </PackageReference>
@@ -105,6 +95,16 @@
     <PackageReference Include="OpenTK.GLControl">
       <Version>3.3.3</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\OCCPort.OpenGL\OCCPort.OpenGL.csproj">
+      <Project>{a668587e-3c75-4afb-9ddc-984abb80f9e4}</Project>
+      <Name>OCCPort.OpenGL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OCCPort\OCCPort.csproj">
+      <Project>{26bf7edf-d7e8-4e6c-b77a-efb585cab6a1}</Project>
+      <Name>OCCPort</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

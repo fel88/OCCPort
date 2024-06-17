@@ -1,0 +1,48 @@
+diff a/OCCPort/TopoDS_Shape.cs b/OCCPort/TopoDS_Shape.cs	(rejected hunks)
+@@ -3,8 +3,46 @@ using System.Runtime.Remoting.Messaging;
+ 
+ namespace OCCPort
+ {
++	//! Describes a shape which
++	//! - references an underlying shape with the potential
++	//! to be given a location and an orientation
++	//! - has a location for the underlying shape, giving its
++	//! placement in the local coordinate system
++	//! - has an orientation for the underlying shape, in
++	//! terms of its geometry (as opposed to orientation in
++	//! relation to other shapes).
++	//! Note: A Shape is empty if it references an underlying
++	//! shape which has an empty list of shapes.
++
+ 	public class TopoDS_Shape
+ 	{
++		public TopoDS_Shape()
++		{
++			myOrient = TopAbs_Orientation.TopAbs_EXTERNAL;
++		}
++		//! Returns the locked flag.
++		public bool Locked()
++		{
++			return myTShape.Locked();
++		}
++
++		//! Returns true if this shape is null. In other words, it
++		//! references no underlying shape with the potential to
++		//! be given a location and an orientation.
++		public bool IsNull() { return myTShape == null; }
++
++		//! Destroys the reference to the underlying shape
++		//! stored in this shape. As a result, this shape becomes null.
++		public void Nullify()
++		{
++			//myTShape.Nullify();
++			myTShape = null;
++			myLocation.Clear();
++			myOrient = TopAbs_Orientation.TopAbs_EXTERNAL;
++		}
++
++		//! Sets the locked flag.
++		public void Locked(bool theIsLocked) { myTShape.Locked(theIsLocked); }
+ 
+ 		//! Sets the closedness flag.
+ 		public void Closed(bool theIsClosed) { myTShape.Closed(theIsClosed); }
