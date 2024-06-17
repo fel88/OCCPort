@@ -2,8 +2,17 @@
 
 namespace OCCPort
 {
-    public class AIS_InteractiveObject: SelectMgr_SelectableObject
+    public class AIS_InteractiveObject : SelectMgr_SelectableObject
     {
+        public AIS_InteractiveObject(PrsMgr_TypeOfPresentation3d aTypeOfPresentation3d = PrsMgr_TypeOfPresentation3d.PrsMgr_TOP_AllView)
+            : base(aTypeOfPresentation3d)
+        {
+
+            myCTXPtr = null;
+        }
+        AIS_InteractiveContext myCTXPtr; //!< pointer to Interactive Context, where object is currently displayed; @sa SetContext()
+        object myOwner;  //!< application-specific owner object
+
         internal bool AcceptDisplayMode(object value)
         {
             throw new NotImplementedException();
@@ -39,6 +48,6 @@ namespace OCCPort
             throw new NotImplementedException();
         }
 
-        
+
     }
 }

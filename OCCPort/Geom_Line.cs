@@ -15,6 +15,17 @@
     {
 
         gp_Ax1 pos;
+        public override double FirstParameter()
+        { return -Precision.Infinite(); }
+
+        //=======================================================================
+        //function : LastParameter
+        //purpose  : 
+        //=======================================================================
+
+        public override double LastParameter()
+        { return Precision.Infinite(); }
+
 
         public Geom_Line(gp_Lin L)
         {

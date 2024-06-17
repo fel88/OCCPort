@@ -66,29 +66,34 @@ namespace OCCPort
             }
             else { T.Transforms(ref coord); }
         }
-		public void SetX(double v)
-		{
-			throw new NotImplementedException();
-		}
-
-		public void SetY(double v)
-		{
-			throw new NotImplementedException();
-		}
-
-		public void SetZ(double v)
-		{
-			throw new NotImplementedException();
-		}
-
-		public void Translate(object value)
-		{
-			throw new NotImplementedException();
-		}
-
-        internal gp_Pnt Transformed(gp_Trsf t)
+        public void SetX(double v)
         {
             throw new NotImplementedException();
+        }
+
+        public void SetY(double v)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetZ(double v)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Translate(gp_Vec theV)
+        {            
+            coord.Add(theV.XYZ());
+        }
+
+        public gp_Pnt Transformed(gp_Trsf theT)
+        {
+
+            gp_Pnt aP = this;
+            aP.Transform(theT);
+            return aP;
+
+
         }
     }
 }

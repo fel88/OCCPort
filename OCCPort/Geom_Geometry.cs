@@ -1,6 +1,6 @@
 ﻿namespace OCCPort
 {
-    internal class gp_GTrsf
+    public class Geom_Geometry
     {
     }
 }

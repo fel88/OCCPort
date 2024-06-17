@@ -2,16 +2,13 @@
 
 namespace OCCPort
 {
-    public class TopoDS_Edge
+    public class TopoDS_Edge: TopoDS_Shape    
     {
         internal bool Locked()
         {
             throw new NotImplementedException();
         }
 
-        internal void Reverse()
-        {
-            throw new NotImplementedException();
-        }
+        
     }
 }

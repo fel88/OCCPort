@@ -2,11 +2,8 @@
 
 namespace OCCPort
 {
-    internal class TopoDS_Vertex
+    public class TopoDS_Vertex: TopoDS_Shape
     {
-        internal void Reverse()
-        {
-            throw new NotImplementedException();
-        }
+        
     }
 }

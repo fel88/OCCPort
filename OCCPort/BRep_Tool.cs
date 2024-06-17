@@ -18,5 +18,14 @@ namespace OCCPort
         {
             throw new NotImplementedException();
         }
+
+        internal static Geom_Surface Surface(TopoDS_Face F,
+           ref TopLoc_Location L)
+        {
+            BRep_TFace TF = (BRep_TFace)(F.TShape());
+            L = F.Location() * TF.Location();
+            return TF.Surface();
+
+        }
     }
 }

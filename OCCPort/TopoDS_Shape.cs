@@ -1,10 +1,39 @@
-﻿using System;
+﻿using OCCPort;
+using System;
 using System.Runtime.Remoting.Messaging;
 
 namespace OCCPort
 {
     public class TopoDS_Shape
     {
+        public TopoDS_Shape()
+        {
+            myOrient = TopAbs_Orientation.TopAbs_EXTERNAL;
+        }
+        //! Returns the locked flag.
+        public bool Locked()
+        {
+            return myTShape.Locked();
+        }
+
+        //! Returns true if this shape is null. In other words, it
+        //! references no underlying shape with the potential to
+        //! be given a location and an orientation.
+        public bool IsNull() { return myTShape == null; }
+
+        //! Destroys the reference to the underlying shape
+        //! stored in this shape. As a result, this shape becomes null.
+        public void Nullify()
+        {
+            //myTShape.Nullify();
+            myTShape = null;
+            myLocation.Clear();
+            myOrient = TopAbs_Orientation.TopAbs_EXTERNAL;
+        }
+
+        //! Sets the locked flag.
+        public void Locked(bool theIsLocked) { myTShape.Locked(theIsLocked); }
+
 
         //! Sets the closedness flag.
         public void Closed(bool theIsClosed) { myTShape.Closed(theIsClosed); }
@@ -62,9 +91,9 @@ namespace OCCPort
         {
             return myOrient;
         }
-		//! Reverses the orientation, using the Reverse method
-		//! from the TopAbs package.
-		public void Reverse() { myOrient = TopAbs.Reverse(myOrient); }
+        //! Reverses the orientation, using the Reverse method
+        //! from the TopAbs package.
+        public void Reverse() { myOrient = TopAbs.Reverse(myOrient); }
 
 
         internal void Move(object v1, bool v2)

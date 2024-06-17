@@ -4,12 +4,16 @@ namespace OCCPort
 {
     public class TopoDS_Builder
     {
-
-		//! Add the Shape C in the Shape S.
-		//! Exceptions
-		//! - TopoDS_FrozenShape if S is not free and cannot be modified.
-		//! - TopoDS__UnCompatibleShapes if S and C are not compatible.
-		public void Add(TopoDS_Shape aShape, TopoDS_Shape aComponent)
+        public void MakeWire(TopoDS_Wire W)
+		{
+			TopoDS_TWire TW = new TopoDS_TWire();
+			MakeShape(W, TW);
+		}
+    //! Add the Shape C in the Shape S.
+    //! Exceptions
+    //! - TopoDS_FrozenShape if S is not free and cannot be modified.
+    //! - TopoDS__UnCompatibleShapes if S and C are not compatible.
+    public void Add(TopoDS_Shape aShape, TopoDS_Shape aComponent)
 		{
 
 			//=======================================================================

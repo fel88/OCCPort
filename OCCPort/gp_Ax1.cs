@@ -3,16 +3,19 @@
 namespace OCCPort
 {
     public struct gp_Ax1
-    {       
+    {
 
         gp_Pnt loc;
         gp_Dir vdir;
-
-        public gp_Ax1(gp_Pnt aRCenter, gp_Dir aYAxis)
+        //! P is the location point and V is the direction of <me>.
+        public gp_Ax1(gp_Pnt theP, gp_Dir theV)
         {
-            this.loc = aRCenter;
-            this.vdir = aYAxis;
+
+            loc = (theP);
+            vdir = (theV);
         }
+
+
 
         public gp_Dir Direction()
         {

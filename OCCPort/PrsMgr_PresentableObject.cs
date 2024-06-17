@@ -57,4 +57,6 @@
 
 		bool myToPropagateVisualState;  //!< flag indicating if visual state (display/erase/color) should be propagated to all children
     }
+
+
 }

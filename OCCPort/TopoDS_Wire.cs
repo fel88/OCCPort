@@ -2,11 +2,8 @@
 
 namespace OCCPort
 {
-    internal class TopoDS_Wire
+    public class TopoDS_Wire: TopoDS_Shape
     {
-        internal void Closed(bool v)
-        {
-            throw new NotImplementedException();
-        }
+        
     }
 }

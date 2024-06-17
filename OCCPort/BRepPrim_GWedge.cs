@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OCCPort;
+using System;
 using System.Data;
 using System.Security.Cryptography;
 
@@ -9,7 +10,9 @@ namespace OCCPort
         public BRepPrim_GWedge()
         {
             myShell = new TopoDS_Shell();
+            initAll();
         }
+
         static int[] num = { 0, 1, 2, 3, 4, 5 };
         protected BRepPrim_Builder myBuilder;
         protected gp_Ax2 myAxes;
@@ -514,6 +517,27 @@ new[]                      { 8,10, 4, 6,-1,-1},
             throw new NotImplementedException();
         }
 
+        private void initAll()
+        {
+            for (int i = 0; i < myFaces.Length; i++)
+            {
+                myFaces[i] = new TopoDS_Face();
+
+            }
+            for (int i = 0; i < myWires.Length; i++)
+            {
+                myWires[i] = new TopoDS_Wire();
+            }
+            for (int i = 0; i < myEdges.Length; i++)
+            {
+                myEdges[i] = new TopoDS_Edge();
+            }
+            for (int i = 0; i < myVertices.Length; i++)
+            {
+                myVertices[i] = new TopoDS_Vertex();
+            }
+        }
+
         public bool HasWire(BRepPrim_Direction d1)
         {
             int i = BRepPrim_Wedge_NumDir1(d1);
@@ -655,139 +679,138 @@ new[]                      { 8,10, 4, 6,-1,-1},
 
             double X = 0.0, Y = 0.0, Z = 0.0;
 
-            gp_Dir D;
+            gp_Dir D = new gp_Dir();
             gp_Vec VX = new gp_Vec(myAxes.XDirection());
             gp_Vec VY = new gp_Vec(myAxes.YDirection());
             gp_Vec VZ = new gp_Vec(myAxes.Direction());
 
-            //switch (i / 4)
-            //{
+            switch (i / 4)
+            {
 
-            //	case 0:
-            //		D = myAxes.Direction();
-            //		break;
+                case 0:
+                    D = myAxes.Direction();
+                    break;
 
-            //	case 1:
-            //		D = myAxes.XDirection();
-            //		break;
+                case 1:
+                    D = myAxes.XDirection();
+                    break;
 
-            //	case 2:
-            //		D = myAxes.YDirection();
-            //		break;
+                case 2:
+                    D = myAxes.YDirection();
+                    break;
 
-            //};
+            };
 
-            //switch (i)
-            //{
+            switch (i)
+            {
 
-            //	case 0:
-            //		// XMin YMin
-            //		X = XMin;
-            //		Y = YMin;
-            //		Z = ZMin;
-            //		break;
+                case 0:
+                    // XMin YMin
+                    X = XMin;
+                    Y = YMin;
+                    Z = ZMin;
+                    break;
 
-            //	case 1:
-            //		// XMin YMax
-            //		X = X2Min;
-            //		Y = YMax;
-            //		Z = Z2Min;
-            //		break;
+                case 1:
+                    // XMin YMax
+                    X = X2Min;
+                    Y = YMax;
+                    Z = Z2Min;
+                    break;
 
-            //	case 2:
-            //		// XMax YMin
-            //		X = XMax;
-            //		Y = YMin;
-            //		Z = ZMin;
-            //		break;
+                case 2:
+                    // XMax YMin
+                    X = XMax;
+                    Y = YMin;
+                    Z = ZMin;
+                    break;
 
-            //	case 3:
-            //		// XMax YMax
-            //		X = X2Max;
-            //		Y = YMax;
-            //		Z = Z2Min;
-            //		break;
+                case 3:
+                    // XMax YMax
+                    X = X2Max;
+                    Y = YMax;
+                    Z = Z2Min;
+                    break;
 
-            //	case 4:
-            //		// YMin ZMin
-            //		X = XMin;
-            //		Y = YMin;
-            //		Z = ZMin;
-            //		break;
+                case 4:
+                    // YMin ZMin
+                    X = XMin;
+                    Y = YMin;
+                    Z = ZMin;
+                    break;
 
-            //	case 5:
-            //		// YMin ZMax
-            //		X = XMin;
-            //		Y = YMin;
-            //		Z = ZMax;
-            //		break;
+                case 5:
+                    // YMin ZMax
+                    X = XMin;
+                    Y = YMin;
+                    Z = ZMax;
+                    break;
 
-            //	case 6:
-            //		// YMax ZMin
-            //		X = X2Min;
-            //		Y = YMax;
-            //		Z = Z2Min;
-            //		break;
+                case 6:
+                    // YMax ZMin
+                    X = X2Min;
+                    Y = YMax;
+                    Z = Z2Min;
+                    break;
 
-            //	case 7:
-            //		// YMax ZMax
-            //		X = X2Min;
-            //		Y = YMax;
-            //		Z = Z2Max;
-            //		break;
+                case 7:
+                    // YMax ZMax
+                    X = X2Min;
+                    Y = YMax;
+                    Z = Z2Max;
+                    break;
 
-            //	case 8:
-            //		// ZMin XMin
-            //		X = XMin;
-            //		Y = YMin;
-            //		Z = ZMin;
-            //		if ((XMin != X2Min) || (ZMin != Z2Min))
-            //		{
-            //			D = new gp_Vec((X2Min - XMin) * VX + (YMax - YMin) * VY + (Z2Min - ZMin) * VZ);
-            //		}
-            //		break;
+                case 8:
+                    // ZMin XMin
+                    X = XMin;
+                    Y = YMin;
+                    Z = ZMin;
+                    if ((XMin != X2Min) || (ZMin != Z2Min))
+                    {
+                        D = new gp_Dir((X2Min - XMin) * VX + (YMax - YMin) * VY + (Z2Min - ZMin) * VZ);
+                    }
+                    break;
 
-            //	case 9:
-            //		// ZMax XMin
-            //		X = XMin;
-            //		Y = YMin;
-            //		Z = ZMax;
-            //		if ((XMin != X2Min) || (ZMax != Z2Max))
-            //		{
-            //			D = new gp_Vec((X2Min - XMin) * VX + (YMax - YMin) * VY + (Z2Max - ZMax) * VZ);
-            //		}
-            //		break;
+                case 9:
+                    // ZMax XMin
+                    X = XMin;
+                    Y = YMin;
+                    Z = ZMax;
+                    if ((XMin != X2Min) || (ZMax != Z2Max))
+                    {
+                        D = new gp_Dir((X2Min - XMin) * VX + (YMax - YMin) * VY + (Z2Max - ZMax) * VZ);
+                    }
+                    break;
 
-            //	case 10:
-            //		// ZMin XMax
-            //		X = XMax;
-            //		Y = YMin;
-            //		Z = ZMin;
-            //		if ((XMax != X2Max) || (ZMin != Z2Min))
-            //		{
-            //			D = new gp_Vec((X2Max - XMax) * VX + (YMax - YMin) * VY + (Z2Min - ZMin) * VZ);
-            //		}
-            //		break;
+                case 10:
+                    // ZMin XMax
+                    X = XMax;
+                    Y = YMin;
+                    Z = ZMin;
+                    if ((XMax != X2Max) || (ZMin != Z2Min))
+                    {
+                        D = new gp_Dir((X2Max - XMax) * VX + (YMax - YMin) * VY + (Z2Min - ZMin) * VZ);
+                    }
+                    break;
 
-            //	case 11:
-            //		// ZMax XMax
-            //		X = XMax;
-            //		Y = YMin;
-            //		Z = ZMax;
-            //		if ((XMax != X2Max) || (ZMax != Z2Max))
-            //		{
-            //			D = new gp_Vec((X2Max - XMax) * VX + (YMax - YMin) * VY + (Z2Max - ZMax) * VZ);
-            //		}
-            //		break;
+                case 11:
+                    // ZMax XMax
+                    X = XMax;
+                    Y = YMin;
+                    Z = ZMax;
+                    if ((XMax != X2Max) || (ZMax != Z2Max))
+                    {
+                        D = new gp_Dir((X2Max - XMax) * VX + (YMax - YMin) * VY + (Z2Max - ZMax) * VZ);
+                    }
+                    break;
 
-            //}
+            }
 
-            //gp_Pnt P = myAxes.Location();
-            //P.Translate(X * new gp_Vec(myAxes.XDirection()));
-            //P.Translate(Y * new gp_Vec(myAxes.YDirection()));
-            //P.Translate(Z * new gp_Vec(myAxes.Direction()));
-            //return new gp_Lin(new gp_Ax1(P, D));
-            return null;
+            gp_Pnt P = myAxes.Location();
+            P.Translate(X * new gp_Vec(myAxes.XDirection()));
+            P.Translate(Y * new gp_Vec(myAxes.YDirection()));
+            P.Translate(Z * new gp_Vec(myAxes.Direction()));
+            return new gp_Lin(new gp_Ax1(P, D));            
         }
 
         public bool HasEdge(BRepPrim_Direction d1,
@@ -825,6 +848,8 @@ new[]                      { 8,10, 4, 6,-1,-1},
                 WiresBuilt, FacesBuilt);
 
             myShell = new TopoDS_Shell();
+
+            initAll();
         }
 
 

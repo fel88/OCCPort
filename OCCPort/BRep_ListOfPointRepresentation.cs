@@ -1,6 +1,6 @@
 ﻿namespace OCCPort
 {
-	internal class BRep_ListOfPointRepresentation
-	{
-	}
+    internal class BRep_ListOfPointRepresentation
+    {
+    }
 }

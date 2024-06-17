@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OCCPort;
+using System;
 using System.Net.Http.Headers;
 
 namespace OCCPort
@@ -26,109 +27,143 @@ namespace OCCPort
     {
 
 
-        //! Add the Shape C in the Shape S.
-        //! Exceptions
-        //! - TopoDS_FrozenShape if S is not free and cannot be modified.
-        //! - TopoDS__UnCompatibleShapes if S and C are not compatible.
-        public void Add(TopoDS_Shape aShape, TopoDS_Shape aComponent)
+
+        internal void MakeEdge(TopoDS_Edge E,
+            Geom_Curve C, double Tol)
         {
+            MakeEdge(E);
+            UpdateEdge(E, C, new TopLoc_Location(), Tol);
 
-            //=======================================================================
-            //function : Add
-            //purpose  : insert aComponent in aShape
-            //=======================================================================
+        }
 
-
-
-            // From now the Component cannot be edited
-            aComponent.TShape().Free(false);
-
-            // Note that freezing aComponent before testing if aShape is free
-            // prevents from self-insertion
-            // but aShape will be frozen when the Exception is raised
-            if (aShape.Free())
+        private void UpdateEdge(TopoDS_Edge E,
+            Geom_Curve C, TopLoc_Location L, double Tol)
+        {
+            BRep_TEdge TE = (BRep_TEdge)E.TShape();
+            if (TE.Locked())
             {
-                uint[] aTb =                 {
-      //COMPOUND to:
-      (1<<((int)TopAbs_ShapeEnum.TopAbs_COMPOUND)),
-      //COMPSOLID to:
-      (1 << ((int)TopAbs_ShapeEnum.TopAbs_COMPOUND)),
-      //SOLID to:
-      (1 << ((int)TopAbs_ShapeEnum.TopAbs_COMPOUND)) |
-      (1 << ((int)TopAbs_ShapeEnum.TopAbs_COMPSOLID)),
-      //SHELL to:
-      (1 << ((int)TopAbs_ShapeEnum.TopAbs_COMPOUND)) |
-      (1 << ((int)TopAbs_ShapeEnum.TopAbs_SOLID)),
-      //FACE to:
-      (1 << ((int)TopAbs_ShapeEnum.TopAbs_COMPOUND)) |
-      (1 << ((int)TopAbs_ShapeEnum.TopAbs_SHELL)),
-      //WIRE to:
-      (1 << ((int)TopAbs_ShapeEnum.TopAbs_COMPOUND)) |
-      (1 << ((int)TopAbs_ShapeEnum.TopAbs_FACE)),
-      //EDGE to:
-      (1 << ((int)TopAbs_ShapeEnum.TopAbs_COMPOUND)) |
-      (1 << ((int)TopAbs_ShapeEnum.TopAbs_SOLID)) |
-      (1 << ((int)TopAbs_ShapeEnum.TopAbs_WIRE)),
-      //VERTEX to:
-      (1 << ((int)TopAbs_ShapeEnum.TopAbs_COMPOUND)) |
-      (1 << ((int)TopAbs_ShapeEnum.TopAbs_SOLID)) |
-      (1 << ((int)TopAbs_ShapeEnum.TopAbs_FACE)) |
-      (1 << ((int)TopAbs_ShapeEnum.TopAbs_EDGE)),
-      //SHAPE to:
-      0
-                  };
-                //
-                uint iC = (uint)aComponent.ShapeType();
-                int iS = (int)aShape.ShapeType();
-                //
-                if ((aTb[iC] & (1 << iS)) != 0)
+                throw new TopoDS_LockedShape("BRep_Builder::UpdateEdge");
+            }
+            TopLoc_Location l = L.Predivided(E.Location()).Clone();
+
+            UpdateCurves(TE.ChangeCurves(), C, l);
+
+            TE.UpdateTolerance(Tol);
+            TE.Modified(true);
+
+        }
+        //=======================================================================
+        //function : UpdateCurves
+        //purpose  : Insert a pcurve <C> on surface <S> with location <L> 
+        //           in a list of curve representations <lcr>
+        //           Remove the pcurve on <S> from <lcr> if <C> is null
+        //=======================================================================
+
+        public static void UpdateCurves(BRep_ListOfCurveRepresentation lcr,
+                          Geom2d_Curve C,
+                          Geom_Surface S,
+                          TopLoc_Location L)
+        {
+            BRep_ListIteratorOfListOfCurveRepresentation itcr = new BRep_ListIteratorOfListOfCurveRepresentation(lcr);
+            BRep_CurveRepresentation cr;
+            BRep_GCurve GC = null;
+            double f = -Precision.Infinite(), l = Precision.Infinite();
+            // search the range of the 3d curve
+            // and remove any existing representation
+
+            while (itcr.More())
+            {
+                GC = (BRep_GCurve)(itcr.Value());
+                if (GC!=null)
                 {
-                    TopoDS_ListOfShape L = aShape.TShape().myShapes;
-                    L.Append(aComponent);
-                    TopoDS_Shape S = L.Last();
-                    //
-                    // compute the relative Orientation
-                    if (aShape.Orientation() == TopAbs_Orientation.TopAbs_REVERSED)
-                        S.Reverse();
-                    //
-                    // and the Relative Location
-                    TopLoc_Location aLoc = aShape.Location();
-                    if (!aLoc.IsIdentity())
-                        S.Move(aLoc.Inverted(), false);
-                    //
-                    // Set the TShape as modified.
-                    aShape.TShape().Modified(true);
+                    if (GC.IsCurve3D())
+                    {
+                        //      if (!C.IsNull()) { //xpu031198, edge degeneree
+
+                        // xpu151298 : parameters can be set for null curves
+                        //             see lbo & flo, to determine whether range is defined
+                        //             compare first and last parameters with default values.
+                        GC.Range(f, l);
+                    }
+                    if (GC.IsCurveOnSurface(S, L))
+                    {
+                        // remove existing curve on surface
+                        // cr is used to keep a reference on the curve representation
+                        // this avoid deleting it as its content may be referenced by C or S
+                        cr = itcr.Value();
+                        //lcr.Remove(itcr);
+                    }
+                    else
+                    {
+                        itcr.Next();
+                    }
                 }
                 else
                 {
-                    throw new TopoDS_UnCompatibleShapes("TopoDS_Builder::Add");
+                    itcr.Next();
                 }
+            }
+
+            //if (!C.IsNull())
+            {
+                BRep_CurveOnSurface COS = new BRep_CurveOnSurface(C, S, L);
+                double aFCur = 0.0, aLCur = 0.0;
+                COS.Range(aFCur, aLCur);
+                if (!Precision.IsInfinite(f))
+                {
+                    aFCur = f;
+                }
+
+                if (!Precision.IsInfinite(l))
+                {
+                    aLCur = l;
+                }
+
+                COS.SetRange(aFCur, aLCur);
+                //lcr.Append(COS);
+            }
+        }
+
+
+        private void UpdateCurves(BRep_ListOfCurveRepresentation lcr, Geom_Curve C, TopLoc_Location L)
+        {
+            BRep_ListIteratorOfListOfCurveRepresentation itcr = new BRep_ListIteratorOfListOfCurveRepresentation(lcr);
+            BRep_GCurve GC = null;
+            double f = 0.0, l = 0.0;
+
+            while (itcr.More())
+            {
+                if (itcr.Value() is BRep_GCurve bb)
+                {
+                    GC = bb;
+                }
+                //GC = Handle(BRep_GCurve)::DownCast(itcr.Value());
+                if (GC != null)
+                {
+                    GC.Range(f, l);
+                    if (GC.IsCurve3D()) break;
+
+                }
+                itcr.Next();
+            }
+
+            if (itcr.More())
+            {
+                itcr.Value().Curve3D(C);
+                itcr.Value().Location(L);
             }
             else
             {
-                throw new TopoDS_FrozenShape("TopoDS_Builder::Add");
+                BRep_Curve3D C3d = new BRep_Curve3D(C, L);
+                // test if there is already a range
+                if (GC != null)
+                {
+                    C3d.SetRange(f, l);
+                }
+                lcr.Append(C3d);
             }
         }
 
-        internal void Add(TopoDS_Edge e, TopoDS_Vertex vV)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal void Add(TopoDS_Wire w, TopoDS_Edge eE)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal void Add(TopoDS_Face f, TopoDS_Wire w)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal void MakeEdge(TopoDS_Edge E, Geom_Curve C, double Tol)
-        {
-            throw new NotImplementedException();
-        }
         public void MakeEdge(TopoDS_Edge E)
         {
             BRep_TEdge TE = new BRep_TEdge();
@@ -139,16 +174,13 @@ namespace OCCPort
             MakeShape(E, TE);
         }
 
-        private void MakeShape(TopoDS_Edge e, BRep_TEdge tE)
-        {
-            throw new NotImplementedException();
-        }
+
 
         internal void MakeFace(TopoDS_Face F, Geom_Surface S,
                     double Tol)
         {
             BRep_TFace TF = new BRep_TFace();
-            if (F != null && F.Locked())
+            if (!F.IsNull() && F.Locked())
             {
                 throw new TopoDS_LockedShape("BRep_Builder::MakeFace");
             }
@@ -157,10 +189,7 @@ namespace OCCPort
             MakeShape(F, TF);
         }
 
-        private void MakeShape(TopoDS_Face f, BRep_TFace tF)
-        {
-            throw new NotImplementedException();
-        }
+
 
         public void MakeFace(TopoDS_Face F)
         {
@@ -168,22 +197,70 @@ namespace OCCPort
             MakeShape(F, TF);
         }
 
+        public void UpdateEdge(TopoDS_Edge E,
+                                      Geom_Curve C,
+                                      double Tol)
+        {
+            UpdateEdge(E, C, new TopLoc_Location(), Tol);
+        }
 
-        internal void UpdateEdge(TopoDS_Edge e, Geom2d_Line geom2d_Line, TopoDS_Face f, double v)
+
+        internal void UpdateEdge(TopoDS_Edge e,
+                Geom_Curve geom2d_Line, TopoDS_Face f, double v)
         {
             throw new NotImplementedException();
         }
 
-        internal void UpdateVertex(TopoDS_Vertex V,
-            double Par, TopoDS_Edge E, double F, double Tol)
+
+        public void MakeVertex(TopoDS_Vertex V)
+        {
+            BRep_TVertex TV = new BRep_TVertex();
+            MakeShape(V, TV);
+        }
+
+        internal void MakeVertex(TopoDS_Vertex V, gp_Pnt P, double Tol)
+        {
+            MakeVertex(V);
+            UpdateVertex(V, P, Tol);
+
+        }
+        public void UpdateVertex(TopoDS_Vertex V,
+                                 gp_Pnt P,
+                                 double Tol)
+        {
+            BRep_TVertex TV = V.TShape() as BRep_TVertex;
+            if (TV.Locked())
+            {
+                throw new TopoDS_LockedShape("BRep_Builder::UpdateVertex");
+            }
+            TV.Pnt(P.Transformed(V.Location().Inverted().Transformation()));
+            TV.UpdateTolerance(Tol);
+            TV.Modified(true);
+        }
+
+        public void UpdateEdge(TopoDS_Edge E,
+                                 Geom2d_Curve C,
+                                 Geom_Surface S,
+                                 TopLoc_Location L,
+                                 double Tol)
+        {
+            BRep_TEdge TE = (BRep_TEdge)E.TShape();
+            if (TE.Locked())
+            {
+                throw new TopoDS_LockedShape("BRep_Builder::UpdateEdge");
+            }
+            TopLoc_Location l = L.Predivided(E.Location()).Clone();
+
+            UpdateCurves(TE.ChangeCurves(), C, S, l);
+
+            TE.UpdateTolerance(Tol);
+            TE.Modified(true);
+        }
+        internal void UpdateEdge(TopoDS_Edge E,
+                    Geom2d_Curve C, TopoDS_Face F, double Tol)
         {
             TopLoc_Location l = new TopLoc_Location();
-            //UpdateVertex(V, Par, E, BRep_Tool.Surface(F, l), l, Tol);
-        }
-
-        internal void UpdateVertex(TopoDS_Vertex vV, double p, TopoDS_Edge e, double v)
-        {
-            throw new NotImplementedException();
+            UpdateEdge(E, C, BRep_Tool.Surface(F, ref l), l, Tol);
         }
     }
 }

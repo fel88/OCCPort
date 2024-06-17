@@ -6,6 +6,6 @@
 
 	public class TopoDS_TFace : TopoDS_TShape
 
-	{
-	}
+    {
+    }
 }

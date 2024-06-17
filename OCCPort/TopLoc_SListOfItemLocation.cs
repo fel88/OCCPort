@@ -26,6 +26,11 @@ namespace OCCPort
 
             return myNode == null;
 
+
+        }
+        public void Clear()
+        {
+            
         }
         public TopLoc_ItemLocation Value()
         {
@@ -44,6 +49,11 @@ namespace OCCPort
         }
 
         internal void Next()
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void ToTail()
         {
             throw new NotImplementedException();
         }

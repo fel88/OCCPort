@@ -56,5 +56,15 @@ namespace OCCPort
         {
             throw new NotImplementedException();
         }
+
+        internal bool Locked(bool theIsLocked)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal bool Locked()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
