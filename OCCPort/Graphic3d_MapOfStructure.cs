@@ -1,16 +1,19 @@
-﻿using System.Net.Security;
+﻿using OCCPort.Tester;
+using System.Collections.Generic;
+using System.Net.Security;
+using static OCCPort.Tester.Prs3d_Presentation;
 
 namespace OCCPort
 {
-    public class Graphic3d_MapOfStructure
+    public class Graphic3d_MapOfStructure:List<Graphic3d_Structure>
     {
-		public Graphic3d_MapOfStructure(Graphic3d_Structure ss)
+		public Graphic3d_MapOfStructure(Prs3d_Presentation ss)
 		{
 			key = ss;
 		}
 
-        Graphic3d_Structure key;
-        public Graphic3d_Structure Key()
+		Prs3d_Presentation key;
+        public Prs3d_Presentation Key()
         {
             return key;
         }

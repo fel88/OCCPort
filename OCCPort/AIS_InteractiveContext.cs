@@ -2,6 +2,8 @@
 using OCCPort.Tester;
 using System;
 using System.Net.NetworkInformation;
+using System.Reflection;
+using System.Security.Policy;
 
 namespace OCCPort
 {
@@ -10,7 +12,20 @@ namespace OCCPort
         public AIS_InteractiveContext(V3d_Viewer MainViewer)
         {
             mgrSelector = new SelectMgr_SelectionManager(new StdSelect_ViewerSelector3d());
+			myDefaultDrawer = (new Prs3d_Drawer());
+			myToHilightSelected = true;
+			mySelection = (new AIS_Selection());
+			myFilters = (new SelectMgr_AndOrFilter(SelectMgr_FilterType.SelectMgr_FilterType_OR));
+			myDefaultDrawer = (new Prs3d_Drawer());
+			myCurDetected = (0);
+			myCurHighlighted = (0);
+			myPickingStrategy = SelectMgr_PickingStrategy.SelectMgr_PickingStrategy_FirstAcceptable;
+			myAutoHilight = true;
+			myIsAutoActivateSelMode = (true);
+
         }
+
+
         SelectMgr_SelectionManager mgrSelector;
         StdSelect_ViewerSelector3d MainSelector()
         {
@@ -174,10 +189,30 @@ namespace OCCPort
             throw new NotImplementedException();
         }
 
-        private void setContextToObject(AIS_InteractiveObject theIObj)
+		public void setContextToObject(AIS_InteractiveObject theObj)
         {
-            throw new NotImplementedException();
+			if (theObj.HasInteractiveContext())
+			{
+				if (theObj.myCTXPtr != this)
+				{
+					throw new Standard_ProgramError("AIS_InteractiveContext - object has been already displayed in another context!");
+				}
+			}
+			else
+			{
+				theObj.SetContext(this);
+			}
+
+			for (PrsMgr_ListOfPresentableObjectsIter aPrsIter = new PrsMgr_ListOfPresentableObjectsIter(theObj.Children()); aPrsIter.More(); aPrsIter.Next())
+			{
+				AIS_InteractiveObject aChild = aPrsIter.Value() as AIS_InteractiveObject;
+				if (aChild != null)
+				{
+					setContextToObject(aChild);
+				}
+			}
         }
+
 
 
 
@@ -321,5 +356,19 @@ namespace OCCPort
             throw new NotImplementedException();
         }
     }
+	public enum SelectMgr_FilterType
+	{
+
+		//Enumeration defines the filter type.
+
+		SelectMgr_FilterType_AND,
+
+		//an object should be suitable for all filters.
+		SelectMgr_FilterType_OR
+
+		//an object should be suitable at least one filter. 
+	}
+
+
 
 }

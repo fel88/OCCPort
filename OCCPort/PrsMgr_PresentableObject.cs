@@ -1,6 +1,9 @@
-﻿namespace OCCPort
+﻿using OCCPort.Tester;
+using System;
+
+namespace OCCPort
 {
-    public class PrsMgr_PresentableObject
+	public abstract class PrsMgr_PresentableObject
     {
 
         //! Return view affinity mask.

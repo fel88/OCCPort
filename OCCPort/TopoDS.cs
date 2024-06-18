@@ -24,6 +24,11 @@ namespace OCCPort
             throw new NotImplementedException();
         }
 
+		internal static TopoDS_Face Face(TopoDS_Shape topoDS_Shape)
+        {
+            throw new NotImplementedException();
+        }
+
         internal static TopoDS_Shell Shell(TopoDS_Shape myShape)
         {
             throw new NotImplementedException();

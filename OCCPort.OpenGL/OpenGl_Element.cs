@@ -1,6 +1,10 @@
-﻿namespace OCCPort
+﻿using OCCPort.OpenGL;
+using System;
+
+namespace OCCPort
 {
-    public class OpenGl_Element
+	public abstract class OpenGl_Element
     {
+		public abstract void Render(OpenGl_Workspace theWorkspace);
     }
 }
