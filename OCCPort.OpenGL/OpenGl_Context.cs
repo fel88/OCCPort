@@ -52,7 +52,8 @@ namespace OCCPort.OpenGL
 
         internal bool ToUseVbo()
         {
-            throw new NotImplementedException();
+			return core15fwd != null
+			   && !caps.vboDisable;
         }
 
         internal Aspect_GraphicsLibrary GraphicsLibrary()
@@ -93,6 +94,11 @@ namespace OCCPort.OpenGL
             throw new NotImplementedException();
         }
 
+		internal object Clipping()
+		{
+			throw new NotImplementedException();
+		}
+
         int[] myViewport = new int[4];     //!< current viewport
         int[] myViewportVirt = new int[4]; //!< virtual viewport
         int myPointSpriteOrig; //!< GL_POINT_SPRITE_COORD_ORIGIN state (
@@ -100,8 +106,13 @@ namespace OCCPort.OpenGL
         OpenGl_ResourcesMap mySharedResources; //!< shared resources with unique identification key
         public OpenGl_Caps caps; //!< context options
         internal _core11fwd core11fwd;
+		internal _core15fwd core15fwd;
     }
+	public class _core15fwd
+	{
 
+
+	}
     public class _core11fwd
     {
         internal void glDisable(int v)

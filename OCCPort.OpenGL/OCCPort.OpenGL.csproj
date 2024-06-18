@@ -46,6 +46,7 @@
     <Compile Include="Graphic3d_BoundBuffer.cs" />
     <Compile Include="Graphic3d_Buffer.cs" />
     <Compile Include="Graphic3d_IndexBuffer.cs" />
+    <Compile Include="Graphic3d_IndexedMapOfStructure.cs" />
     <Compile Include="Graphic3d_MarkerImage.cs" />
     <Compile Include="Graphic3d_ShaderManager.cs" />
     <Compile Include="Graphic3d_TextureSet.cs" />
@@ -68,6 +69,7 @@
     <Compile Include="OpenGl_Element.cs" />
     <Compile Include="OpenGl_ElementNode.cs" />
     <Compile Include="OpenGl_FrameBuffer.cs" />
+    <Compile Include="OpenGl_GlobalLayerSettings.cs" />
     <Compile Include="OpenGl_GradientParameters.cs" />
     <Compile Include="OpenGl_GraphicDriver.cs" />
     <Compile Include="OpenGl_Group.cs" />

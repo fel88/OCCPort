@@ -17,6 +17,16 @@
 
     public static class Standard_Real
     {
+		public static float RealToShortReal(double theVal)
+		{
+			var FLT_MAX = float.MaxValue;
+			var FLT_MIN = float.MinValue;
+
+			return theVal < -FLT_MAX ? -FLT_MAX
+	: theVal > FLT_MAX ? FLT_MAX
+	: (float)theVal;
+
+		}
         public static double RealEpsilon()
         { return double.Epsilon; }
 

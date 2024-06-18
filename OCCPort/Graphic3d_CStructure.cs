@@ -1,4 +1,6 @@
-﻿using System;
+﻿using OCCPort.Tester;
+using System;
+using static OCCPort.Tester.Prs3d_Presentation;
 
 namespace OCCPort
 {
@@ -16,10 +18,14 @@ namespace OCCPort
         {
             return myBndBox;
         }
+
+		protected Graphic3d_SequenceOfGroup myGroups;
         Graphic3d_TransformPers myTrsfPers;
         internal Graphic3d_TransformPers TransformPersistence()
         {
             return myTrsfPers; 
         }
+
+        public abstract Graphic3d_Group NewGroup(Graphic3d_Structure prs3d_Presentation);
     }
 }

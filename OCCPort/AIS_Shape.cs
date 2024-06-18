@@ -25,5 +25,6 @@
         bool myCompBB;   //!< if TRUE, then bounding box should be recomputed
 
 
+
     }
 }

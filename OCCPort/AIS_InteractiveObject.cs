@@ -2,7 +2,7 @@
 
 namespace OCCPort
 {
-    public class AIS_InteractiveObject : SelectMgr_SelectableObject
+	public abstract class AIS_InteractiveObject : SelectMgr_SelectableObject
     {
         public AIS_InteractiveObject(PrsMgr_TypeOfPresentation3d aTypeOfPresentation3d = PrsMgr_TypeOfPresentation3d.PrsMgr_TOP_AllView)
             : base(aTypeOfPresentation3d)

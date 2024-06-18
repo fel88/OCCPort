@@ -10,6 +10,46 @@ namespace OCCPort
 {
     public class V3d_View
     {
+
+		V3d_Viewer MyViewer;
+
+		//=============================================================================
+		//function : Redraw
+		//purpose  :
+		//=============================================================================
+		public void Redraw()
+		{
+			if (!myView.IsDefined()
+			 || !myView.IsActive())
+			{
+				return;
+			}
+
+			//myIsInvalidatedImmediate = false;
+			Graphic3d_StructureManager aStructureMgr = MyViewer.StructureManager();
+			//	for (Standard_Integer aRetryIter = 0; aRetryIter < 2; ++aRetryIter)
+			{
+				if (aStructureMgr.IsDeviceLost())
+				{
+					aStructureMgr.RecomputeStructures();
+				}
+
+				AutoZFit();
+
+				myView.Redraw();
+
+				if (!aStructureMgr.IsDeviceLost())
+				{
+					return;
+				}
+			}
+		}
+
+		private void AutoZFit()
+		{
+			throw new NotImplementedException();
+		}
+
         public void Rotation(int X,
                           int Y)
         {

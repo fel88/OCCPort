@@ -10,6 +10,7 @@ using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static OCCPort.Tester.Prs3d_Presentation;
 
 namespace OCCPort.Tester
 {
@@ -33,7 +34,7 @@ namespace OCCPort.Tester
             V3d_View.CreateView = () => new OpenGL.OpenGl_View();
             ViewManager = GravityViewManager = new GravityCameraViewManager(glControl);
             ViewManager.Attach(evwrapper, camera1);
-            GravityViewManager.View.myView.Items.Add(new Graphic3d_MapOfStructure(
+            /*GravityViewManager.View.myView.Items.Add(new Graphic3d_MapOfStructure(
                 new Graphic3d_Structure()
                 {
                     myCStructure = new OpenGl_Structure()
@@ -42,7 +43,7 @@ namespace OCCPort.Tester
                         myBndBox = new Graphic3d_BndBox3d(new BVH_VecNt(0, 0, 0),
                              new BVH_VecNt(50, 50, 50))
                     }
-                }));
+                }));*/
             Controls.Add(glControl);
             glControl.Dock = DockStyle.Fill;
         }
@@ -64,7 +65,7 @@ namespace OCCPort.Tester
             }
             try
             {
-                //GravityViewManager.View.myView.Redraw();
+                GravityViewManager.View.Redraw();
             }
             catch (Exception ex)
             {

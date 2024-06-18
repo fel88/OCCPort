@@ -2,7 +2,8 @@
 
 namespace OCCPort.Tester
 {
-    internal class StdPrs_ToolTriangulatedShape
+    internal class StdPrs_ToolTriangulatedShape: BRepLib_ToolTriangulatedShape
+	
     {
         internal static void ClearOnOwnDeflectionChange(TopoDS_Shape myshape, Prs3d_Drawer myDrawer, bool standard_True)
         {
@@ -19,4 +20,8 @@ namespace OCCPort.Tester
             throw new NotImplementedException();
         }
     }
+
+	internal class BRepLib_ToolTriangulatedShape
+	{
+	}
 }

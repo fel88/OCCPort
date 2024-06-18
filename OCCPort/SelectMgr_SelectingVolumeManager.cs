@@ -9,6 +9,19 @@ namespace OCCPort
             throw new NotImplementedException();
         }
 
+		SelectMgr_BaseIntersector myActiveSelectingVolume;
+
+		internal Graphic3d_Camera Camera()
+		{
+			if (myActiveSelectingVolume == null)
+			{
+				Graphic3d_Camera anEmptyCamera = new Graphic3d_Camera();
+				return anEmptyCamera;
+			}
+			return myActiveSelectingVolume.Camera();
+
+		}
+
         internal void InitPointSelectingVolume(gp_Pnt2d aMousePos)
         {
             throw new NotImplementedException();

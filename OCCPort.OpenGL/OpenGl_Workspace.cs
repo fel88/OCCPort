@@ -29,6 +29,11 @@ namespace OCCPort.OpenGL
             throw new NotImplementedException();
         }
 
+		internal void SetAllowFaceCulling(object value)
+        {
+            throw new NotImplementedException();
+        }
+
         internal OpenGl_Aspects SetAspects(OpenGl_Aspects myCubeMapParams)
         {
             throw new NotImplementedException();
@@ -40,6 +45,11 @@ namespace OCCPort.OpenGL
         }
 
         internal bool SetUseZBuffer(bool v)
+        {
+            throw new NotImplementedException();
+        }
+
+		internal bool ShouldRender(OpenGl_Element theElement, OpenGl_Group openGl_Group)
         {
             throw new NotImplementedException();
         }

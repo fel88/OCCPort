@@ -22,7 +22,7 @@ namespace OCCPort.OpenGL
         {
         }
 
-        public void Render(OpenGl_Workspace theWorkspace)
+        public override void Render(OpenGl_Workspace theWorkspace)
         {
             OpenGl_Aspects anAspectFace = theWorkspace.Aspects();
             OpenGl_Context aCtx = theWorkspace.GetGlContext();

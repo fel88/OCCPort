@@ -1,4 +1,7 @@
-﻿using System;
+﻿using OCCPort.Tester;
+using System;
+using System.CodeDom;
+using static OCCPort.Tester.Prs3d_Presentation;
 
 namespace OCCPort.OpenGL
 {
@@ -26,7 +29,7 @@ namespace OCCPort.OpenGL
             OpenGl_PrimitiveArray anArray = new OpenGl_PrimitiveArray(aDriver, theType, theIndices, theAttribs, theBounds);
             AddElement(anArray);
 
-            AddPrimitiveArray(theType, theIndices, theAttribs, theBounds, theToEvalMinMax);
+			base.AddPrimitiveArray(theType, theIndices, theAttribs, theBounds, theToEvalMinMax);
         }
         OpenGl_Aspects myAspects;
         OpenGl_ElementNode myFirst;
@@ -71,5 +74,46 @@ namespace OCCPort.OpenGL
         {
             throw new NotImplementedException();
         }
+
+		internal Graphic3d_TransformPers TransformPersistence()
+		{
+			throw new NotImplementedException();
+		}
+		public bool renderFiltered(OpenGl_Workspace theWorkspace,
+									   OpenGl_Element theElement)
+		{
+			if (!theWorkspace.ShouldRender(theElement, this))
+			{
+				return false;
+			}
+
+			theElement.Render(theWorkspace);
+			return true;
+		}
+		bool myIsClosed;
+
+		public OpenGl_Group(Graphic3d_Structure theStruct)
+		{
+		}
+
+		internal void Render(OpenGl_Workspace theWorkspace)
+		{
+			// Setup aspects
+			theWorkspace.SetAllowFaceCulling(myIsClosed
+										   && !theWorkspace.GetGlContext().Clipping().IsClippingOrCappingOn());
+			OpenGl_Aspects aBackAspects = theWorkspace.Aspects();
+			bool isAspectSet = myAspects != null && renderFiltered(theWorkspace, myAspects);
+
+			// Render group elements
+			for (OpenGl_ElementNode aNodeIter = myFirst; aNodeIter != null; aNodeIter = aNodeIter.next)
+			{
+				renderFiltered(theWorkspace, aNodeIter.elem);
+			}
+
+			// Restore aspects
+			if (isAspectSet)
+				theWorkspace.SetAspects(aBackAspects);
+
+		}
     }
 }

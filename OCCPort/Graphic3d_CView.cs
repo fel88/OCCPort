@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace OCCPort
 {
@@ -61,5 +62,9 @@ namespace OCCPort
             return new Bnd_Box();
         }
 
+		internal bool IsActive()
+		{
+			throw new NotImplementedException();
+		}
     }
 }

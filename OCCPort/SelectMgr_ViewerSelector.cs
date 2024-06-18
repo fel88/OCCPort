@@ -82,5 +82,21 @@ namespace OCCPort
         {
             throw new NotImplementedException();
         }
+
+		SelectMgr_SelectableObjectSet mySelectableObjects;
+
+		internal void RebuildObjectsTree(bool theIsForce = false)
+		{
+
+			mySelectableObjects.MarkDirty();
+
+			if (theIsForce)
+			{
+				Graphic3d_Vec2i aWinSize;
+				mySelectingVolumeMgr.WindowSize(aWinSize.x(), aWinSize.y());
+				mySelectableObjects.UpdateBVH(mySelectingVolumeMgr.Camera(), aWinSize);
+			}
+
+		}
     }
 }

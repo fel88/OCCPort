@@ -70,5 +70,10 @@ namespace OCCPort
             return TF.Surface();
 
         }
+
+		internal static Poly_Triangulation Triangulation(TopoDS_Face aFace, TopLoc_Location aLocation)
+		{
+			throw new NotImplementedException();
+		}
     }
 }
