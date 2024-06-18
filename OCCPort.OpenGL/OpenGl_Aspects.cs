@@ -15,6 +15,11 @@ namespace OCCPort.OpenGL
         //! Return aspect.
         public Graphic3d_Aspects Aspect() { return myAspect; }
 
+        public override void Render(OpenGl_Workspace theWorkspace)
+        {
+            theWorkspace.SetAspects(this);
+        }
+
         internal bool IsDisplayListSprite(OpenGl_Context aCtx)
         {
             throw new NotImplementedException();

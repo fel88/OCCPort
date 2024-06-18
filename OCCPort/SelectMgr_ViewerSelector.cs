@@ -92,9 +92,13 @@ namespace OCCPort
 
 			if (theIsForce)
 			{
-				Graphic3d_Vec2i aWinSize;
-				mySelectingVolumeMgr.WindowSize(aWinSize.x(), aWinSize.y());
-				mySelectableObjects.UpdateBVH(mySelectingVolumeMgr.Camera(), aWinSize);
+                
+                int xx = 0;
+                int  yy = 0;
+                
+                mySelectingVolumeMgr.WindowSize(ref xx, ref yy);
+                Graphic3d_Vec2i aWinSize = new Graphic3d_Vec2i(xx,yy);
+                mySelectableObjects.UpdateBVH(mySelectingVolumeMgr.Camera(), aWinSize);
 			}
 
 		}

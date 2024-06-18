@@ -1,6 +1,6 @@
 ﻿using OCCPort.Tester;
 using System;
-using static OCCPort.Tester.Prs3d_Presentation;
+
 
 namespace OCCPort
 {
@@ -27,5 +27,10 @@ namespace OCCPort
         }
 
         public abstract Graphic3d_Group NewGroup(Graphic3d_Structure prs3d_Presentation);
+
+        internal Graphic3d_SequenceOfGroup Groups()
+        {
+            return myGroups;
+        }
     }
 }

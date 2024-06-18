@@ -26,28 +26,28 @@ namespace OCCPort
         {
             throw new NotImplementedException();
         }
-		void renderLayer(OpenGl_Workspace theWorkspace,
-									 OpenGl_GlobalLayerSettings theDefaultSettings,
-									 Graphic3d_Layer theLayer)
-		{
-			// render priority list
-			int aViewId = theWorkspace.View().Identification();
-			for (int aPriorityIter =  Graphic3d_DisplayPriority_Bottom; aPriorityIter <= Graphic3d_DisplayPriority_Topmost; ++aPriorityIter)
-			{
-				Graphic3d_IndexedMapOfStructure aStructures = theLayer.Structures((Graphic3d_DisplayPriority)aPriorityIter);
-				for (OpenGl_Structure.StructIterator aStructIter (aStructures); aStructIter.More(); aStructIter.Next())
-				{
-					OpenGl_Structure aStruct = aStructIter.Value();
-					if (aStruct.IsCulled()
-					|| !aStruct.IsVisible(aViewId))
-					{
-						continue;
-					}
+        void renderLayer(OpenGl_Workspace theWorkspace,
+                                     OpenGl_GlobalLayerSettings theDefaultSettings,
+                                     Graphic3d_Layer theLayer)
+        {
+            // render priority list
+            int aViewId = theWorkspace.View().Identification();
+            for (int aPriorityIter = (int)Graphic3d_DisplayPriority.Graphic3d_DisplayPriority_Bottom; aPriorityIter <= (int)Graphic3d_DisplayPriority.Graphic3d_DisplayPriority_Topmost; ++aPriorityIter)
+            {
+                Graphic3d_IndexedMapOfStructure aStructures = theLayer.Structures((Graphic3d_DisplayPriority)aPriorityIter);
+                for (OpenGl_Structure.StructIterator aStructIter = new OpenGl_Structure.StructIterator(aStructures); aStructIter.More(); aStructIter.Next())
+                {
+                    OpenGl_Structure aStruct = aStructIter.Value();
+                    if (aStruct.IsCulled()
+                    || !aStruct.IsVisible(aViewId))
+                    {
+                        continue;
+                    }
 
-					aStruct.Render(theWorkspace);
-				}
-			}
-		}
+                    aStruct.Render(theWorkspace);
+                }
+            }
+        }
 
         internal void Render(OpenGl_Workspace myWorkspace, bool theToDrawImmediate, OpenGl_LayerFilter openGl_LF_Upper, OpenGl_FrameBuffer theReadDrawFbo, OpenGl_FrameBuffer theOitAccumFbo)
         {

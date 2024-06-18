@@ -5,6 +5,10 @@ namespace OCCPort
 {
     public abstract class Graphic3d_Group
     {
+        /*public Graphic3d_Group(Graphic3d_StructureManager m)
+        {
+            myStructureManager = m;
+        }*/
         Graphic3d_TransformPers myTrsfPers; //!< current transform persistence
         protected Graphic3d_Structure myStructure;     //!< pointer to the parent structure
         //Graphic3d_BndBox4f myBounds;        //!< bounding box
@@ -18,7 +22,7 @@ namespace OCCPort
 
 
 
-		public void AddPrimitiveArray(Graphic3d_ArrayOfPrimitives thePrim, bool theToEvalMinMax = true)
+		public void AddPrimitiveArray(Graphic3d_ArrayOfPrimitives thePrim, Graphic3d_IndexBuffer graphic3d_IndexBuffer, bool theToEvalMinMax = true)
 		{
 
 			if (IsDeleted()
@@ -65,8 +69,10 @@ namespace OCCPort
 					{
 						for (int aVertIter = 0; aVertIter < aNbVerts; ++aVertIter)
         {
-							const Graphic3d_Vec2&aVert = *reinterpret_cast <const Graphic3d_Vec2* > (aDataPtr + anAttribStride * aVertIter);
-							myBounds.Add(Graphic3d_Vec4(aVert.x(), aVert.y(), 0.0f, 1.0f));
+							//const Graphic3d_Vec2&aVert = *reinterpret_cast <const Graphic3d_Vec2* > (aDataPtr + anAttribStride * aVertIter);
+							Graphic3d_Vec2 aVert = new Graphic3d_Vec2();
+
+                            myBounds.Add(new Graphic3d_Vec4(aVert.x(), aVert.y(), 0.0f, 1.0f));
 						}
 						break;
 					}
@@ -75,7 +81,8 @@ namespace OCCPort
 					{
 						for (int aVertIter = 0; aVertIter < aNbVerts; ++aVertIter)
 						{
-							//Graphic3d_Vec3 aVert = (Graphic3d_Vec3)(aDataPtr + anAttribStride * aVertIter);
+							Graphic3d_Vec3 aVert = new Graphic3d_Vec3();
+							//(Graphic3d_Vec3)(aDataPtr + anAttribStride * aVertIter);
 							myBounds.Add(new Graphic3d_Vec4(aVert.x(), aVert.y(), aVert.z(), 1.0f));
 						}
 						break;
@@ -94,7 +101,17 @@ namespace OCCPort
 		{
 			throw new NotImplementedException();
 		}
-	}
+
+        internal void AddPrimitiveArray(Graphic3d_ArrayOfPrimitives aTriFreeEdges)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void SetPrimitivesAspect(object value)
+        {
+            throw new NotImplementedException();
+        }
+    }
 
 	public enum Graphic3d_TypeOfData
 	{

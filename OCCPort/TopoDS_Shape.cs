@@ -126,6 +126,9 @@ namespace OCCPort
             return aShape;
         }
 
-
+        internal int NbChildren()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

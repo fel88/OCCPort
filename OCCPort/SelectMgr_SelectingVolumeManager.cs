@@ -41,5 +41,10 @@ namespace OCCPort
         {
             throw new NotImplementedException();
         }
+
+        internal void WindowSize(ref int xx, ref int yy)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

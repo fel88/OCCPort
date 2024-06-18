@@ -75,5 +75,10 @@ namespace OCCPort
 		{
 			throw new NotImplementedException();
 		}
+
+        internal static Geom_Surface Surface(TopoDS_Face aFace, TopLoc_Location aDummyLoc)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

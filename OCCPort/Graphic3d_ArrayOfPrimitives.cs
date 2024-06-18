@@ -52,5 +52,19 @@ namespace OCCPort
 		{
 			throw new NotImplementedException();
 		}
-	}
+
+        internal Graphic3d_Buffer Attributes()
+        {
+            throw new NotImplementedException();
+        }
+
+        internal Graphic3d_BoundBuffer Bounds()
+        {
+            throw new NotImplementedException();
+        }
+        Graphic3d_TypeOfPrimitiveArray myType;
+        //! Returns the type of this primitive
+        public Graphic3d_TypeOfPrimitiveArray Type()  { return myType; }
+
+}
 }

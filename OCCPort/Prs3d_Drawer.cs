@@ -80,6 +80,9 @@ namespace OCCPort
             throw new NotImplementedException();
         }
 
-		
+        internal object FreeBoundaryAspect()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

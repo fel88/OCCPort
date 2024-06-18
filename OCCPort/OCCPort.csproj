@@ -165,9 +165,11 @@
     <Compile Include="Graphic3d_TypeOfVisualization.cs" />
     <Compile Include="Graphic3d_UniformValue.cs" />
     <Compile Include="Graphic3d_ValueInterface.cs" />
+    <Compile Include="Graphic3d_Vec2.cs" />
     <Compile Include="Graphic3d_Vec2i.cs" />
     <Compile Include="Graphic3d_Vec3.cs" />
     <Compile Include="Graphic3d_Vec3d.cs" />
+    <Compile Include="Graphic3d_Vec4.cs" />
     <Compile Include="Graphic3d_Vec4d.cs" />
     <Compile Include="Graphic3d_Vertex.cs" />
     <Compile Include="Graphic3d_ViewAffinity.cs" />

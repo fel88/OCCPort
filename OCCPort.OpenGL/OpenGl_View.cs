@@ -403,6 +403,11 @@ namespace OCCPort.OpenGL
         {
             throw new System.NotImplementedException();
         }
+
+        internal int Identification()
+        {
+            throw new NotImplementedException();
+        }
     }
 
 

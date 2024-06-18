@@ -45,6 +45,19 @@ namespace OCCPort
             throw new NotImplementedException();
         }
 
+        internal bool HasInteractiveContext()
+        {
+            throw new NotImplementedException();
+        }
 
+        internal void SetContext(AIS_InteractiveContext aIS_InteractiveContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal object Children()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

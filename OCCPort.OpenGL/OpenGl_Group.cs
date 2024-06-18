@@ -1,7 +1,7 @@
 ﻿using OCCPort.Tester;
 using System;
 using System.CodeDom;
-using static OCCPort.Tester.Prs3d_Presentation;
+
 
 namespace OCCPort.OpenGL
 {
@@ -99,13 +99,13 @@ namespace OCCPort.OpenGL
 		internal void Render(OpenGl_Workspace theWorkspace)
 		{
 			// Setup aspects
-			theWorkspace.SetAllowFaceCulling(myIsClosed
-										   && !theWorkspace.GetGlContext().Clipping().IsClippingOrCappingOn());
+//			theWorkspace.SetAllowFaceCulling(myIsClosed
+									//	   && !theWorkspace.GetGlContext().Clipping().IsClippingOrCappingOn());
 			OpenGl_Aspects aBackAspects = theWorkspace.Aspects();
 			bool isAspectSet = myAspects != null && renderFiltered(theWorkspace, myAspects);
 
 			// Render group elements
-			for (OpenGl_ElementNode aNodeIter = myFirst; aNodeIter != null; aNodeIter = aNodeIter.next)
+			for (OpenGl_ElementNode aNodeIter = myFirst; aNodeIter != null; aNodeIter = (OpenGl_ElementNode)aNodeIter.next)
 			{
 				renderFiltered(theWorkspace, aNodeIter.elem);
 			}
@@ -115,5 +115,10 @@ namespace OCCPort.OpenGL
 				theWorkspace.SetAspects(aBackAspects);
 
 		}
+
+        internal bool IsClosed()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -193,9 +193,9 @@ namespace OCCPort
         {
 			if (theObj.HasInteractiveContext())
 			{
-				if (theObj.myCTXPtr != this)
+				//if (theObj.myCTXPtr != this)
 				{
-					throw new Standard_ProgramError("AIS_InteractiveContext - object has been already displayed in another context!");
+					//throw new Standard_ProgramError("AIS_InteractiveContext - object has been already displayed in another context!");
 				}
 			}
 			else
