@@ -1,5 +1,6 @@
 ﻿using OpenTK.Graphics.OpenGL;
 using System;
+using System.Collections.Generic;
 using System.Xml.Linq;
 
 namespace OCCPort.OpenGL
@@ -11,6 +12,11 @@ namespace OCCPort.OpenGL
         {
             myZLayers = new OpenGl_LayerList();
         }
+
+		public OpenGl_View(Graphic3d_StructureManager theMgr, OpenGl_GraphicDriver openGl_GraphicDriver, OpenGl_Caps myCaps, OpenGl_StateCounter myStateCounter)
+		{
+			this.myCaps = myCaps;
+		}
 
         OpenGl_GraphicDriver myDriver;
         OpenGl_Window myWindow;

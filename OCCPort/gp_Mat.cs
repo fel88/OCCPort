@@ -36,6 +36,12 @@ namespace OCCPort
             myMat[1][0] = myMat[1][1] = myMat[1][2] =
             myMat[2][0] = myMat[2][1] = myMat[2][2] = 0.0;
         }
+
+		public gp_Mat(gp_Mat matrix)
+		{
+            myMat = (double[][])matrix.myMat.Clone();            
+		}
+
         internal void Multiply(gp_Mat theOther)
         {
             double aT00 = myMat[0][0] * theOther.myMat[0][0] + myMat[0][1] * theOther.myMat[1][0] + myMat[0][2] * theOther.myMat[2][0];

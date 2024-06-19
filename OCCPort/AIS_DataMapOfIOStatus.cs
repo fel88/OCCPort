@@ -12,7 +12,7 @@ namespace OCCPort
 
         internal bool IsBound(AIS_InteractiveObject theIObj)
         {
-            throw new NotImplementedException();
+            return ContainsKey(theIObj);
         }
     }
 }

@@ -75,11 +75,11 @@ namespace OCCPort
                     false);
         }
 
-        public static Func<Graphic3d_CView> CreateView;
+		//public static Func<Graphic3d_CView> CreateView;
         public V3d_View()
         {
             //myView = theViewer->Driver()->CreateView(theViewer->StructureManager());
-            myView = CreateView();
+			//myView = CreateView();
             //myView.SetBackground(theViewer->GetBackgroundColor());
             //  myView->SetGradientBackground(theViewer->GetGradientBackground());
 
@@ -115,6 +115,41 @@ namespace OCCPort
             Init();
             myImmediateUpdate = true;
         }
+
+		public V3d_View(V3d_Viewer theViewer, V3d_TypeOfView myDefaultTypeOfView)
+		{
+			//myIsInvalidatedImmediate = (true);
+			MyViewer = theViewer;
+			SwitchSetFront = (false);
+			myZRotation = (false);
+			//MyTrsf=new  (1, 4, 1, 4)
+
+			myView = theViewer.Driver().CreateView(theViewer.StructureManager());
+		//	myView.SetBackground(theViewer.GetBackgroundColor());
+		//	myView.SetGradientBackground(theViewer.GetGradientBackground());
+
+			//ChangeRenderingParams() = theViewer->DefaultRenderingParams();
+
+			// camera init
+			Graphic3d_Camera aCamera = new Graphic3d_Camera();
+			//aCamera.SetFOVy(45.0);
+			/*aCamera.SetIOD(Graphic3d_Camera::IODType_Relative, 0.05);
+			aCamera.SetZFocus(Graphic3d_Camera::FocusType_Relative, 1.0);
+			aCamera.SetProjectionType((theType == V3d_ORTHOGRAPHIC)
+			  ? Graphic3d_Camera::Projection_Orthographic
+			  : Graphic3d_Camera::Projection_Perspective);
+
+			myDefaultCamera = new Graphic3d_Camera();
+
+			myImmediateUpdate = Standard_False;
+			SetAutoZFitMode(Standard_True, 1.0);
+			SetBackFacingModel(V3d_TOBM_AUTOMATIC);*/
+			SetCamera(aCamera);
+
+			Init();
+			myImmediateUpdate = true;
+		}
+
         public void Pan(int theDXp,
                      int theDYp,
                      double theZoomFactor = 1,

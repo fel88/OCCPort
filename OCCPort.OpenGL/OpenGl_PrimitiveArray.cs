@@ -1,10 +1,44 @@
 ﻿using OpenTK.Graphics.OpenGL;
 using System;
+using System.Security.AccessControl;
 
 namespace OCCPort.OpenGL
 {
     public class OpenGl_PrimitiveArray : OpenGl_Element
     {
+		public void InitBuffers(OpenGl_Context theContext,
+										 Graphic3d_TypeOfPrimitiveArray theType,
+
+										 Graphic3d_IndexBuffer theIndices,
+										 Graphic3d_Buffer theAttribs,
+										 Graphic3d_BoundBuffer theBounds)
+		{
+			// Release old graphic resources
+			Release(theContext);
+
+			myIndices = theIndices;
+			myAttribs = theAttribs;
+			myBounds = theBounds;
+			if (theContext != null
+			  && theContext.GraphicsLibrary() == Aspect_GraphicsLibrary.Aspect_GraphicsLibrary_OpenGLES)
+			{
+				processIndices(theContext);
+			}
+
+			setDrawMode(theType);
+		}
+
+		//=======================================================================
+		public void setDrawMode(Graphic3d_TypeOfPrimitiveArray theType)
+		{
+			throw new NotImplementedException();
+		}
+
+
+		private void Release(OpenGl_Context theContext)
+		{
+			throw new NotImplementedException();
+		}
 
         OpenGl_IndexBuffer myVboIndices;
         protected OpenGl_VertexBuffer myVboAttribs;
@@ -16,10 +50,39 @@ namespace OCCPort.OpenGL
         bool myIsFillType;
         bool myIsVboInit;
 
-        Standard_Size myUID; //!< Unique ID of primitive array. 
+		int myUID; //!< Unique ID of primitive array. 
 
-        public OpenGl_PrimitiveArray(OpenGl_GraphicDriver aDriver, Graphic3d_TypeOfPrimitiveArray theType, Graphic3d_IndexBuffer theIndices, Graphic3d_Buffer theAttribs, Graphic3d_BoundBuffer theBounds)
+		public OpenGl_PrimitiveArray(OpenGl_GraphicDriver theDriver,
+			Graphic3d_TypeOfPrimitiveArray theType,
+			Graphic3d_IndexBuffer theIndices,
+			Graphic3d_Buffer theAttribs,
+			Graphic3d_BoundBuffer theBounds)
         {
+			myIndices = (theIndices);
+			myAttribs = (theAttribs);
+			myBounds = (theBounds);
+			//myDrawMode(DRAW_MODE_NONE),
+			myIsFillType = (false);
+			myIsVboInit = (false);
+
+			if (myIndices != null && myIndices.NbElements < 1)
+			{
+				// dummy index buffer?
+				myIndices = null;
+			}
+
+			if (theDriver != null)
+			{
+				myUID = theDriver.GetNextPrimitiveArrayUID();
+				OpenGl_Context aCtx = theDriver.GetSharedContext();
+				if (aCtx != null
+				  && aCtx.GraphicsLibrary() == Aspect_GraphicsLibrary.Aspect_GraphicsLibrary_OpenGLES)
+				{
+					processIndices(aCtx);
+				}
+			}
+
+			setDrawMode(theType);
         }
 
         public override void Render(OpenGl_Workspace theWorkspace)

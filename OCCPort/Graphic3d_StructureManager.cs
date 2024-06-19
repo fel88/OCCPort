@@ -9,7 +9,7 @@ namespace OCCPort
     {
 
 		Graphic3d_MapOfStructure myDisplayedStructure;
-        public void RegisterObject(object theObject,
+		public void RegisterObject(AIS_InteractiveObject theObject,
                                                   Graphic3d_ViewAffinity theAffinity)
         {
             Graphic3d_ViewAffinity aResult;
@@ -56,8 +56,24 @@ namespace OCCPort
 				aStruct.Compute();
 			}
 		}
+		Graphic3d_IndexedMapOfView myDefinedViews;
+		internal void Display(Graphic3d_Structure theStructure)
+		{
+
+			myDisplayedStructure.Add(theStructure);
 
 
-        protected Graphic3d_MapOfObject myRegisteredObjects;
+			for (Graphic3d_IndexedMapOfView.Iterator aViewIt = new Graphic3d_IndexedMapOfView.Iterator(myDefinedViews); aViewIt.More(); aViewIt.Next())
+			{
+				aViewIt.Value().Display(theStructure);
+			}
+
+		}
+
+		protected Graphic3d_MapOfObject myRegisteredObjects = new Graphic3d_MapOfObject();
+
+		public Graphic3d_StructureManager(Graphic3d_GraphicDriver theDriver)
+		{
+		}
     }
 }
