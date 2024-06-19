@@ -129,8 +129,10 @@
     <Compile Include="Graphic3d_CView.cs" />
     <Compile Include="Graphic3d_DataStructureManager.cs" />
     <Compile Include="Graphic3d_GraduatedTrihedron.cs" />
+    <Compile Include="Graphic3d_GraphicDriver.cs" />
     <Compile Include="Graphic3d_Group.cs" />
     <Compile Include="Graphic3d_IndexBuffer.cs" />
+    <Compile Include="Graphic3d_IndexedMapOfView.cs" />
     <Compile Include="Graphic3d_Layer.cs" />
     <Compile Include="Graphic3d_MapOfObject.cs" />
     <Compile Include="Graphic3d_MapOfStructure.cs" />
@@ -156,9 +158,11 @@
     <Compile Include="Graphic3d_TextureParams.cs" />
     <Compile Include="Graphic3d_TextureRoot.cs" />
     <Compile Include="Graphic3d_TransformPers.cs" />
+    <Compile Include="Graphic3d_TypeOfAttribute.cs" />
     <Compile Include="Graphic3d_TypeOfBackfacingModel.cs" />
     <Compile Include="Graphic3d_TypeOfBackground.cs" />
     <Compile Include="Graphic3d_TypeOfConnection.cs" />
+    <Compile Include="Graphic3d_TypeOfData.cs" />
     <Compile Include="Graphic3d_TypeOfPrimitiveArray.cs" />
     <Compile Include="Graphic3d_TypeOfShaderObject.cs" />
     <Compile Include="Graphic3d_TypeOfTexture.cs" />

@@ -1,26 +1,31 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace OCCPort
 {
 	internal class PrsMgr_ListOfPresentableObjectsIter
 	{
-		public PrsMgr_ListOfPresentableObjectsIter(object v)
+		public PrsMgr_ListOfPresentableObjectsIter(PrsMgr_ListOfPresentableObjects v)
 		{
+			list = v;
 		}
+		PrsMgr_ListOfPresentableObjects list;
 
+
+		int index = 0;
 		internal bool More()
 		{
-			throw new NotImplementedException();
+			return index < list.list.Count - 1;
 		}
 
-		internal object Next()
+		internal void Next()
 		{
-			throw new NotImplementedException();
+			index++; 
 		}
 
-		internal AIS_InteractiveObject Value()
+		internal PrsMgr_PresentableObject Value()
 		{
-			throw new NotImplementedException();
+			return list.list[index];
 		}
 	}
 }

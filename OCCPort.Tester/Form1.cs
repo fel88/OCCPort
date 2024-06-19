@@ -20,8 +20,9 @@ namespace OCCPort.Tester
         {
             InitializeComponent();
             glControl = new OpenTK.GLControl(new OpenTK.Graphics.GraphicsMode(32, 24, 0, 8));
+            v3d_viewer = new V3d_Viewer(new OpenGl_GraphicDriver());
 
-            myAISContext = new AIS_InteractiveContext(new V3d_Viewer ());
+			myAISContext = new AIS_InteractiveContext(v3d_viewer);
 
 
             if (glControl.Context.GraphicsMode.Samples == 0)
@@ -31,8 +32,10 @@ namespace OCCPort.Tester
             evwrapper = new EventWrapperGlControl(glControl);
 
             glControl.Paint += Gl_Paint;
-            V3d_View.CreateView = () => new OpenGL.OpenGl_View();
+            //V3d_View.CreateView = () => new OpenGL.OpenGl_View();
             ViewManager = GravityViewManager = new GravityCameraViewManager(glControl);
+            GravityViewManager.View = v3d_viewer.CreateView();
+
             ViewManager.Attach(evwrapper, camera1);
             /*GravityViewManager.View.myView.Items.Add(new Graphic3d_MapOfStructure(
                 new Graphic3d_Structure()
@@ -255,6 +258,7 @@ namespace OCCPort.Tester
             GravityViewManager.View.myView.Items.Clear();
         }
 
+        V3d_Viewer v3d_viewer;
         AIS_InteractiveContext myAISContext;
         public void AddBox()
         {

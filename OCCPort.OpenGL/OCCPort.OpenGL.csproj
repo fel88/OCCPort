@@ -87,6 +87,7 @@
     <Compile Include="OpenGl_ShaderProgram.cs" />
     <Compile Include="OpenGl_ShaderProgramList.cs" />
     <Compile Include="OpenGl_ShadowMapArray.cs" />
+    <Compile Include="OpenGl_StateCounter.cs" />
     <Compile Include="OpenGl_Structure.cs" />
     <Compile Include="OpenGl_Texture.cs" />
     <Compile Include="OpenGl_TextureArray.cs" />

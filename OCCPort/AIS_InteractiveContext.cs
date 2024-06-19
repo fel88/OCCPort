@@ -11,6 +11,8 @@ namespace OCCPort
     {
         public AIS_InteractiveContext(V3d_Viewer MainViewer)
         {
+			myMainPM = (new PrsMgr_PresentationManager(MainViewer.StructureManager()));
+			myMainVwr = (MainViewer);
             mgrSelector = new SelectMgr_SelectionManager(new StdSelect_ViewerSelector3d());
 			myDefaultDrawer = (new Prs3d_Drawer());
 			myToHilightSelected = true;
@@ -25,6 +27,9 @@ namespace OCCPort
 
         }
 
+		//! Returns the current viewer.
+		public V3d_Viewer CurrentViewer() { return myMainVwr; }
+
 
         SelectMgr_SelectionManager mgrSelector;
         StdSelect_ViewerSelector3d MainSelector()
@@ -33,7 +38,7 @@ namespace OCCPort
         }
         //! @name internal fields
 
-        protected AIS_DataMapOfIOStatus myObjects;
+		protected AIS_DataMapOfIOStatus myObjects = new AIS_DataMapOfIOStatus();
 
         PrsMgr_PresentationManager myMainPM;
         V3d_Viewer myMainVwr;
@@ -186,8 +191,34 @@ namespace OCCPort
 
         private void setObjectStatus(AIS_InteractiveObject theIObj, PrsMgr_DisplayStatus prsMgr_DisplayStatus_Displayed, int theDispMode, int theSelectionMode)
         {
-            throw new NotImplementedException();
+			//theIObj.SetDisplayStatus(theStatus);
+			//if (theStatus != PrsMgr_DisplayStatus_None)
+			//{
+			//	AIS_GlobalStatus aStatus = new AIS_GlobalStatus();
+			//	aStatus.SetDisplayMode(theDispMode);
+			//	if (theSelectionMode != -1)
+			//	{
+			//		aStatus.AddSelectionMode(theSelectionMode);
+			//	}
+			//	myObjects.Bind(theIObj, aStatus);
+			//}
+			//else
+			//{
+			//	myObjects.UnBind(theIObj);
+			//}
+
+			//for (PrsMgr_ListOfPresentableObjectsIter aPrsIter (theIObj->Children()); aPrsIter.More(); aPrsIter.Next())
+			//{
+			//	AIS_InteractiveObject aChild=(Handle(AIS_InteractiveObject)::DownCast(aPrsIter.Value()));
+			//	if (aChild.IsNull())
+			//	{
+			//		continue;
+			//	}
+
+			//	setObjectStatus(aChild, theStatus, theDispMode, theSelectionMode);
+			//}
         }
+
 
 		public void setContextToObject(AIS_InteractiveObject theObj)
         {

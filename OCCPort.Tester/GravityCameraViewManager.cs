@@ -7,8 +7,9 @@ namespace OCCPort.Tester
 {
     public class GravityCameraViewManager : CameraViewManager
     {
-        OCCPort.V3d_View view = new V3d_View();
-        public OCCPort.V3d_View View => view;
+		//OCCPort.V3d_View view = new V3d_View();
+		OCCPort.V3d_View view;
+		public OCCPort.V3d_View View { get => view; set { view = value; } }
         public override void Update()
         {
             var cc1 = view.Eye();

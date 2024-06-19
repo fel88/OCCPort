@@ -11,6 +11,7 @@ namespace OCCPort
 		public int visible;
 
         public bool IsInfinite { get; internal set; }
+        public bool IsForHighlight;
 
         //! @return bounding box of this presentation
 
@@ -21,6 +22,8 @@ namespace OCCPort
 
 		protected Graphic3d_SequenceOfGroup myGroups;
         Graphic3d_TransformPers myTrsfPers;
+		internal int stick;
+
         internal Graphic3d_TransformPers TransformPersistence()
         {
             return myTrsfPers; 
@@ -32,5 +35,10 @@ namespace OCCPort
         {
             return myGroups;
         }
+
+		internal void OnVisibilityChanged()
+		{
+			throw new NotImplementedException();
+		}
     }
 }

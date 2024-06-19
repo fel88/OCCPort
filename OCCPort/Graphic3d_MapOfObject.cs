@@ -11,10 +11,15 @@ namespace OCCPort
             map.Add(theObject, theAffinity);
         }
 
-        internal bool Find(object theObject, out Graphic3d_ViewAffinity aResult)
+        internal bool Find(AIS_InteractiveObject theObject, out Graphic3d_ViewAffinity aResult)
+        {
+            if (map.ContainsKey(theObject))
         {
             aResult = map[theObject];
-            return map.ContainsKey(theObject);
+                return true;
+            }
+            aResult = null;
+            return false;            
         }
     }
 }

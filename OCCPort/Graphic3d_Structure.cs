@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.Contracts;
 
 namespace OCCPort
 {
@@ -12,6 +13,51 @@ namespace OCCPort
         {
             return myCStructure.Groups();
         }
+
+		//! Returns the display indicator for this structure.
+		public virtual bool IsDisplayed()
+		{
+			return myCStructure != null
+				&& myCStructure.stick != 0;
+		}
+		public virtual void Display()
+		{
+
+			if (IsDeleted()) return;
+
+			if (myCStructure.stick == 0)
+			{
+				myCStructure.stick = 1;
+				myStructureManager.Display(this);
+			}
+
+			if (myCStructure.visible != 1)
+			{
+				myCStructure.visible = 1;
+				myCStructure.OnVisibilityChanged();
+			}
+
+		}
+		public void SetVisible(bool theValue)
+		{
+			if (IsDeleted())
+				return;
+
+			int isVisible = theValue ? 1 : 0;
+			if (myCStructure.visible == isVisible)
+			{
+				return;
+			}
+
+			myCStructure.visible = isVisible;
+			myCStructure.OnVisibilityChanged();
+			Update(true);
+		}
+
+		private void Update(bool v)
+		{
+			throw new NotImplementedException();
+		}
 
 
         //! Returns the highlight indicator for this structure.
@@ -27,7 +73,7 @@ namespace OCCPort
        || myCStructure.IsInfinite;
         }
 
-        private bool IsDeleted()
+		public bool IsDeleted()
         {
             return myCStructure == null;
         }
@@ -72,6 +118,13 @@ namespace OCCPort
         {
 
         }
+		public void SetIsForHighlight(bool isForHighlight)
+		{
+			if (myCStructure != null) { 
+				myCStructure.IsForHighlight = isForHighlight; }
+		}
+
+
         internal void Clear()
         {
             throw new NotImplementedException();

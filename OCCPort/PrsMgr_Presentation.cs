@@ -47,9 +47,52 @@ namespace OCCPort
             myPresentableObject.Compute(myPresentationManager, this, aDispMode);
         }
 
-        private int Mode()
+		public int Mode()
         {
-            throw new NotImplementedException();
+			return myMode;
         }
+
+		public bool MustBeUpdated() { return myMustBeUpdated; }
+		enum BeforeHighlightState
+		{
+			State_Empty,
+			State_Hidden,
+			State_Visible
+		};
+
+		public override void Display()
+		{
+
+			display(false);
+			myBeforeHighlightState = (int)BeforeHighlightState.State_Visible;
+
+		}
+		//=======================================================================
+		//function : display
+		//purpose  :
+		//=======================================================================
+		void display(bool theIsHighlight)
+		{
+			if (!base.IsDisplayed())
+			{
+				base.SetIsForHighlight(theIsHighlight); // optimization - disable frustum culling for this presentation
+				base.Display();
+			}
+			else if (!base.IsVisible())
+			{
+				base.SetVisible(true);
+			}
+		}
+
+
+		int myBeforeHighlightState;
+		int myMode;
+		bool myMustBeUpdated;
+
+		public void SetUpdateStatus(bool theUpdateStatus) { myMustBeUpdated = theUpdateStatus; }
+
+		//! returns the PresentationManager in which the presentation has been created.
+		public PrsMgr_PresentationManager PresentationManager() { return myPresentationManager; }
+
     }
 }

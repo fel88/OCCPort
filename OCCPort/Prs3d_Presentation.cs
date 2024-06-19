@@ -7,6 +7,10 @@ namespace OCCPort
   
     public class Prs3d_Presentation : Graphic3d_Structure
     {
+		public Prs3d_Presentation()
+		{
+		}
+
         public Prs3d_Presentation(Graphic3d_StructureManager theManager) : base(theManager)
         {
             //const Handle(Graphic3d_Structure)&theLinkPrs = Handle(Graphic3d_Structure)());
@@ -25,6 +29,7 @@ namespace OCCPort
         }
 
         
+
         internal void Network(Graphic3d_Structure theStructure,
 
                                 Graphic3d_TypeOfConnection theType,
@@ -53,6 +58,8 @@ namespace OCCPort
             //}
 
         }
+
+		
     }
 
 

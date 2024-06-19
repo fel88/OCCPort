@@ -4,7 +4,6 @@ namespace OCCPort.Tester
 {
     //! Tool for computing wireframe presentation of a TopoDS_Shape.
     class StdPrs_WFShape : Prs3d_Root
-
     {
 
 

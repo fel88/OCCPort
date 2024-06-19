@@ -34,7 +34,21 @@ namespace OCCPort.Tester
             }
 
 
+			switch (theMode)
+			{
 
+				case (int)AIS_DisplayMode.AIS_Shaded:
+					{
+						StdPrs_ToolTriangulatedShape.ClearOnOwnDeflectionChange(myshape, myDrawer, true);
+						if ((int)myshape.ShapeType() > 4)
+						{
+							StdPrs_WFShape.Add(thePrs, myshape, myDrawer);
+						}
+
+						break;
+					}
+
+			}
         }
 
         private bool IsInfinite()
@@ -47,6 +61,7 @@ namespace OCCPort.Tester
         {
             this.solid = solid;
         }
+
 
         protected TopoDS_Shape myshape;    //!< shape to display
 
