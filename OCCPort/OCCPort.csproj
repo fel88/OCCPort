@@ -67,8 +67,11 @@
     <Compile Include="BRepBuilderAPI_Command.cs" />
     <Compile Include="BRepBuilderAPI_MakeShape.cs" />
     <Compile Include="BRepPrimAPI_MakeBox.cs" />
+    <Compile Include="BRepPrimAPI_MakeOneAxis.cs" />
     <Compile Include="BRepPrim_Builder.cs" />
+    <Compile Include="BRepPrim_Cylinder.cs" />
     <Compile Include="BRepPrim_GWedge.cs" />
+    <Compile Include="BRepPrim_OneAxis.cs" />
     <Compile Include="BRepPrim_Wedge.cs" />
     <Compile Include="BRepTools.cs" />
     <Compile Include="BRep_Builder.cs" />
@@ -128,6 +131,7 @@
     <Compile Include="Graphic3d_CubeMapSide.cs" />
     <Compile Include="Graphic3d_CView.cs" />
     <Compile Include="Graphic3d_DataStructureManager.cs" />
+    <Compile Include="Graphic3d_DisplayPriority.cs" />
     <Compile Include="Graphic3d_GraduatedTrihedron.cs" />
     <Compile Include="Graphic3d_GraphicDriver.cs" />
     <Compile Include="Graphic3d_Group.cs" />
@@ -221,6 +225,8 @@
     <Compile Include="SelectMgr_SelectionType.cs" />
     <Compile Include="SelectMgr_SequenceOfSelection.cs" />
     <Compile Include="SelectMgr_ToleranceMap.cs" />
+    <Compile Include="SelectMgr_TypeOfBVHUpdate.cs" />
+    <Compile Include="SelectMgr_TypeOfUpdate.cs" />
     <Compile Include="SelectMgr_ViewerSelector.cs" />
     <Compile Include="ShaderVariable.cs" />
     <Compile Include="Standard_DomainError.cs" />

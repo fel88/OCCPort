@@ -35,6 +35,22 @@ namespace OCCPort
             throw new NotImplementedException();
         }
 
+        public bool IsValid()
+        {
+            return isValidFrameBuffer();
+        }
+
+
+        //! Helpful constants
+        const int NO_FRAMEBUFFER = 0;
+        const int NO_RENDERBUFFER = 0;
+
+        bool isValidFrameBuffer()
+        {
+            return myGlFBufferId != NO_FRAMEBUFFER;
+        }
+
+
         int myInitVPSizeX;         //!< viewport width  specified during initialization (kept even on failure)
         int myInitVPSizeY;         //!< viewport height specified during initialization (kept even on failure)
         int myVPSizeX;             //!< viewport width  (should be <= texture width)
@@ -50,5 +66,10 @@ namespace OCCPort
         bool myIsOwnDepth;          //!< flag indicating that depth texture  should be deallocated by this class
         OpenGl_TextureArray myColorTextures;       //!< color texture objects
         OpenGl_Texture myDepthStencilTexture; //!< depth-stencil texture object
+
+        public OpenGl_FrameBuffer(string theResourceId) : base(theResourceId)
+        {
+
+        }
     }
 }

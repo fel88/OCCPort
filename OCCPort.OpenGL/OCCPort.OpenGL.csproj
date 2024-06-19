@@ -68,6 +68,7 @@
     <Compile Include="OpenGl_DepthPeeling.cs" />
     <Compile Include="OpenGl_Element.cs" />
     <Compile Include="OpenGl_ElementNode.cs" />
+    <Compile Include="OpenGl_FilteredIndexedLayerIterator.cs" />
     <Compile Include="OpenGl_FrameBuffer.cs" />
     <Compile Include="OpenGl_GlobalLayerSettings.cs" />
     <Compile Include="OpenGl_GradientParameters.cs" />
@@ -75,6 +76,7 @@
     <Compile Include="OpenGl_Group.cs" />
     <Compile Include="OpenGl_IndexBuffer.cs" />
     <Compile Include="OpenGl_IndexBufferCompat.cs" />
+    <Compile Include="OpenGl_Layer.cs" />
     <Compile Include="OpenGl_LayerList.cs" />
     <Compile Include="OpenGl_LayerStack.cs" />
     <Compile Include="OpenGl_MatrixState.cs" />

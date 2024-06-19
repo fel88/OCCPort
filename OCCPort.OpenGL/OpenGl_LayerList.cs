@@ -48,10 +48,40 @@ namespace OCCPort
                 }
             }
         }
-
-        internal void Render(OpenGl_Workspace myWorkspace, bool theToDrawImmediate, OpenGl_LayerFilter openGl_LF_Upper, OpenGl_FrameBuffer theReadDrawFbo, OpenGl_FrameBuffer theOitAccumFbo)
+        internal struct OpenGl_GlobalLayerSettings
         {
-            throw new NotImplementedException();
+            public int DepthFunc;
+            public bool DepthMask;
+        }
+        internal void Render(OpenGl_Workspace theWorkspace,
+            bool theToDrawImmediate, OpenGl_LayerFilter theLayersToProcess,
+            OpenGl_FrameBuffer theReadDrawFbo,
+            OpenGl_FrameBuffer theOitAccumFbo)
+        {
+            // Remember global settings for glDepth function and write mask.
+            OpenGl_GlobalLayerSettings aPrevSettings = new OpenGl_GlobalLayerSettings();
+
+            OpenGl_Context aCtx = theWorkspace.GetGlContext();
+            //aCtx.core11fwd.glGetIntegerv(GL_DEPTH_FUNC, &aPrevSettings.DepthFunc);
+            //aCtx.core11fwd.glGetBooleanv(GL_DEPTH_WRITEMASK, &aPrevSettings.DepthMask);
+            OpenGl_GlobalLayerSettings aDefaultSettings = aPrevSettings;
+            /*
+            const bool isShadowMapPass = theReadDrawFbo != NULL
+                                     && !theReadDrawFbo->HasColor();*/
+            for (OpenGl_FilteredIndexedLayerIterator aLayerIterStart =new OpenGl_FilteredIndexedLayerIterator (myLayers, theToDrawImmediate, theLayersToProcess); aLayerIterStart.More();)
+            {
+
+                OpenGl_FilteredIndexedLayerIterator aLayerIter = new OpenGl_FilteredIndexedLayerIterator(aLayerIterStart);
+                for (; aLayerIter.More(); aLayerIter.Next())
+                {
+                    OpenGl_Layer aLayer = aLayerIter.Value();
+
+
+                    renderLayer(theWorkspace, aDefaultSettings, aLayer);
+                }
+            }
+
+
         }
 
         Dictionary<Graphic3d_ZLayerId, Graphic3d_Layer> myLayerIds;

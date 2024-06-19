@@ -102,5 +102,15 @@ namespace OCCPort
 			}
 
 		}
+
+        internal bool Contains(SelectMgr_SelectableObject theObject)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void AddSelectableObject(SelectMgr_SelectableObject theObject)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

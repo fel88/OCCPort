@@ -5,6 +5,9 @@ namespace OCCPort
 {
     public class Graphic3d_Structure
     {
+        public Graphic3d_Structure()
+        {
+        }
         //
         //! Alias for porting code.
         //typedef Graphic3d_Structure Prs3d_Presentation;

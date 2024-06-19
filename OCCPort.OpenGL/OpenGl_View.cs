@@ -12,11 +12,19 @@ namespace OCCPort.OpenGL
         {
             myZLayers = new OpenGl_LayerList();
         }
+        OpenGl_FrameBuffer[] myMainSceneFbos;
+        OpenGl_FrameBuffer[] myMainSceneFbosOit;
+        public OpenGl_View(Graphic3d_StructureManager theMgr, OpenGl_GraphicDriver openGl_GraphicDriver, OpenGl_Caps myCaps, OpenGl_StateCounter myStateCounter)
+        {
+            this.myCaps = myCaps;
+            myMainSceneFbos = new OpenGl_FrameBuffer[2];
+            myMainSceneFbosOit = new OpenGl_FrameBuffer[2];
 
-		public OpenGl_View(Graphic3d_StructureManager theMgr, OpenGl_GraphicDriver openGl_GraphicDriver, OpenGl_Caps myCaps, OpenGl_StateCounter myStateCounter)
-		{
-			this.myCaps = myCaps;
-		}
+            myMainSceneFbos[0] = new OpenGl_FrameBuffer("fbo0_main");
+            myMainSceneFbos[1] = new OpenGl_FrameBuffer("fbo1_main");
+            myMainSceneFbosOit[0] = new OpenGl_FrameBuffer("fbo0_main_oit");
+            myMainSceneFbosOit[1] = new OpenGl_FrameBuffer("fbo1_main_oit");
+        }
 
         OpenGl_GraphicDriver myDriver;
         OpenGl_Window myWindow;
@@ -309,6 +317,14 @@ namespace OCCPort.OpenGL
             throw new NotImplementedException();
         }
 
+        void redraw(Graphic3d_Camera.Projection theProjection,
+                          OpenGl_FrameBuffer theReadDrawFbo,
+                          OpenGl_FrameBuffer theOitAccumFbo)
+        {
+            render(theProjection, theReadDrawFbo, theOitAccumFbo, false);
+        }
+        OpenGl_FrameBuffer      myFBO;
+
         public override void Redraw()
         {
             bool wasDisabledMSAA = myToDisableMSAA;
@@ -322,12 +338,28 @@ namespace OCCPort.OpenGL
                 myDriver.setDeviceLost();
                 myCaps.keepArrayData = true;
             }
+
+            OpenGl_FrameBuffer aFrameBuffer = myFBO;
+
+            Graphic3d_Camera.Projection aProjectType = myCamera.ProjectionType();
+            if (aProjectType == Graphic3d_Camera.Projection.Projection_Stereo)
+            {
+            }
+            else
+            {
+                OpenGl_FrameBuffer aMainFbo = myMainSceneFbos[0].IsValid() ? myMainSceneFbos[0] : aFrameBuffer;
+                OpenGl_FrameBuffer aMainFboOit = myMainSceneFbosOit[0].IsValid() ? myMainSceneFbosOit[0] : null;
+                redraw(aProjectType, aMainFbo, aMainFboOit);
+            }
+
         }
 
         public override void RedrawImmediate()
         {
             if (!myWorkspace.Activate())
                 return;
+
+
 
         }
         public void renderScene(Graphic3d_Camera.Projection theProjection,
@@ -336,6 +368,8 @@ namespace OCCPort.OpenGL
                               bool theToDrawImmediate)
         {
             OpenGl_Context aContext = myWorkspace.GetGlContext();
+            renderStructs(theProjection, theReadDrawFbo, theOitAccumFbo, theToDrawImmediate);
+            //aContext->BindTextures(Handle(OpenGl_TextureSet)(), Handle(OpenGl_ShaderProgram)());
 
         }
         //=======================================================================
@@ -378,6 +412,8 @@ namespace OCCPort.OpenGL
             // =================================
             //      Step 3: Redraw main plane
             // =================================
+
+            renderScene(theProjection, theOutputFBO, theOitAccumFbo, theToDrawImmediate);
 
         }
 
