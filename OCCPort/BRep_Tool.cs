@@ -72,7 +72,7 @@ namespace OCCPort
 
         }
 
-		internal static Poly_Triangulation Triangulation(TopoDS_Face aFace, TopLoc_Location aLocation)
+		internal static Poly_Triangulation Triangulation(TopoDS_Face aFace, ref TopLoc_Location aLocation)
 		{
 			throw new NotImplementedException();
 		}

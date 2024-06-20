@@ -4,7 +4,17 @@ namespace OCCPort
 {
     public class Graphic3d_Layer
 	{
-		public Graphic3d_IndexedMapOfStructure Structures(Graphic3d_DisplayPriority aPriorityIter)
+        public void Add(Graphic3d_CStructure theStruct, Graphic3d_DisplayPriority thePriority, bool isForChangePriority)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool IsImmediate()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Graphic3d_IndexedMapOfStructure Structures(Graphic3d_DisplayPriority aPriorityIter)
 		{
 			throw new NotImplementedException();
 		}

@@ -7,9 +7,9 @@ namespace OCCPort
 {
     public class Graphic3d_MapOfStructure:List<Graphic3d_Structure>
     {
-		public Graphic3d_MapOfStructure(Prs3d_Presentation ss)
+		public Graphic3d_MapOfStructure()
 		{
-			key = ss;
+			
 		}
 
 		Prs3d_Presentation key;

@@ -66,6 +66,8 @@ namespace OCCPort.OpenGL
         OpenGl_Aspects myNoneCulling;
         OpenGl_Aspects myFrontCulling;
 
-
+        public OpenGl_Workspace(OpenGl_View openGl_View, object value)
+        {
+        }
     }
 }
