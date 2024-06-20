@@ -4,8 +4,14 @@ using System.Collections.Generic;
 namespace OCCPort
 {
     public abstract class Graphic3d_CView : Graphic3d_DataStructureManager
+	{
 
+		public Graphic3d_CView(Graphic3d_StructureManager theMgr)
     {
+			myCamera = new Graphic3d_Camera();
+			myStructureManager = theMgr;
+		}
+
         protected Graphic3d_TextureMap myBackgroundImage;
         protected bool myIsSubviewComposer;        //!< flag to skip rendering of viewer contents
         protected Graphic3d_CubeMap    myCubeMapBackground;  //!< Cubemap displayed at background
@@ -67,6 +73,12 @@ namespace OCCPort
 			throw new NotImplementedException();
 		}
 
+
+		//! Adds the structure to display lists of the view.
+		public abstract void displayStructure(Graphic3d_CStructure theStructure,
+								  Graphic3d_DisplayPriority thePriority);
+
+
 		internal void Display(Graphic3d_Structure theStructure)
 		{
 			//if (!IsActive())
@@ -106,7 +118,7 @@ namespace OCCPort
 			//	}
 
 			//	theStructure.CalculateBoundBox();
-			//	displayStructure(theStructure.CStructure(), theStructure.DisplayPriority());
+			displayStructure(theStructure.CStructure(), theStructure.DisplayPriority());
 			//	Update(theStructure.GetZLayer());
 			//	return;
 			//}
@@ -223,6 +235,45 @@ namespace OCCPort
 
 			//Update(aStruct->GetZLayer());
 
+		}
+
+
+		internal void Clear(Graphic3d_Structure theStructure, bool theWithDestruction)
+		{
+			int anIndex = IsComputed(theStructure);
+			if (anIndex != 0)
+			{
+				Graphic3d_Structure aCompStruct = myStructsComputed.Value(anIndex);
+				aCompStruct.GraphicClear(theWithDestruction);
+				aCompStruct.SetHLRValidation(false);
+			}
+
+		}
+
+		private int IsComputed(Graphic3d_Structure theStructure)
+		{
+			int aStructId = theStructure.Identification();
+			int aStructIndex = 1;
+			foreach (var aStructIter in myStructsToCompute.list)
+			{
+				Graphic3d_Structure aStruct = aStructIter;
+				if (aStruct.Identification() == aStructId)
+				{
+					return aStructIndex;
+				}
+			}
+			return 0;
+
+		}
+
+		internal void SetWindow(object value, Aspect_Window theWindow, Aspect_RenderingContext theContext)
+		{
+			throw new NotImplementedException();
+		}
+
+		internal bool IsRemoved()
+		{
+			throw new NotImplementedException();
 		}
     }
 }

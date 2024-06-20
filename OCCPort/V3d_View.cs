@@ -19,11 +19,11 @@ namespace OCCPort
 		//=============================================================================
 		public void Redraw()
 		{
-			if (!myView.IsDefined()
+			/*if (!myView.IsDefined()
 			 || !myView.IsActive())
 			{
 				return;
-			}
+			}*/
 
 			//myIsInvalidatedImmediate = false;
 			Graphic3d_StructureManager aStructureMgr = MyViewer.StructureManager();
@@ -47,7 +47,7 @@ namespace OCCPort
 
 		private void AutoZFit()
 		{
-			throw new NotImplementedException();
+			//throw new NotImplementedException();
 		}
 
         public void Rotation(int X,
@@ -115,6 +115,33 @@ namespace OCCPort
             Init();
             myImmediateUpdate = true;
         }
+		public void SetWindow(Aspect_Window theWindow,
+						  Aspect_RenderingContext theContext)
+		{
+			if (myView.IsRemoved())
+			{
+				return;
+			}
+			if (myParentView != null)
+			{
+				throw new Standard_ProgramError("V3d_View::SetWindow() called twice");
+			}
+
+			// method V3d_View::SetWindow() should assign the field MyWindow before calling Redraw()
+			MyWindow = theWindow;
+			myView.SetWindow(null, theWindow, theContext);
+			MyViewer.SetViewOn(this);
+			SetRatio();
+			if (myImmediateUpdate)
+			{
+				Redraw();
+			}
+		}
+
+		private void SetRatio()
+		{
+			throw new NotImplementedException();
+		}
 
 		public V3d_View(V3d_Viewer theViewer, V3d_TypeOfView myDefaultTypeOfView)
 		{
@@ -757,8 +784,11 @@ namespace OCCPort
             ImmediateUpdate();
         }
 
+		V3d_View myParentView;
         //! Returns the Aspect Window associated with the view.
         public Aspect_Window Window() { return MyWindow; }
 
+		//! Return TRUE if this is a subview of another view.
+		public bool IsSubview() { return myParentView != null; }
     }
 }

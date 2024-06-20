@@ -62,8 +62,42 @@ namespace OCCPort
 
     internal class TopExp_Explorer
     {
-        public TopExp_Explorer(object v, TopAbs_ShapeEnum topAbs_VERTEX)
+		public TopExp_Explorer(TopoDS_Shape theS,
+			TopAbs_ShapeEnum theToFind,
+			TopAbs_ShapeEnum theToAvoid = TopAbs_ShapeEnum.TopAbs_SHAPE
+)
         {
+			Init(theS, theToFind, theToAvoid);
+
+		}
+
+		private void Init(TopoDS_Shape S, TopAbs_ShapeEnum ToFind, TopAbs_ShapeEnum ToAvoid)
+		{
+
+			Clear();
+
+			myShape = S;
+			toFind = ToFind;
+			toAvoid = ToAvoid;
+
+			if (S.IsNull())
+			{
+				hasMore = false;
+				return;
+			}
+
+		}
+
+		private void Clear()
+		{
+			hasMore = false;
+			myStack.list.Clear();
+			/*for (int i = 0; i <= myTop; ++i)
+			{
+				myStack[i].~TopoDS_Iterator();
+			}*/
+			myTop = -1;
+
         }
 
         internal TopoDS_Shape Current()
@@ -83,18 +117,75 @@ namespace OCCPort
         //! Returns True if there are more shapes in the exploration.
         public bool More() { return hasMore; }
 
-
-        TopExp_Stack myStack;
+		//typedef TopoDS_Iterator* TopExp_Stack;
+		TopExp_Stack myStack = new TopExp_Stack();
         TopoDS_Shape myShape;
         int myTop;
         int mySizeOfStack;
         TopAbs_ShapeEnum toFind;
         TopAbs_ShapeEnum toAvoid;
         bool hasMore;
+		// macro to compare two types of shapes
+		// always True if the first one is SHAPE
+		bool SAMETYPE(TopAbs_ShapeEnum x, TopAbs_ShapeEnum y)
+		{
+			return (x) == (y);
+		}
+		bool AVOID(TopAbs_ShapeEnum x, TopAbs_ShapeEnum y)
+		{
+			return ((x) == TopAbs_ShapeEnum.TopAbs_SHAPE) ? false : (x) == (y);
+		}
+
+		bool LESSCOMPLEX(TopAbs_ShapeEnum x, TopAbs_ShapeEnum y)
+		{
+			return (x) > (y);
+		}
 
         internal void Next()
         {
+			int NewSize;
+			TopoDS_Shape ShapTop;
+			TopAbs_ShapeEnum ty;
+			//Standard_NoMoreObject_Raise_if(!hasMore, "TopExp_Explorer::Next");
 
+			if (myTop < 0)
+			{
+				// empty stack. Entering the initial shape.
+				ty = myShape.ShapeType();
+
+				if (SAMETYPE(toFind, ty))
+				{
+					// already visited once
+					hasMore = false;
+					return;
+				}
+				else if (AVOID(toAvoid, ty))
+				{
+					// avoid the top-level
+					hasMore = false;
+					return;
+				}
+				else
+				{
+					// push and try to find
+					if (++myTop >= mySizeOfStack)
+					{
+						//NewSize = mySizeOfStack + theStackSize;
+						//TopExp_Stack newStack = (TopoDS_Iterator*)Standard::Allocate(NewSize * sizeof(TopoDS_Iterator));
+						//int i;
+						//for (i = 0; i < myTop; i++)
+						//{
+						//	new(&newStack[i]) TopoDS_Iterator(myStack[i]);
+						//	myStack[i].~TopoDS_Iterator();
+						//}
+						//Standard::Free(myStack);
+						//mySizeOfStack = NewSize;
+						//myStack = newStack;
+					}
+					//new(&myStack[myTop]) TopoDS_Iterator(myShape);
+				}
+			}
+			//else myStack[myTop].Next();
         }
         //{
         //    int NewSize;

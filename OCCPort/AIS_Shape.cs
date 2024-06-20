@@ -4,7 +4,7 @@ namespace OCCPort.Tester
 {
     public class AIS_Shape : AIS_InteractiveObject
     {
-        private object solid;
+        
         public override void Compute(PrsMgr_PresentationManager thePrsMgr,
                                    Prs3d_Presentation thePrs,
                                    int theMode)
@@ -34,10 +34,10 @@ namespace OCCPort.Tester
             }
 
 
-			switch (theMode)
+			//switch (theMode)
 			{
 
-				case (int)AIS_DisplayMode.AIS_Shaded:
+				//case (int)AIS_DisplayMode.AIS_Shaded:
 					{
 						StdPrs_ToolTriangulatedShape.ClearOnOwnDeflectionChange(myshape, myDrawer, true);
 						if ((int)myshape.ShapeType() > 4)
@@ -45,21 +45,22 @@ namespace OCCPort.Tester
 							StdPrs_WFShape.Add(thePrs, myshape, myDrawer);
 						}
 
-						break;
+						//break;
 					}
 
 			}
         }
 
-        private bool IsInfinite()
+        
+        
+        public AIS_Shape( )
         {
-            throw new NotImplementedException();
-        }
 
-        public AIS_Shape() { }
-        public AIS_Shape(object solid)
+        }
+        public AIS_Shape(TopoDS_Shape theShape)
         {
-            this.solid = solid;
+            myshape = (theShape);
+            
         }
 
 

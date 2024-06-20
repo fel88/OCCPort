@@ -1,9 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace OCCPort
 {
 	internal class SelectMgr_SelectableObjectSet
 	{
+		public SelectMgr_SelectableObjectSet()
+		{
+			for (int i = 0; i < myObjects.Length; i++)
+			{
+				myObjects[i] = new List<SelectMgr_SelectableObject>();
+			}
+		}
 		//! is represented directly in eye space coordinates.
 		//! This subset uses linear BVH builder with 32 levels of depth and 1 element per leaf.
 		enum BVHSubset
@@ -93,6 +101,22 @@ namespace OCCPort
 			//// keep last window state
 			//myLastWinSize = theWinSize;
 
+		}
+
+		List<SelectMgr_SelectableObject>[] myObjects = new List<SelectMgr_SelectableObject>[(int)BVHSubset.BVHSubsetNb]; //!< Map of objects for each subset
+
+		internal bool Contains(SelectMgr_SelectableObject theObject)
+		{
+
+			return myObjects[(int)BVHSubset.BVHSubset_3d].Contains(theObject)
+				|| myObjects[(int)BVHSubset.BVHSubset_3dPersistent].Contains(theObject)
+				|| myObjects[(int)BVHSubset.BVHSubset_2dPersistent].Contains(theObject);
+
+		}
+
+		internal void Append(SelectMgr_SelectableObject theObject)
+		{
+			
 		}
 	}
 }

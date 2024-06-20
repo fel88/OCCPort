@@ -83,7 +83,7 @@ namespace OCCPort
             throw new NotImplementedException();
         }
 
-		SelectMgr_SelectableObjectSet mySelectableObjects;
+		SelectMgr_SelectableObjectSet mySelectableObjects = new SelectMgr_SelectableObjectSet();
 
 		internal void RebuildObjectsTree(bool theIsForce = false)
 		{
@@ -103,14 +103,25 @@ namespace OCCPort
 
 		}
 
+
+
+		public SelectMgr_SelectableObjectSet SelectableObjects() { return mySelectableObjects; }
+
         internal bool Contains(SelectMgr_SelectableObject theObject)
         {
-            throw new NotImplementedException();
+			return mySelectableObjects.Contains(theObject);
         }
-
+		SelectMgr_MapOfObjectSensitives myMapOfObjectSensitives = new SelectMgr_MapOfObjectSensitives();
+		Select3D_BVHBuilder3d myEntitySetBuilder;
         internal void AddSelectableObject(SelectMgr_SelectableObject theObject)
         {
-            throw new NotImplementedException();
+			if (!myMapOfObjectSensitives.IsBound(theObject))
+			{
+				mySelectableObjects.Append(theObject);
+				SelectMgr_SensitiveEntitySet anEntitySet = new SelectMgr_SensitiveEntitySet(myEntitySetBuilder);
+				myMapOfObjectSensitives.Bind(theObject, anEntitySet);
+			}
+
         }
     }
 }

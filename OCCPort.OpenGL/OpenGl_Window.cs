@@ -3,7 +3,7 @@ using System;
 
 namespace OCCPort
 {
-    internal class OpenGl_Window
+    public class OpenGl_Window
     {
         internal Aspect_Window SizeWindow()
         {
@@ -21,6 +21,11 @@ namespace OCCPort
 
         public int Width() { return mySize.x(); }
         public int Height() { return mySize.y(); }
+
+		internal OpenGl_Context GetGlContext()
+		{
+			throw new NotImplementedException();
+		}
     }
 
 }

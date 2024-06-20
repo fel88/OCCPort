@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Aspect_GraphicsLibrary.cs" />
+    <Compile Include="Aspect_RenderingContext.cs" />
     <Compile Include="Graphic3d_Aspects.cs" />
     <Compile Include="Graphic3d_BoundBuffer.cs" />
     <Compile Include="Graphic3d_Buffer.cs" />
@@ -53,6 +54,7 @@
     <Compile Include="Graphic3d_TypeOfPrimitiveArray.cs" />
     <Compile Include="Graphic3d_TypeOfShadingModel.cs" />
     <Compile Include="Graphic3d_ZLayerId.cs" />
+    <Compile Include="MyLayersDic.cs" />
     <Compile Include="OpenGl_ArbFBO.cs" />
     <Compile Include="OpenGl_ArbFBOBlit.cs" />
     <Compile Include="OpenGl_Aspects.cs" />

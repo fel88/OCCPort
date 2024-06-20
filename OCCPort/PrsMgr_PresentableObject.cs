@@ -24,6 +24,13 @@ namespace OCCPort
         protected Prs3d_Drawer myDrawer;                  //!< main presentation attributes
         protected Prs3d_Drawer myHilightDrawer;           //!< (optional) custom presentation attributes for highlighting selected object
 
+		//! Returns true if the interactive object is infinite; FALSE by default.
+		//! This flag affects various operations operating on bounding box of graphic presentations of this object.
+		//! For instance, infinite objects are not taken in account for View FitAll.
+		//! This does not necessarily means that object is actually infinite,
+		//! auxiliary objects might be also marked with this flag to achieve desired behavior.
+		public bool IsInfinite() { return myInfiniteState; }
+
         public PrsMgr_PresentableObject(PrsMgr_TypeOfPresentation3d theType)
         {
             myParent = null;

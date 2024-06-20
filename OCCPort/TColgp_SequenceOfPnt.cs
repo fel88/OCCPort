@@ -7,7 +7,7 @@ namespace OCCPort.Tester
 	{
 		internal int Size()
 		{
-			throw new NotImplementedException();
+			return list.Count;
 		}
 
 		List<gp_Pnt> list = new List<gp_Pnt>();

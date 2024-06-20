@@ -66,14 +66,14 @@ namespace OCCPort.Tester
             {
                 glControl.MakeCurrent();
             }
-            try
+			/*try
             {
                 GravityViewManager.View.Redraw();
             }
             catch (Exception ex)
             {
 
-            }
+			}*/
             Redraw();
         }
 
@@ -291,6 +291,23 @@ namespace OCCPort.Tester
         {
             AddBox();
         }
+
+		private void toolStripButton8_Click(object sender, EventArgs e)
+		{
+			gp_Pnt p1 = new gp_Pnt(0, 0, 0);
+			gp_Pnt p2 = new gp_Pnt(10, 10, 10);
+			BRepPrimAPI_MakeBox box = new BRepPrimAPI_MakeBox(p1, p2);
+
+			box.Build();
+			var solid = box.Solid();
+			var shape = new AIS_Shape(solid);
+			var sm = v3d_viewer.StructureManager();
+
+			myAISContext.Display(shape, true);
+
+			//shape.Compute(sm,);
+			GravityViewManager.View.Redraw();
+		}
     }
 
 }

@@ -52,7 +52,7 @@ namespace OCCPort.Tester
                         continue;
                     }
                 }
-                Poly_Triangulation aPolyTri = BRep_Tool.Triangulation(aFace, aLocation);
+                Poly_Triangulation aPolyTri = BRep_Tool.Triangulation(aFace, ref aLocation);
                 if (aPolyTri != null)
                 {
                     Prs3d.AddFreeEdges(theSegments, aPolyTri, aLocation);

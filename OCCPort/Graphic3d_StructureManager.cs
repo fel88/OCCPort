@@ -7,8 +7,8 @@ namespace OCCPort
 {
     public class Graphic3d_StructureManager
     {
-
-		Graphic3d_MapOfStructure myDisplayedStructure;
+		Graphic3d_GraphicDriver myGraphicDriver;
+		Graphic3d_MapOfStructure myDisplayedStructure = new Graphic3d_MapOfStructure();
 		public void RegisterObject(AIS_InteractiveObject theObject,
                                                   Graphic3d_ViewAffinity theAffinity)
         {
@@ -31,9 +31,11 @@ namespace OCCPort
 			myDeviceLostFlag = false;
 
 			// Go through all unique structures including child (connected) ones and ensure that they are computed.
-			List<Prs3d_Presentation> aStructNetwork = new List<Prs3d_Presentation>();
+			List<Graphic3d_Structure> aStructNetwork = new List<Graphic3d_Structure>();
 			foreach (var anIter in myDisplayedStructure)
 			{
+				Graphic3d_Structure.Network(anIter, Graphic3d_TypeOfConnection.Graphic3d_TOC_DESCENDANT, aStructNetwork);
+				//aStructNetwork.Add(anIter.net);
 				//anIter.Network();
 			}
 			/*
@@ -47,26 +49,44 @@ namespace OCCPort
 
 		}
 
-		public void RecomputeStructures(List<Prs3d_Presentation> theStructures)
+		public void RecomputeStructures(List<Graphic3d_Structure> theStructures)
 		{
 			foreach (var item in theStructures)
 			{
-				Prs3d_Presentation aStruct = item;
+				var aStruct = item;
 				aStruct.Clear();
 				aStruct.Compute();
 			}
 		}
-		Graphic3d_IndexedMapOfView myDefinedViews;
+
+		Graphic3d_IndexedMapOfView myDefinedViews = new Graphic3d_IndexedMapOfView();
+
 		internal void Display(Graphic3d_Structure theStructure)
 		{
-
 			myDisplayedStructure.Add(theStructure);
 
+			foreach (var anIter in myDefinedViews.list)
+			{
+				anIter.Display(theStructure);
 
-			for (Graphic3d_IndexedMapOfView.Iterator aViewIt = new Graphic3d_IndexedMapOfView.Iterator(myDefinedViews); aViewIt.More(); aViewIt.Next())
+			}
+			/*for (Graphic3d_IndexedMapOfView.Iterator aViewIt = new Graphic3d_IndexedMapOfView.Iterator(myDefinedViews); aViewIt.More(); aViewIt.Next())
 			{
 				aViewIt.Value().Display(theStructure);
+			}*/
 			}
+		public Graphic3d_GraphicDriver GraphicDriver()
+		{
+			return (myGraphicDriver);
+		}
+
+		internal void Clear(Graphic3d_Structure theStructure, bool theWithDestruction)
+		{
+			foreach (var aViewIt in myDefinedViews.list)
+			{
+				aViewIt.Clear(theStructure, theWithDestruction);
+			}
+			
 
 		}
 
@@ -74,6 +94,7 @@ namespace OCCPort
 
 		public Graphic3d_StructureManager(Graphic3d_GraphicDriver theDriver)
 		{
+			myGraphicDriver = (theDriver);
 		}
     }
 }

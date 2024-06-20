@@ -4,10 +4,10 @@ namespace OCCPort.OpenGL
 {
     public class OpenGl_Workspace
     {
-        public OpenGl_Context GetGlContext()
-        {
-            throw new NotImplementedException();
-        }
+
+
+
+		public  OpenGl_Context GetGlContext() { return myGlContext; }
 
         internal bool Activate()
         {
