@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 
 namespace OCCPort
@@ -41,6 +42,15 @@ namespace OCCPort
 			}
 
 		}
+		public static void Network(Graphic3d_Structure theStructure,
+
+										Graphic3d_TypeOfConnection theType,
+									   List<Graphic3d_Structure> theSet)
+		{
+			theSet.Add(theStructure);
+		}
+
+
 		public void SetVisible(bool theValue)
 		{
 			if (IsDeleted())
@@ -57,9 +67,15 @@ namespace OCCPort
 			Update(true);
 		}
 
-		private void Update(bool v)
+		private void Update(bool theUpdateLayer)
 		{
-			throw new NotImplementedException();
+			if (IsDeleted())
+			{
+				return;
+			}
+
+			//myStructureManager.Update(theUpdateLayer ? myCStructure.ZLayer() : Graphic3d_ZLayerId_UNKNOWN);
+
 		}
 
 
@@ -102,7 +118,9 @@ namespace OCCPort
 
         public Graphic3d_Structure(Graphic3d_StructureManager theManager)
         {
-            myStructureManager= theManager; ;
+			myStructureManager = theManager;
+			myCStructure = theManager.GraphicDriver().CreateStructure(theManager);
+
         }
 
         internal Graphic3d_Group NewGroup()
@@ -123,14 +141,51 @@ namespace OCCPort
         }
 		public void SetIsForHighlight(bool isForHighlight)
 		{
-			if (myCStructure != null) { 
-				myCStructure.IsForHighlight = isForHighlight; }
+			if (myCStructure != null)
+			{
+				myCStructure.IsForHighlight = isForHighlight;
+			}
 		}
 
+		public virtual void Clear(bool WithDestruction = true)
+		{
+			clear(WithDestruction);
+		}
 
-        internal void Clear()
+		public void clear(bool theWithDestruction)
         {
-            throw new NotImplementedException();
+			if (IsDeleted())
+				return;
+
+			// clean groups in graphics driver at first
+			GraphicClear(theWithDestruction);
+
+			myCStructure.SetGroupTransformPersistence(false);
+			myStructureManager.Clear(this, theWithDestruction);
+
+			Update(true);
+		}
+
+		public void GraphicClear(bool theWithDestruction)
+		{
+			//throw new NotImplementedException();
+		}
+
+		internal void SetHLRValidation(bool v)
+		{
+			//throw new NotImplementedException();
+		}
+
+		public int Identification()
+		{
+			return myCStructure.Identification();
         }
+		//! Returns the current display priority for this structure.
+		public Graphic3d_DisplayPriority DisplayPriority()
+		{
+			return myCStructure.Priority();
+		}
+
+		
     }
 }

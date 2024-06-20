@@ -9,14 +9,14 @@ namespace OCCPort
     {
 
 
-        public SelectMgr_SelectionManager(StdSelect_ViewerSelector3d stdSelect_ViewerSelector3d)
+        public SelectMgr_SelectionManager(SelectMgr_ViewerSelector theSelector)
         {
-
+            mySelector = (theSelector);
         }
 
         internal void Activate(AIS_InteractiveObject theIObj, int theSelectionMode)
         {
-            throw new NotImplementedException();
+            
         }
 
         internal bool Contains(SelectMgr_SelectableObject theObject)

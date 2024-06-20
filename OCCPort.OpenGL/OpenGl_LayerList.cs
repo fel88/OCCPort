@@ -19,12 +19,34 @@ namespace OCCPort
         //! Number of displayed structures
         public int NbStructures() { return myNbStructures; }
 
+		public void AddStructure(OpenGl_Structure theStruct,
+									  Graphic3d_ZLayerId theLayerId,
+									  Graphic3d_DisplayPriority thePriority,
+									 bool isForChangePriority = false)
+		{
+			// add structure to associated layer,
+			// if layer doesn't exists, display structure in default layer
+			Graphic3d_Layer aLayerPtr = myLayerIds.Seek(theLayerId);
+			Graphic3d_Layer aLayer = aLayerPtr != null ? aLayerPtr : myLayerIds.Find(Graphic3d_ZLayerId.Graphic3d_ZLayerId_Default);
+			aLayer.Add(theStruct, thePriority, isForChangePriority);
+			++myNbStructures;
+			if (aLayer.IsImmediate())
+			{
+				++myImmediateNbStructures;
+			}
+
+			// Note: In ray-tracing mode we don't modify modification
+			// state here. It is redundant, because the possible changes
+			// will be handled in the loop for structures
+		}
+
+
         //! Return number of structures within immediate layers
         public int NbImmediateStructures() { return myImmediateNbStructures; }
 
         internal void UpdateCulling(OpenGl_Workspace myWorkspace, bool theToDrawImmediate)
         {
-            throw new NotImplementedException();
+			//throw new NotImplementedException();
         }
         void renderLayer(OpenGl_Workspace theWorkspace,
                                      OpenGl_GlobalLayerSettings theDefaultSettings,
@@ -84,7 +106,8 @@ namespace OCCPort
 
         }
 
-        Dictionary<Graphic3d_ZLayerId, Graphic3d_Layer> myLayerIds;
+
+		MyLayersDic myLayerIds;
         Select3D_BVHBuilder3d myBVHBuilder;      //!< BVH tree builder for frustum culling
 
         int myNbStructures;
@@ -98,5 +121,7 @@ namespace OCCPort
 
 
     }
+
+
 
 }

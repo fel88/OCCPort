@@ -9,10 +9,18 @@ namespace OCCPort.OpenGL
 
 		OpenGl_Caps myCaps;
 		List<OpenGl_View> myMapOfView=new List<OpenGl_View> ();
-		Dictionary<int, OpenGl_Structure> myMapOfStructure;
+		Dictionary<int, OpenGl_Structure> myMapOfStructure = new Dictionary<int, OpenGl_Structure>();
 
 
 		OpenGl_StateCounter myStateCounter; //!< State counter for OpenGl structures.
+
+		public override Graphic3d_CStructure CreateStructure(Graphic3d_StructureManager theManager)
+		{
+			OpenGl_Structure aStructure = new OpenGl_Structure(theManager);
+			myMapOfStructure.Add(aStructure.Identification(), aStructure);
+			return aStructure;
+
+		}
 
 		public override Graphic3d_CView CreateView(Graphic3d_StructureManager theMgr)
 		{

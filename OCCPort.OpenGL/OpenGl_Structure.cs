@@ -10,6 +10,11 @@ namespace OCCPort.OpenGL
     {
         private bool isClipped;
         OpenGl_Structure myInstancedStructure;
+
+		public OpenGl_Structure(Graphic3d_StructureManager theManager):base(theManager)
+		{
+		}
+
         // =======================================================================
         public void renderGeometry(OpenGl_Workspace theWorkspace,
                                          ref bool theHasClosed)
@@ -96,6 +101,11 @@ namespace OCCPort.OpenGL
         }
 
         internal bool IsVisible(int aViewId)
+        {
+            throw new NotImplementedException();
+        }
+
+		internal Graphic3d_ZLayerId ZLayer()
         {
             throw new NotImplementedException();
         }

@@ -7,7 +7,7 @@ namespace OCCPort.Tester
     {
         internal static void ClearOnOwnDeflectionChange(TopoDS_Shape myshape, Prs3d_Drawer myDrawer, bool standard_True)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
 
         internal static void GetDeflection(TopoDS_Shape myshape, Prs3d_Drawer myDrawer)

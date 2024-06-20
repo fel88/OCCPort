@@ -59,7 +59,10 @@
     <Compile Include="Aspect_Eye.cs" />
     <Compile Include="Aspect_FillMethod.cs" />
     <Compile Include="Aspect_FrustumLRBT.cs" />
+    <Compile Include="Aspect_GenId.cs" />
     <Compile Include="Aspect_GradientFillMethod.cs" />
+    <Compile Include="Aspect_IdentDefinitionError.cs" />
+    <Compile Include="Aspect_RenderingContext.cs" />
     <Compile Include="Aspect_SkydomeBackground.cs" />
     <Compile Include="Aspect_TypeOfFacingModel.cs" />
     <Compile Include="Aspect_TypeOfHighlightMethod.cs" />
@@ -117,6 +120,7 @@
     <Compile Include="gp_Vec.cs" />
     <Compile Include="gp_XY.cs" />
     <Compile Include="gp_XYZ.cs" />
+    <Compile Include="Graphic3d_ArrayOfIndexedMapOfStructure.cs" />
     <Compile Include="Graphic3d_ArrayOfPrimitives.cs" />
     <Compile Include="Graphic3d_ArrayOfSegments.cs" />
     <Compile Include="Graphic3d_AspectFillArea3d.cs" />
@@ -212,10 +216,12 @@
     <Compile Include="PrsMgr_Presentations.cs" />
     <Compile Include="PrsMgr_TypeOfPresentation3d.cs" />
     <Compile Include="Quantity_ColorRGBA.cs" />
+    <Compile Include="Select3D_BVHBuilder3d.cs" />
     <Compile Include="SelectMgr_AndOrFilter.cs" />
     <Compile Include="SelectMgr_BaseIntersector.cs" />
     <Compile Include="SelectMgr_EntityOwner.cs" />
     <Compile Include="SelectMgr_IndexedDataMapOfOwnerCriterion.cs" />
+    <Compile Include="SelectMgr_MapOfObjectSensitives.cs" />
     <Compile Include="SelectMgr_PickingStrategy.cs" />
     <Compile Include="SelectMgr_SelectableObject.cs" />
     <Compile Include="SelectMgr_SelectableObjectSet.cs" />
@@ -223,6 +229,7 @@
     <Compile Include="SelectMgr_Selection.cs" />
     <Compile Include="SelectMgr_SelectionManager.cs" />
     <Compile Include="SelectMgr_SelectionType.cs" />
+    <Compile Include="SelectMgr_SensitiveEntitySet.cs" />
     <Compile Include="SelectMgr_SequenceOfSelection.cs" />
     <Compile Include="SelectMgr_ToleranceMap.cs" />
     <Compile Include="SelectMgr_TypeOfBVHUpdate.cs" />
@@ -278,6 +285,7 @@
     <Compile Include="TopTools_ShapeMapHasher.cs" />
     <Compile Include="TransformMatrices.cs" />
     <Compile Include="V3d.cs" />
+    <Compile Include="V3d_ListOfView.cs" />
     <Compile Include="V3d_TypeOfOrientation.cs" />
     <Compile Include="V3d_View.cs" />
     <Compile Include="gp_Dir.cs" />

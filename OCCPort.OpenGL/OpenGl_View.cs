@@ -7,23 +7,24 @@ namespace OCCPort.OpenGL
 {
     public class OpenGl_View : Graphic3d_CView
     {
-
-        public OpenGl_View()
-        {
-            myZLayers = new OpenGl_LayerList();
-        }
         OpenGl_FrameBuffer[] myMainSceneFbos;
         OpenGl_FrameBuffer[] myMainSceneFbosOit;
         public OpenGl_View(Graphic3d_StructureManager theMgr, OpenGl_GraphicDriver openGl_GraphicDriver, OpenGl_Caps myCaps, OpenGl_StateCounter myStateCounter)
+			: base(theMgr)
         {
             this.myCaps = myCaps;
             myMainSceneFbos = new OpenGl_FrameBuffer[2];
             myMainSceneFbosOit = new OpenGl_FrameBuffer[2];
+			myZLayers = new OpenGl_LayerList();
 
             myMainSceneFbos[0] = new OpenGl_FrameBuffer("fbo0_main");
             myMainSceneFbos[1] = new OpenGl_FrameBuffer("fbo1_main");
             myMainSceneFbosOit[0] = new OpenGl_FrameBuffer("fbo0_main_oit");
             myMainSceneFbosOit[1] = new OpenGl_FrameBuffer("fbo1_main_oit");
+
+
+			myWorkspace = new OpenGl_Workspace(this, null);
+
         }
 
         OpenGl_GraphicDriver myDriver;
@@ -60,7 +61,13 @@ namespace OCCPort.OpenGL
         OpenGl_BackgroundArray[] myBackgrounds = new OpenGl_BackgroundArray[(int)Graphic3d_TypeOfBackground.Graphic3d_TypeOfBackground_NB]; //!< Array of primitive arrays of different background types
         OpenGl_TextureSet myTextureEnv;
         OpenGl_Texture mySkydomeTexture;
+		public void SetWindow(Graphic3d_CView theParentVIew,
+							  Aspect_Window theWindow,
+							  Aspect_RenderingContext theContext)
+		{
 
+
+		}
 
         //=======================================================================
         //function : drawBackground
@@ -199,6 +206,13 @@ namespace OCCPort.OpenGL
         //! 3D scene geometry data for ray-tracing.
         protected OpenGl_RaytraceGeometry myRaytraceGeometry;
 
+		public override void displayStructure(Graphic3d_CStructure theStructure,
+									 Graphic3d_DisplayPriority thePriority)
+		{
+			OpenGl_Structure aStruct = (OpenGl_Structure)(theStructure);
+			Graphic3d_ZLayerId aZLayer = aStruct.ZLayer();
+			myZLayers.AddStructure(aStruct, aZLayer, thePriority);
+		}
 
         //=======================================================================
         public void renderStructs(Graphic3d_Camera.Projection theProjection,
@@ -329,7 +343,7 @@ namespace OCCPort.OpenGL
         {
             bool wasDisabledMSAA = myToDisableMSAA;
             bool hadFboBlit = myHasFboBlit;
-            if (myRenderParams.Method == Graphic3d_RenderingMode.Graphic3d_RM_RAYTRACING
+			/*if (myRenderParams.Method == Graphic3d_RenderingMode.Graphic3d_RM_RAYTRACING
             && !myCaps.vboDisable
             && !myCaps.keepArrayData)
             {
@@ -337,7 +351,7 @@ namespace OCCPort.OpenGL
                 // if (myWasRedrawnGL) { myStructureManager->SetDeviceLost(); }
                 myDriver.setDeviceLost();
                 myCaps.keepArrayData = true;
-            }
+			}*/
 
             OpenGl_FrameBuffer aFrameBuffer = myFBO;
 
