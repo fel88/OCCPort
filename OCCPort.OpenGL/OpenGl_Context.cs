@@ -99,7 +99,19 @@ namespace OCCPort.OpenGL
 			throw new NotImplementedException();
 		}
 
-        int[] myViewport = new int[4];     //!< current viewport
+		OpenGl_ShaderManager myShaderManager; //! support object for managing shader programs
+
+		internal OpenGl_ShaderManager ShaderManager()
+		{
+            return myShaderManager;
+		}
+
+		internal bool ColorMask()
+		{
+			throw new NotImplementedException();
+		}
+
+		int[] myViewport = new int[4];     //!< current viewport
         int[] myViewportVirt = new int[4]; //!< virtual viewport
         int myPointSpriteOrig; //!< GL_POINT_SPRITE_COORD_ORIGIN state (
 

@@ -1,6 +1,6 @@
 ﻿namespace OCCPort.OpenGL
 {
-    internal abstract class OpenGl_Buffer
+    public abstract class OpenGl_Buffer
     {
         //! Return buffer target.
         public abstract uint GetTarget();
