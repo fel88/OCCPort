@@ -88,6 +88,7 @@
     <Compile Include="OpenGl_RaytraceGeometry.cs" />
     <Compile Include="OpenGl_Resource.cs" />
     <Compile Include="OpenGl_ResourcesMap.cs" />
+    <Compile Include="OpenGl_ShaderManager.cs" />
     <Compile Include="OpenGl_ShaderProgram.cs" />
     <Compile Include="OpenGl_ShaderProgramList.cs" />
     <Compile Include="OpenGl_ShadowMapArray.cs" />

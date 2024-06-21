@@ -24,5 +24,10 @@ namespace OCCPort.OpenGL
         {
             throw new NotImplementedException();
         }
-    }
+
+		internal Graphic3d_TypeOfShadingModel ShadingModel()
+		{
+			throw new NotImplementedException();
+		}
+	}
 }
