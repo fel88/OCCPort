@@ -24,8 +24,24 @@ namespace OCCPort
 
 		internal OpenGl_Context GetGlContext()
 		{
-			throw new NotImplementedException();
+            return myGlContext;
 		}
-    }
+
+		internal void Init(OpenGl_GraphicDriver theDriver, 
+            Aspect_Window thePlatformWindow,
+            Aspect_Window theSizeWindow, 
+            Aspect_RenderingContext theGContext,
+            OpenGl_Caps theCaps, 
+            OpenGl_Context theShareCtx)
+		{
+			myGlContext = new OpenGl_Context(theCaps);
+			//myOwnGContext = (theGContext == 0);
+			myPlatformWindow = thePlatformWindow;
+			mySizeWindow = theSizeWindow;
+			//mySwapInterval = theCaps->swapInterval;
+
+
+		}
+	}
 
 }

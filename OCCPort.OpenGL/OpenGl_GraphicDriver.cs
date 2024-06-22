@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace OCCPort.OpenGL
 {
 	//! This class defines an OpenGl graphic driver
 	public class OpenGl_GraphicDriver : Graphic3d_GraphicDriver
-    {
+	{
 
 		OpenGl_Caps myCaps;
-		List<OpenGl_View> myMapOfView=new List<OpenGl_View> ();
+		MyMapOfView myMapOfView = new MyMapOfView();
 		Dictionary<int, OpenGl_Structure> myMapOfStructure = new Dictionary<int, OpenGl_Structure>();
 
 
@@ -36,19 +37,52 @@ namespace OCCPort.OpenGL
 
 		}
 
+		internal OpenGl_Window CreateRenderWindow(Aspect_Window theNativeWindow,
+			Aspect_Window theSizeWindow, Aspect_RenderingContext theContext)
+		{
+			OpenGl_Context aShareCtx = GetSharedContext();
+			OpenGl_Window aWindow = new OpenGl_Window();
+			aWindow.Init(this, theNativeWindow, theSizeWindow, theContext, myCaps, aShareCtx);
+			return aWindow;
+
+		}
+
 		internal int GetNextPrimitiveArrayUID()
 		{
 			throw new NotImplementedException();
 		}
 
-		internal OpenGl_Context GetSharedContext()
+		const OpenGl_Context TheNullGlCtx = null;
+
+		internal OpenGl_Context GetSharedContext(bool theBound = false)
+		{
+			if (myMapOfView.IsEmpty())
+			{
+				return TheNullGlCtx;
+			}
+
+			foreach (var aViewIter in myMapOfView)
+			{
+				OpenGl_Window aWindow = aViewIter.GlWindow();
+				if (aWindow != null)
+				{
+					if (!theBound)
+					{
+						return aWindow.GetGlContext();
+					}
+					else if (aWindow.GetGlContext().IsCurrent())
+					{
+						return aWindow.GetGlContext();
+					}
+				}
+			}
+
+			return TheNullGlCtx;
+		}
+
+		internal void setDeviceLost()
 		{
 			throw new NotImplementedException();
 		}
-
-        internal void setDeviceLost()
-        {
-            throw new NotImplementedException();
-        }
-    }
+	}
 }

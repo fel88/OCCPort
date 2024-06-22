@@ -888,5 +888,18 @@ namespace OCCPort
             return myProjType;
         }
 
-    }
+		internal void SetAspect(double theAspect)
+		{
+			if (Aspect() == theAspect)
+			{
+				return;
+			}
+
+			myAspect = theAspect;
+			myFOVx = myFOVy * theAspect;
+
+			InvalidateProjection();
+
+		}
+	}
 }

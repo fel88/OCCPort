@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace OCCPort
 {
 	[Serializable]
-	internal class Standard_ProgramError : Exception
+	public  class Standard_ProgramError : Exception
 	{
 		public Standard_ProgramError()
 		{

@@ -11,6 +11,11 @@ namespace OCCPort
 
 		}
 
+		internal void Find(Graphic3d_ZLayerId theLayerId, out Graphic3d_Layer aLayer)
+		{
+			aLayer = this[theLayerId];
+		}
+
 		internal Graphic3d_Layer Seek(Graphic3d_ZLayerId theLayerId)
 		{
 			return this[theLayerId];

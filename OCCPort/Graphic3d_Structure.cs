@@ -4,19 +4,22 @@ using System.Diagnostics.Contracts;
 
 namespace OCCPort
 {
-    public class Graphic3d_Structure
-    {
-        public Graphic3d_Structure()
-        {
-        }
-        //
-        //! Alias for porting code.
-        //typedef Graphic3d_Structure Prs3d_Presentation;
-        //! Returns the groups sequence included in this structure.
-        public Graphic3d_SequenceOfGroup Groups()
-        {
-            return myCStructure.Groups();
-        }
+	public class Graphic3d_Structure
+	{
+		public Graphic3d_Structure()
+		{
+		}
+		//
+		//! Alias for porting code.
+		//typedef Graphic3d_Structure Prs3d_Presentation;
+		//! Returns the groups sequence included in this structure.
+		public Graphic3d_SequenceOfGroup Groups()
+		{
+			return myCStructure.Groups();
+		}
+		//! Returns the visualisation mode for the structure <me>.
+		public Graphic3d_TypeOfStructure Visual() { return myVisual; }
+		Graphic3d_TypeOfStructure myVisual;
 
 		//! Returns the display indicator for this structure.
 		public virtual bool IsDisplayed()
@@ -79,66 +82,63 @@ namespace OCCPort
 		}
 
 
-        //! Returns the highlight indicator for this structure.
-        public bool IsHighlighted()
-        {
-            return myCStructure != null && myCStructure.highlight != 0;
-        }
+		//! Returns the highlight indicator for this structure.
+		public bool IsHighlighted()
+		{
+			return myCStructure != null && myCStructure.highlight != 0;
+		}
 
-        //! Returns Standard_True if the structure <me> is infinite.
-        internal bool IsInfinite()
-        {
-            return IsDeleted()
-       || myCStructure.IsInfinite;
-        }
+		//! Returns Standard_True if the structure <me> is infinite.
+		internal bool IsInfinite()
+		{
+			return IsDeleted() || myCStructure.IsInfinite;
+		}
 
 		public bool IsDeleted()
-        {
-            return myCStructure == null;
-        }
+		{
+			return myCStructure == null;
+		}
 
+		internal bool IsVisible()
+		{
+			return myCStructure != null && myCStructure.visible != 0;
+		}
 
-        internal bool IsVisible()
-        {
-            return myCStructure != null && myCStructure.visible != 0;
-        }
+		public Graphic3d_TransformPers TransformPersistence()
+		{
+			return myCStructure.TransformPersistence();
+		}
 
-        internal Graphic3d_TransformPers TransformPersistence()
-        {
-            return myCStructure.TransformPersistence();
-        }
-        public Graphic3d_CStructure CStructure()
-        {
-            return myCStructure;
-        }
+		public Graphic3d_CStructure CStructure()
+		{
+			return myCStructure;
+		}
 
-        public Graphic3d_CStructure myCStructure;
+		public Graphic3d_CStructure myCStructure;
 
-        Graphic3d_StructureManager myStructureManager;
+		Graphic3d_StructureManager myStructureManager;
 
-        public Graphic3d_Structure(Graphic3d_StructureManager theManager)
-        {
+		public Graphic3d_Structure(Graphic3d_StructureManager theManager)
+		{
 			myStructureManager = theManager;
 			myCStructure = theManager.GraphicDriver().CreateStructure(theManager);
 
-        }
+		}
 
-        internal Graphic3d_Group NewGroup()
-        {
-            return myCStructure.NewGroup(this);
-        }
+		internal Graphic3d_Group NewGroup()
+		{
+			return myCStructure.NewGroup(this);
+		}
 
+		internal void SetInfiniteState(bool v)
+		{
+			throw new NotImplementedException();
+		}
 
+		public virtual void Compute()
+		{
 
-        internal void SetInfiniteState(bool v)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual void Compute()
-        {
-
-        }
+		}
 		public void SetIsForHighlight(bool isForHighlight)
 		{
 			if (myCStructure != null)
@@ -153,7 +153,7 @@ namespace OCCPort
 		}
 
 		public void clear(bool theWithDestruction)
-        {
+		{
 			if (IsDeleted())
 				return;
 
@@ -179,13 +179,23 @@ namespace OCCPort
 		public int Identification()
 		{
 			return myCStructure.Identification();
-        }
+		}
 		//! Returns the current display priority for this structure.
 		public Graphic3d_DisplayPriority DisplayPriority()
 		{
 			return myCStructure.Priority();
 		}
 
-		
-    }
+
+	}
+	//! Structural attribute indicating if it can be displayed
+	//! in wireframe, shadow mode, or both.
+	public enum Graphic3d_TypeOfStructure
+	{
+		Graphic3d_TOS_WIREFRAME,
+		Graphic3d_TOS_SHADING,
+		Graphic3d_TOS_COMPUTED,
+		Graphic3d_TOS_ALL
+	}
+
 }
