@@ -1,8 +1,8 @@
 ﻿namespace OCCPort.OpenGL
 {
-    internal class OpenGl_ElementNode
+    public class OpenGl_ElementNode
     {
-        internal OpenGl_Element elem;
-        internal object next;
+        public OpenGl_Element elem;
+		public OpenGl_ElementNode next;
     }
 }

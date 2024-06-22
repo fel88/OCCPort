@@ -5,22 +5,22 @@ using System.Collections.Generic;
 
 namespace OCCPort
 {
-    public class Graphic3d_StructureManager
-    {
+	public class Graphic3d_StructureManager
+	{
 		Graphic3d_GraphicDriver myGraphicDriver;
 		Graphic3d_MapOfStructure myDisplayedStructure = new Graphic3d_MapOfStructure();
 		public void RegisterObject(AIS_InteractiveObject theObject,
-                                                  Graphic3d_ViewAffinity theAffinity)
-        {
-            Graphic3d_ViewAffinity aResult;
-            if (myRegisteredObjects.Find(theObject, out aResult)
-             && aResult == theAffinity)
-            {
-                return;
-            }
+												  Graphic3d_ViewAffinity theAffinity)
+		{
+			Graphic3d_ViewAffinity aResult;
+			if (myRegisteredObjects.Find(theObject, out aResult)
+			 && aResult == theAffinity)
+			{
+				return;
+			}
 
-            myRegisteredObjects.Bind(theObject, theAffinity);
-        }
+			myRegisteredObjects.Bind(theObject, theAffinity);
+		}
 
 		//! Returns TRUE if Device Lost flag has been set and presentation data should be reuploaded onto graphics driver.
 		public bool IsDeviceLost() { return myDeviceLostFlag; }
@@ -74,11 +74,18 @@ namespace OCCPort
 			{
 				aViewIt.Value().Display(theStructure);
 			}*/
-			}
+		}
 		public Graphic3d_GraphicDriver GraphicDriver()
 		{
 			return (myGraphicDriver);
 		}
+		//! Returns the set of structures displayed in
+		//! visualiser <me>.
+		public void DisplayedStructures(ref Graphic3d_MapOfStructure SG)
+		{
+			SG = myDisplayedStructure;
+		}
+
 
 		internal void Clear(Graphic3d_Structure theStructure, bool theWithDestruction)
 		{
@@ -86,7 +93,7 @@ namespace OCCPort
 			{
 				aViewIt.Clear(theStructure, theWithDestruction);
 			}
-			
+
 
 		}
 
@@ -96,5 +103,5 @@ namespace OCCPort
 		{
 			myGraphicDriver = (theDriver);
 		}
-    }
+	}
 }

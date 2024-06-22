@@ -9,7 +9,7 @@ namespace OCCPort
         {
             myStructureManager = m;
         }*/
-        Graphic3d_TransformPers myTrsfPers; //!< current transform persistence
+        protected Graphic3d_TransformPers myTrsfPers; //!< current transform persistence
         protected Graphic3d_Structure myStructure;     //!< pointer to the parent structure
         //Graphic3d_BndBox4f myBounds;        //!< bounding box
         bool myIsClosed;      //!< flag indicating closed volume

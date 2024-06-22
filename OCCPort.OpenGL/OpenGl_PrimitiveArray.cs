@@ -31,7 +31,77 @@ namespace OCCPort.OpenGL
 		//=======================================================================
 		public void setDrawMode(Graphic3d_TypeOfPrimitiveArray theType)
 		{
-			throw new NotImplementedException();
+
+			if (myAttribs == null)
+			{
+				myDrawMode = DRAW_MODE_NONE;
+				myIsFillType = false;
+				return;
+			}
+
+			switch (theType)
+			{
+				case Graphic3d_TypeOfPrimitiveArray.Graphic3d_TOPA_POINTS:
+					myDrawMode = GLConstants.GL_POINTS;
+					myIsFillType = false;
+					break;
+				case Graphic3d_TypeOfPrimitiveArray.Graphic3d_TOPA_SEGMENTS:
+					myDrawMode = GLConstants.GL_LINES;
+					myIsFillType = false;
+					break;
+				case Graphic3d_TypeOfPrimitiveArray.Graphic3d_TOPA_POLYLINES:
+					myDrawMode = GLConstants.GL_LINE_STRIP;
+					myIsFillType = false;
+					break;
+				case Graphic3d_TypeOfPrimitiveArray.Graphic3d_TOPA_TRIANGLES:
+					myDrawMode = GLConstants.GL_TRIANGLES;
+					myIsFillType = true;
+					break;
+				case Graphic3d_TypeOfPrimitiveArray.Graphic3d_TOPA_TRIANGLESTRIPS:
+					myDrawMode = GLConstants.GL_TRIANGLE_STRIP;
+					myIsFillType = true;
+					break;
+				case Graphic3d_TypeOfPrimitiveArray.Graphic3d_TOPA_TRIANGLEFANS:
+					myDrawMode = GLConstants.GL_TRIANGLE_FAN;
+					myIsFillType = true;
+					break;
+
+				case Graphic3d_TypeOfPrimitiveArray.Graphic3d_TOPA_LINES_ADJACENCY:
+					myDrawMode = GLConstants.GL_LINES_ADJACENCY;
+					myIsFillType = false;
+					break;
+				case Graphic3d_TypeOfPrimitiveArray.Graphic3d_TOPA_LINE_STRIP_ADJACENCY:
+					myDrawMode = GLConstants.GL_LINE_STRIP_ADJACENCY;
+					myIsFillType = false;
+					break;
+				case Graphic3d_TypeOfPrimitiveArray.Graphic3d_TOPA_TRIANGLES_ADJACENCY:
+					myDrawMode = GLConstants.GL_TRIANGLES_ADJACENCY;
+					myIsFillType = true;
+					break;
+				case Graphic3d_TypeOfPrimitiveArray.Graphic3d_TOPA_TRIANGLE_STRIP_ADJACENCY:
+					myDrawMode = GLConstants.GL_TRIANGLE_STRIP_ADJACENCY;
+					myIsFillType = true;
+					break;
+
+
+				case Graphic3d_TypeOfPrimitiveArray.Graphic3d_TOPA_QUADRANGLES:
+					myDrawMode = GLConstants.GL_QUADS;
+					myIsFillType = true;
+					break;
+				case Graphic3d_TypeOfPrimitiveArray.Graphic3d_TOPA_QUADRANGLESTRIPS:
+					myDrawMode = GLConstants.GL_QUAD_STRIP;
+					myIsFillType = true;
+					break;
+				case Graphic3d_TypeOfPrimitiveArray.Graphic3d_TOPA_POLYGONS:
+					myDrawMode = GLConstants.GL_POLYGON;
+					myIsFillType = true;
+					break;
+				case Graphic3d_TypeOfPrimitiveArray.Graphic3d_TOPA_UNDEFINED:
+					myDrawMode = DRAW_MODE_NONE;
+					myIsFillType = false;
+					break;
+
+			}
 		}
 
 
@@ -259,6 +329,11 @@ namespace OCCPort.OpenGL
 		private bool initNormalVbo(OpenGl_Context theCtx)
 		{
 			throw new NotImplementedException();
+		}
+
+		internal int DrawMode()
+		{
+			return myDrawMode;
 		}
 	}
 }

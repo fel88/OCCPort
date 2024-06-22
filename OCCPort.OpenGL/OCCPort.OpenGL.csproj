@@ -43,18 +43,22 @@
   <ItemGroup>
     <Compile Include="Aspect_GraphicsLibrary.cs" />
     <Compile Include="Aspect_RenderingContext.cs" />
+    <Compile Include="GLConstants.cs" />
+    <Compile Include="Graphic3d_AlphaMode.cs" />
     <Compile Include="Graphic3d_Aspects.cs" />
     <Compile Include="Graphic3d_BoundBuffer.cs" />
     <Compile Include="Graphic3d_Buffer.cs" />
     <Compile Include="Graphic3d_IndexBuffer.cs" />
     <Compile Include="Graphic3d_IndexedMapOfStructure.cs" />
     <Compile Include="Graphic3d_MarkerImage.cs" />
+    <Compile Include="Graphic3d_MaterialAspect.cs" />
     <Compile Include="Graphic3d_ShaderManager.cs" />
     <Compile Include="Graphic3d_TextureSet.cs" />
     <Compile Include="Graphic3d_TypeOfPrimitiveArray.cs" />
     <Compile Include="Graphic3d_TypeOfShadingModel.cs" />
     <Compile Include="Graphic3d_ZLayerId.cs" />
     <Compile Include="MyLayersDic.cs" />
+    <Compile Include="MyMapOfView.cs" />
     <Compile Include="OpenGl_ArbFBO.cs" />
     <Compile Include="OpenGl_ArbFBOBlit.cs" />
     <Compile Include="OpenGl_Aspects.cs" />
@@ -106,6 +110,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Select3D_BVHBuilder3d.cs" />
     <Compile Include="Standard_Size.cs" />
+    <Compile Include="_core11fwd.cs" />
+    <Compile Include="_core15fwd.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\OCCPort\OCCPort.csproj">

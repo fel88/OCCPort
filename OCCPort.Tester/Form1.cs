@@ -35,6 +35,7 @@ namespace OCCPort.Tester
             //V3d_View.CreateView = () => new OpenGL.OpenGl_View();
             ViewManager = GravityViewManager = new GravityCameraViewManager(glControl);
             GravityViewManager.View = v3d_viewer.CreateView();
+            GravityViewManager.View.SetWindow(new Aspect_Window() { }, new Aspect_RenderingContext());
 
             ViewManager.Attach(evwrapper, camera1);
             /*GravityViewManager.View.myView.Items.Add(new Graphic3d_MapOfStructure(
