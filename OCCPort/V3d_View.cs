@@ -189,14 +189,143 @@ namespace OCCPort
 			SetBackFacingModel(V3d_TOBM_AUTOMATIC);*/
 			SetCamera(aCamera);
 
+			SetAxis(0.0, 0.0, 0.0, 1.0, 1.0, 1.0);
+			//SetVisualization (theViewer->DefaultVisualization());
+			SetTwist(0.0);
+			SetAt(0.0, 0.0, 0.0);
+			SetProj(theViewer.DefaultViewProj());
+			/*
+  SetSize (theViewer->DefaultViewSize());
+  Standard_Real zsize = theViewer->DefaultViewSize();
+  SetZSize (2.*zsize);
+  SetDepth (theViewer->DefaultViewSize() / 2.0);
+  SetViewMappingDefault();
+  SetViewOrientationDefault();
+
+			 */
+			theViewer.AddView(this);
 			Init();
 			myImmediateUpdate = true;
 		}
 
+
+
+		public void SetAt(double X, double Y, double Z)
+		{
+			double aTwistBefore = Twist();
+
+			bool wasUpdateEnabled = SetImmediateUpdate(false);
+
+			Camera().SetCenter(new gp_Pnt(X, Y, Z));
+
+			SetTwist(aTwistBefore);
+
+			SetImmediateUpdate(wasUpdateEnabled);
+
+			ImmediateUpdate();
+		}
+
+		double Twist()
+		{
+			gp_Vec Xaxis = new gp_Vec(), Yaxis = new gp_Vec(), Zaxis = new gp_Vec();
+			gp_Dir aReferencePlane = new gp_Dir(Camera().Direction().Reversed());
+			if (!screenAxis(aReferencePlane, gp.DZ(), ref Xaxis, ref Yaxis, ref Zaxis)
+			 && !screenAxis(aReferencePlane, gp.DY(), ref Xaxis, ref Yaxis, ref Zaxis)
+			 && !screenAxis(aReferencePlane, gp.DX(), ref Xaxis, ref Yaxis, ref Zaxis))
+			{
+				//
+			}
+
+			// Compute Cross Vector From Up & Origin
+			gp_Dir aCameraUp = Camera().Up();
+			gp_XYZ aP = Yaxis.XYZ().Crossed(aCameraUp.XYZ());
+
+			// compute Angle
+			double anAngle = Math.Asin(Math.Max(Math.Min(aP.Modulus(), 1.0), -1.0));
+			if (Yaxis.Dot(aCameraUp.XYZ()) < 0.0)
+			{
+				anAngle = Math.PI - anAngle;
+			}
+			if (anAngle > 0.0
+			 && anAngle < Math.PI)
+			{
+				gp_Dir aProjDir = Camera().Direction().Reversed();
+				if (aP.Dot(aProjDir.XYZ()) < 0.0)
+				{
+					anAngle = DEUXPI - anAngle;
+				}
+			}
+			return anAngle;
+		}
+
+		bool screenAxis(gp_Dir theVpn, gp_Dir theVup,
+										   ref gp_Vec theXaxe, ref gp_Vec theYaxe, ref gp_Vec theZaxe)
+		{
+			theXaxe = new gp_Vec(theVup.XYZ().Crossed(theVpn.XYZ()));
+
+			if (theXaxe.Magnitude() <= gp.Resolution())
+			{
+				return false;
+			}
+			theXaxe.Normalize();
+
+			theYaxe = new gp_Vec(theVpn.XYZ().Crossed(theXaxe.XYZ()));
+			if (theYaxe.Magnitude() <= gp.Resolution())
+			{
+				return false;
+			}
+			theYaxe.Normalize();
+
+			theZaxe = new gp_Vec(theVpn.XYZ());
+			theZaxe.Normalize();
+			return true;
+		}
+
+		public void SetTwist(double angle)
+		{
+			double Angle = angle;
+
+			if (Angle > 0.0) while (Angle > DEUXPI) Angle -= DEUXPI;
+			else if (Angle < 0.0) while (Angle < -DEUXPI) Angle += DEUXPI;
+
+			Graphic3d_Camera aCamera = Camera();
+
+			gp_Dir aReferencePlane = new gp_Dir(aCamera.Direction().Reversed());
+			if (!screenAxis(aReferencePlane, gp.DZ(), ref myXscreenAxis, ref myYscreenAxis, ref myZscreenAxis)
+			 && !screenAxis(aReferencePlane, gp.DY(), ref myXscreenAxis, ref myYscreenAxis, ref myZscreenAxis)
+			 && !screenAxis(aReferencePlane, gp.DX(), ref myXscreenAxis, ref myYscreenAxis, ref myZscreenAxis))
+			{
+				throw new V3d_BadValue("V3d_ViewSetTwist, alignment of Eye,At,Up,");
+			}
+
+			gp_Pnt aRCenter = aCamera.Center();
+			gp_Dir aZAxis = new gp_Dir(aCamera.Direction().Reversed());
+
+			gp_Trsf aTrsf = new gp_Trsf();
+			aTrsf.SetRotation(new gp_Ax1(aRCenter, aZAxis), Angle);
+
+			aCamera.SetUp(new gp_Dir(myYscreenAxis));
+			aCamera.Transform(aTrsf);
+
+			ImmediateUpdate();
+		}
+
+		void SetAxis(double theX, double theY, double theZ,
+
+								double theVx, double theVy, double theVz)
+		{
+			myDefaultViewPoint.SetCoord(theX, theY, theZ);
+			myDefaultViewAxis.SetCoord(theVx, theVy, theVz);
+		}
+
+		gp_Dir myDefaultViewAxis;
+		gp_Pnt myDefaultViewPoint;
+
+
 		public void Pan(int theDXp,
-					 int theDYp,
-					 double theZoomFactor = 1,
-					 bool theToStart = true)
+						 int theDYp,
+						 double theZoomFactor = 1,
+						 bool theToStart = true)
 		{
 			Panning(Convert(theDXp), Convert(theDYp), theZoomFactor, theToStart);
 		}
@@ -525,9 +654,9 @@ namespace OCCPort
 		}
 
 		/*private object gp_Ax1(gp_Pnt aRCenter, Func<aCamera.Up, (object, object), gpDir> aYAxis)
-        {
-            throw new NotImplementedException();
-        }*/
+		{
+			throw new NotImplementedException();
+		}*/
 
 		const int THE_NB_BOUND_POINTS = 8;
 		//=======================================================================
@@ -588,7 +717,7 @@ namespace OCCPort
 			new  gp_Pnt (Xmin, Ymax, Zmin), new gp_Pnt (Xmin, Ymax, Zmax),
 			 new gp_Pnt (Xmax, Ymin, Zmin), new gp_Pnt (Xmax, Ymin, Zmax),
 			 new gp_Pnt (Xmax, Ymax, Zmin), new gp_Pnt (Xmax, Ymax, Zmax)
-	};
+		};
 
 				for (int aPntIt = 0; aPntIt < THE_NB_BOUND_POINTS; ++aPntIt)
 				{
@@ -617,7 +746,7 @@ namespace OCCPort
 	   new  gp_Pnt (Xmin, Ymax, Zmin),new gp_Pnt (Xmin, Ymax, Zmax),
 	   new gp_Pnt (Xmax, Ymin, Zmin), new gp_Pnt(Xmax, Ymin, Zmax),
 	   new gp_Pnt (Xmax, Ymax, Zmin),new  gp_Pnt (Xmax, Ymax, Zmax)
-	  };
+		};
 
 					for (int aPntIt = 0; aPntIt < THE_NB_BOUND_POINTS; ++aPntIt)
 					{

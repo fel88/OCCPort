@@ -10,6 +10,26 @@ namespace OCCPort
 		{
 			myDriver = theDriver;
 			myStructureManager = (new Graphic3d_StructureManager(theDriver));
+			/**
+			 *   myZLayerGenId (1, IntegerLast()),
+  myBackground (Quantity_NOC_GRAY30),*/
+			//myViewSize (1000.0),
+			myViewProj = V3d_TypeOfOrientation.V3d_XposYnegZpos;
+
+			//myVisualization (V3d_ZBUFFER),
+
+			//myDefaultTypeOfView (V3d_ORTHOGRAPHIC),
+			/*
+myComputedMode (Standard_True),
+myDefaultComputedMode (Standard_False),
+myPrivilegedPlane (gp_Ax3 (gp_Pnt (0.,0.,0), gp_Dir (0.,0.,1.), gp_Dir (1.,0.,0.))),
+myDisplayPlane (Standard_False),
+myDisplayPlaneLength (1000.0),
+myGridType (Aspect_GT_Rectangular),
+myGridEcho (Standard_True),
+myGridEchoLastVert (ShortRealLast(), ShortRealLast(), ShortRealLast())
+
+		 */
 		}
 
 		//! Returns the structure manager associated to this viewer.
@@ -18,6 +38,7 @@ namespace OCCPort
 		{
 			return new V3d_View(this, myDefaultTypeOfView);
 		}
+
 		V3d_TypeOfView myDefaultTypeOfView;
 		Graphic3d_StructureManager myStructureManager;
 
@@ -25,6 +46,19 @@ namespace OCCPort
 		{
 			Redraw();
 		}
+
+		public void AddView(V3d_View theView)
+		{
+			if (!myDefinedViews.Contains(theView))
+			{
+				myDefinedViews.Append(theView);
+			}
+		}
+		V3d_TypeOfOrientation myViewProj;
+		//! Returns the default Projection.
+		public V3d_TypeOfOrientation DefaultViewProj() { return myViewProj; }
+
+
 		V3d_ListOfView myDefinedViews = new V3d_ListOfView();
 		public void Redraw()
 		{

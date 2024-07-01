@@ -15,11 +15,15 @@ namespace OCCPort
 
 		public bool IsInfinite { get; internal set; }
 		public bool IsForHighlight;
+		public bool IsMutable;
+		public bool Is2dText;
+
 		public Graphic3d_CStructure(Graphic3d_StructureManager theManager)
 		{
 			myGraphicDriver = (theManager.GraphicDriver());
 			myId = (-1);
-			/*myZLayer(Graphic3d_ZLayerId_Default),
+			myZLayer = Graphic3d_ZLayerId.Graphic3d_ZLayerId_Default;
+			/*
 			myPriority(Graphic3d_DisplayPriority_Normal),
 			myPreviousPriority(Graphic3d_DisplayPriority_Normal),
 			myIsCulled(Standard_True),
@@ -49,7 +53,7 @@ namespace OCCPort
 		}
 
 		protected Graphic3d_SequenceOfGroup myGroups;
-		Graphic3d_TransformPers myTrsfPers;
+		protected Graphic3d_TransformPers myTrsfPers;
 		internal int stick;
 		public int Identification()
 		{
@@ -78,14 +82,19 @@ namespace OCCPort
 			//throw new NotImplementedException();
 		}
 
-		internal object ZLayer()
-		{
-			throw new NotImplementedException();
-		}
+		//! Get z layer ID
+		public Graphic3d_ZLayerId ZLayer() { return myZLayer; }
+
+		Graphic3d_ZLayerId myZLayer;
 
 		internal bool IsAlwaysRendered()
 		{
-			throw new NotImplementedException();
+			return IsInfinite
+				|| IsForHighlight
+				|| IsMutable
+				|| Is2dText
+				|| (myTrsfPers != null && myTrsfPers.IsTrihedronOr2d());
+
 		}
 
 		internal void MarkAsNotCulled()
@@ -94,6 +103,11 @@ namespace OCCPort
 		}
 		//! Return structure display priority.
 		public Graphic3d_DisplayPriority Priority() { return myPriority; }
+
+		internal void updateLayerTransformation()
+		{
+			throw new NotImplementedException();
+		}
 
 		Graphic3d_DisplayPriority myPriority;
 		Graphic3d_DisplayPriority myPreviousPriority;

@@ -2,13 +2,14 @@
 using OCCPort.OpenGL;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace OCCPort
 {
 	//! Class defining the list of layers.
 	internal class OpenGl_LayerList
 	{
-		List<Graphic3d_Layer> myLayers = new List<Graphic3d_Layer>();
+		LayersCollection myLayers = new LayersCollection();
 		internal Graphic3d_Layer[] Layers()
 		{
 			return myLayers.ToArray();
@@ -43,6 +44,87 @@ namespace OCCPort
 			// state here. It is redundant, because the possible changes
 			// will be handled in the loop for structures
 		}
+		public void InsertLayerBefore(Graphic3d_ZLayerId theNewLayerId,
+										  Graphic3d_ZLayerSettings theSettings,
+										  Graphic3d_ZLayerId theLayerAfter)
+		{
+			if (myLayerIds.IsBound(theNewLayerId))
+			{
+				return;
+			}
+
+			Graphic3d_Layer aNewLayer = new Graphic3d_Layer(theNewLayerId, myBVHBuilder);
+			aNewLayer.SetLayerSettings(theSettings);
+
+			Graphic3d_Layer anOtherLayer;
+			if (theLayerAfter != Graphic3d_ZLayerId.Graphic3d_ZLayerId_UNKNOWN
+			 && myLayerIds.Find(theLayerAfter, out anOtherLayer))
+			{
+				foreach (var aLayerIter in myLayers)
+				
+				//	for (NCollection_List < Handle(Graphic3d_Layer) >::Iterator aLayerIter(myLayers); aLayerIter.More(); aLayerIter.Next())
+				{
+					//if (aLayerIter.Value() == anOtherLayer)
+					{
+						myLayers.InsertBefore(aNewLayer, aLayerIter);
+						break;
+					}
+				}
+			}
+			else
+			{
+				myLayers.Prepend(aNewLayer);
+			}
+
+			myLayerIds.Bind(theNewLayerId, aNewLayer);
+			//myTransparentToProcess.Allocate(myLayers.Size());
+		}
+
+		Select3D_BVHBuilder3d myBVHBuilder;      //!< BVH tree builder for frustum culling
+
+		int myNbStructures;
+
+		//=======================================================================
+		//function : InsertLayerAfter
+		//purpose  :
+		//=======================================================================
+		public void InsertLayerAfter(Graphic3d_ZLayerId theNewLayerId,
+
+										 Graphic3d_ZLayerSettings theSettings,
+										 Graphic3d_ZLayerId theLayerBefore)
+		{
+			if (myLayerIds.IsBound(theNewLayerId))
+			{
+				return;
+			}
+
+			Graphic3d_Layer aNewLayer = new Graphic3d_Layer(theNewLayerId, myBVHBuilder);
+			aNewLayer.SetLayerSettings(theSettings);
+
+			Graphic3d_Layer anOtherLayer;
+			if (theLayerBefore != Graphic3d_ZLayerId.Graphic3d_ZLayerId_UNKNOWN
+			 && myLayerIds.Find(theLayerBefore, out anOtherLayer))
+			{
+				foreach (var aLayerIter in myLayers)
+
+				//for (NCollection_List < Handle(Graphic3d_Layer) >::Iterator aLayerIter(myLayers); aLayerIter.More(); aLayerIter.Next())
+				{
+					if (aLayerIter == anOtherLayer)
+					{
+						myLayers.InsertAfter(aNewLayer, aLayerIter);
+						break;
+					}
+				}
+			}
+			else
+			{
+				myLayers.Append(aNewLayer);
+			}
+
+			myLayerIds.Bind(theNewLayerId, aNewLayer);
+			//myTransparentToProcess.Allocate(myLayers.Size());
+		}
+
 
 
 		//! Return number of structures within immediate layers
@@ -92,8 +174,8 @@ namespace OCCPort
 			//aCtx.core11fwd.glGetBooleanv(GL_DEPTH_WRITEMASK, &aPrevSettings.DepthMask);
 			OpenGl_GlobalLayerSettings aDefaultSettings = aPrevSettings;
 			/*
-            const bool isShadowMapPass = theReadDrawFbo != NULL
-                                     && !theReadDrawFbo->HasColor();*/
+			const bool isShadowMapPass = theReadDrawFbo != NULL
+									 && !theReadDrawFbo->HasColor();*/
 			for (OpenGl_FilteredIndexedLayerIterator aLayerIterStart = new OpenGl_FilteredIndexedLayerIterator(myLayers, theToDrawImmediate, theLayersToProcess); aLayerIterStart.More();)
 			{
 
@@ -106,26 +188,73 @@ namespace OCCPort
 					renderLayer(theWorkspace, aDefaultSettings, aLayer);
 				}
 			}
-
-
 		}
 
+		internal void RemoveStructure(OpenGl_Structure theStructure)
+		{
+			Graphic3d_ZLayerId aLayerId = theStructure.ZLayer();
+			Graphic3d_Layer aLayerPtr = myLayerIds.Seek(aLayerId);
+			Graphic3d_Layer aLayer = aLayerPtr != null ? aLayerPtr : myLayerIds.Find(Graphic3d_ZLayerId.Graphic3d_ZLayerId_Default);
+
+			Graphic3d_DisplayPriority aPriority = Graphic3d_DisplayPriority.Graphic3d_DisplayPriority_INVALID;
+
+			// remove structure from associated list
+			// if the structure is not found there,
+			// scan through layers and remove it
+			if (aLayer.Remove(theStructure, ref aPriority))
+			{
+				--myNbStructures;
+				if (aLayer.IsImmediate())
+				{
+					--myImmediateNbStructures;
+				}
+
+				if (aLayer.LayerSettings().IsRaytracable()
+				 && theStructure.IsRaytracable())
+				{
+					++myModifStateOfRaytraceable;
+				}
+
+				return;
+
+			}
+
+
+			// scan through layers and remove it
+			foreach (var aLayerEx in myLayers)
+			//for (NCollection_List < Handle(Graphic3d_Layer) >::Iterator aLayerIter(myLayers); aLayerIter.More(); aLayerIter.Next())
+			{
+				//Graphic3d_Layer aLayerEx = aLayerIter.ChangeValue();
+				if (aLayerEx == aLayer)
+				{
+					continue;
+				}
+
+				if (aLayerEx.Remove(theStructure, ref aPriority))
+				{
+					--myNbStructures;
+					if (aLayerEx.IsImmediate())
+					{
+						--myImmediateNbStructures;
+					}
+
+					if (aLayerEx.LayerSettings().IsRaytracable()
+					 && theStructure.IsRaytracable())
+					{
+						++myModifStateOfRaytraceable;
+					}
+					return;
+				}
+			}
+		}
 
 		MyLayersDic myLayerIds = new MyLayersDic();
-		Select3D_BVHBuilder3d myBVHBuilder;      //!< BVH tree builder for frustum culling
-
-		int myNbStructures;
+		
 		int myImmediateNbStructures; //!< number of structures within immediate layers
 
-		Standard_Size myModifStateOfRaytraceable;
+		int myModifStateOfRaytraceable;
 
 		//! Collection of references to layers with transparency gathered during rendering pass.
 		OpenGl_LayerStack myTransparentToProcess;
-
-
-
 	}
-
-
-
 }
