@@ -57,6 +57,7 @@
     <Compile Include="Graphic3d_TypeOfPrimitiveArray.cs" />
     <Compile Include="Graphic3d_TypeOfShadingModel.cs" />
     <Compile Include="Graphic3d_ZLayerId.cs" />
+    <Compile Include="LayersCollection.cs" />
     <Compile Include="MyLayersDic.cs" />
     <Compile Include="MyMapOfView.cs" />
     <Compile Include="OpenGl_ArbFBO.cs" />

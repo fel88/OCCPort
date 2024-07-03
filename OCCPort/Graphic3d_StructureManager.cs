@@ -5,6 +5,13 @@ using System.Collections.Generic;
 
 namespace OCCPort
 {
+	//! This class allows the definition of a manager to
+	//! which the graphic objects are associated.
+	//! It allows them to be globally manipulated.
+	//! It defines the global attributes.
+	//! Keywords: Structure, Structure Manager, Update Mode,
+	//! Destroy, Highlight, Visible
+
 	public class Graphic3d_StructureManager
 	{
 		Graphic3d_GraphicDriver myGraphicDriver;
@@ -20,6 +27,23 @@ namespace OCCPort
 			}
 
 			myRegisteredObjects.Bind(theObject, theAffinity);
+		}
+
+		Aspect_GenId myViewGenId;
+
+		// ========================================================================
+		// function : Identification
+		// purpose  :
+		// ========================================================================
+		public int Identification(Graphic3d_CView theView)
+		{
+			if (myDefinedViews.Contains(theView))
+			{
+				return theView.Identification();
+			}
+
+			myDefinedViews.Add(theView);
+			return myViewGenId.Next();
 		}
 
 		//! Returns TRUE if Device Lost flag has been set and presentation data should be reuploaded onto graphics driver.
@@ -65,7 +89,7 @@ namespace OCCPort
 		{
 			myDisplayedStructure.Add(theStructure);
 
-			foreach (var anIter in myDefinedViews.list)
+			foreach (var anIter in myDefinedViews)
 			{
 				anIter.Display(theStructure);
 
@@ -89,7 +113,7 @@ namespace OCCPort
 
 		internal void Clear(Graphic3d_Structure theStructure, bool theWithDestruction)
 		{
-			foreach (var aViewIt in myDefinedViews.list)
+			foreach (var aViewIt in myDefinedViews)
 			{
 				aViewIt.Clear(theStructure, theWithDestruction);
 			}
@@ -102,6 +126,9 @@ namespace OCCPort
 		public Graphic3d_StructureManager(Graphic3d_GraphicDriver theDriver)
 		{
 			myGraphicDriver = (theDriver);
+			myViewGenId = new Aspect_GenId(0, 31);
+			myDeviceLostFlag = (false);
+
 		}
 	}
 }

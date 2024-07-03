@@ -3,9 +3,10 @@ using System.Collections.Generic;
 
 namespace OCCPort
 {
-	internal class Graphic3d_IndexedMapOfView
+	internal class Graphic3d_IndexedMapOfView : List<Graphic3d_CView>
 	{
-		public List<Graphic3d_CView> list = new List<Graphic3d_CView>();
+		//public List<Graphic3d_CView> list = new List<Graphic3d_CView>();
+
 		internal class Iterator
 		{
 			Graphic3d_IndexedMapOfView list;

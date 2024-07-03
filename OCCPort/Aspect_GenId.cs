@@ -18,6 +18,31 @@ namespace OCCPort
 			return aNewId;
 
 		}
+
+		int  myFreeCount;
+		int myLength;
+		int myLowerBound;
+		int myUpperBound;
+
+		public Aspect_GenId()
+		{
+
+		}
+
+		public Aspect_GenId(int theLow,
+							int theUpper)
+		{
+
+			myFreeCount = (theUpper - theLow + 1);
+			myLength = (theUpper - theLow + 1);
+			myLowerBound = (theLow);
+			myUpperBound = (theUpper);
+			if (theLow > theUpper)
+			{
+				throw new Aspect_IdentDefinitionError("GenId Create Error: wrong interval");
+			}
+		}
+
 		List<int> myFreeIds = new List<int>();
 		//bool Next(ref int theId)
 		//{

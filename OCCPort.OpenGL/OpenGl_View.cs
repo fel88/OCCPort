@@ -31,13 +31,19 @@ namespace OCCPort.OpenGL
 
 		}
 
+		public override void eraseStructure(Graphic3d_CStructure theStructure)
+		{
+			OpenGl_Structure aStruct = (OpenGl_Structure)(theStructure);
+			myZLayers.RemoveStructure(aStruct);
+		}
+
 		// =======================================================================
 		// function : SetWindow
 		// purpose  :
 		// =======================================================================
 		public override void SetWindow(Graphic3d_CView theParentVIew,
-							  Aspect_Window theWindow,
-							  Aspect_RenderingContext theContext)
+								  Aspect_Window theWindow,
+								  Aspect_RenderingContext theContext)
 		{
 
 			OpenGl_View aParentView = (OpenGl_View)(theParentVIew);
@@ -77,6 +83,20 @@ namespace OCCPort.OpenGL
 		{
 			return myWindow;
 		}
+
+		//! Add a layer to the view.
+		//! @param theNewLayerId  [in] id of new layer, should be > 0 (negative values are reserved for default layers).
+		//! @param theSettings    [in] new layer settings
+		//! @param theLayerBefore [in] id of layer to append new layer after
+		public void InsertLayerAfter(Graphic3d_ZLayerId theLayerId,
+
+												  Graphic3d_ZLayerSettings theSettings,
+												  Graphic3d_ZLayerId theLayerBefore)
+		{
+			myZLayers.InsertLayerAfter(theLayerId, theSettings, theLayerBefore);
+
+		}
+
 
 		OpenGl_GraphicDriver myDriver;
 		OpenGl_Window myWindow;
@@ -494,7 +514,7 @@ namespace OCCPort.OpenGL
 			return myWindow.SizeWindow();
 
 		}
-				
+
 		public override void Invalidate()
 		{
 			myBackBufferRestored = false;
@@ -508,9 +528,9 @@ namespace OCCPort.OpenGL
 		public override Graphic3d_Layer Layer(Graphic3d_ZLayerId theLayerId)
 		{
 			Graphic3d_Layer aLayer = null;
-			if (theLayerId !=Graphic3d_ZLayerId. Graphic3d_ZLayerId_UNKNOWN)
+			if (theLayerId != Graphic3d_ZLayerId.Graphic3d_ZLayerId_UNKNOWN)
 			{
-				myZLayers.LayerIDs().Find(theLayerId,out aLayer);
+				myZLayers.LayerIDs().Find(theLayerId, out aLayer);
 			}
 			return aLayer;
 

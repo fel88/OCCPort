@@ -28,6 +28,11 @@ namespace OCCPort.OpenGL
 
 			OpenGl_View aView = new OpenGl_View(theMgr, this, myCaps, myStateCounter);
 			myMapOfView.Add(aView);
+			foreach (var aLayer in myLayers)
+			{
+				aView.InsertLayerAfter(aLayer.LayerId(), aLayer.LayerSettings(), Graphic3d_ZLayerId.Graphic3d_ZLayerId_UNKNOWN);
+
+			}
 			/*for (NCollection_List < Handle(Graphic3d_Layer) >::Iterator aLayerIter(myLayers); aLayerIter.More(); aLayerIter.Next())
 			{
 				Graphic3d_Layer aLayer = aLayerIter.Value();
@@ -53,6 +58,10 @@ namespace OCCPort.OpenGL
 		}
 
 		const OpenGl_Context TheNullGlCtx = null;
+
+		public OpenGl_GraphicDriver(Aspect_DisplayConnection theDisp) : base(theDisp)
+		{
+		}
 
 		internal OpenGl_Context GetSharedContext(bool theBound = false)
 		{

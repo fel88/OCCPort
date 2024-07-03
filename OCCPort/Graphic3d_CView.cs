@@ -10,7 +10,12 @@ namespace OCCPort
 		{
 			myCamera = new Graphic3d_Camera();
 			myStructureManager = theMgr;
+			myId = myStructureManager.Identification(this);
+
 		}
+
+		//! Returns the identification number of the view.
+		public int Identification() { return myId; }
 
 		//! Returns layer with given ID or NULL if undefined.
 		public abstract Graphic3d_Layer Layer(Graphic3d_ZLayerId theLayerId);
@@ -278,6 +283,39 @@ namespace OCCPort
 
 		}
 
+		public void SetComputedMode(bool theMode)
+		{
+
+			if ((theMode && myIsInComputedMode)
+			 || (!theMode && !myIsInComputedMode))
+			{
+				return;
+			}
+
+			myIsInComputedMode = theMode;
+			if (!myIsInComputedMode)
+			{
+				foreach (var aStruct in myStructsDisplayed)
+				{
+					Graphic3d_TypeOfAnswer anAnswer = acceptDisplay(aStruct.Visual());
+					if (anAnswer != Graphic3d_TypeOfAnswer.Graphic3d_TOA_COMPUTE)
+						continue;
+
+					int anIndex = IsComputed(aStruct);
+					if (anIndex != 0)
+					{
+						Graphic3d_Structure aStructComp = myStructsComputed.Value(anIndex);
+						eraseStructure(aStructComp.CStructure());
+						displayStructure(aStruct.CStructure(), aStruct.DisplayPriority());
+						Update(aStruct.GetZLayer());
+					}
+				}
+				return;
+
+			}
+		}
+
+		public abstract void eraseStructure(Graphic3d_CStructure graphic3d_CStructure);
 
 		internal void Clear(Graphic3d_Structure theStructure, bool theWithDestruction)
 		{

@@ -62,9 +62,9 @@ namespace OCCPort.OpenGL
 		public void Render(OpenGl_Workspace theWorkspace)
 		{
 			// Process the structure only if visible
-			if (visible == 0)			
+			if (visible == 0)
 				return;
-			
+
 
 			// True if structure is fully clipped
 			bool isClipped = false;
@@ -105,10 +105,22 @@ namespace OCCPort.OpenGL
 			throw new NotImplementedException();
 		}
 
-		internal Graphic3d_ZLayerId ZLayer()
+
+		internal bool IsRaytracable()
 		{
-			throw new NotImplementedException();
+			if (!myGroups.IsEmpty()
+			  && myIsRaytracable
+			  && myTrsfPers == null)
+			{
+				return true;
+			}
+
+			return myInstancedStructure != null
+			   && myInstancedStructure.IsRaytracable();
+
 		}
+
+		bool myIsRaytracable;
 
 		private class GroupIterator
 		{
