@@ -28,7 +28,7 @@ namespace OCCPort
 
             myRegisteredObjects.Bind(theObject, theAffinity);
         }
-        public virtual void Update(Graphic3d_ZLayerId theLayerId)
+        public virtual void Update(Graphic3d_ZLayerId theLayerId = Graphic3d_ZLayerId.Graphic3d_ZLayerId_UNKNOWN)
         {
             foreach (var aViewIt in myDefinedViews)
             {

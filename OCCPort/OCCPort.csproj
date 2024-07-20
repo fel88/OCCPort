@@ -130,10 +130,13 @@
     <Compile Include="gp_Vec.cs" />
     <Compile Include="gp_XY.cs" />
     <Compile Include="gp_XYZ.cs" />
+    <Compile Include="Graphic3d_AlphaMode.cs" />
     <Compile Include="Graphic3d_ArrayOfIndexedMapOfStructure.cs" />
     <Compile Include="Graphic3d_ArrayOfPrimitives.cs" />
     <Compile Include="Graphic3d_ArrayOfSegments.cs" />
     <Compile Include="Graphic3d_AspectFillArea3d.cs" />
+    <Compile Include="Graphic3d_AspectLine3d.cs" />
+    <Compile Include="Graphic3d_Aspects.cs" />
     <Compile Include="Graphic3d_Attribute.cs" />
     <Compile Include="Graphic3d_BndBox3d.cs" />
     <Compile Include="Graphic3d_BndBox4f.cs" />
@@ -159,8 +162,10 @@
     <Compile Include="Graphic3d_LightSet.cs" />
     <Compile Include="Graphic3d_MapOfObject.cs" />
     <Compile Include="Graphic3d_MapOfStructure.cs" />
+    <Compile Include="Graphic3d_MarkerImage.cs" />
     <Compile Include="Graphic3d_Mat4.cs" />
     <Compile Include="Graphic3d_Mat4d.cs" />
+    <Compile Include="Graphic3d_MaterialAspect.cs" />
     <Compile Include="Graphic3d_PolygonOffset.cs" />
     <Compile Include="Graphic3d_PresentationAttributes.cs" />
     <Compile Include="Graphic3d_RenderingMode.cs" />
@@ -181,6 +186,7 @@
     <Compile Include="Graphic3d_TextureMap.cs" />
     <Compile Include="Graphic3d_TextureParams.cs" />
     <Compile Include="Graphic3d_TextureRoot.cs" />
+    <Compile Include="Graphic3d_TextureSet.cs" />
     <Compile Include="Graphic3d_TransformPers.cs" />
     <Compile Include="Graphic3d_TransModeFlags.cs" />
     <Compile Include="Graphic3d_TypeOfAnswer.cs" />
@@ -190,7 +196,9 @@
     <Compile Include="Graphic3d_TypeOfConnection.cs" />
     <Compile Include="Graphic3d_TypeOfData.cs" />
     <Compile Include="Graphic3d_TypeOfPrimitiveArray.cs" />
+    <Compile Include="Graphic3d_TypeOfReflection.cs" />
     <Compile Include="Graphic3d_TypeOfShaderObject.cs" />
+    <Compile Include="Graphic3d_TypeOfShadingModel.cs" />
     <Compile Include="Graphic3d_TypeOfStructure.cs" />
     <Compile Include="Graphic3d_TypeOfTexture.cs" />
     <Compile Include="Graphic3d_TypeOfVisualization.cs" />
@@ -228,9 +236,12 @@
     <Compile Include="Poly_Triangulation.cs" />
     <Compile Include="Precision.cs" />
     <Compile Include="Prs3d.cs" />
+    <Compile Include="Prs3d_BasicAspect.cs" />
     <Compile Include="Prs3d_Drawer.cs" />
+    <Compile Include="Prs3d_LineAspect.cs" />
     <Compile Include="Prs3d_Presentation.cs" />
     <Compile Include="Prs3d_Root.cs" />
+    <Compile Include="Prs3d_ShadingAspect.cs" />
     <Compile Include="PrsMgr_DisplayStatus.cs" />
     <Compile Include="PrsMgr_ListOfPresentableObjects.cs" />
     <Compile Include="PrsMgr_ListOfPresentableObjectsIter.cs" />
@@ -272,7 +283,9 @@
     <Compile Include="Standard_ProgramError.cs" />
     <Compile Include="Standard_Size.cs" />
     <Compile Include="StdFail_NotDone.cs" />
+    <Compile Include="StdPrs_ShadedShape.cs" />
     <Compile Include="StdPrs_ToolTriangulatedShape.cs" />
+    <Compile Include="StdPrs_Volume.cs" />
     <Compile Include="StdPrs_WFShape.cs" />
     <Compile Include="StdSelect_ViewerSelector3d.cs" />
     <Compile Include="STEPControl_Reader.cs" />
