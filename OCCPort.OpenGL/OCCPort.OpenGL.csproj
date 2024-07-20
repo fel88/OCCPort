@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Aspect_DisplayConnection.cs" />
     <Compile Include="Aspect_GraphicsLibrary.cs" />
     <Compile Include="Aspect_RenderingContext.cs" />
     <Compile Include="GLConstants.cs" />
@@ -57,7 +58,7 @@
     <Compile Include="Graphic3d_TypeOfPrimitiveArray.cs" />
     <Compile Include="Graphic3d_TypeOfShadingModel.cs" />
     <Compile Include="Graphic3d_ZLayerId.cs" />
-    <Compile Include="LayersCollection.cs" />
+    <Compile Include="Graphic3d_ZLayerSettings.cs" />
     <Compile Include="MyLayersDic.cs" />
     <Compile Include="MyMapOfView.cs" />
     <Compile Include="OpenGl_ArbFBO.cs" />

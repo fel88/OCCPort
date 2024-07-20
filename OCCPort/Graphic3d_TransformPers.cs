@@ -15,4 +15,6 @@ namespace OCCPort
 		//! Return true for Graphic3d_TMF_TriedronPers and Graphic3d_TMF_2d modes.
 		public bool IsTrihedronOr2d() { return IsTrihedronOr2d(myMode); }
 	}
+
+
 }

@@ -120,9 +120,7 @@ namespace OCCPort
 
 		internal int NbOfTransformPersistenceObjects()
 		{
-
 			return myBVHPrimitivesTrsfPers.Size();
-
 		}
 
 		//! Set of transform persistent Graphic3d_CStructures for building BVH tree.
@@ -142,7 +140,7 @@ namespace OCCPort
 			for (int aPriorIter = (int)Graphic3d_DisplayPriority.Graphic3d_DisplayPriority_Bottom; aPriorIter <= (int)Graphic3d_DisplayPriority.Graphic3d_DisplayPriority_Topmost; ++aPriorIter)
 			{
 				Graphic3d_IndexedMapOfStructure aStructures = myArray[aPriorIter];
-				foreach (var aStructIter in aStructures.list)
+				foreach (var aStructIter in aStructures)
 				{
 					Graphic3d_CStructure aStructure = (Graphic3d_CStructure)(aStructIter);
 					aStructure.updateLayerTransformation();

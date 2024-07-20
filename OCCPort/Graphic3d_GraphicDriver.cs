@@ -22,8 +22,8 @@ namespace OCCPort
 				myLayers.Append(aLayer);
 				myLayerIds.Bind(aLayer.LayerId(), aLayer);
 			}
-
 		}
+
 		Aspect_DisplayConnection myDisplayConnection;
 		MyLayersDic myLayerIds = new MyLayersDic();
 
@@ -36,6 +36,7 @@ namespace OCCPort
 		{
 			return myStructGenId.Next();
 		}
+
 		protected LayersCollection myLayers = new LayersCollection();
 		Aspect_GenId myStructGenId = new Aspect_GenId();
 	}
