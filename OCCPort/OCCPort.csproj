@@ -242,6 +242,7 @@
     <Compile Include="Prs3d_Presentation.cs" />
     <Compile Include="Prs3d_Root.cs" />
     <Compile Include="Prs3d_ShadingAspect.cs" />
+    <Compile Include="Prs3d_TypeOfHighlight.cs" />
     <Compile Include="PrsMgr_DisplayStatus.cs" />
     <Compile Include="PrsMgr_ListOfPresentableObjects.cs" />
     <Compile Include="PrsMgr_ListOfPresentableObjectsIter.cs" />
@@ -261,6 +262,7 @@
     <Compile Include="SelectMgr_AndOrFilter.cs" />
     <Compile Include="SelectMgr_BaseIntersector.cs" />
     <Compile Include="SelectMgr_EntityOwner.cs" />
+    <Compile Include="SelectMgr_FilterType.cs" />
     <Compile Include="SelectMgr_IndexedDataMapOfOwnerCriterion.cs" />
     <Compile Include="SelectMgr_MapOfObjectSensitives.cs" />
     <Compile Include="SelectMgr_PickingStrategy.cs" />

@@ -11,7 +11,7 @@ namespace OCCPort
 	public class V3d_View
 	{
 
-		V3d_Viewer MyViewer;
+		public V3d_Viewer MyViewer;
 
 		//=============================================================================
 		//function : Redraw

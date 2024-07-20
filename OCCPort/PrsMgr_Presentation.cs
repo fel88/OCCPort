@@ -15,7 +15,7 @@ namespace OCCPort
             myPresentationManager = (thePrsMgr);
             myPresentableObject = (thePrsObject);
             //myBeforeHighlightState=(State_Empty);
-            //myMode = (theMode);
+            myMode = (theMode);
             /*myMustBeUpdated = false;
 			if (thePrsObject.TypeOfPresentation3d() == PrsMgr_TOP_ProjectorDependent)
 			{

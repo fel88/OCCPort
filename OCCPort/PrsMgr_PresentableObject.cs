@@ -16,6 +16,23 @@ namespace OCCPort
         //! Return presentations.
         public PrsMgr_Presentations Presentations() { return myPresentations; }
 
+        //! Returns the display mode setting of the Interactive Object.
+        //! The range of supported display mode indexes should be specified within object definition and filtered by AccepDisplayMode().
+        //! @sa AcceptDisplayMode()
+        public int DisplayMode() { return myDrawer.DisplayMode(); }
+
+        //! Sets the display mode for the interactive object.
+        //! An object can have its own temporary display mode, which is different from that proposed by the interactive context.
+        //! @sa AcceptDisplayMode()
+        public void SetDisplayMode(int theMode)
+        {
+            if (AcceptDisplayMode(theMode))
+            {
+                myDrawer.SetDisplayMode(theMode);
+            }
+        }
+
+
 
         protected PrsMgr_PresentableObject myParent;                  //!< pointer to the parent object
         public PrsMgr_Presentations myPresentations = new PrsMgr_Presentations();           //!< list of presentations
@@ -24,12 +41,12 @@ namespace OCCPort
         protected Prs3d_Drawer myDrawer;                  //!< main presentation attributes
         protected Prs3d_Drawer myHilightDrawer;           //!< (optional) custom presentation attributes for highlighting selected object
 
-		//! Returns true if the interactive object is infinite; FALSE by default.
-		//! This flag affects various operations operating on bounding box of graphic presentations of this object.
-		//! For instance, infinite objects are not taken in account for View FitAll.
-		//! This does not necessarily means that object is actually infinite,
-		//! auxiliary objects might be also marked with this flag to achieve desired behavior.
-		public bool IsInfinite() { return myInfiniteState; }
+        //! Returns true if the interactive object is infinite; FALSE by default.
+        //! This flag affects various operations operating on bounding box of graphic presentations of this object.
+        //! For instance, infinite objects are not taken in account for View FitAll.
+        //! This does not necessarily means that object is actually infinite,
+        //! auxiliary objects might be also marked with this flag to achieve desired behavior.
+        public bool IsInfinite() { return myInfiniteState; }
 
         public PrsMgr_PresentableObject(PrsMgr_TypeOfPresentation3d theType)
         {
@@ -94,7 +111,7 @@ namespace OCCPort
         //! Returns true if object should have own presentations.
         public bool HasOwnPresentations() { return myHasOwnPresentations; }
 
-        
+
 
         //! Returns true if the Interactive Object is in highlight mode.
         //! @sa HilightAttributes()

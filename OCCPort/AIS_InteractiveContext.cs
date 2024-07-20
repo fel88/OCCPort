@@ -3,6 +3,7 @@ using OCCPort.Tester;
 using System;
 using System.Net.NetworkInformation;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Security.Policy;
 
 namespace OCCPort
@@ -11,24 +12,94 @@ namespace OCCPort
     {
         public AIS_InteractiveContext(V3d_Viewer MainViewer)
         {
-			myMainPM = (new PrsMgr_PresentationManager(MainViewer.StructureManager()));
-			myMainVwr = (MainViewer);
+            myMainPM = (new PrsMgr_PresentationManager(MainViewer.StructureManager()));
+            myMainVwr = (MainViewer);
             mgrSelector = new SelectMgr_SelectionManager(new StdSelect_ViewerSelector3d());
-			myDefaultDrawer = (new Prs3d_Drawer());
-			myToHilightSelected = true;
-			mySelection = (new AIS_Selection());
-			myFilters = (new SelectMgr_AndOrFilter(SelectMgr_FilterType.SelectMgr_FilterType_OR));
-			myDefaultDrawer = (new Prs3d_Drawer());
-			myCurDetected = (0);
-			myCurHighlighted = (0);
-			myPickingStrategy = SelectMgr_PickingStrategy.SelectMgr_PickingStrategy_FirstAcceptable;
-			myAutoHilight = true;
-			myIsAutoActivateSelMode = (true);
 
+            myToHilightSelected = true;
+            mySelection = (new AIS_Selection());
+            myFilters = (new SelectMgr_AndOrFilter(SelectMgr_FilterType.SelectMgr_FilterType_OR));
+            myDefaultDrawer = (new Prs3d_Drawer());
+            //myDefaultDrawer.SetDisplayMode((int)AIS_DisplayMode.AIS_Shaded);
+            myCurDetected = (0);
+            myCurHighlighted = (0);
+            myPickingStrategy = SelectMgr_PickingStrategy.SelectMgr_PickingStrategy_FirstAcceptable;
+            myAutoHilight = true;
+            myIsAutoActivateSelMode = (true);
+
+            myStyles[(int)Prs3d_TypeOfHighlight. Prs3d_TypeOfHighlight_None] = myDefaultDrawer;
+            myStyles[(int)Prs3d_TypeOfHighlight.Prs3d_TypeOfHighlight_Selected] = new Prs3d_Drawer();
+            myStyles[(int)Prs3d_TypeOfHighlight.Prs3d_TypeOfHighlight_Dynamic] = new Prs3d_Drawer();
+            myStyles[(int)Prs3d_TypeOfHighlight.Prs3d_TypeOfHighlight_LocalSelected] = new Prs3d_Drawer();
+            myStyles[(int)Prs3d_TypeOfHighlight.Prs3d_TypeOfHighlight_LocalDynamic] = new Prs3d_Drawer();
+            myStyles[(int)Prs3d_TypeOfHighlight.Prs3d_TypeOfHighlight_SubIntensity] = new Prs3d_Drawer();
+
+
+            myDefaultDrawer.SetupOwnDefaults();
+            myDefaultDrawer.SetZLayer(Graphic3d_ZLayerId.Graphic3d_ZLayerId_Default);
+            myDefaultDrawer.SetDisplayMode(0);
+            {
+                Prs3d_Drawer aStyle = myStyles[(int)Prs3d_TypeOfHighlight.Prs3d_TypeOfHighlight_Dynamic];
+                aStyle.Link(myDefaultDrawer);
+                initDefaultHilightAttributes(aStyle, new Quantity_Color(Quantity_NameOfColor.Quantity_NOC_CYAN1));
+                aStyle.SetZLayer(Graphic3d_ZLayerId.Graphic3d_ZLayerId_Top);
+            }
         }
 
-		//! Returns the current viewer.
-		public V3d_Viewer CurrentViewer() { return myMainVwr; }
+        //! Initialize default highlighting attributes.
+        static void initDefaultHilightAttributes(Prs3d_Drawer theDrawer,
+                                             Quantity_Color theColor)
+        {
+            theDrawer.SetMethod(Aspect_TypeOfHighlightMethod.Aspect_TOHM_COLOR);
+            theDrawer.SetDisplayMode(0);
+            //theDrawer.SetColor(theColor);
+
+            theDrawer.SetupOwnShadingAspect();
+            //theDrawer.SetupOwnPointAspect();
+            /*theDrawer.SetLineAspect(new Prs3d_LineAspect(Quantity_NOC_BLACK, Aspect_TOL_SOLID, 1.0));
+        *theDrawer->LineAspect()->Aspect() = *theDrawer->Link()->LineAspect()->Aspect();
+            theDrawer->SetWireAspect(new Prs3d_LineAspect(Quantity_NOC_BLACK, Aspect_TOL_SOLID, 1.0));
+        *theDrawer->WireAspect()->Aspect() = *theDrawer->Link()->WireAspect()->Aspect();
+            theDrawer->SetPlaneAspect(new Prs3d_PlaneAspect());
+        *theDrawer->PlaneAspect()->EdgesAspect() = *theDrawer->Link()->PlaneAspect()->EdgesAspect();
+            theDrawer->SetFreeBoundaryAspect(new Prs3d_LineAspect(Quantity_NOC_BLACK, Aspect_TOL_SOLID, 1.0));
+        *theDrawer->FreeBoundaryAspect()->Aspect() = *theDrawer->Link()->FreeBoundaryAspect()->Aspect();
+            theDrawer->SetUnFreeBoundaryAspect(new Prs3d_LineAspect(Quantity_NOC_BLACK, Aspect_TOL_SOLID, 1.0));
+        *theDrawer->UnFreeBoundaryAspect()->Aspect() = *theDrawer->Link()->UnFreeBoundaryAspect()->Aspect();
+            theDrawer->SetDatumAspect(new Prs3d_DatumAspect());
+
+        theDrawer->ShadingAspect()->SetColor(theColor);
+            theDrawer->WireAspect()->SetColor(theColor);
+            theDrawer->LineAspect()->SetColor(theColor);
+            theDrawer->PlaneAspect()->ArrowAspect()->SetColor(theColor);
+            theDrawer->PlaneAspect()->IsoAspect()->SetColor(theColor);
+            theDrawer->PlaneAspect()->EdgesAspect()->SetColor(theColor);
+            theDrawer->FreeBoundaryAspect()->SetColor(theColor);
+            theDrawer->UnFreeBoundaryAspect()->SetColor(theColor);
+            theDrawer->PointAspect()->SetColor(theColor);
+        for (Standard_Integer aPartIter = 0; aPartIter<Prs3d_DatumParts_None; ++aPartIter)
+        {
+          if (Handle(Prs3d_LineAspect) aLineAsp = theDrawer->DatumAspect()->LineAspect((Prs3d_DatumParts)aPartIter))
+          {
+            aLineAsp->SetColor(theColor);
+        }
+    }
+
+    theDrawer->WireAspect()->SetWidth(2.0);
+    theDrawer->LineAspect()->SetWidth(2.0);
+    theDrawer->PlaneAspect()->EdgesAspect()->SetWidth(2.0);
+    theDrawer->FreeBoundaryAspect()->SetWidth(2.0);
+    theDrawer->UnFreeBoundaryAspect()->SetWidth(2.0);
+    theDrawer->PointAspect()->SetTypeOfMarker(Aspect_TOM_O_POINT);
+    theDrawer->PointAspect()->SetScale(2.0);
+            */
+            // the triangulation should be computed using main presentation attributes,
+            // and should not be overridden by highlighting
+            theDrawer.SetAutoTriangulation(false);
+        }
+
+        //! Returns the current viewer.
+        public V3d_Viewer CurrentViewer() { return myMainVwr; }
 
 
         SelectMgr_SelectionManager mgrSelector;
@@ -38,7 +109,7 @@ namespace OCCPort
         }
         //! @name internal fields
 
-		protected AIS_DataMapOfIOStatus myObjects = new AIS_DataMapOfIOStatus();
+        protected AIS_DataMapOfIOStatus myObjects = new AIS_DataMapOfIOStatus();
 
         PrsMgr_PresentationManager myMainPM;
         V3d_Viewer myMainVwr;
@@ -49,7 +120,7 @@ namespace OCCPort
         SelectMgr_AndOrFilter myFilters; //!< context filter (the content active filters
                                          //!  can be applied with AND or OR operation)
         Prs3d_Drawer myDefaultDrawer;
-        //Prs3d_Drawer myStyles[Prs3d_TypeOfHighlight_NB];
+        Prs3d_Drawer[] myStyles = new Prs3d_Drawer[(int)Prs3d_TypeOfHighlight.Prs3d_TypeOfHighlight_NB];
         int[] myDetectedSeq;
         int myCurDetected;
         int myCurHighlighted;
@@ -191,57 +262,57 @@ namespace OCCPort
 
         private void setObjectStatus(AIS_InteractiveObject theIObj, PrsMgr_DisplayStatus prsMgr_DisplayStatus_Displayed, int theDispMode, int theSelectionMode)
         {
-			//theIObj.SetDisplayStatus(theStatus);
-			//if (theStatus != PrsMgr_DisplayStatus_None)
-			//{
-			//	AIS_GlobalStatus aStatus = new AIS_GlobalStatus();
-			//	aStatus.SetDisplayMode(theDispMode);
-			//	if (theSelectionMode != -1)
-			//	{
-			//		aStatus.AddSelectionMode(theSelectionMode);
-			//	}
-			//	myObjects.Bind(theIObj, aStatus);
-			//}
-			//else
-			//{
-			//	myObjects.UnBind(theIObj);
-			//}
+            //theIObj.SetDisplayStatus(theStatus);
+            //if (theStatus != PrsMgr_DisplayStatus_None)
+            //{
+            //	AIS_GlobalStatus aStatus = new AIS_GlobalStatus();
+            //	aStatus.SetDisplayMode(theDispMode);
+            //	if (theSelectionMode != -1)
+            //	{
+            //		aStatus.AddSelectionMode(theSelectionMode);
+            //	}
+            //	myObjects.Bind(theIObj, aStatus);
+            //}
+            //else
+            //{
+            //	myObjects.UnBind(theIObj);
+            //}
 
-			//for (PrsMgr_ListOfPresentableObjectsIter aPrsIter (theIObj->Children()); aPrsIter.More(); aPrsIter.Next())
-			//{
-			//	AIS_InteractiveObject aChild=(Handle(AIS_InteractiveObject)::DownCast(aPrsIter.Value()));
-			//	if (aChild.IsNull())
-			//	{
-			//		continue;
-			//	}
+            //for (PrsMgr_ListOfPresentableObjectsIter aPrsIter (theIObj->Children()); aPrsIter.More(); aPrsIter.Next())
+            //{
+            //	AIS_InteractiveObject aChild=(Handle(AIS_InteractiveObject)::DownCast(aPrsIter.Value()));
+            //	if (aChild.IsNull())
+            //	{
+            //		continue;
+            //	}
 
-			//	setObjectStatus(aChild, theStatus, theDispMode, theSelectionMode);
-			//}
+            //	setObjectStatus(aChild, theStatus, theDispMode, theSelectionMode);
+            //}
         }
 
 
-		public void setContextToObject(AIS_InteractiveObject theObj)
+        public void setContextToObject(AIS_InteractiveObject theObj)
         {
-			if (theObj.HasInteractiveContext())
-			{
-				//if (theObj.myCTXPtr != this)
-				{
-					//throw new Standard_ProgramError("AIS_InteractiveContext - object has been already displayed in another context!");
-				}
-			}
-			else
-			{
-				theObj.SetContext(this);
-			}
+            if (theObj.HasInteractiveContext())
+            {
+                //if (theObj.myCTXPtr != this)
+                {
+                    //throw new Standard_ProgramError("AIS_InteractiveContext - object has been already displayed in another context!");
+                }
+            }
+            else
+            {
+                theObj.SetContext(this);
+            }
 
-			for (PrsMgr_ListOfPresentableObjectsIter aPrsIter = new PrsMgr_ListOfPresentableObjectsIter(theObj.Children()); aPrsIter.More(); aPrsIter.Next())
-			{
-				AIS_InteractiveObject aChild = aPrsIter.Value() as AIS_InteractiveObject;
-				if (aChild != null)
-				{
-					setContextToObject(aChild);
-				}
-			}
+            for (PrsMgr_ListOfPresentableObjectsIter aPrsIter = new PrsMgr_ListOfPresentableObjectsIter(theObj.Children()); aPrsIter.More(); aPrsIter.Next())
+            {
+                AIS_InteractiveObject aChild = aPrsIter.Value() as AIS_InteractiveObject;
+                if (aChild != null)
+                {
+                    setContextToObject(aChild);
+                }
+            }
         }
 
 
@@ -382,23 +453,57 @@ namespace OCCPort
             throw new NotImplementedException();
         }
 
-        public void SetDisplayMode(AIS_Shape shape, AIS_DisplayMode aIS_Shaded, bool v)
+        public void SetDisplayMode(AIS_Shape theIObj, AIS_DisplayMode theMode, bool theToUpdateViewer)
         {
-            throw new NotImplementedException();
+            setContextToObject(theIObj);
+            if (!myObjects.IsBound(theIObj))
+            {
+                theIObj.SetDisplayMode((int)theMode);
+                return;
+            }
+            /*else if (!theIObj.AcceptDisplayMode(theMode))
+            {
+                return;
+            }*/
+
+            //AIS_GlobalStatus aStatus = myObjects(theIObj);
+            /*if (theIObj->DisplayStatus() != PrsMgr_DisplayStatus_Displayed)
+            {
+                aStatus->SetDisplayMode(theMode);
+                theIObj->SetDisplayMode(theMode);
+                return;
+            }
+
+            // erase presentations for all display modes different from <aMode>
+            const Standard_Integer anOldMode = aStatus->DisplayMode();
+            if (anOldMode != theMode)
+            {
+                if (myMainPM->IsHighlighted(theIObj, anOldMode))
+                {
+                    unhighlightGlobal(theIObj);
+                }
+                myMainPM->SetVisibility(theIObj, anOldMode, Standard_False);
+            }
+
+            aStatus->SetDisplayMode(theMode);
+
+            myMainPM->Display(theIObj, theMode);
+            if (aStatus->IsHilighted())
+            {
+                highlightGlobal(theIObj, getSelStyle(theIObj, theIObj->GlobalSelOwner()), theMode);
+            }
+            if (aStatus->IsSubIntensityOn())
+            {
+                highlightWithSubintensity(theIObj, theMode);
+            }
+            */
+            if (theToUpdateViewer)
+            {
+                myMainVwr.Update();
+            }
+            theIObj.SetDisplayMode((int)theMode);
         }
     }
-	public enum SelectMgr_FilterType
-	{
-
-		//Enumeration defines the filter type.
-
-		SelectMgr_FilterType_AND,
-
-		//an object should be suitable for all filters.
-		SelectMgr_FilterType_OR
-
-		//an object should be suitable at least one filter. 
-	}
 
 
 

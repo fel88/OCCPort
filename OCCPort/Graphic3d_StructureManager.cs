@@ -143,7 +143,7 @@ namespace OCCPort
         {
             myGraphicDriver = (theDriver);
             myViewGenId = new Aspect_GenId(0, 31);
-            //myDeviceLostFlag = (false);
+            myDeviceLostFlag = (false);
 
         }
     }

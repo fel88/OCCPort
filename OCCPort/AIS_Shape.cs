@@ -35,7 +35,7 @@ namespace OCCPort.Tester
                 thePrs.SetInfiniteState(true); //not taken in account during FITALL
             }
 
-
+            theMode = (int)AIS_DisplayMode.AIS_Shaded;
             switch (theMode)
             {
 

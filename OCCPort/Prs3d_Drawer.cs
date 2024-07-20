@@ -1,12 +1,69 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 
 namespace OCCPort
 {
     public class Prs3d_Drawer : Graphic3d_PresentationAttributes
     {
 
+        //! Changes highlight method to the given one.
+        public virtual void SetMethod(Aspect_TypeOfHighlightMethod theMethod) { myHiMethod = theMethod; }
+
+        public void SetAutoTriangulation(bool theIsEnabled)
+        {
+            myHasOwnIsAutoTriangulated = true;
+            myIsAutoTriangulated = theIsEnabled;
+        }
+        Aspect_TypeOfHighlightMethod myHiMethod;            //!< box or color highlighting
+
         bool myFaceBoundaryDraw;
         bool myHasOwnFaceBoundaryDraw;
+        public void SetupOwnDefaults()
+        {
+            myNbPoints = 30;
+            myMaximalParameterValue = 500000.0;
+            myChordialDeviation = 0.0001;
+            myDeviationCoefficient = 0.001;
+            myDeviationAngle = 20.0 * Math.PI / 180.0;
+            //SetupOwnShadingAspect();
+            /*SetupOwnPointAspect();
+            SetOwnDatumAspects();
+            SetOwnLineAspects();
+            SetTextAspect(new Prs3d_TextAspect());
+            SetDimensionAspect(new Prs3d_DimensionAspect());*/
+        }
+        //! Sets presentation Zlayer.
+        public virtual void SetZLayer(Graphic3d_ZLayerId theLayer) { myZLayer = theLayer; }
+        Graphic3d_ZLayerId myZLayer;              //!< Z-layer
+                                                  //! Sets theDrawer as a link to which the current object references.
+        public void Link(Prs3d_Drawer theDrawer)
+        {
+            SetLink(theDrawer);
+        }
+        //! Sets theDrawer as a link to which the current object references.
+        public void SetLink(Prs3d_Drawer theDrawer) { myLink = theDrawer; }
+
+
+
+        public bool SetupOwnShadingAspect(Prs3d_Drawer theDefaults = null)
+        {
+            if (theDefaults == null)
+            {
+                theDefaults = new Prs3d_Drawer();
+            }
+            if (myShadingAspect != null)
+            {
+                return false;
+            }
+
+            myShadingAspect = new Prs3d_ShadingAspect();
+            Prs3d_Drawer aLink = (theDefaults != null && theDefaults != this) ? theDefaults : myLink;
+            /*if (const Prs3d_ShadingAspect* aLinked = !aLink.IsNull() ? aLink->ShadingAspect().get() : NULL)
+  {
+                *myShadingAspect->Aspect() = *aLinked->Aspect();
+            }*/
+            return true;
+        }
 
         //! Get the most edge continuity class; GeomAbs_CN by default (all edges).
         public GeomAbs_Shape FaceBoundaryUpperContinuity()

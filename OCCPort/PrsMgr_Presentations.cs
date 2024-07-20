@@ -6,6 +6,12 @@ namespace OCCPort
     public class PrsMgr_Presentations
     {
 		List<PrsMgr_Presentation> list = new List<PrsMgr_Presentation>();
+
+        internal void Append(PrsMgr_Presentation aPrs)
+        {
+            list.Add(aPrs);
+        }
+
         internal class Iterator
         {
 			PrsMgr_Presentations list;

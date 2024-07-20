@@ -20,9 +20,9 @@ namespace OCCPort.Tester
         {
             InitializeComponent();
             glControl = new OpenTK.GLControl(new OpenTK.Graphics.GraphicsMode(32, 24, 0, 8));
-            v3d_viewer = new V3d_Viewer(new OpenGl_GraphicDriver(new Aspect_DisplayConnection ()));
+            v3d_viewer = new V3d_Viewer(new OpenGl_GraphicDriver(new Aspect_DisplayConnection()));
 
-			myAISContext = new AIS_InteractiveContext(v3d_viewer);
+            myAISContext = new AIS_InteractiveContext(v3d_viewer);
 
 
             if (glControl.Context.GraphicsMode.Samples == 0)
@@ -67,7 +67,7 @@ namespace OCCPort.Tester
             {
                 glControl.MakeCurrent();
             }
-			/*try
+            /*try
             {
                 GravityViewManager.View.Redraw();
             }
@@ -278,12 +278,12 @@ namespace OCCPort.Tester
             gp_Pnt p1 = new gp_Pnt(0, 0, 0);
             gp_Pnt p2 = new gp_Pnt(w, h, l);
             BRepPrimAPI_MakeBox box = new BRepPrimAPI_MakeBox(p1, p2);
-            
+
             box.Build();
             var solid = box.Solid();
             var shape = new AIS_Shape(solid);
             myAISContext.Display(shape, true);
-            myAISContext.SetDisplayMode(shape, AIS_DisplayMode. AIS_Shaded, false);
+            myAISContext.SetDisplayMode(shape, AIS_DisplayMode.AIS_Shaded, false);
             //auto hn = GetHandle(*shape);
             //hh->FromObjHandle(hn);
         }
@@ -293,25 +293,27 @@ namespace OCCPort.Tester
             AddBox();
         }
 
-		private void toolStripButton8_Click(object sender, EventArgs e)
-		{
-			gp_Pnt p1 = new gp_Pnt(0, 0, 0);
-			gp_Pnt p2 = new gp_Pnt(10, 10, 10);
-			BRepPrimAPI_MakeBox box = new BRepPrimAPI_MakeBox(p1, p2);
+        private void toolStripButton8_Click(object sender, EventArgs e)
+        {
+            gp_Pnt p1 = new gp_Pnt(0, 0, 0);
+            gp_Pnt p2 = new gp_Pnt(10, 10, 10);
+            BRepPrimAPI_MakeBox box = new BRepPrimAPI_MakeBox(p1, p2);
 
-			box.Build();
-			var solid = box.Solid();
-			var shape = new AIS_Shape(solid);
-			var sm = v3d_viewer.StructureManager();
+            box.Build();
+            var solid = box.Solid();
+            var shape = new AIS_Shape(solid);
+            var sm = v3d_viewer.StructureManager();
 
-			myAISContext.Display(shape, true);
+            myAISContext.Display(shape, true);
+            myAISContext.SetDisplayMode(shape, AIS_DisplayMode.AIS_Shaded, false);
 
-			//shape.Compute(sm,);
-			GravityViewManager.View.Redraw();
-		}
+            //shape.Compute(sm,);
+            GravityViewManager.View.Redraw();
+        }
 
         private void toolStripButton9_Click(object sender, EventArgs e)
         {
+            GravityViewManager.View.MyViewer.StructureManager().SetDeviceLost();
             GravityViewManager.View.Redraw();
 
         }
