@@ -119,7 +119,7 @@ namespace OCCPort.OpenGL
         }
         bool myIsClosed;
 
-        public OpenGl_Group(Graphic3d_Structure theStruct)
+        public OpenGl_Group(Graphic3d_Structure theStruct):base(theStruct)
         {
         }
 

@@ -121,5 +121,10 @@ namespace OCCPort
                 return myItems.Value().myTrsf;
 
         }
+
+        internal void Identity()
+        {
+            myItems.Clear();
+        }
     }
 }

@@ -69,13 +69,13 @@ namespace OCCPort.Tester
             //                    theVolume == StdPrs_Volume_Closed);
             //}
 
-            if (theDrawer.FaceBoundaryDraw())
+           // if (theDrawer.FaceBoundaryDraw())
             {
                 Graphic3d_ArrayOfSegments aBndSegments = fillFaceBoundaries(theShape, theDrawer.FaceBoundaryUpperContinuity());
                 if (aBndSegments != null)
                 {
                     Graphic3d_Group aPrsGrp = thePrs.NewGroup();
-                    aPrsGrp.SetGroupPrimitivesAspect(theDrawer.FaceBoundaryAspect().Aspect());
+                    //aPrsGrp.SetGroupPrimitivesAspect(theDrawer.FaceBoundaryAspect().Aspect());
                     aPrsGrp.AddPrimitiveArray(aBndSegments);
                 }
             }

@@ -6,7 +6,7 @@ namespace OCCPort
 {
     internal class TopoDS_ListOfShape
     {
-        List<TopoDS_Shape> list = new List<TopoDS_Shape>();
+      public  List<TopoDS_Shape> list = new List<TopoDS_Shape>();
         internal void Append(TopoDS_Shape aComponent)
         {
             list.Add(aComponent);

@@ -68,6 +68,12 @@ namespace OCCPort
 
             myDrawer.SetDisplayMode(-1);
         }
+        public void SetMaterial(Graphic3d_MaterialAspect theMaterial)
+        {
+            myDrawer.SetupOwnShadingAspect();
+            myDrawer.ShadingAspect().SetMaterial(theMaterial);
+            hasOwnMaterial = true;
+        }
 
 
         //! Returns true if the class of objects accepts specified display mode index.

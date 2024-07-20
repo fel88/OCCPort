@@ -1,6 +1,6 @@
 ﻿namespace OCCPort
 {
-    internal class Graphic3d_Vec4
+    public  class Graphic3d_Vec4
     {
         private object value1;
         private object value2;

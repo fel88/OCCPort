@@ -72,6 +72,7 @@
     <Compile Include="Aspect_TypeOfFacingModel.cs" />
     <Compile Include="Aspect_TypeOfHighlightMethod.cs" />
     <Compile Include="Aspect_TypeOfHighlightMethod1.cs" />
+    <Compile Include="Aspect_TypeOfLine.cs" />
     <Compile Include="Bnd_Box.cs" />
     <Compile Include="BRepBuilderAPI_Command.cs" />
     <Compile Include="BRepBuilderAPI_MakeShape.cs" />
@@ -131,6 +132,7 @@
     <Compile Include="gp_XY.cs" />
     <Compile Include="gp_XYZ.cs" />
     <Compile Include="Graphic3d_AlphaMode.cs" />
+    <Compile Include="Graphic3d_ArrayFlags.cs" />
     <Compile Include="Graphic3d_ArrayOfIndexedMapOfStructure.cs" />
     <Compile Include="Graphic3d_ArrayOfPrimitives.cs" />
     <Compile Include="Graphic3d_ArrayOfSegments.cs" />
@@ -223,6 +225,7 @@
     <Compile Include="Message_ProgressRange.cs" />
     <Compile Include="MyLayersDic.cs" />
     <Compile Include="NCollection_Buffer.cs" />
+    <Compile Include="NCollection_ListNode.cs" />
     <Compile Include="NCollection_Map.cs" />
     <Compile Include="NCollection_Mat4.cs" />
     <Compile Include="NCollection_Vec2.cs" />

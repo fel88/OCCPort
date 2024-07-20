@@ -1,11 +1,60 @@
-﻿using System;
+﻿using OCCPort;
+using System;
 using System.Runtime.InteropServices;
 
 namespace OCCPort
 {
     public class Prs3d_Drawer : Graphic3d_PresentationAttributes
     {
+        public Prs3d_Drawer()
+        {
+            myNbPoints = (-1);
+            /*myMaximalParameterValue(-1.0),
+            myChordialDeviation(-1.0),
+            myTypeOfDeflection(Aspect_TOD_RELATIVE),
+            myHasOwnTypeOfDeflection(Standard_False),
+            myTypeOfHLR(Prs3d_TOH_NotSet),
+            myDeviationCoefficient(-1.0),
+            myDeviationAngle(-1.0),
+            myIsoOnPlane(Standard_False),
+            myHasOwnIsoOnPlane(Standard_False),
+            myIsoOnTriangulation(Standard_False),
+            myHasOwnIsoOnTriangulation(Standard_False),
+            myIsAutoTriangulated(Standard_True),
+            myHasOwnIsAutoTriangulated(Standard_False),
 
+            myWireDraw(Standard_True),
+            myHasOwnWireDraw(Standard_False),
+            myLineArrowDraw(Standard_False),
+            myHasOwnLineArrowDraw(Standard_False),
+            myDrawHiddenLine(Standard_False),
+            myHasOwnDrawHiddenLine(Standard_False),
+            myVertexDrawMode(Prs3d_VDM_Inherited),*/
+
+            myFreeBoundaryDraw = (true);
+            myHasOwnFreeBoundaryDraw = (false);
+            myUnFreeBoundaryDraw = (true);
+            myHasOwnUnFreeBoundaryDraw = (false);/*
+  myFaceBoundaryUpperContinuity(-1),
+  myFaceBoundaryDraw(Standard_False),
+  myHasOwnFaceBoundaryDraw(Standard_False),
+
+  myHasOwnDimLengthModelUnits(Standard_False),
+  myHasOwnDimAngleModelUnits(Standard_False),
+  myHasOwnDimLengthDisplayUnits(Standard_False),
+  myHasOwnDimAngleDisplayUnits(Standard_False)*/
+        }
+
+        Prs3d_LineAspect myFreeBoundaryAspect;
+        bool myFreeBoundaryDraw;
+        bool myHasOwnFreeBoundaryDraw;
+        Prs3d_LineAspect myUnFreeBoundaryAspect;
+        bool myUnFreeBoundaryDraw;
+        bool myHasOwnUnFreeBoundaryDraw;
+        Prs3d_LineAspect myFaceBoundaryAspect;
+        int myFaceBoundaryUpperContinuity; //!< the most edge continuity class (GeomAbs_Shape) to be included to face boundaries presentation, or -1 if undefined
+        bool myFaceBoundaryDraw;
+        bool myHasOwnFaceBoundaryDraw;
         //! Changes highlight method to the given one.
         public virtual void SetMethod(Aspect_TypeOfHighlightMethod theMethod) { myHiMethod = theMethod; }
 
@@ -16,8 +65,7 @@ namespace OCCPort
         }
         Aspect_TypeOfHighlightMethod myHiMethod;            //!< box or color highlighting
 
-        bool myFaceBoundaryDraw;
-        bool myHasOwnFaceBoundaryDraw;
+
         public void SetupOwnDefaults()
         {
             myNbPoints = 30;
@@ -25,12 +73,125 @@ namespace OCCPort
             myChordialDeviation = 0.0001;
             myDeviationCoefficient = 0.001;
             myDeviationAngle = 20.0 * Math.PI / 180.0;
-            //SetupOwnShadingAspect();
+            SetupOwnShadingAspect();
             /*SetupOwnPointAspect();
-            SetOwnDatumAspects();
+            SetOwnDatumAspects();*/
             SetOwnLineAspects();
+            /*
             SetTextAspect(new Prs3d_TextAspect());
             SetDimensionAspect(new Prs3d_DimensionAspect());*/
+        }
+
+        static Quantity_NameOfColor THE_DEF_COLOR_FaceBoundary = Quantity_NameOfColor.Quantity_NOC_BLACK;
+        static Quantity_NameOfColor THE_DEF_COLOR_FreeBoundary = Quantity_NameOfColor.Quantity_NOC_GREEN;
+        // =======================================================================
+        // function : SetOwnLineAspects
+        // purpose  :
+        // =======================================================================
+        public bool SetOwnLineAspects(Prs3d_Drawer theDefaults = null)
+        {
+            if (theDefaults == null)
+            {
+                theDefaults = new Prs3d_Drawer();
+            }
+            bool isUpdateNeeded = false;
+            /*  const Handle(Prs3d_Drawer)&aLink = (!theDefaults.IsNull() && theDefaults != this) ? theDefaults : myLink;
+              if (myUIsoAspect.IsNull())
+              {
+                  isUpdateNeeded = true;
+                  myUIsoAspect = new Prs3d_IsoAspect(Quantity_NOC_GRAY75, Aspect_TOL_SOLID, 1.0, 1);
+                  if (const Prs3d_IsoAspect* aLinked = !aLink.IsNull() ? aLink->UIsoAspect().get() : NULL)
+      {
+                      *myUIsoAspect->Aspect() = *aLinked->Aspect();
+                      myUIsoAspect->SetNumber(aLinked->Number());
+                  }
+              }
+              if (myVIsoAspect.IsNull())
+              {
+                  isUpdateNeeded = true;
+                  myVIsoAspect = new Prs3d_IsoAspect(Quantity_NOC_GRAY75, Aspect_TOL_SOLID, 1.0, 1);
+                  if (const Prs3d_IsoAspect* aLinked = !aLink.IsNull() ? aLink->VIsoAspect().get() : NULL)
+      {
+                      *myVIsoAspect->Aspect() = *aLinked->Aspect();
+                      myVIsoAspect->SetNumber(aLinked->Number());
+                  }
+              }
+              if (myWireAspect.IsNull())
+              {
+                  isUpdateNeeded = true;
+                  myWireAspect = new Prs3d_LineAspect(THE_DEF_COLOR_Wire, Aspect_TOL_SOLID, 1.0);
+                  if (const Prs3d_LineAspect* aLinked = !aLink.IsNull() ? aLink->WireAspect().get() : NULL)
+      {
+                      *myWireAspect->Aspect() = *aLinked->Aspect();
+                  }
+              }
+              if (myLineAspect.IsNull())
+              {
+                  isUpdateNeeded = true;
+                  myLineAspect = new Prs3d_LineAspect(THE_DEF_COLOR_Line, Aspect_TOL_SOLID, 1.0);
+                  if (const Prs3d_LineAspect* aLinked = !aLink.IsNull() ? aLink->LineAspect().get() : NULL)
+      {
+                      *myLineAspect->Aspect() = *aLinked->Aspect();
+                  }
+              }
+              if (mySeenLineAspect.IsNull())
+              {
+                  isUpdateNeeded = true;
+                  mySeenLineAspect = new Prs3d_LineAspect(THE_DEF_COLOR_SeenLine, Aspect_TOL_SOLID, 1.0);
+                  if (const Prs3d_LineAspect* aLinked = !aLink.IsNull() ? aLink->SeenLineAspect().get() : NULL)
+      {
+                      *mySeenLineAspect->Aspect() = *aLinked->Aspect();
+                  }
+              }
+              if (myHiddenLineAspect.IsNull())
+              {
+                  isUpdateNeeded = true;
+                  myHiddenLineAspect = new Prs3d_LineAspect(THE_DEF_COLOR_HiddenLine, Aspect_TOL_DASH, 1.0);
+                  if (const Prs3d_LineAspect* aLinked = !aLink.IsNull() ? aLink->HiddenLineAspect().get() : NULL)
+      {
+                      *myHiddenLineAspect->Aspect() = *aLinked->Aspect();
+                  }
+              }*/
+            if (myFreeBoundaryAspect == null)
+            {
+                isUpdateNeeded = true;
+                myFreeBoundaryAspect = new Prs3d_LineAspect(new Quantity_Color(THE_DEF_COLOR_FreeBoundary), Aspect_TypeOfLine.Aspect_TOL_SOLID, 1.0);
+                /* if (const Prs3d_LineAspect* aLinked = !aLink.IsNull() ? aLink->FreeBoundaryAspect().get() : NULL)
+     {
+                     *myFreeBoundaryAspect->Aspect() = *aLinked->Aspect();
+                 }*/
+            }
+            /*  if (myUnFreeBoundaryAspect.IsNull())
+              {
+                  isUpdateNeeded = true;
+                  myUnFreeBoundaryAspect = new Prs3d_LineAspect(THE_DEF_COLOR_UnFreeBoundary, Aspect_TOL_SOLID, 1.0);
+                  if (const Prs3d_LineAspect* aLinked = !aLink.IsNull() ? aLink->UnFreeBoundaryAspect().get() : NULL)
+      {
+                      *myUnFreeBoundaryAspect->Aspect() = *aLinked->Aspect();
+                  }
+              }*/
+            isUpdateNeeded = SetupOwnFaceBoundaryAspect(theDefaults) || isUpdateNeeded;
+            return isUpdateNeeded;
+        }
+        public bool SetupOwnFaceBoundaryAspect(Prs3d_Drawer theDefaults = null)
+        {
+            if (theDefaults == null)
+            {
+                theDefaults = new Prs3d_Drawer();
+            }
+            if (myFaceBoundaryAspect != null)
+            {
+                return false;
+            }
+
+            myFaceBoundaryAspect = new Prs3d_LineAspect(new Quantity_Color(THE_DEF_COLOR_FaceBoundary), Aspect_TypeOfLine.Aspect_TOL_SOLID, 1.0);
+
+            /* const Handle(Prs3d_Drawer)&aLink = (!theDefaults.IsNull() && theDefaults != this) ? theDefaults : myLink;
+             if (const Prs3d_LineAspect* aLinked = !aLink.IsNull() ? aLink->FaceBoundaryAspect().get() : NULL)
+   {
+                 *myFaceBoundaryAspect->Aspect() = *aLinked->Aspect();
+             }*/
+            return true;
         }
         //! Sets presentation Zlayer.
         public virtual void SetZLayer(Graphic3d_ZLayerId theLayer) { myZLayer = theLayer; }
@@ -77,7 +238,7 @@ namespace OCCPort
 
         //! Returns true if the drawer has its own attribute for face boundaries upper edge continuity class that overrides the one in the link.
         public bool HasOwnFaceBoundaryUpperContinuity() { return myFaceBoundaryUpperContinuity != -1; }
-        int myFaceBoundaryUpperContinuity; //!< the most edge continuity class (GeomAbs_Shape) to be included to face boundaries presentation, or -1 if undefined
+
 
 
         //! Checks whether the face boundary drawing is enabled or not.
@@ -95,10 +256,22 @@ namespace OCCPort
                  ? myIsAutoTriangulated
                  : myLink.IsAutoTriangulation();
 
-        }// =======================================================================
-         // function : ShadingAspect
-         // purpose  :
-         // =======================================================================
+        }
+
+        //! Sets the parameter theAspect for display attributes of shading.
+        public void SetShadingAspect(Prs3d_ShadingAspect theAspect)
+        {
+            myShadingAspect = theAspect;
+        }
+
+        //! Returns true if the drawer has its own attribute for
+        //! shading aspect that overrides the one in the link.
+        public bool HasOwnShadingAspect() { return myShadingAspect != null; }
+
+        // =======================================================================
+        // function : ShadingAspect
+        // purpose  :
+        // =======================================================================
 
         public Prs3d_ShadingAspect ShadingAspect()
         {
@@ -110,7 +283,7 @@ namespace OCCPort
             return myShadingAspect;
         }
 
-        Prs3d_ShadingAspect myShadingAspect;
+        Prs3d_ShadingAspect myShadingAspect = new Prs3d_ShadingAspect();
         Prs3d_Drawer myLink;
 
         int myNbPoints;
@@ -175,8 +348,7 @@ namespace OCCPort
         {
             throw new NotImplementedException();
         }
-        Prs3d_LineAspect myFaceBoundaryAspect;
-        Prs3d_LineAspect myFreeBoundaryAspect;
+
 
         public Prs3d_LineAspect FaceBoundaryAspect()
         {

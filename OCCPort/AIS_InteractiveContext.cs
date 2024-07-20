@@ -27,7 +27,7 @@ namespace OCCPort
             myAutoHilight = true;
             myIsAutoActivateSelMode = (true);
 
-            myStyles[(int)Prs3d_TypeOfHighlight. Prs3d_TypeOfHighlight_None] = myDefaultDrawer;
+            myStyles[(int)Prs3d_TypeOfHighlight.Prs3d_TypeOfHighlight_None] = myDefaultDrawer;
             myStyles[(int)Prs3d_TypeOfHighlight.Prs3d_TypeOfHighlight_Selected] = new Prs3d_Drawer();
             myStyles[(int)Prs3d_TypeOfHighlight.Prs3d_TypeOfHighlight_Dynamic] = new Prs3d_Drawer();
             myStyles[(int)Prs3d_TypeOfHighlight.Prs3d_TypeOfHighlight_LocalSelected] = new Prs3d_Drawer();
@@ -44,8 +44,61 @@ namespace OCCPort
                 initDefaultHilightAttributes(aStyle, new Quantity_Color(Quantity_NameOfColor.Quantity_NOC_CYAN1));
                 aStyle.SetZLayer(Graphic3d_ZLayerId.Graphic3d_ZLayerId_Top);
             }
-        }
+            {
+                Prs3d_Drawer aStyle = myStyles[(int)Prs3d_TypeOfHighlight.Prs3d_TypeOfHighlight_LocalDynamic];
+                aStyle.Link(myDefaultDrawer);
+                initDefaultHilightAttributes(aStyle, new Quantity_Color(Quantity_NameOfColor.Quantity_NOC_CYAN1));
+                aStyle.SetZLayer(Graphic3d_ZLayerId.Graphic3d_ZLayerId_Topmost);
+            }
+            {
+                Prs3d_Drawer aStyle = myStyles[(int)Prs3d_TypeOfHighlight.Prs3d_TypeOfHighlight_Selected];
+                aStyle.Link(myDefaultDrawer);
+                initDefaultHilightAttributes(aStyle, new Quantity_Color(Quantity_NameOfColor.Quantity_NOC_GRAY80));
+                aStyle.SetZLayer(Graphic3d_ZLayerId.Graphic3d_ZLayerId_UNKNOWN);
+            }
+            {
+                Prs3d_Drawer aStyle = myStyles[(int)Prs3d_TypeOfHighlight.Prs3d_TypeOfHighlight_LocalSelected];
+                aStyle.Link(myDefaultDrawer);
+                initDefaultHilightAttributes(aStyle, new Quantity_Color(Quantity_NameOfColor.Quantity_NOC_GRAY80));
+                aStyle.SetZLayer(Graphic3d_ZLayerId.Graphic3d_ZLayerId_UNKNOWN);
+            }
+            {
+                Prs3d_Drawer aStyle = myStyles[(int)Prs3d_TypeOfHighlight.Prs3d_TypeOfHighlight_SubIntensity];
+                aStyle.SetZLayer(Graphic3d_ZLayerId.Graphic3d_ZLayerId_UNKNOWN);
+                aStyle.SetMethod(Aspect_TypeOfHighlightMethod.Aspect_TOHM_COLOR);
+                //aStyle.SetColor(new Quantity_Color(Quantity_NameOfColor.Quantity_NOC_GRAY40));
+            }
 
+            InitAttributes();
+        }
+        void InitAttributes()
+        {
+            /*  Graphic3d_MaterialAspect aMat=new Graphic3d_MaterialAspect ( Graphic3d_NameOfMaterial_Brass);
+              myDefaultDrawer.ShadingAspect().SetMaterial(aMat);
+
+              //  myDefaultDrawer->ShadingAspect()->SetColor(Quantity_NOC_GRAY70);
+              Handle(Prs3d_LineAspect) aLineAspect = myDefaultDrawer->HiddenLineAspect();
+              aLineAspect->SetColor(Quantity_NOC_GRAY20);
+              aLineAspect->SetWidth(1.0);
+              aLineAspect->SetTypeOfLine(Aspect_TOL_DASH);
+
+              // tolerance to 2 pixels...
+              SetPixelTolerance(2);
+
+              // Customizing the drawer for trihedrons and planes...
+              Handle(Prs3d_DatumAspect) aTrihAspect = myDefaultDrawer->DatumAspect();
+              const Standard_Real aLength = 100.0;
+              aTrihAspect->SetAxisLength(aLength, aLength, aLength);
+              const Quantity_Color aColor = Quantity_NOC_LIGHTSTEELBLUE4;
+              aTrihAspect->LineAspect(Prs3d_DatumParts_XAxis)->SetColor(aColor);
+              aTrihAspect->LineAspect(Prs3d_DatumParts_YAxis)->SetColor(aColor);
+              aTrihAspect->LineAspect(Prs3d_DatumParts_ZAxis)->SetColor(aColor);
+
+              Handle(Prs3d_PlaneAspect) aPlaneAspect = myDefaultDrawer->PlaneAspect();
+              const Standard_Real aPlaneLength = 200.0;
+              aPlaneAspect->SetPlaneLength(aPlaneLength, aPlaneLength);
+              aPlaneAspect->EdgesAspect()->SetColor(Quantity_NOC_SKYBLUE);*/
+        }
         //! Initialize default highlighting attributes.
         static void initDefaultHilightAttributes(Prs3d_Drawer theDrawer,
                                              Quantity_Color theColor)

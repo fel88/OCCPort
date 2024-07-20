@@ -5,6 +5,12 @@ namespace OCCPort
 {
     public abstract class Graphic3d_Group
     {
+        public Graphic3d_Group(Graphic3d_Structure theStruct)
+        {
+            myStructure = theStruct;
+            myIsClosed = (false);
+        }
+
         /*public Graphic3d_Group(Graphic3d_StructureManager m)
         {
             myStructureManager = m;
@@ -104,7 +110,7 @@ namespace OCCPort
 
         private bool IsDeleted()
         {
-            throw new NotImplementedException();
+            return myStructure == null || myStructure.IsDeleted();
         }
 
         internal void AddPrimitiveArray(Graphic3d_ArrayOfPrimitives thePrim, bool theToEvalMinMax = true)
