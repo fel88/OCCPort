@@ -1,31 +1,33 @@
-﻿using System;
+﻿using OCCPort.Tester;
+using OCCPort;
+using System;
 
 namespace OCCPort.Tester
 {
     public class AIS_Shape : AIS_InteractiveObject
     {
-        
+
         public override void Compute(PrsMgr_PresentationManager thePrsMgr,
                                    Prs3d_Presentation thePrs,
                                    int theMode)
         {
 
             if (myshape.IsNull()
-             || (myshape.ShapeType() == TopAbs_ShapeEnum. TopAbs_COMPOUND && myshape.NbChildren() == 0))
+             || (myshape.ShapeType() == TopAbs_ShapeEnum.TopAbs_COMPOUND && myshape.NbChildren() == 0))
             {
                 return;
             }
 
 
             // wire,edge,vertex -> pas de HLR + priorite display superieure
-            if (myshape.ShapeType() >= TopAbs_ShapeEnum. TopAbs_WIRE
+            if (myshape.ShapeType() >= TopAbs_ShapeEnum.TopAbs_WIRE
              && myshape.ShapeType() <= TopAbs_ShapeEnum.TopAbs_VERTEX)
             {
                 // TopAbs_WIRE -> 7, TopAbs_EDGE -> 8, TopAbs_VERTEX -> 9 (Graphic3d_DisplayPriority_Highlight)
-                 /*int aPrior = (int)Graphic3d_DisplayPriority_Above1
-                                              + (int)myshape.ShapeType() - TopAbs_ShapeEnum. TopAbs_WIRE;
-                thePrs.SetVisual(Graphic3d_TOS_ALL);
-                thePrs.SetDisplayPriority((Graphic3d_DisplayPriority)aPrior);*/
+                /*int aPrior = (int)Graphic3d_DisplayPriority_Above1
+                                             + (int)myshape.ShapeType() - TopAbs_ShapeEnum. TopAbs_WIRE;
+               thePrs.SetVisual(Graphic3d_TOS_ALL);
+               thePrs.SetDisplayPriority((Graphic3d_DisplayPriority)aPrior);*/
             }
 
             if (IsInfinite())
@@ -34,33 +36,58 @@ namespace OCCPort.Tester
             }
 
 
-			//switch (theMode)
-			{
+            switch (theMode)
+            {
 
-				//case (int)AIS_DisplayMode.AIS_Shaded:
-					{
-						StdPrs_ToolTriangulatedShape.ClearOnOwnDeflectionChange(myshape, myDrawer, true);
-						if ((int)myshape.ShapeType() > 4)
-						{
-							StdPrs_WFShape.Add(thePrs, myshape, myDrawer);
-						}
+                case (int)AIS_DisplayMode.AIS_Shaded:
+                    {
+                        StdPrs_ToolTriangulatedShape.ClearOnOwnDeflectionChange(myshape, myDrawer, true);
+                        if ((int)myshape.ShapeType() > 4)
+                        {
+                            StdPrs_WFShape.Add(thePrs, myshape, myDrawer);
+                        }
+                        else
+                        {
+                            if (IsInfinite())
+                            {
+                                StdPrs_WFShape.Add(thePrs, myshape, myDrawer);
+                            }
+                            else
+                            {
+                                /* try
+                                 {*/
+                                //OCC_CATCH_SIGNALS
+                                StdPrs_ShadedShape.Add(thePrs, myshape, myDrawer,
+                                                         myDrawer.ShadingAspect().Aspect().ToMapTexture()
+                                                     && myDrawer.ShadingAspect().Aspect().TextureMap() != null,
+                                                         myUVOrigin, myUVRepeat, myUVScale);
 
-						//break;
-					}
+                                /*
+                                }
+                                catch (Standard_Failure const&anException)
+          {
+                                    Message::SendFail(TCollection_AsciiString("Error: AIS_Shape::Compute() shaded presentation builder has failed (")
+                                                     + anException.GetMessageString() + ")");
+                                    StdPrs_WFShape::Add(thePrs, myshape, myDrawer);
+                                }*/
+                            }
+                        }
+                        break;
+                    }
 
-			}
+            }
         }
 
-        
-        
-        public AIS_Shape( )
+
+
+        public AIS_Shape()
         {
 
         }
         public AIS_Shape(TopoDS_Shape theShape)
         {
             myshape = (theShape);
-            
+
         }
 
 

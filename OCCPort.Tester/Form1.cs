@@ -309,6 +309,12 @@ namespace OCCPort.Tester
 			//shape.Compute(sm,);
 			GravityViewManager.View.Redraw();
 		}
+
+        private void toolStripButton9_Click(object sender, EventArgs e)
+        {
+            GravityViewManager.View.Redraw();
+
+        }
     }
 
 }

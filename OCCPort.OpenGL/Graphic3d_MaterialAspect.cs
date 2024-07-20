@@ -1,12 +1,8 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 
 namespace OCCPort.OpenGL
 {
-	internal class Graphic3d_MaterialAspect
-	{
-		internal float Alpha()
-		{
-			throw new NotImplementedException();
-		}
-	}
+    
+
 }

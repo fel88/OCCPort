@@ -56,6 +56,7 @@
     <Compile Include="Graphic3d_ShaderManager.cs" />
     <Compile Include="Graphic3d_TextureSet.cs" />
     <Compile Include="Graphic3d_TypeOfPrimitiveArray.cs" />
+    <Compile Include="Graphic3d_TypeOfReflection.cs" />
     <Compile Include="Graphic3d_TypeOfShadingModel.cs" />
     <Compile Include="Graphic3d_ZLayerId.cs" />
     <Compile Include="Graphic3d_ZLayerSettings.cs" />
@@ -84,6 +85,7 @@
     <Compile Include="OpenGl_Group.cs" />
     <Compile Include="OpenGl_IndexBuffer.cs" />
     <Compile Include="OpenGl_IndexBufferCompat.cs" />
+    <Compile Include="OpenGl_IndexedLayerIterator.cs" />
     <Compile Include="OpenGl_Layer.cs" />
     <Compile Include="OpenGl_LayerList.cs" />
     <Compile Include="OpenGl_LayerStack.cs" />

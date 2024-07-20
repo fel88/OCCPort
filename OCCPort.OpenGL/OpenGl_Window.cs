@@ -21,27 +21,80 @@ namespace OCCPort
 
         public int Width() { return mySize.x(); }
         public int Height() { return mySize.y(); }
+        // =======================================================================
+        // function : Resize
+        // purpose  : call_subr_resize
+        // =======================================================================
+        void Resize()
+        {
+            Graphic3d_Vec2i aWinSize;
+            int xx, yy;
+            mySizeWindow.Size(out xx, out yy);
+            aWinSize = new Graphic3d_Vec2i(xx, yy);
+            if (mySize.x() == aWinSize.x() && mySize.y() == aWinSize.y())
+            {
+                // if the size is not changed - do nothing
+                return;
+            }
 
-		internal OpenGl_Context GetGlContext()
-		{
+            mySize = aWinSize;
+
+            init();
+        }
+
+        // =======================================================================
+        // function : Activate
+        // purpose  :
+        // =======================================================================
+        bool Activate()
+        {
+            return myGlContext.MakeCurrent();
+        }
+
+        // =======================================================================
+        // function : init
+        // purpose  :
+        // =======================================================================
+        void init()
+        {
+            if (!Activate())
+            {
+                return;
+            }
+
+
+
+            //myGlContext->core11fwd->glDisable(GL_DITHER);
+            //  myGlContext->core11fwd->glDisable(GL_SCISSOR_TEST);
+            int[] aViewport = new[] { 0, 0, mySize.x(), mySize.y() };
+            /*   myGlContext->ResizeViewport(aViewport);
+               myGlContext->SetDrawBuffer(GL_BACK);
+               if (myGlContext->core11ffp != NULL)
+               {
+                   myGlContext->core11ffp->glMatrixMode(GL_MODELVIEW);
+               }*/
+        }
+
+        internal OpenGl_Context GetGlContext()
+        {
             return myGlContext;
-		}
+        }
 
-		internal void Init(OpenGl_GraphicDriver theDriver, 
+        internal void Init(OpenGl_GraphicDriver theDriver,
             Aspect_Window thePlatformWindow,
-            Aspect_Window theSizeWindow, 
+            Aspect_Window theSizeWindow,
             Aspect_RenderingContext theGContext,
-            OpenGl_Caps theCaps, 
+            OpenGl_Caps theCaps,
             OpenGl_Context theShareCtx)
-		{
-			myGlContext = new OpenGl_Context(theCaps);
-			//myOwnGContext = (theGContext == 0);
-			myPlatformWindow = thePlatformWindow;
-			mySizeWindow = theSizeWindow;
-			//mySwapInterval = theCaps->swapInterval;
+        {
+            myGlContext = new OpenGl_Context(theCaps);
+            //myOwnGContext = (theGContext == 0);
+            myPlatformWindow = thePlatformWindow;
+            mySizeWindow = theSizeWindow;
+            //mySwapInterval = theCaps->swapInterval;
 
 
-		}
-	}
+        }
+    }
 
 }

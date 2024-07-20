@@ -1,6 +1,6 @@
 ﻿namespace OCCPort.Tester
 {
-	internal class Prs3d_Root
+	public class Prs3d_Root
 	{
 	}
 }

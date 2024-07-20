@@ -20,7 +20,7 @@ namespace OCCPort
 		//! Returns layer with given ID or NULL if undefined.
 		public abstract Graphic3d_Layer Layer(Graphic3d_ZLayerId theLayerId);
 
-		void Update(Graphic3d_ZLayerId theLayerId = Graphic3d_ZLayerId.Graphic3d_ZLayerId_UNKNOWN)
+		public void Update(Graphic3d_ZLayerId theLayerId = Graphic3d_ZLayerId.Graphic3d_ZLayerId_UNKNOWN)
 		{
 			InvalidateZLayerBoundingBox(theLayerId);
 		}
@@ -59,7 +59,7 @@ namespace OCCPort
 		protected Graphic3d_CubeMap myCubeMapBackground;  //!< Cubemap displayed at background
 		protected Graphic3d_StructureManager myStructureManager;
 		protected Graphic3d_Camera myCamera;
-		protected Graphic3d_SequenceOfStructure myStructsToCompute;
+		protected Graphic3d_SequenceOfStructure myStructsToCompute = new Graphic3d_SequenceOfStructure();
 		protected Graphic3d_SequenceOfStructure myStructsComputed;
 		protected Graphic3d_MapOfStructure myStructsDisplayed;
 		protected bool myIsInComputedMode;
@@ -333,7 +333,7 @@ namespace OCCPort
 		{
 			int aStructId = theStructure.Identification();
 			int aStructIndex = 1;
-			foreach (var aStructIter in myStructsToCompute.list)
+			foreach (var aStructIter in myStructsToCompute)
 			{
 				Graphic3d_Structure aStruct = aStructIter;
 				if (aStruct.Identification() == aStructId)

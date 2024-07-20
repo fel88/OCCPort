@@ -1,6 +1,11 @@
-﻿namespace OCCPort
+﻿using System;
+
+namespace OCCPort
 {
-    internal class Graphic3d_AspectFillArea3d
+    public class Graphic3d_AspectFillArea3d: Graphic3d_Aspects
     {
+        
+
+        
     }
 }
