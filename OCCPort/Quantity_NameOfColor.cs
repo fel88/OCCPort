@@ -4,7 +4,7 @@
     //! Definition of names of known colors.
     //! The names come (mostly) from the X11 specification.
     public enum Quantity_NameOfColor
-    {
+    {        
         Quantity_NOC_BLACK,
         Quantity_NOC_MATRABLUE,
         Quantity_NOC_MATRAGRAY,

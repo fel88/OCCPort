@@ -50,10 +50,48 @@ namespace OCCPort
                 List<Quantity_StandardColor> l = new List<Quantity_StandardColor>();
                 var ss = new StringReader(rr);
                 string str = null;
+                List<Quantity_StandardColor> ret = new List<Quantity_StandardColor>();
                 while ((str = ss.ReadLine()) != null)
-                {
+                {/*
+                  
+// Note that HTML/hex sRGB representation is ignored
+#define RawColor(theName, theHex, SRGB, sR, sG, sB, RGB, theR, theG, theB) \
+  Quantity_StandardColor(Quantity_NOC_##theName, #theName, NCollection_Vec3<float>(sR##f, sG##f, sB##f), NCollection_Vec3<float>(theR##f, theG##f, theB##f))
+*/
+
+                    var spl = str.Replace("RawColor", "").Split(new char[] { '(', ')', ',' }, StringSplitOptions.RemoveEmptyEntries).Select(z => z.Trim()).Where(z => !string.IsNullOrEmpty(z)).ToArray();
+
+
+                    var name = "Quantity_NOC_" + spl[0];
+                    var r = float.Parse(spl[7]);
+                    var g = float.Parse(spl[8]);
+                    var b = float.Parse(spl[9]);
+                    float[] rgb = new float[] {
+                         r,g,b
+                    };
+
+                    r = float.Parse(spl[3]);
+                    g = float.Parse(spl[4]);
+                    b = float.Parse(spl[5]);
+                    var s = Convert.ToUInt32(spl[2], 16);
+                    float[] srgb = new float[] {
+                        s, r,g,b
+                    };
+
+
+                    ret.Add(new Quantity_StandardColor()
+                    {
+                        StringName = name,
+                        RgbValues = rgb,
+                        sRgbValues = srgb,
+                        EnumName = (Quantity_NameOfColor)Enum.Parse(typeof(Quantity_NameOfColor), name)
+                    });
+
+
+
                     //parse str
                 }
+                _the_colors = ret.ToArray();
             }
             var fr = _the_colors.First(z => theName.ToString().Contains(z.StringName));
             return fr;
