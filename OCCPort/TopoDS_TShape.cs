@@ -13,10 +13,14 @@ namespace OCCPort
         //! VERTEX, EDGE, WIRE, FACE, ....
         public abstract TopAbs_ShapeEnum ShapeType();
 
+        //! Returns the number of direct sub-shapes (children).
+        //! @sa TopoDS_Iterator for accessing sub-shapes
+        public int NbChildren()  { return myShapes.Size(); }
 
 
-        //! Returns the checked flag.
-        public bool Checked()  { return ((myFlags & (int)TopoDS_TShape_Flags.TopoDS_TShape_Flags_Checked) != 0); }
+
+    //! Returns the checked flag.
+    public bool Checked()  { return ((myFlags & (int)TopoDS_TShape_Flags.TopoDS_TShape_Flags_Checked) != 0); }
 
 
     //! Sets the checked flag.

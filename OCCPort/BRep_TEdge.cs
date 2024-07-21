@@ -4,7 +4,10 @@ namespace OCCPort
 {
     internal class BRep_TEdge : TopoDS_TEdge
     {//=======================================================================
-
+        public bool Degenerated()
+        {
+            return (myFlags & DegeneratedMask) != 0;
+        }
         public BRep_TEdge()
 
 

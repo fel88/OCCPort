@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace OCCPort
 {
@@ -10,6 +11,11 @@ namespace OCCPort
         {
             get { return list[i]; }
             set { list[i] = value; }
+        }
+
+        internal void Add(TopoDS_Iterator topoDS_Iterator)
+        {
+            list.Add(topoDS_Iterator);
         }
     }
 }

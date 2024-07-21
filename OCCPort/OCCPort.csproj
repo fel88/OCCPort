@@ -284,6 +284,7 @@
     <Compile Include="ShaderVariable.cs" />
     <Compile Include="Standard_DomainError.cs" />
     <Compile Include="Standard_Integer.cs" />
+    <Compile Include="Standard_NoMoreObject_Exception.cs" />
     <Compile Include="Standard_OutOfRange.cs" />
     <Compile Include="Standard_ProgramError.cs" />
     <Compile Include="Standard_Size.cs" />

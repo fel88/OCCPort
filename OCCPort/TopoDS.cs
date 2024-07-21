@@ -19,18 +19,34 @@ namespace OCCPort
             //return *(TopoDS_Solid*)&S;
         }
 
-        internal static TopoDS_Edge Edge(TopoDS_Shape theShape)
+        internal static TopoDS_Edge Edge(TopoDS_Shape S)
         {
+            if (S is TopoDS_Edge)
+            {
+                return S as TopoDS_Edge;
+            }
+            throw new ArgumentException("\"TopoDS::Edge\"");
+            //t Standard_TypeMismatch_Raise_if(TopoDS_Mismatch(S, TopAbs_EDGE),"TopoDS::Edge");
+            //return *(TopoDS_Edge*)&S;
+        }
+
+		internal static TopoDS_Face Face(TopoDS_Shape S)
+        {
+            if (S is TopoDS_Face)
+            {
+                return S as TopoDS_Face;
+            }
+            throw new ArgumentException("\"TopoDS::Face\"");
             throw new NotImplementedException();
         }
 
-		internal static TopoDS_Face Face(TopoDS_Shape topoDS_Shape)
+        internal static TopoDS_Shell Shell(TopoDS_Shape S)
         {
-            throw new NotImplementedException();
-        }
-
-        internal static TopoDS_Shell Shell(TopoDS_Shape myShape)
-        {
+            if (S is TopoDS_Shell)
+            {
+                return S as TopoDS_Shell;
+            }
+            throw new ArgumentException("\"TopoDS::Shell\"");
             throw new NotImplementedException();
         }
     }

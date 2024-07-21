@@ -13,17 +13,19 @@ namespace OCCPort
 
 
         //! Returns the checked flag.
-        public bool Checked()  { return myTShape.Checked();
-    }
+        public bool Checked()
+        {
+            return myTShape.Checked();
+        }
 
-    //! Sets the checked flag.
-    public void Checked(bool theIsChecked) { myTShape.Checked(theIsChecked); }
+        //! Sets the checked flag.
+        public void Checked(bool theIsChecked) { myTShape.Checked(theIsChecked); }
 
 
 
 
-    //! Returns the locked flag.
-    public bool Locked()
+        //! Returns the locked flag.
+        public bool Locked()
         {
             return myTShape.Locked();
         }
@@ -126,9 +128,11 @@ namespace OCCPort
             return aShape;
         }
 
-        internal int NbChildren()
+        //! Returns the number of direct sub-shapes (children).
+        //! @sa TopoDS_Iterator for accessing sub-shapes
+        public int NbChildren()
         {
-            throw new NotImplementedException();
+            return myTShape == null ? 0 : myTShape.NbChildren();
         }
     }
 }

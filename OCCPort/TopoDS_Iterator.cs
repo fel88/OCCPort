@@ -25,6 +25,11 @@ namespace OCCPort
         {
             Initialize(S, cumOri, cumLoc);
         }
+
+        public TopoDS_Iterator(TopoDS_Iterator topoDS_Iterator)
+        {
+        }
+
         //! Returns the current sub-shape in the shape which
         //! this iterator is scanning.
         //! Exceptions

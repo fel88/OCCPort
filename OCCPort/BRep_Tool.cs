@@ -55,7 +55,10 @@ namespace OCCPort
 
         private static bool Degenerated(TopoDS_Edge e)
         {
-            throw new NotImplementedException();
+            BRep_TEdge TE = e.TShape() as BRep_TEdge;
+
+            //const BRep_TEdge* TE = static_cast <const BRep_TEdge*> (E.TShape().get());
+            return TE.Degenerated();
         }
 
         internal static double Surface(double f, TopLoc_Location l)
