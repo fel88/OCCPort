@@ -4,9 +4,7 @@ namespace OCCPort.Tester
 {
     public class Graphic3d_ArrayOfSegments : Graphic3d_ArrayOfPrimitives
     {
-        public Graphic3d_ArrayOfSegments()
-        {
-        }
+        
 
         public Graphic3d_ArrayOfSegments(int theMaxVertexs,
                              int theMaxEdges = 0,

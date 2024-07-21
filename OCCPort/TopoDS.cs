@@ -30,7 +30,7 @@ namespace OCCPort
             //return *(TopoDS_Edge*)&S;
         }
 
-		internal static TopoDS_Face Face(TopoDS_Shape S)
+		public static TopoDS_Face Face(TopoDS_Shape S)
         {
             if (S is TopoDS_Face)
             {

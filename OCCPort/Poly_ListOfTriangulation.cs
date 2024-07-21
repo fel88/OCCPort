@@ -1,19 +1,37 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace OCCPort
 {
-	internal class Poly_ListOfTriangulation
+	internal class Poly_ListOfTriangulation: List<Poly_Triangulation>
 	{
-		public List<Poly_Triangulation> list = new List<Poly_Triangulation>();
-		public bool IsEmpty()
+		
+
+        public void Clear()
+        {
+            this.Clear();
+        }
+        public void Append(Poly_Triangulation p)
+        {
+            this.Add(p);
+        }
+        
+        public void Set(int index,Poly_Triangulation p)
+        {
+            this[index] = p; 
+        }
+
+        public bool IsEmpty()
 		{
-			return list.Count == 0;
+			return this.Count == 0;
 		}
 
 		internal Poly_Triangulation First()
 		{
-			return list[0];
+			return this[0];
 		}
-	}
+
+        
+    }
 }

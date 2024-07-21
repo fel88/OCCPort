@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace OCCPort.Tester
 {
@@ -69,7 +70,7 @@ namespace OCCPort.Tester
             //                    theVolume == StdPrs_Volume_Closed);
             //}
 
-           // if (theDrawer.FaceBoundaryDraw())
+            // if (theDrawer.FaceBoundaryDraw())
             {
                 Graphic3d_ArrayOfSegments aBndSegments = fillFaceBoundaries(theShape, theDrawer.FaceBoundaryUpperContinuity());
                 if (aBndSegments != null)
@@ -89,7 +90,7 @@ namespace OCCPort.Tester
             int aNodeNumber = 0;
             int aNbPolylines = 0;
 
-            TopLoc_Location aTrsf;
+            TopLoc_Location aTrsf = new TopLoc_Location();
 
             TColgp_SequenceOfPnt aSeqPntsExtra = null;
             for (TopExp_Explorer aFaceIter = new TopExp_Explorer(theShape, TopAbs_ShapeEnum.TopAbs_FACE); aFaceIter.More(); aFaceIter.Next())
@@ -107,6 +108,61 @@ namespace OCCPort.Tester
                 }
             }
 
+            // explore all boundary edges
+            TopTools_IndexedDataMapOfShapeListOfShape anEdgesMap = new TopTools_IndexedDataMapOfShapeListOfShape();
+            TopExp.MapShapesAndAncestors(theShape, TopAbs_ShapeEnum.  TopAbs_EDGE, TopAbs_ShapeEnum.TopAbs_FACE, anEdgesMap);
+            foreach (var item in anEdgesMap.items)
+
+            //  for (TopTools_IndexedDataMapOfShapeListOfShape::Iterator anEdgeIter (anEdgesMap); anEdgeIter.More(); anEdgeIter.Next())
+            {
+                var anEdgeIter = item ;
+                // reject free edges
+                if (anEdgeIter.list.Extent() == 0)
+                {
+                    continue;
+                }
+
+                // take one of the shared edges and get edge triangulation
+                TopoDS_Face aFace = TopoDS.Face(anEdgeIter.list.First());
+                Poly_Triangulation aTriangulation = BRep_Tool.Triangulation(aFace, ref aTrsf);
+                if (aTriangulation == null)
+                {
+                    continue;
+                }
+
+                 TopoDS_Edge anEdge = TopoDS.Edge(anEdgeIter.shape);
+                if (theUpperContinuity < GeomAbs_Shape. GeomAbs_CN
+                 && anEdgeIter.list.Extent() >= 2
+                 && BRep_Tool.MaxContinuity(anEdge) > theUpperContinuity)
+                {
+                    continue;
+                }
+
+                Poly_PolygonOnTriangulation anEdgePoly = BRep_Tool.PolygonOnTriangulation(anEdge, aTriangulation, aTrsf);
+                if (anEdgePoly!=null
+                  && anEdgePoly.Nodes().Length() >= 2)
+                {
+                    aNodeNumber += anEdgePoly.Nodes().Length();
+                    ++aNbPolylines;
+                }
+            }
+             int aNbExtra = aSeqPntsExtra!=null ? aSeqPntsExtra.Size() : 0;
+            if (aNodeNumber == 0)
+            {
+                if (aNbExtra < 2)
+                {
+                    return null;
+                }
+
+                Graphic3d_ArrayOfSegments aSegments = new Graphic3d_ArrayOfSegments(aNbExtra);
+                foreach (var aPntIter in aSeqPntsExtra.list)
+                
+                //for (TColgp_SequenceOfPnt::Iterator aPntIter (*aSeqPntsExtra); aPntIter.More(); aPntIter.Next())
+                {
+                    aSegments.AddVertex(aPntIter);
+                }
+                return aSegments;
+            }
             return null;
         }
     }

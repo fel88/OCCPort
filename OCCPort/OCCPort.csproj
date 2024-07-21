@@ -76,6 +76,8 @@
     <Compile Include="Bnd_Box.cs" />
     <Compile Include="BRepBuilderAPI_Command.cs" />
     <Compile Include="BRepBuilderAPI_MakeShape.cs" />
+    <Compile Include="BRepMesh_DiscretRoot.cs" />
+    <Compile Include="BRepMesh_IncrementalMesh.cs" />
     <Compile Include="BRepPrimAPI_MakeBox.cs" />
     <Compile Include="BRepPrimAPI_MakeOneAxis.cs" />
     <Compile Include="BRepPrim_Builder.cs" />
@@ -84,6 +86,7 @@
     <Compile Include="BRepPrim_OneAxis.cs" />
     <Compile Include="BRepPrim_Wedge.cs" />
     <Compile Include="BRepTools.cs" />
+    <Compile Include="BRepTools_Modification.cs" />
     <Compile Include="BRep_Builder.cs" />
     <Compile Include="BRep_Curve3D.cs" />
     <Compile Include="BRep_CurveOnSurface.cs" />
@@ -139,11 +142,13 @@
     <Compile Include="Graphic3d_AspectFillArea3d.cs" />
     <Compile Include="Graphic3d_AspectLine3d.cs" />
     <Compile Include="Graphic3d_Aspects.cs" />
+    <Compile Include="Graphic3d_AttribBuffer.cs" />
     <Compile Include="Graphic3d_Attribute.cs" />
     <Compile Include="Graphic3d_BndBox3d.cs" />
     <Compile Include="Graphic3d_BndBox4f.cs" />
     <Compile Include="Graphic3d_BoundBuffer.cs" />
     <Compile Include="Graphic3d_Buffer.cs" />
+    <Compile Include="Graphic3d_BufferRange.cs" />
     <Compile Include="Graphic3d_BvhCStructureSet.cs" />
     <Compile Include="Graphic3d_BvhCStructureSetTrsfPers.cs" />
     <Compile Include="Graphic3d_CameraTile.cs" />
@@ -225,6 +230,7 @@
     <Compile Include="LayersCollection.cs" />
     <Compile Include="Message_ProgressRange.cs" />
     <Compile Include="MyLayersDic.cs" />
+    <Compile Include="NCollection_BaseAllocator.cs" />
     <Compile Include="NCollection_Buffer.cs" />
     <Compile Include="NCollection_ListNode.cs" />
     <Compile Include="NCollection_Map.cs" />
@@ -237,6 +243,7 @@
     <Compile Include="OpenGl_RenderFilter.cs" />
     <Compile Include="Poly_ListOfTriangulation.cs" />
     <Compile Include="Poly_MeshPurpose.cs" />
+    <Compile Include="Poly_PolygonOnTriangulation.cs" />
     <Compile Include="Poly_Triangulation.cs" />
     <Compile Include="Precision.cs" />
     <Compile Include="Prs3d.cs" />
@@ -333,7 +340,11 @@
     <Compile Include="TopoDS_UnCompatibleShapes.cs" />
     <Compile Include="TopoDS_Vertex.cs" />
     <Compile Include="TopoDS_Wire.cs" />
+    <Compile Include="TopTools_IndexedDataMapOfShapeListOfShape.cs" />
+    <Compile Include="TopTools_IndexedDataMapOfShapeListOfShape1.cs" />
+    <Compile Include="TopTools_ListOfShape.cs" />
     <Compile Include="TopTools_ShapeMapHasher.cs" />
+    <Compile Include="TopTools_ShapeMapHasher1.cs" />
     <Compile Include="TransformMatrices.cs" />
     <Compile Include="V3d.cs" />
     <Compile Include="V3d_BadValue.cs" />

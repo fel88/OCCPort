@@ -1,11 +1,12 @@
 ﻿using OCCPort;
+using OCCPort.Tester;
 using System;
 using System.Collections.Generic;
 using System.Security.Policy;
 
 namespace OCCPort
 {
-    internal class BRep_Tool
+    public class BRep_Tool
     {
 
         public static bool IsClosed(TopoDS_Shape theShape)
@@ -75,14 +76,45 @@ namespace OCCPort
 
         }
 
-		internal static Poly_Triangulation Triangulation(TopoDS_Face aFace, ref TopLoc_Location aLocation)
-		{
-			throw new NotImplementedException();
-		}
+        public static Poly_Triangulation Triangulation(TopoDS_Face theFace,
+            ref TopLoc_Location theLocation,
+            Poly_MeshPurpose theMeshPurpose = Poly_MeshPurpose.Poly_MeshPurpose_NONE)
+        {
+            theLocation = theFace.Location();
+            var aTFace = theFace.TShape() as BRep_TFace;
+            //const BRep_TFace* aTFace = static_cast <const BRep_TFace*> (theFace.TShape().get());
+            return aTFace.Triangulation(theMeshPurpose);
+        }
 
         internal static Geom_Surface Surface(TopoDS_Face aFace, TopLoc_Location aDummyLoc)
         {
             throw new NotImplementedException();
+        }
+
+        internal static Poly_PolygonOnTriangulation PolygonOnTriangulation(TopoDS_Edge anEdge, Poly_Triangulation aTriangulation, TopLoc_Location aTrsf)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal static GeomAbs_Shape MaxContinuity(TopoDS_Edge theEdge)
+        {
+            GeomAbs_Shape aMaxCont = GeomAbs_Shape.GeomAbs_C0;
+            var curves = ((BRep_TEdge)theEdge.TShape()).ChangeCurves();
+            //for (BRep_ListIteratorOfListOfCurveRepresentation aReprIter ((*((Handle(BRep_TEdge) *) & theEdge.TShape()))->ChangeCurves());
+            //  aReprIter.More(); aReprIter.Next())
+            foreach (var aReprIter in curves.list)
+            {
+                BRep_CurveRepresentation aRepr = aReprIter;
+                if (aRepr.IsRegularity())
+                {
+                    GeomAbs_Shape aCont = aRepr.Continuity();
+                    if ((int)aCont > (int)aMaxCont)
+                    {
+                        aMaxCont = aCont;
+                    }
+                }
+            }
+            return aMaxCont;
         }
     }
 }

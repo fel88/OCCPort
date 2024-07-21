@@ -8,12 +8,25 @@
         {
             throw new Standard_DomainError("BRep_CurveRepresentation");
         }
+        public virtual bool IsRegularity()
+        {
+            return false;
+        }
 
         public bool IsCurveOnSurface(Geom_Surface a, TopLoc_Location f)
         {
             return false;
         }
 
+        //=======================================================================
+        //function : Continuity
+        //purpose  : 
+        //=======================================================================
+
+        public virtual GeomAbs_Shape Continuity()
+        {
+            throw new Standard_DomainError("BRep_CurveRepresentation");
+        }
 
         public void Curve3D(Geom_Curve cc)
         {

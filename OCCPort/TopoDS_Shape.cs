@@ -1,6 +1,7 @@
 ﻿using OCCPort;
 using System;
 using System.Runtime.Remoting.Messaging;
+using System.Security.Cryptography;
 
 namespace OCCPort
 {
@@ -10,7 +11,15 @@ namespace OCCPort
         {
             myOrient = TopAbs_Orientation.TopAbs_EXTERNAL;
         }
-
+        public static int idx = 0;
+        public int HashCode(int theUpperBound)
+        {
+            return idx++;
+            // PKV
+            //  //int aHS = ::HashCode(myTShape.get(), theUpperBound);
+            //  int aHL = myLocation.HashCode(theUpperBound);
+            //  return ::HashCode(aHS ^ aHL, theUpperBound);
+        }
 
         //! Returns the checked flag.
         public bool Checked()
@@ -133,6 +142,16 @@ namespace OCCPort
         public int NbChildren()
         {
             return myTShape == null ? 0 : myTShape.NbChildren();
+        }
+
+
+        //! Returns True if two shapes are same, i.e.  if they
+        //! share  the  same TShape  with the same  Locations.
+        //! Orientations may differ.
+        public bool IsSame(TopoDS_Shape theOther)
+        {
+            return myTShape == theOther.myTShape
+                && myLocation == theOther.myLocation;
         }
     }
 }

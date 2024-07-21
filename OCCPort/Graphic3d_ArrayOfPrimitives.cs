@@ -38,29 +38,30 @@ namespace OCCPort
             myType = theType;
             /*myNormData = NULL;
             myTexData = NULL;
-            myColData = NULL;
-            myAttribs.Nullify();
+            myColData = NULL;*/
+            myAttribs = null;
+            /*
             myIndices.Nullify();
             myBounds.Nullify();*/
 
-                   //NCollection_BaseAllocator)&anAlloc = Graphic3d_Buffer::DefaultAllocator();
+            NCollection_BaseAllocator anAlloc = Graphic3d_Buffer.DefaultAllocator();
 
-            //      if ((theArrayOptions & Graphic3d_ArrayFlags_AttribsMutable) != 0
-            //       || (theArrayOptions & Graphic3d_ArrayFlags_AttribsDeinterleaved) != 0)
-            //      {
-            //          Graphic3d_AttribBuffer* anAttribs = new Graphic3d_AttribBuffer(anAlloc);
-            //          anAttribs->SetMutable((theArrayOptions & Graphic3d_ArrayFlags_AttribsMutable) != 0);
-            //          anAttribs->SetInterleaved((theArrayOptions & Graphic3d_ArrayFlags_AttribsDeinterleaved) == 0);
-            //          myAttribs = anAttribs;
-            //      }
-            //      else
-            //      {
-            //          myAttribs = new Graphic3d_Buffer(anAlloc);
-            //      }
-            //      if (theMaxVertexs < 1)
-            //      {
-            //          return;
-            //      }
+            if ((theArrayOptions &  Graphic3d_ArrayFlags. Graphic3d_ArrayFlags_AttribsMutable) != 0
+             || (theArrayOptions & Graphic3d_ArrayFlags.Graphic3d_ArrayFlags_AttribsDeinterleaved) != 0)
+            {
+                Graphic3d_AttribBuffer anAttribs = new Graphic3d_AttribBuffer(anAlloc);
+                anAttribs.SetMutable((theArrayOptions & Graphic3d_ArrayFlags. Graphic3d_ArrayFlags_AttribsMutable) != 0);
+                anAttribs.SetInterleaved((theArrayOptions & Graphic3d_ArrayFlags. Graphic3d_ArrayFlags_AttribsDeinterleaved) == 0);
+                myAttribs = anAttribs;
+            }
+            else
+            {
+                myAttribs = new Graphic3d_Buffer(anAlloc);
+            }
+            if (theMaxVertexs < 1)
+            {
+                return;
+            }
 
             //      if (theMaxEdges > 0)
             //      {

@@ -67,7 +67,7 @@ namespace OCCPort.Tester
             AddEdgesOnTriangulation(aSeqPnts, theShape, theToExcludeGeometric);
             if (aSeqPnts.Size() < 2)
             {
-                return new Graphic3d_ArrayOfSegments();
+                return null;
             }
 
             int aNbVertices = aSeqPnts.Size();

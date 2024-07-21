@@ -317,6 +317,26 @@ namespace OCCPort.Tester
             GravityViewManager.View.Redraw();
 
         }
+
+        private void toolStripButton10_Click(object sender, EventArgs e)
+        {
+            gp_Pnt p1 = new gp_Pnt(0, 0, 0);
+            gp_Pnt p2 = new gp_Pnt(10, 10, 10);
+            BRepPrimAPI_MakeBox box = new BRepPrimAPI_MakeBox(p1, p2);
+
+            box.Build();
+            var solid = box.Solid();
+            var shape = new AIS_Shape(solid).Shape();
+            var sm = v3d_viewer.StructureManager();
+            
+            for (TopExp_Explorer aExpFace = new TopExp_Explorer(shape, TopAbs_ShapeEnum.TopAbs_FACE); aExpFace.More(); aExpFace.Next())
+            {
+                TopoDS_Face aFace = TopoDS.Face(aExpFace.Current());
+                TopAbs_Orientation faceOrientation = aFace.Orientation();
+                TopLoc_Location aLocation = new TopLoc_Location();
+                Poly_Triangulation aTr = BRep_Tool.Triangulation(aFace, ref aLocation);
+            }
+        }
     }
 
 }

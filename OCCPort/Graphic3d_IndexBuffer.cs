@@ -1,7 +1,10 @@
 ﻿namespace OCCPort
 {
     public class Graphic3d_IndexBuffer : Graphic3d_Buffer
-    {
+    {  //! Empty constructor.
+     public   Graphic3d_IndexBuffer(NCollection_BaseAllocator theAlloc)
+  : base(theAlloc) { }
+
         //! Access index at specified position
         public int Index(int theIndex)
         {

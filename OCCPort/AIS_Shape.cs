@@ -85,10 +85,18 @@ namespace OCCPort.Tester
 
         }
         public AIS_Shape(TopoDS_Shape theShape)
+            : base(PrsMgr_TypeOfPresentation3d.PrsMgr_TOP_ProjectorDependent)
         {
-            myshape = (theShape);
-
+            myshape = theShape;
+            myUVOrigin = new gp_Pnt2d(0.0, 0.0);
+            myUVRepeat = new gp_Pnt2d(1.0, 1.0);
+            myUVScale = new gp_Pnt2d(1.0, 1.0);
+            myInitAng = 0.0;
+            myCompBB = true;
         }
+
+        //! Returns this shape object.
+        public TopoDS_Shape Shape() { return myshape; }
 
 
         protected TopoDS_Shape myshape;    //!< shape to display

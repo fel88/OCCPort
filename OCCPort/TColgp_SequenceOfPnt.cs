@@ -10,7 +10,7 @@ namespace OCCPort.Tester
 			return list.Count;
 		}
 
-		List<gp_Pnt> list = new List<gp_Pnt>();
+		public List<gp_Pnt> list = new List<gp_Pnt>();
 		public gp_Pnt Value(int index)
 		{
 			return list[index];

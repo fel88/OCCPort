@@ -60,7 +60,7 @@ namespace OCCPort
     //! For example searching edges  not in a vertex  does
     //! not make a difference.
 
-    internal class TopExp_Explorer
+    public class TopExp_Explorer
     {
         public TopExp_Explorer(TopoDS_Shape theS,
             TopAbs_ShapeEnum theToFind,
@@ -132,7 +132,7 @@ namespace OCCPort
 
         }
 
-        internal TopoDS_Shape Current()
+        public TopoDS_Shape Current()
         {
             //Standard_NoSuchObject_Raise_if(!hasMore, "TopExp_Explorer::Current");
             if (myTop >= 0)
@@ -173,7 +173,7 @@ namespace OCCPort
             return (x) > (y);
         }
 
-        internal void Next()
+        public void Next()
         {
             int NewSize;
             TopoDS_Shape ShapTop;

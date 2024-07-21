@@ -37,7 +37,7 @@ namespace OCCPort
             else myFlags &= ~RangeMask;
         }
 
-        internal BRep_ListOfCurveRepresentation ChangeCurves()
+        public BRep_ListOfCurveRepresentation ChangeCurves()
         {
             return myCurves;
         }
