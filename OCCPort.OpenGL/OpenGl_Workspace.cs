@@ -14,7 +14,11 @@ namespace OCCPort.OpenGL
 			throw new NotImplementedException();
 		}
 
-		internal OpenGl_Aspects Aspects()
+        //! @return true if usage of Z buffer is enabled.
+        public bool UseZBuffer() { return myUseZBuffer; }
+        
+
+        internal OpenGl_Aspects Aspects()
 		{
 			throw new NotImplementedException();
 		}
@@ -119,7 +123,13 @@ namespace OCCPort.OpenGL
 		{
 			return myView;
 		}
-		OpenGl_View myView;
+
+        internal void SetUseDepthWrite(bool v)
+        {
+			myUseDepthWrite = v;
+        }
+
+        OpenGl_View myView;
 		OpenGl_Window myWindow;
 		OpenGl_Context myGlContext;
 		bool myUseZBuffer;

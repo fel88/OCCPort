@@ -437,9 +437,200 @@ namespace OCCPort.OpenGL
             if (!myWorkspace.Activate())
                 return;
 
+            // no special handling of HMD display, since it will force full Redraw() due to no frame caching (myBackBufferRestored)
+            OpenGl_Context aCtx = myWorkspace.GetGlContext();
+            if (!myTransientDrawToFront
+             || !myBackBufferRestored
+             || (aCtx.caps.buffersNoSwap && !myMainSceneFbos[0].IsValid()))
+            {
+                Redraw();
+                return;
+            }
 
+            Graphic3d_StereoMode aStereoMode = myRenderParams.StereoMode;
+            Graphic3d_Camera.Projection aProjectType = myCamera.ProjectionType();
+            OpenGl_FrameBuffer aFrameBuffer = myFBO;
+            //aCtx.FrameStats()->FrameStart(myWorkspace.View(), true);
+            bool toSwap = false;
+            if (aProjectType == Graphic3d_Camera.Projection.Projection_Stereo)
+            {
+                OpenGl_FrameBuffer[] aMainFbos =
+    {
+      myMainSceneFbos[0].IsValid() ? myMainSceneFbos[0] : null,
+      myMainSceneFbos[1].IsValid() ? myMainSceneFbos[1] : null
+    };
+                OpenGl_FrameBuffer[] anImmFbos =
+    {
+      myMainSceneFbos[0].IsValid() ? myMainSceneFbos[0] : null,
+      myMainSceneFbos[1].IsValid() ? myMainSceneFbos[1] : null
+    }; OpenGl_FrameBuffer[] anImmFbosOit =
+    {
+      myMainSceneFbos[0].IsValid() ? myMainSceneFbos[0] : null,
+      myMainSceneFbos[1].IsValid() ? myMainSceneFbos[1] : null
+    };
 
+                toSwap = redrawImmediate(Graphic3d_Camera.Projection.Projection_MonoLeftEye,
+                                     aMainFbos[0],
+                                     anImmFbos[0],
+                                     anImmFbosOit[0],
+                                     true) || toSwap;
+            }
         }
+
+        private bool redrawImmediate(Graphic3d_Camera.Projection theProjection,
+                                   OpenGl_FrameBuffer theReadFbo,
+                                   OpenGl_FrameBuffer theDrawFbo,
+                                   OpenGl_FrameBuffer theOitAccumFbo,
+                                    bool theIsPartialUpdate)
+        {
+            OpenGl_Context aCtx = myWorkspace.GetGlContext();
+            bool toCopyBackToFront = false;
+            if (theDrawFbo == theReadFbo
+             && theDrawFbo != null
+             && theDrawFbo.IsValid())
+            {
+                myBackBufferRestored = false;
+                theDrawFbo.BindBuffer(aCtx);
+            }
+            else if (theReadFbo != null
+                  && theReadFbo.IsValid()
+                  && aCtx.IsRender())
+            {
+                if (!blitBuffers(theReadFbo, theDrawFbo))
+                {
+                    return true;
+                }
+            }
+            else if (theDrawFbo == null)
+            {
+                if (aCtx.GraphicsLibrary() != Aspect_GraphicsLibrary.Aspect_GraphicsLibrary_OpenGLES)
+                {
+                    
+                    aCtx.core11fwd.glGetBooleanv(GetPName.Doublebuffer, ref toCopyBackToFront);
+                }
+                if (toCopyBackToFront
+                 && myTransientDrawToFront)
+                {
+                    if (!HasImmediateStructures()
+                     && !theIsPartialUpdate)
+                    {
+                        // prefer Swap Buffers within Redraw in compatibility mode (without FBO)
+                        return true;
+                    }
+                    if (!copyBackToFront())
+                    {
+                        toCopyBackToFront = false;
+                        myBackBufferRestored = false;
+                    }
+                }
+                else
+                {
+                    toCopyBackToFront = false;
+                    myBackBufferRestored = false;
+                }
+            }
+            else
+            {
+                myBackBufferRestored = false;
+            }
+            myIsImmediateDrawn = true;
+
+            myWorkspace.SetUseZBuffer(true);
+            myWorkspace.SetUseDepthWrite(true) ;
+            aCtx.core11fwd.glDepthFunc(All.Lequal);
+            aCtx.core11fwd.glDepthMask(true);
+            aCtx.core11fwd.glEnable(All.DepthTest);
+            aCtx.core11fwd.glClearDepth(1.0);
+
+            render(theProjection, theDrawFbo, theOitAccumFbo, true);
+
+            blitSubviews(theProjection, theDrawFbo);
+
+            return !toCopyBackToFront;
+        }
+
+        private bool blitBuffers(OpenGl_FrameBuffer theReadFbo, OpenGl_FrameBuffer theDrawFbo)
+        {
+            throw new NotImplementedException();
+        }
+
+        private bool HasImmediateStructures()
+        {
+            throw new NotImplementedException();
+        }
+
+        private void blitSubviews(Graphic3d_Camera.Projection theProjection, OpenGl_FrameBuffer theDrawFbo)
+        {
+            throw new NotImplementedException();
+        }
+        
+
+        private bool copyBackToFront()
+        {
+            myIsImmediateDrawn = false;
+            OpenGl_Context aCtx = myWorkspace.GetGlContext();
+            if (aCtx.core11ffp == null)
+            {
+                return false;
+            }
+
+            /*OpenGl_Mat4 aProjectMat;
+            Graphic3d_TransformUtils.Ortho2D(aProjectMat,
+                                               0.0f, static_cast<GLfloat>(myWindow->Width()),
+                                               0.0f, static_cast<GLfloat>(myWindow->Height()));
+            */
+            aCtx.WorldViewState.Push();
+            aCtx.ProjectionState.Push();
+
+            aCtx.WorldViewState.SetIdentity();
+            //  aCtx.ProjectionState.SetCurrent(aProjectMat);
+
+            aCtx.ApplyProjectionMatrix();
+            //  aCtx.ApplyWorldViewMatrix();
+
+
+            // synchronize FFP state before copying pixels
+            aCtx.BindProgram(new OpenGl_ShaderProgram());
+            //   aCtx.ShaderManager().PushState(new OpenGl_ShaderProgram());
+            //  aCtx.DisableFeatures();
+
+            switch (aCtx.DrawBuffer())
+            {
+                case GLConstants.GL_BACK_LEFT:
+                    {
+                        aCtx.SetReadBuffer(GLConstants.GL_BACK_LEFT);
+                        aCtx.SetDrawBuffer(GLConstants.GL_FRONT_LEFT);
+                        break;
+                    }
+                case GLConstants.GL_BACK_RIGHT:
+                    {
+                        aCtx.SetReadBuffer(GLConstants.GL_BACK_RIGHT);
+                        aCtx.SetDrawBuffer(GLConstants.GL_FRONT_RIGHT);
+                        break;
+                    }
+                default:
+                    {
+                        aCtx.SetReadBuffer(GLConstants.GL_BACK);
+                        aCtx.SetDrawBuffer(GLConstants.GL_FRONT);
+                        break;
+                    }
+            }
+
+            /*aCtx->core11ffp->glRasterPos2i(0, 0);
+            aCtx->core11ffp->glCopyPixels(0, 0, myWindow->Width() + 1, myWindow->Height() + 1, GL_COLOR);
+            //aCtx->core11ffp->glCopyPixels  (0, 0, myWidth + 1, myHeight + 1, GL_DEPTH);
+
+            aCtx->EnableFeatures();
+
+            aCtx->WorldViewState.Pop();
+            aCtx->ProjectionState.Pop();
+            aCtx->ApplyProjectionMatrix();
+
+            // read/write from front buffer now
+            aCtx->SetReadBuffer(aCtx->DrawBuffer());*/
+            return true;
+        }
+
         public void renderScene(Graphic3d_Camera.Projection theProjection,
                              OpenGl_FrameBuffer theReadDrawFbo,
                              OpenGl_FrameBuffer theOitAccumFbo,
@@ -520,7 +711,7 @@ namespace OCCPort.OpenGL
             myBackBufferRestored = false;
         }
 
-        
+
 
         public override Graphic3d_Layer Layer(Graphic3d_ZLayerId theLayerId)
         {
@@ -533,7 +724,7 @@ namespace OCCPort.OpenGL
 
         }
     }
-
+    //public enum { Graphic3d_StereoMode_NB = Graphic3d_StereoMode_OpenVR + 1 };
 
 
 }

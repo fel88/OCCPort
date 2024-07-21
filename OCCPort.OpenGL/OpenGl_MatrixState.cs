@@ -1,4 +1,5 @@
 ﻿using OpenTK;
+using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,7 +31,12 @@ namespace OCCPort.OpenGL
         Graphic3d_Mat4 myCurrent;   //!< Current matrix
 
         int myStackHead; //!< Index of stack head
+                         //! Sets current matrix to identity.
+        public void SetIdentity()
+        {
 
+            myCurrent = new Graphic3d_Mat4();
+        }
 
         internal void SetCurrent(Graphic3d_Mat4 aWorldView)
         {

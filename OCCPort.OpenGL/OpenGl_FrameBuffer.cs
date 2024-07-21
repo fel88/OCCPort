@@ -42,8 +42,8 @@ namespace OCCPort
 
 
         //! Helpful constants
-        const int NO_FRAMEBUFFER = 0;
-        const int NO_RENDERBUFFER = 0;
+        public const int NO_FRAMEBUFFER = 0;
+        public const int NO_RENDERBUFFER = 0;
 
         bool isValidFrameBuffer()
         {

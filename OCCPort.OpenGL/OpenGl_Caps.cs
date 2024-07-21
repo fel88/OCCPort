@@ -2,6 +2,14 @@
 {
     public class OpenGl_Caps
     {
+        /**
+         * Specify that driver should not swap back/front buffers at the end of frame.
+         * Useful when OCCT Viewer is integrated into existing OpenGL rendering pipeline as part,
+         * thus swapping part is performed outside.
+         *
+         * OFF by default.
+         */
+        public bool buffersNoSwap;
         public bool sRGBDisable;       //!< Disables sRGB rendering (OFF by default)
         public bool compressedTexturesDisable; //!< Disables uploading of compressed texture formats native to GPU (OFF by default)
         public bool vboDisable;        //!< disallow VBO usage for debugging purposes (OFF by default)

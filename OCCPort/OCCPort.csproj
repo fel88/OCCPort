@@ -182,6 +182,7 @@
     <Compile Include="Graphic3d_ShaderProgram.cs" />
     <Compile Include="Graphic3d_ShaderVariable.cs" />
     <Compile Include="Graphic3d_ShaderVariableList.cs" />
+    <Compile Include="Graphic3d_StereoMode.cs" />
     <Compile Include="Graphic3d_Structure.cs" />
     <Compile Include="Graphic3d_StructureManager.cs" />
     <Compile Include="Graphic3d_TextureEnv.cs" />

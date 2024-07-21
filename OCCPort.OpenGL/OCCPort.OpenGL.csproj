@@ -54,7 +54,9 @@
     <Compile Include="Graphic3d_MarkerImage.cs" />
     <Compile Include="Graphic3d_MaterialAspect.cs" />
     <Compile Include="Graphic3d_ShaderManager.cs" />
+    <Compile Include="Graphic3d_StereoMode.cs" />
     <Compile Include="Graphic3d_TextureSet.cs" />
+    <Compile Include="Graphic3d_TransformUtils.cs" />
     <Compile Include="Graphic3d_TypeOfPrimitiveArray.cs" />
     <Compile Include="Graphic3d_TypeOfReflection.cs" />
     <Compile Include="Graphic3d_TypeOfShadingModel.cs" />
@@ -62,6 +64,7 @@
     <Compile Include="Graphic3d_ZLayerSettings.cs" />
     <Compile Include="MyLayersDic.cs" />
     <Compile Include="MyMapOfView.cs" />
+    <Compile Include="NCollection_Array1.cs" />
     <Compile Include="OpenGl_ArbFBO.cs" />
     <Compile Include="OpenGl_ArbFBOBlit.cs" />
     <Compile Include="OpenGl_Aspects.cs" />
@@ -79,6 +82,9 @@
     <Compile Include="OpenGl_ElementNode.cs" />
     <Compile Include="OpenGl_FilteredIndexedLayerIterator.cs" />
     <Compile Include="OpenGl_FrameBuffer.cs" />
+    <Compile Include="OpenGl_GlCore11.cs" />
+    <Compile Include="OpenGl_GlCore15.cs" />
+    <Compile Include="OpenGl_GlCore20.cs" />
     <Compile Include="OpenGl_GlobalLayerSettings.cs" />
     <Compile Include="OpenGl_GradientParameters.cs" />
     <Compile Include="OpenGl_GraphicDriver.cs" />
