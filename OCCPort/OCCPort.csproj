@@ -76,6 +76,9 @@
     <Compile Include="Bnd_Box.cs" />
     <Compile Include="BRepBuilderAPI_Command.cs" />
     <Compile Include="BRepBuilderAPI_MakeShape.cs" />
+    <Compile Include="BRepLib_ToolTriangulatedShape.cs" />
+    <Compile Include="BRepMesh_DiscretFactory.cs" />
+    <Compile Include="BRepMesh_DiscretFactory1.cs" />
     <Compile Include="BRepMesh_DiscretRoot.cs" />
     <Compile Include="BRepMesh_IncrementalMesh.cs" />
     <Compile Include="BRepPrimAPI_MakeBox.cs" />
@@ -118,6 +121,7 @@
     <Compile Include="Geom_Line.cs" />
     <Compile Include="Geom_Plane.cs" />
     <Compile Include="Geom_Surface.cs" />
+    <Compile Include="gl_Vec3.cs" />
     <Compile Include="gp.cs" />
     <Compile Include="gp_Ax1.cs" />
     <Compile Include="gp_Ax2.cs" />
@@ -173,6 +177,7 @@
     <Compile Include="Graphic3d_Mat4.cs" />
     <Compile Include="Graphic3d_Mat4d.cs" />
     <Compile Include="Graphic3d_MaterialAspect.cs" />
+    <Compile Include="Graphic3d_MutableIndexBuffer.cs" />
     <Compile Include="Graphic3d_PolygonOffset.cs" />
     <Compile Include="Graphic3d_PresentationAttributes.cs" />
     <Compile Include="Graphic3d_RenderingMode.cs" />
@@ -230,6 +235,7 @@
     <Compile Include="LayersCollection.cs" />
     <Compile Include="Message_ProgressRange.cs" />
     <Compile Include="MyLayersDic.cs" />
+    <Compile Include="NCollection_Array1.cs" />
     <Compile Include="NCollection_BaseAllocator.cs" />
     <Compile Include="NCollection_Buffer.cs" />
     <Compile Include="NCollection_ListNode.cs" />
@@ -241,8 +247,10 @@
     <Compile Include="NCollection_Vec4.cs" />
     <Compile Include="OpenGl_LayerFilter.cs" />
     <Compile Include="OpenGl_RenderFilter.cs" />
+    <Compile Include="Poly_ArrayOfNodes.cs" />
     <Compile Include="Poly_ListOfTriangulation.cs" />
     <Compile Include="Poly_MeshPurpose.cs" />
+    <Compile Include="Poly_Polygon3D.cs" />
     <Compile Include="Poly_PolygonOnTriangulation.cs" />
     <Compile Include="Poly_Triangulation.cs" />
     <Compile Include="Precision.cs" />
@@ -320,6 +328,7 @@
     <Compile Include="TopLoc_SListOfItemLocation.cs" />
     <Compile Include="TopoDS.cs" />
     <Compile Include="TopoDS_Builder.cs" />
+    <Compile Include="TopoDS_Compound.cs" />
     <Compile Include="TopoDS_Edge.cs" />
     <Compile Include="TopoDS_Face.cs" />
     <Compile Include="TopoDS_FrozenShape.cs" />
@@ -330,6 +339,7 @@
     <Compile Include="TopoDS_Shape.cs" />
     <Compile Include="TopoDS_Shell.cs" />
     <Compile Include="TopoDS_Solid.cs" />
+    <Compile Include="TopoDS_TCompound.cs" />
     <Compile Include="TopoDS_TEdge.cs" />
     <Compile Include="TopoDS_TFace.cs" />
     <Compile Include="TopoDS_TShape.cs" />

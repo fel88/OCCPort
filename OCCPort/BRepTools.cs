@@ -1,4 +1,7 @@
-﻿using System;
+﻿using OCCPort.Tester;
+using OCCPort;
+using System;
+using System.Runtime.InteropServices;
 
 namespace OCCPort
 {
@@ -9,7 +12,63 @@ namespace OCCPort
 
         }
 
+        public static bool Triangulation(TopoDS_Shape theShape,
+                                            double theLinDefl,
+                                            bool theToCheckFreeEdges)
+        {
+            TopExp_Explorer anEdgeIter;
+            TopLoc_Location aDummyLoc = new TopLoc_Location();
+            for (TopExp_Explorer aFaceIter = new TopExp_Explorer(theShape, TopAbs_ShapeEnum.TopAbs_FACE); aFaceIter.More(); aFaceIter.Next())
+            {
+                TopoDS_Face aFace = TopoDS.Face(aFaceIter.Current());
+                Poly_Triangulation aTri = BRep_Tool.Triangulation(aFace, ref aDummyLoc);
+                if (aTri == null
+                 || aTri.Deflection() > theLinDefl)
+                {
+                    return false;
+                }
 
+                //for (anEdgeIter.Init(aFace, TopAbs_ShapeEnum.TopAbs_EDGE); anEdgeIter.More(); anEdgeIter.Next())
+                //{
+                //    TopoDS_Edge anEdge = TopoDS.Edge(anEdgeIter.Current());
+                //    Poly_PolygonOnTriangulation aPoly = BRep_Tool.PolygonOnTriangulation(anEdge, aTri, aDummyLoc);
+                //    if (aPoly == null)
+                //    {
+                //        return false;
+                //    }
+                //}
+            }
+            if (!theToCheckFreeEdges)
+            {
+                return true;
+            }
+
+            Poly_Triangulation anEdgeTri = null;
+            //for (anEdgeIter.Init(theShape, TopAbs_ShapeEnum.TopAbs_EDGE, TopAbs_ShapeEnum.TopAbs_FACE); anEdgeIter.More(); anEdgeIter.Next())
+            //{
+            //    TopoDS_Edge anEdge = TopoDS.Edge(anEdgeIter.Current());
+            //    Poly_Polygon3D aPolygon = BRep_Tool.Polygon3D(anEdge, aDummyLoc);
+            //    if (aPolygon != null)
+            //    {
+            //        if (aPolygon.Deflection() > theLinDefl)
+            //        {
+            //            return false;
+            //        }
+            //    }
+            //    else
+            //    {
+            //        Poly_PolygonOnTriangulation aPoly = BRep_Tool.PolygonOnTriangulation(anEdge, anEdgeTri, aDummyLoc);
+            //        if (aPoly == null
+            //         || anEdgeTri == null
+            //         || anEdgeTri.Deflection() > theLinDefl)
+            //        {
+            //            return false;
+            //        }
+            //    }
+            //}
+
+            return true;
+        }
 
         public static void Update(TopoDS_Face F)
         {

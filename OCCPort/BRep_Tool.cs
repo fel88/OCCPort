@@ -2,12 +2,37 @@
 using OCCPort.Tester;
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Security.Policy;
 
 namespace OCCPort
 {
     public class BRep_Tool
     {
+
+        public static Poly_Polygon3D nullPolygon3D = new Poly_Polygon3D();
+
+        public static Poly_Polygon3D Polygon3D(TopoDS_Edge E,
+                                                          TopLoc_Location L)
+        {
+            // find the representation
+            BRep_TEdge TE = (BRep_TEdge)E.TShape();
+            //BRep_ListIteratorOfListOfCurveRepresentation itcr(TE->Curves());
+
+            //while (itcr.More())
+            //{
+            //    const Handle(BRep_CurveRepresentation)&cr = itcr.Value();
+            //    if (cr->IsPolygon3D())
+            //    {
+            //        const BRep_Polygon3D* GC = static_cast <const BRep_Polygon3D*> (cr.get());
+            //        L = E.Location() * GC->Location();
+            //        return GC->Polygon3D();
+            //    }
+            //    itcr.Next();
+            //}
+            //L.Identity();
+            return nullPolygon3D;
+        }
 
         public static bool IsClosed(TopoDS_Shape theShape)
         {

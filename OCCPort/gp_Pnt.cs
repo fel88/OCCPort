@@ -16,7 +16,7 @@ namespace OCCPort
 		{
 			coord = new gp_XYZ(theCoord);
 		}
-				
+
 
 		//! For this point, assigns  the values theXp, theYp and theZp to its three coordinates.
 		public void SetCoord(double theXp, double theYp, double theZp)
@@ -55,6 +55,12 @@ namespace OCCPort
 			aDD = coord.Y(); aDD -= aXYZ.Y(); aDD *= aDD; aD += aDD;
 			aDD = coord.Z(); aDD -= aXYZ.Z(); aDD *= aDD; aD += aDD;
 			return Math.Sqrt(aD);
+		}
+
+
+		internal void Transform(TopLoc_Location T)
+		{
+			Transform(T.Transformation());
 		}
 
 		internal void Transform(gp_Trsf T)

@@ -26,6 +26,7 @@ namespace OCCPort.OpenGL
         {
             throw new NotImplementedException();
         }
+
         //! Return active draw buffer attached to a render target referred by index (layout location).
         public int DrawBuffer(int theIndex = 0)
         {
@@ -34,6 +35,7 @@ namespace OCCPort.OpenGL
                  ? myDrawBuffers.Value(theIndex)
                  : 0; // GL_NONE
         }
+
         OpenGl_ShaderProgram myActiveProgram;   //!< currently active GLSL program
         // =======================================================================
         // function : BindProgram
