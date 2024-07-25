@@ -1,4 +1,5 @@
 ﻿using System;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace OCCPort
 {
@@ -17,6 +18,13 @@ namespace OCCPort
 			coord = new gp_XYZ(theCoord);
 		}
 
+
+		//! For this point gives its three coordinates theXp, theYp and theZp.
+		public void Coord(ref double theXp, ref double theYp, ref double theZp)
+		{
+
+			coord.Coord(ref theXp,ref  theYp, ref theZp);
+		}
 
 		//! For this point, assigns  the values theXp, theYp and theZp to its three coordinates.
 		public void SetCoord(double theXp, double theYp, double theZp)

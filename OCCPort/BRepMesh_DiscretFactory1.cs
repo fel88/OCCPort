@@ -27,7 +27,7 @@
 			{
 				// use built-in
 				BRepMesh_IncrementalMesh.Discret(theShape,
-				  theDeflection, theAngle, anInstancePtr);
+				  theDeflection, theAngle, ref anInstancePtr);
 			}
 
 			// cover with handle

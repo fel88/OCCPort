@@ -62,7 +62,9 @@ namespace OCCPort
 
     public class TopExp_Explorer
     {
-        public TopExp_Explorer(TopoDS_Shape theS,
+		public TopExp_Explorer() { }
+
+		public TopExp_Explorer(TopoDS_Shape theS,
             TopAbs_ShapeEnum theToFind,
             TopAbs_ShapeEnum theToAvoid = TopAbs_ShapeEnum.TopAbs_SHAPE
 )

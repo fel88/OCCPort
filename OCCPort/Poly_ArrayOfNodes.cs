@@ -6,11 +6,16 @@ namespace OCCPort
     public class Poly_ArrayOfNodes //: public NCollection_AliasedArray<>
     {
 
-        // =======================================================================
-        // function : Value
-        // purpose  :
-        // =======================================================================
-        List<gp_Pnt> pnts = new List<gp_Pnt>();
+        public int Length()
+        {
+            return pnts.Count;
+        }
+
+		// =======================================================================
+		// function : Value
+		// purpose  :
+		// =======================================================================
+		List<gp_Pnt> pnts = new List<gp_Pnt>();
         List<gp_Vec3> vecs = new List<gp_Vec3>();
         int myStride;    //!< element size
         public gp_Pnt Value(int theIndex)

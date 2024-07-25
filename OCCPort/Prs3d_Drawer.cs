@@ -9,9 +9,10 @@ namespace OCCPort
 		public Prs3d_Drawer()
 		{
 			myNbPoints = (-1);
-			/*myMaximalParameterValue(-1.0),
-            myChordialDeviation(-1.0),
-            myTypeOfDeflection(Aspect_TOD_RELATIVE),
+			/*myMaximalParameterValue(-1.0),*/
+			myChordialDeviation = (-1.0);
+			myTypeOfDeflection = Aspect_TypeOfDeflection.Aspect_TOD_RELATIVE;
+			/*
             myHasOwnTypeOfDeflection(Standard_False),
             myTypeOfHLR(Prs3d_TOH_NotSet),
             myDeviationCoefficient(-1.0),*/
@@ -55,6 +56,42 @@ namespace OCCPort
 				   : 20.0 * Math.PI / 180.0);
 		}
 
+		//! Defines the maximal chordial deviation when drawing any curve.
+		//! Even if the type of deviation is set to TOD_Relative, this value is used by: 
+		//!   Prs3d_DeflectionCurve
+		//!   Prs3d_WFDeflectionSurface
+		//!   Prs3d_WFDeflectionRestrictedFace
+		public void SetMaximalChordialDeviation(double theChordialDeviation)
+		{
+
+			myChordialDeviation = theChordialDeviation;
+		}
+
+		//! Returns the deviation coefficient.
+		//! Drawings of curves or patches are made with respect
+		//! to a maximal chordal deviation. A Deviation coefficient
+		//! is used in the shading display mode. The shape is
+		//! seen decomposed into triangles. These are used to
+		//! calculate reflection of light from the surface of the
+		//! object. The triangles are formed from chords of the
+		//! curves in the shape. The deviation coefficient gives
+		//! the highest value of the angle with which a chord can
+		//! deviate from a tangent to a   curve. If this limit is
+		//! reached, a new triangle is begun.
+		//! This deviation is absolute and is set through the
+		//! method: SetMaximalChordialDeviation. The default value is 0.001.
+		//! In drawing shapes, however, you are allowed to ask
+		//! for a relative deviation. This deviation will be:
+		//! SizeOfObject * DeviationCoefficient.
+		public double DeviationCoefficient()
+		{
+			return myDeviationCoefficient > 0.0
+				 ? myDeviationCoefficient
+				 : (myLink != null
+				   ? myLink.DeviationCoefficient()
+				   : 0.001);
+		}
+
 		Prs3d_LineAspect myFreeBoundaryAspect;
 		bool myFreeBoundaryDraw;
 		bool myHasOwnFreeBoundaryDraw;
@@ -67,6 +104,26 @@ namespace OCCPort
 		bool myHasOwnFaceBoundaryDraw;
 		//! Changes highlight method to the given one.
 		public virtual void SetMethod(Aspect_TypeOfHighlightMethod theMethod) { myHiMethod = theMethod; }
+		//! Returns the maximal chordal deviation. The default value is 0.0001.
+		//! Drawings of curves or patches are made with respect to an absolute maximal chordal deviation.
+		public double MaximalChordialDeviation()
+		{
+			return myChordialDeviation > 0.0
+				 ? myChordialDeviation
+				 : (myLink != null
+				   ? myLink.MaximalChordialDeviation()
+				   : 0.0001);
+		}
+
+		//! Returns the type of chordal deflection.
+		//! This indicates whether the deflection value is absolute or relative to the size of the object.
+		public Aspect_TypeOfDeflection TypeOfDeflection()
+		{
+			return myHasOwnTypeOfDeflection || myLink == null
+				 ? myTypeOfDeflection
+				 : myLink.TypeOfDeflection();
+		}
+
 
 		public void SetAutoTriangulation(bool theIsEnabled)
 		{
@@ -318,7 +375,7 @@ namespace OCCPort
 		int myNbPoints;
 		double myMaximalParameterValue;
 		double myChordialDeviation;
-		//Aspect_TypeOfDeflection myTypeOfDeflection;
+		Aspect_TypeOfDeflection myTypeOfDeflection;
 		bool myHasOwnTypeOfDeflection;
 		//Prs3d_TypeOfHLR myTypeOfHLR;
 		double myDeviationCoefficient;

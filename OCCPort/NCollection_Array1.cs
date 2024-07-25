@@ -17,6 +17,12 @@ namespace OCCPort
 			//
 		}
 
+		public int this[int key]
+		{
+			get => list[key];
+			set => list[key] = value;
+		}
+
 		int myLowerBound;
 		int myUpperBound;
 		public void Init(int val)

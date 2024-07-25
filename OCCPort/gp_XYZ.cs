@@ -20,10 +20,16 @@ namespace OCCPort
 			y += theOther.y;
 			z += theOther.z;
 		}
+		public void Coord(ref double theX, ref double theY, ref double theZ)
+		{
 
+			theX = x;
+			theY = y;
+			theZ = z;
+		}
 
 		public bool IsEqual(gp_XYZ Other,
-						  double Tolerance)
+							  double Tolerance)
 		{
 			double val;
 			val = x - Other.x;

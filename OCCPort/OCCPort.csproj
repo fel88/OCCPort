@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Adaptor3d_Surface.cs" />
     <Compile Include="AIS_ColoredDrawer.cs" />
     <Compile Include="AIS_ColoredShape.cs" />
     <Compile Include="AIS_DataMapOfIOStatus.cs" />
@@ -73,14 +74,24 @@
     <Compile Include="Aspect_TypeOfHighlightMethod.cs" />
     <Compile Include="Aspect_TypeOfHighlightMethod1.cs" />
     <Compile Include="Aspect_TypeOfLine.cs" />
+    <Compile Include="BndLib_Add3dCurve.cs" />
+    <Compile Include="BndLib_AddSurface.cs" />
     <Compile Include="Bnd_Box.cs" />
+    <Compile Include="BRepAdaptor_Curve.cs" />
+    <Compile Include="BRepAdaptor_Surface.cs" />
+    <Compile Include="BRepBndLib.cs" />
     <Compile Include="BRepBuilderAPI_Command.cs" />
     <Compile Include="BRepBuilderAPI_MakeShape.cs" />
     <Compile Include="BRepLib_ToolTriangulatedShape.cs" />
+    <Compile Include="BRepMesh_Context.cs" />
+    <Compile Include="BRepMesh_DelabellaMeshAlgoFactory.cs" />
     <Compile Include="BRepMesh_DiscretFactory.cs" />
     <Compile Include="BRepMesh_DiscretFactory1.cs" />
     <Compile Include="BRepMesh_DiscretRoot.cs" />
+    <Compile Include="BRepMesh_FaceDiscret.cs" />
     <Compile Include="BRepMesh_IncrementalMesh.cs" />
+    <Compile Include="BRepMesh_MeshAlgoFactory.cs" />
+    <Compile Include="BRepMesh_ModelBuilder.cs" />
     <Compile Include="BRepPrimAPI_MakeBox.cs" />
     <Compile Include="BRepPrimAPI_MakeOneAxis.cs" />
     <Compile Include="BRepPrim_Builder.cs" />
@@ -115,6 +126,9 @@
     <Compile Include="Geom2d_Curve.cs" />
     <Compile Include="Geom2d_Geometry.cs" />
     <Compile Include="Geom2d_Line.cs" />
+    <Compile Include="GeomAbs_SurfaceType.cs" />
+    <Compile Include="GeomAdaptor_Surface.cs" />
+    <Compile Include="Geom_BSplineSurface.cs" />
     <Compile Include="Geom_Curve.cs" />
     <Compile Include="Geom_ElementarySurface.cs" />
     <Compile Include="Geom_Geometry.cs" />
@@ -231,9 +245,24 @@
     <Compile Include="IBVHObject.cs" />
     <Compile Include="IBVHSet.cs" />
     <Compile Include="Image_PixMap.cs" />
+    <Compile Include="IMeshData\IFaceHandle.cs" />
+    <Compile Include="IMeshData_Model.cs" />
+    <Compile Include="IMeshData_Shape.cs" />
+    <Compile Include="IMeshData_Status.cs" />
+    <Compile Include="IMeshTools_Context.cs" />
+    <Compile Include="IMeshTools_MeshAlgoFactory.cs" />
+    <Compile Include="IMeshTools_MeshAlgoType.cs" />
+    <Compile Include="IMeshTools_MeshBuilder.cs" />
+    <Compile Include="IMeshTools_ModelAlgo.cs" />
+    <Compile Include="IMeshTools_ModelBuilder.cs" />
+    <Compile Include="IMeshTools_Parameters.cs" />
     <Compile Include="Interface_InterfaceModel.cs" />
     <Compile Include="LayersCollection.cs" />
+    <Compile Include="Message_Algorithm.cs" />
+    <Compile Include="Message_ExecStatus.cs" />
     <Compile Include="Message_ProgressRange.cs" />
+    <Compile Include="Message_Status.cs" />
+    <Compile Include="Message_StatusType.cs" />
     <Compile Include="MyLayersDic.cs" />
     <Compile Include="NCollection_Array1.cs" />
     <Compile Include="NCollection_BaseAllocator.cs" />
@@ -301,6 +330,7 @@
     <Compile Include="Standard_DomainError.cs" />
     <Compile Include="Standard_Integer.cs" />
     <Compile Include="Standard_NoMoreObject_Exception.cs" />
+    <Compile Include="Standard_NotImplemented.cs" />
     <Compile Include="Standard_OutOfRange.cs" />
     <Compile Include="Standard_ProgramError.cs" />
     <Compile Include="Standard_Size.cs" />
@@ -311,8 +341,10 @@
     <Compile Include="StdPrs_WFShape.cs" />
     <Compile Include="StdSelect_ViewerSelector3d.cs" />
     <Compile Include="STEPControl_Reader.cs" />
+    <Compile Include="TColgp_Array1OfPnt.cs" />
     <Compile Include="TColgp_SequenceOfPnt.cs" />
     <Compile Include="TColStd_Array1OfInteger.cs" />
+    <Compile Include="TColStd_HArray1OfReal.cs" />
     <Compile Include="TColStd_SequenceOfTransient.cs" />
     <Compile Include="TopAbs.cs" />
     <Compile Include="TopAbs_Orientation.cs" />

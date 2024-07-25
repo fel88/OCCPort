@@ -8,8 +8,13 @@ namespace OCCPort
 	{
 		//! Compute triangulation for set shape.
 		public abstract void Perform(Message_ProgressRange theRange = null);
-
-		
+		//! Set the shape to triangulate.
+		public void SetShape(TopoDS_Shape theShape)
+		{
+			myShape = theShape;
+		}
+		TopoDS_Shape myShape;
+		bool myIsDone;
 	}
 
 }

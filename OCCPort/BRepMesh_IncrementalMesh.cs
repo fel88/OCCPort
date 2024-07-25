@@ -9,6 +9,16 @@ namespace OCCPort
 	//! correctly triangulated parts 
 	public class BRepMesh_IncrementalMesh : BRepMesh_DiscretRoot
 	{
+		public BRepMesh_IncrementalMesh()
+
+		{
+			myModified = (false);
+			myStatus = (int)IMeshData_Status.IMeshData_NoError;
+		}
+
+		IMeshTools_Parameters myParameters;
+		bool myModified;
+		int myStatus;
 		//! Constructor.
 		//! Automatically calls method Perform.
 		//! @param theShape shape to be meshed.
@@ -30,14 +40,24 @@ namespace OCCPort
 
 		}
 
-		internal static void Discret(TopoDS_Shape theShape, double theDeflection, double theAngle, BRepMesh_DiscretRoot anInstancePtr)
+		public static int Discret(TopoDS_Shape theShape,
+			double theDeflection,
+			double theAngle,
+			ref BRepMesh_DiscretRoot theAlgo)
 		{
-			throw new NotImplementedException();
+			BRepMesh_IncrementalMesh anAlgo = new BRepMesh_IncrementalMesh();
+			/*anAlgo.ChangeParameters().Deflection = theDeflection;
+			anAlgo.ChangeParameters().Angle = theAngle;
+			anAlgo.ChangeParameters().InParallel = IS_IN_PARALLEL;*/
+			anAlgo.SetShape(theShape);
+			theAlgo = anAlgo;
+			return 0; // no error
 		}
+
 		public override void Perform(Message_ProgressRange theRange)
 		{
-			//BRepMesh_Context aContext = new BRepMesh_Context(myParameters.MeshAlgo);
-			//Perform(aContext, theRange);
+			BRepMesh_Context aContext = new BRepMesh_Context(myParameters.MeshAlgo);
+			Perform(aContext, theRange);
 		}
 
 		public void Perform(IMeshTools_Context theContext, Message_ProgressRange theRange = null)
@@ -49,55 +69,33 @@ namespace OCCPort
 			//theContext->ChangeParameters().CleanModel = Standard_False;
 
 			//Message_ProgressScope aPS(theRange, "Perform incmesh", 10);
-			//IMeshTools_MeshBuilder aIncMesh(theContext);
-			//aIncMesh.Perform(aPS.Next(9));
+			IMeshTools_MeshBuilder aIncMesh = new IMeshTools_MeshBuilder(theContext);
+			aIncMesh.Perform(aPS.Next(9));
 			//if (!aPS.More())
 			//{
 			//	myStatus = IMeshData_UserBreak;
 			//	return;
 			//}
 			//myStatus = IMeshData_NoError;
-			//const Handle(IMeshData_Model)&aModel = theContext->GetModel();
-			//if (!aModel.IsNull())
-			//{
-			//	for (Standard_Integer aFaceIt = 0; aFaceIt < aModel->FacesNb(); ++aFaceIt)
-			//	{
-			//		const IMeshData::IFaceHandle&aDFace = aModel->GetFace(aFaceIt);
-			//		myStatus |= aDFace->GetStatusMask();
+			IMeshData_Model aModel = theContext.GetModel();
+			if (!aModel.IsNull())
+			{
+				for (int aFaceIt = 0; aFaceIt < aModel.FacesNb(); ++aFaceIt)
+				{
+					IMeshData.IFaceHandle aDFace = aModel.GetFace(aFaceIt);
+					//		myStatus |= aDFace->GetStatusMask();
 
-			//		for (Standard_Integer aWireIt = 0; aWireIt < aDFace->WiresNb(); ++aWireIt)
-			//		{
-			//			const IMeshData::IWireHandle&aDWire = aDFace->GetWire(aWireIt);
-			//			myStatus |= aDWire->GetStatusMask();
-			//		}
-			//	}
-			//}
+					//		for (Standard_Integer aWireIt = 0; aWireIt < aDFace->WiresNb(); ++aWireIt)
+					//		{
+					//			const IMeshData::IWireHandle&aDWire = aDFace->GetWire(aWireIt);
+					//			myStatus |= aDWire->GetStatusMask();
+					//		}
+				}
+			}
 			//aPS.Next(1);
 			//setDone();
 		}
 	}
 
-	//! Class implementing default context of BRepMesh algorithm.
-	//! Initializes context by default algorithms.
-	public class BRepMesh_Context : IMeshTools_Context
-	{
-	}
-
-	//! Interface class representing context of BRepMesh algorithm.
-	//! Intended to cache discrete model and instances of tools for 
-	//! its processing.
-	public interface IMeshTools_Context : IMeshData_Shape
-	{
-
-	}
-
-	//! Interface class representing model with associated TopoDS_Shape.
-	//! Intended for inheritance by structures and algorithms keeping 
-	//! reference TopoDS_Shape.
-	public interface IMeshData_Shape
-	{
-
-
-	}
 
 }
