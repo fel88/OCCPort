@@ -11,6 +11,13 @@ namespace OCCPort
         {
             myOrient = TopAbs_Orientation.TopAbs_EXTERNAL;
         }
+        public TopoDS_Shape(TopoDS_Shape theOther)
+        {
+            myOrient = theOther.myOrient;
+            myTShape = theOther.myTShape;
+            myLocation = theOther.myLocation.Clone();
+        }
+
         public static int idx = 0;
         public int HashCode(int theUpperBound)
         {
@@ -30,7 +37,14 @@ namespace OCCPort
         //! Sets the checked flag.
         public void Checked(bool theIsChecked) { myTShape.Checked(theIsChecked); }
 
-
+        //! Returns a  shape  similar to <me> with   the local
+        //! coordinate system set to <Loc>.
+        public TopoDS_Shape Located(TopLoc_Location theLoc, bool theRaiseExc = true)
+        {
+            TopoDS_Shape aShape = new TopoDS_Shape(this);
+            aShape.Location(theLoc, theRaiseExc);
+            return aShape;
+        }
 
 
         //! Returns the locked flag.

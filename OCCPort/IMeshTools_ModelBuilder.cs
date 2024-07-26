@@ -33,9 +33,6 @@ namespace OCCPort
 			}
 		}
 
-		private void ClearStatus()
-		{
-			throw new NotImplementedException();
-		}
+		
 	}
 }

@@ -1,16 +1,30 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace OCCPort
 {
-	public class IMeshData
+    public partial class IMeshData
 	{
-		public class VectorOfIFaceHandles 
+        public interface IEdgeHandle
+        {
+        }
+
+        public class VectorOfIFaceHandles 
 		{
 			public int Size()
 			{
 				throw new NotImplementedException();
 			}
 		}
-	}
+
+        internal class VectorOfIEdgeHandles
+        {
+            List<IEdgeHandle> items = new List<IEdgeHandle>();
+            public int Size()
+            {
+                return items.Count; 
+            }
+        }
+    }
 
 }

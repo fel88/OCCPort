@@ -35,9 +35,9 @@ namespace OCCPort
 					continue;
 				}
 
-				//theVisitor.Visit(isResetLocation ?
-				//  TopoDS.Edge(aEdge.Located(new TopLoc_Location())) :
-				//  aEdge);
+				theVisitor.Visit(isResetLocation ?
+				  TopoDS.Edge(aEdge.Located(new TopLoc_Location())) :
+				  aEdge);
 			}
 		}
 
