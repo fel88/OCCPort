@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace OCCPort.Tester
+namespace OCCPort
 {
 	public class TColgp_SequenceOfPnt
 	{

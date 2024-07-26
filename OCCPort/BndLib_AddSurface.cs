@@ -303,14 +303,14 @@ namespace OCCPort
 					{
 						int Nu = NbUSamples(S);
 						int Nv = NbVSamples(S);
-						gp_Pnt P;
+						gp_Pnt P = new gp_Pnt();
 						for (int i = 1; i <= Nu; i++)
 						{
 							double U = UMin + ((UMax - UMin) * (i - 1) / (Nu - 1));
 							for (int j = 1; j <= Nv; j++)
 							{
 								double V = VMin + ((VMax - VMin) * (j - 1) / (Nv - 1));
-								S.D0(U, V, P);
+								S.D0(U, V, ref P);
 								B.Add(P);
 							}
 						}

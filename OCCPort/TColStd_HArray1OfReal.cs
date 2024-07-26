@@ -2,12 +2,14 @@
 
 namespace OCCPort
 {
-	internal class TColStd_HArray1OfReal
+	internal class TColStd_HArray1OfReal: NCollection_Array1
 	{
-		public List<double> list = new List<double>();
+		
 		public int Length()
 		{
 			return list.Count;
 		}
+		
+		
 	}
 }

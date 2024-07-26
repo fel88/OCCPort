@@ -6,21 +6,40 @@
 		{
 			throw new Standard_NotImplemented("Adaptor3d_Surface::FirstUParameter");
 		}
+		//=======================================================================
+		//function : UDegree
+		//purpose  : 
+		//=======================================================================
 
+		public virtual int UDegree()
+		{
+			throw new Standard_NotImplemented("Adaptor3d_Surface::UDegree");
+		}
+
+
+		//=======================================================================
+		//function : NbVKnots
+		//purpose  : 
+		//=======================================================================
+
+		public virtual int NbVKnots()
+		{
+			throw new Standard_NotImplemented("Adaptor3d_Surface::NbVKnots");
+		}
 		//=======================================================================
 		//function : D0
 		//purpose  : 
 		//=======================================================================
 
 		//void Adaptor3d_Surface::D0(const Standard_Real U, const Standard_Real V, gp_Pnt& P) const 
-		public void D0(double u, double v, gp_Pnt pnt)
+		public virtual  void D0(double u, double v, ref gp_Pnt pnt)
 		{
 			throw new Standard_NotImplemented("Adaptor3d_Surface::D0");
 		}
 
 
 
-		public double LastUParameter()
+		public virtual  double LastUParameter()
 		{
 			throw new Standard_NotImplemented("Adaptor3d_Surface::LastUParameter");
 		}
@@ -29,7 +48,7 @@
 		//purpose  : 
 		//=======================================================================
 
-		public int NbVPoles()
+		public virtual int NbVPoles()
 		{
 			throw new Standard_NotImplemented("Adaptor3d_Surface::NbVPoles");
 		}
@@ -39,7 +58,7 @@
 		//purpose  : 
 		//=======================================================================
 
-		public double OffsetValue()
+		public virtual double OffsetValue()
 		{
 			throw new Standard_NotImplemented("Adaptor3d_Surface::OffsetValue");
 		}
@@ -50,16 +69,16 @@
 		//purpose  : 
 		//=======================================================================
 
-		public Adaptor3d_Surface BasisSurface()
+		public virtual Adaptor3d_Surface BasisSurface()
 		{
 			throw new Standard_NotImplemented("Adaptor3d_Surface::BasisSurface");
 		}
 
-		public double FirstVParameter()
+		public virtual double FirstVParameter()
 		{
 			throw new Standard_NotImplemented("Adaptor3d_Surface::FirstVParameter");
 		}
-		public double LastVParameter()
+		public virtual double LastVParameter()
 		{
 			throw new Standard_NotImplemented("Adaptor3d_Surface::LastVParameter");
 		}
@@ -69,7 +88,7 @@
 		//purpose  : 
 		//=======================================================================
 
-		public int NbUPoles()
+		public virtual int NbUPoles()
 		{
 			throw new Standard_NotImplemented("Adaptor3d_Surface::NbUPoles");
 		}
@@ -79,7 +98,7 @@
 		//purpose  : 
 		//=======================================================================
 
-		public Geom_BSplineSurface BSpline()
+		public virtual Geom_BSplineSurface BSpline()
 		{
 			throw new Standard_NotImplemented("Adaptor3d_Surface::BSpline");
 		}

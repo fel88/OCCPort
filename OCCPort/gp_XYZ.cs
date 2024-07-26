@@ -53,6 +53,18 @@ namespace OCCPort
 		//! Returns the Z coordinate
 		public double Z() { return z; }
 
+
+		public static gp_XYZ operator /(gp_XYZ v, double y)
+		{
+			return v.Divided(y);
+		}
+
+		//! divides <me> by a real.
+		public gp_XYZ Divided(double theScalar)
+		{
+			return new gp_XYZ(x / theScalar, y / theScalar, z / theScalar);
+		}
+
 		public static gp_XYZ operator *(gp_XYZ v, double y)
 		{
 			return v.Multiplied(y);
@@ -123,7 +135,7 @@ namespace OCCPort
 			y = aYresult;
 		}
 
-		internal void Divide(double theScalar)
+		public void Divide(double theScalar)
 		{
 			x /= theScalar;
 			y /= theScalar;

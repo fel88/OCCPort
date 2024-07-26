@@ -12,6 +12,16 @@
 		}
 		TopoDS_Shape myShape;
 
+		//! Constructor.
+		public IMeshData_Shape()
+		{
+		}
+		//! Constructor.
+		public IMeshData_Shape(TopoDS_Shape theShape)
+		{
+			myShape = (theShape);
+		}
+
 	}
 
 

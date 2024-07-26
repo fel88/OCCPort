@@ -9,11 +9,16 @@ namespace OCCPort
 	//! The  TVertex contains a 3d point, location and a tolerance.
 
 	internal class BRep_TVertex : TopoDS_TVertex
-    {
-		public gp_Pnt Pnt( )
-        {
+	{
+		public gp_Pnt Pnt()
+		{
 			return myPnt;
 
+		}
+
+		public double Tolerance()
+		{
+			return myTolerance;
 		}
 
 		public void Pnt(gp_Pnt P)
@@ -29,6 +34,6 @@ namespace OCCPort
 		internal void UpdateTolerance(double T)
 		{
 			if (T > myTolerance) myTolerance = T;
-        }
-    }
+		}
+	}
 }

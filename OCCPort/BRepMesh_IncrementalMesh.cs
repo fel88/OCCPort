@@ -70,7 +70,7 @@ namespace OCCPort
 
 			//Message_ProgressScope aPS(theRange, "Perform incmesh", 10);
 			IMeshTools_MeshBuilder aIncMesh = new IMeshTools_MeshBuilder(theContext);
-			aIncMesh.Perform(aPS.Next(9));
+			//aIncMesh.Perform(aPS.Next(9));
 			//if (!aPS.More())
 			//{
 			//	myStatus = IMeshData_UserBreak;
@@ -78,11 +78,11 @@ namespace OCCPort
 			//}
 			//myStatus = IMeshData_NoError;
 			IMeshData_Model aModel = theContext.GetModel();
-			if (!aModel.IsNull())
+			if (aModel != null)
 			{
 				for (int aFaceIt = 0; aFaceIt < aModel.FacesNb(); ++aFaceIt)
 				{
-					IMeshData.IFaceHandle aDFace = aModel.GetFace(aFaceIt);
+					//IMeshData.IFaceHandle aDFace = aModel.GetFace(aFaceIt);
 					//		myStatus |= aDFace->GetStatusMask();
 
 					//		for (Standard_Integer aWireIt = 0; aWireIt < aDFace->WiresNb(); ++aWireIt)

@@ -48,7 +48,7 @@ namespace OCCPort
 			return myUpperBound;
 		}
 		public int Value(int index)
-		{
+		{//Standard_OutOfRange_Raise_if(theIndex<myLowerBound || theIndex> myUpperBound, "NCollection_Array1::Value");
 			return list[index];
 		}
 	}

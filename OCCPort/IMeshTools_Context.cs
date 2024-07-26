@@ -11,6 +11,14 @@ namespace OCCPort
 		protected IMeshTools_ModelBuilder myModelBuilder;
 		IMeshData_Model myModel;
 		IMeshTools_Parameters myParameters;
+		public IMeshTools_Context()
+		{
+
+		}
+
+		public IMeshTools_Context(TopoDS_Shape theShape) : base(theShape)
+		{
+		}
 
 		//! Builds model using assigned model builder.
 		//! @return True on success, False elsewhere.

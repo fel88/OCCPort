@@ -41,6 +41,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Adaptor2d_Curve2d.cs" />
+    <Compile Include="Adaptor3d_Curve.cs" />
+    <Compile Include="Adaptor3d_CurveOnSurface.cs" />
     <Compile Include="Adaptor3d_Surface.cs" />
     <Compile Include="AIS_ColoredDrawer.cs" />
     <Compile Include="AIS_ColoredShape.cs" />
@@ -56,6 +59,7 @@
     <Compile Include="AIS_SelectionScheme.cs" />
     <Compile Include="AIS_Shape.cs" />
     <Compile Include="AIS_StatusOfPick.cs" />
+    <Compile Include="AppParCurves_Constraint.cs" />
     <Compile Include="AspectWindow.cs" />
     <Compile Include="Aspect_CircularGrid.cs" />
     <Compile Include="Aspect_DisplayConnection.cs" />
@@ -70,10 +74,12 @@
     <Compile Include="Aspect_RectangularGrid.cs" />
     <Compile Include="Aspect_RenderingContext.cs" />
     <Compile Include="Aspect_SkydomeBackground.cs" />
+    <Compile Include="Aspect_TypeOfDeflection.cs" />
     <Compile Include="Aspect_TypeOfFacingModel.cs" />
     <Compile Include="Aspect_TypeOfHighlightMethod.cs" />
     <Compile Include="Aspect_TypeOfHighlightMethod1.cs" />
     <Compile Include="Aspect_TypeOfLine.cs" />
+    <Compile Include="BndLib.cs" />
     <Compile Include="BndLib_Add3dCurve.cs" />
     <Compile Include="BndLib_AddSurface.cs" />
     <Compile Include="Bnd_Box.cs" />
@@ -83,6 +89,7 @@
     <Compile Include="BRepBuilderAPI_Command.cs" />
     <Compile Include="BRepBuilderAPI_MakeShape.cs" />
     <Compile Include="BRepLib_ToolTriangulatedShape.cs" />
+    <Compile Include="BRepMeshData_Model.cs" />
     <Compile Include="BRepMesh_Context.cs" />
     <Compile Include="BRepMesh_DelabellaMeshAlgoFactory.cs" />
     <Compile Include="BRepMesh_DiscretFactory.cs" />
@@ -92,6 +99,8 @@
     <Compile Include="BRepMesh_IncrementalMesh.cs" />
     <Compile Include="BRepMesh_MeshAlgoFactory.cs" />
     <Compile Include="BRepMesh_ModelBuilder.cs" />
+    <Compile Include="BRepMesh_ShapeTool.cs" />
+    <Compile Include="BRepMesh_ShapeVisitor.cs" />
     <Compile Include="BRepPrimAPI_MakeBox.cs" />
     <Compile Include="BRepPrimAPI_MakeOneAxis.cs" />
     <Compile Include="BRepPrim_Builder.cs" />
@@ -123,17 +132,22 @@
     <Compile Include="DataMapOfDrawerCompd.cs" />
     <Compile Include="ElCLib.cs" />
     <Compile Include="ElSLib.cs" />
+    <Compile Include="Geom2dAdaptor_Curve.cs" />
     <Compile Include="Geom2d_Curve.cs" />
     <Compile Include="Geom2d_Geometry.cs" />
     <Compile Include="Geom2d_Line.cs" />
     <Compile Include="GeomAbs_SurfaceType.cs" />
+    <Compile Include="GeomAdaptor_Curve.cs" />
     <Compile Include="GeomAdaptor_Surface.cs" />
+    <Compile Include="Geom_BoundedCurve.cs" />
+    <Compile Include="Geom_BoundedSurface.cs" />
     <Compile Include="Geom_BSplineSurface.cs" />
     <Compile Include="Geom_Curve.cs" />
     <Compile Include="Geom_ElementarySurface.cs" />
     <Compile Include="Geom_Geometry.cs" />
     <Compile Include="Geom_Line.cs" />
     <Compile Include="Geom_Plane.cs" />
+    <Compile Include="Geom_RectangularTrimmedSurface.cs" />
     <Compile Include="Geom_Surface.cs" />
     <Compile Include="gl_Vec3.cs" />
     <Compile Include="gp.cs" />
@@ -245,6 +259,7 @@
     <Compile Include="IBVHObject.cs" />
     <Compile Include="IBVHSet.cs" />
     <Compile Include="Image_PixMap.cs" />
+    <Compile Include="IMeshData.cs" />
     <Compile Include="IMeshData\IFaceHandle.cs" />
     <Compile Include="IMeshData_Model.cs" />
     <Compile Include="IMeshData_Shape.cs" />
@@ -256,6 +271,8 @@
     <Compile Include="IMeshTools_ModelAlgo.cs" />
     <Compile Include="IMeshTools_ModelBuilder.cs" />
     <Compile Include="IMeshTools_Parameters.cs" />
+    <Compile Include="IMeshTools_ShapeExplorer.cs" />
+    <Compile Include="IMeshTools_ShapeVisitor.cs" />
     <Compile Include="Interface_InterfaceModel.cs" />
     <Compile Include="LayersCollection.cs" />
     <Compile Include="Message_Algorithm.cs" />
@@ -283,6 +300,7 @@
     <Compile Include="Poly_PolygonOnTriangulation.cs" />
     <Compile Include="Poly_Triangulation.cs" />
     <Compile Include="Precision.cs" />
+    <Compile Include="ProjLib_Projector.cs" />
     <Compile Include="Prs3d.cs" />
     <Compile Include="Prs3d_BasicAspect.cs" />
     <Compile Include="Prs3d_Drawer.cs" />
@@ -327,10 +345,13 @@
     <Compile Include="SelectMgr_TypeOfUpdate.cs" />
     <Compile Include="SelectMgr_ViewerSelector.cs" />
     <Compile Include="ShaderVariable.cs" />
+    <Compile Include="Standard_ConstructionError.cs" />
     <Compile Include="Standard_DomainError.cs" />
+    <Compile Include="Standard_Failure.cs" />
     <Compile Include="Standard_Integer.cs" />
     <Compile Include="Standard_NoMoreObject_Exception.cs" />
     <Compile Include="Standard_NotImplemented.cs" />
+    <Compile Include="Standard_NullObject.cs" />
     <Compile Include="Standard_OutOfRange.cs" />
     <Compile Include="Standard_ProgramError.cs" />
     <Compile Include="Standard_Size.cs" />

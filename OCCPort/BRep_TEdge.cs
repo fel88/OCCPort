@@ -8,6 +8,13 @@ namespace OCCPort
 		{
 			return (myFlags & DegeneratedMask) != 0;
 		}
+		//=======================================================================
+
+		public BRep_ListOfCurveRepresentation Curves()
+		{
+			return myCurves;
+		}
+
 		public BRep_TEdge()
 
 

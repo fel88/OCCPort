@@ -12,7 +12,20 @@
 		{
 			return false;
 		}
+		public bool IsCurveOnClosedSurface()
+		{
+			return false;
+		}
 
+		public virtual Geom2d_Curve PCurve2()
+		{
+			throw new Standard_DomainError("BRep_CurveRepresentation");
+		}
+
+		public virtual Geom2d_Curve PCurve()
+		{
+			throw new Standard_DomainError("BRep_CurveRepresentation");
+		}
 
 		//! A 3D curve representation.
 		public virtual bool IsCurve3D()

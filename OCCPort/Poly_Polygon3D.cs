@@ -10,5 +10,7 @@
 
 		double myDeflection;
 		TColgp_Array1OfPnt myNodes;
+		//! Returns the table of nodes for this polygon.
+		public TColgp_Array1OfPnt Nodes() { return myNodes; }
 	}
 }

@@ -2,12 +2,12 @@
 
 namespace OCCPort
 {
-	internal class TColgp_Array1OfPnt
+	public class TColgp_Array1OfPnt : List<gp_Pnt>
 	{
-		public List<gp_Pnt> list = new List<gp_Pnt>();
+		//public List<gp_Pnt> list = new List<gp_Pnt>();
 		public int Length()
 		{
-			return list.Count;
+			return Count;
 		}
 	}
 }

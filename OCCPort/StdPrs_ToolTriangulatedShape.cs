@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OCCPort.Tester;
+using System;
 
 namespace OCCPort
 {
@@ -10,14 +11,14 @@ namespace OCCPort
 			//throw new NotImplementedException();
 		}
 
-		public static double GetDeflection(TopoDS_Shape myshape, Prs3d_Drawer theDrawer)
+		public static double GetDeflection(TopoDS_Shape theShape, Prs3d_Drawer theDrawer)
 		{
 			if (theDrawer.TypeOfDeflection() != Aspect_TypeOfDeflection.Aspect_TOD_RELATIVE)
 			{
 				return theDrawer.MaximalChordialDeviation();
 			}
 
-			Bnd_Box aBndBox;
+			Bnd_Box aBndBox = new Bnd_Box();
 			BRepBndLib.Add(theShape, aBndBox, false);
 			if (aBndBox.IsVoid())
 			{
@@ -70,13 +71,4 @@ namespace OCCPort
 			return BRepTools.Triangulation(theShape, GetDeflection(theShape, theDrawer), true);
 		}
 	}
-
-	//! Defines if the maximal chordial deflection used when
-	//! drawing an object is absolute  or relative to the size
-	//! of the object.
-	public enum Aspect_TypeOfDeflection
-	{
-		Aspect_TOD_RELATIVE,
-		Aspect_TOD_ABSOLUTE
-	};
 }
