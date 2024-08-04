@@ -23,6 +23,12 @@ namespace OCCPort
             return myDEdges.Size();
         }
 
+        public override IMeshData_Face GetFace(int theIndex)
+        {
+            return myDFaces.Get(theIndex);
+        }
+
+
         VectorOfIEdgeHandles myDEdges = new VectorOfIEdgeHandles();
 
         public override IMeshData_Face AddFace(TopoDS_Face theFace)
@@ -68,11 +74,13 @@ namespace OCCPort
     {
         public BRepMeshData_Face(TopoDS_Face theFace) : base(theFace)
         {
-
-
-
             //myDWires(256, myAllocator)
-            
+        }
+
+        VectorOfIWireHandles myDWires = new VectorOfIWireHandles();
+        public int WiresNb()
+        {
+            return myDWires.Size();
         }
     }
 

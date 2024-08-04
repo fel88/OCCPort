@@ -14,8 +14,13 @@
             //mySurface = new BRepAdaptor_Surface(aSurfAdaptor);
             mySurface = aSurfAdaptor;//todo:Clone??
         }
+        //! Returns face's surface.
+      public   BRepAdaptor_Surface GetSurface() 
+        {
+    return mySurface;
+  }
 
-        BRepAdaptor_Surface mySurface;
+    BRepAdaptor_Surface mySurface;
         //! Returns TopoDS_Face attached to model.
         public TopoDS_Face GetFace()
         {

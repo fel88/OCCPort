@@ -92,8 +92,13 @@
     <Compile Include="BRepLib_ToolTriangulatedShape.cs" />
     <Compile Include="BRepMeshData_Edge.cs" />
     <Compile Include="BRepMeshData_Model.cs" />
+    <Compile Include="BRepMesh_BaseMeshAlgo.cs" />
+    <Compile Include="BRepMesh_ConstrainedBaseMeshAlgo.cs" />
     <Compile Include="BRepMesh_Context.cs" />
+    <Compile Include="BRepMesh_DataStructureOfDelaun.cs" />
     <Compile Include="BRepMesh_DelabellaMeshAlgoFactory.cs" />
+    <Compile Include="BRepMesh_Delaun.cs" />
+    <Compile Include="BRepMesh_DelaunayBaseMeshAlgo.cs" />
     <Compile Include="BRepMesh_DiscretFactory.cs" />
     <Compile Include="BRepMesh_DiscretFactory1.cs" />
     <Compile Include="BRepMesh_DiscretRoot.cs" />
@@ -103,6 +108,9 @@
     <Compile Include="BRepMesh_ModelBuilder.cs" />
     <Compile Include="BRepMesh_ShapeTool.cs" />
     <Compile Include="BRepMesh_ShapeVisitor.cs" />
+    <Compile Include="BRepMesh_Vertex.cs" />
+    <Compile Include="BRepMesh_VertexInspector.cs" />
+    <Compile Include="BRepMesh_VertexTool.cs" />
     <Compile Include="BRepPrimAPI_MakeBox.cs" />
     <Compile Include="BRepPrimAPI_MakeOneAxis.cs" />
     <Compile Include="BRepPrim_Builder.cs" />
@@ -271,7 +279,9 @@
     <Compile Include="IMeshData_Status.cs" />
     <Compile Include="IMeshData_StatusOwner.cs" />
     <Compile Include="IMeshData_TessellatedShape.cs" />
+    <Compile Include="IMeshData_Wire.cs" />
     <Compile Include="IMeshTools_Context.cs" />
+    <Compile Include="IMeshTools_MeshAlgo.cs" />
     <Compile Include="IMeshTools_MeshAlgoFactory.cs" />
     <Compile Include="IMeshTools_MeshAlgoType.cs" />
     <Compile Include="IMeshTools_MeshBuilder.cs" />
@@ -281,7 +291,9 @@
     <Compile Include="IMeshTools_ShapeExplorer.cs" />
     <Compile Include="IMeshTools_ShapeVisitor.cs" />
     <Compile Include="Interface_InterfaceModel.cs" />
+    <Compile Include="IteratorOfMapOfInteger.cs" />
     <Compile Include="LayersCollection.cs" />
+    <Compile Include="MapOfInteger.cs" />
     <Compile Include="Message_Algorithm.cs" />
     <Compile Include="Message_ExecStatus.cs" />
     <Compile Include="Message_ProgressRange.cs" />
@@ -301,11 +313,13 @@
     <Compile Include="NCollection_Vec4.cs" />
     <Compile Include="OpenGl_LayerFilter.cs" />
     <Compile Include="OpenGl_RenderFilter.cs" />
+    <Compile Include="Poly_Array1OfTriangle.cs" />
     <Compile Include="Poly_ArrayOfNodes.cs" />
     <Compile Include="Poly_ListOfTriangulation.cs" />
     <Compile Include="Poly_MeshPurpose.cs" />
     <Compile Include="Poly_Polygon3D.cs" />
     <Compile Include="Poly_PolygonOnTriangulation.cs" />
+    <Compile Include="Poly_Triangle.cs" />
     <Compile Include="Poly_Triangulation.cs" />
     <Compile Include="Precision.cs" />
     <Compile Include="ProjLib_Projector.cs" />
@@ -433,6 +447,8 @@
     <Compile Include="V3d_Viewer.cs" />
     <Compile Include="VectorOfIEdgeHandles.cs" />
     <Compile Include="VectorOfIFaceHandles.cs" />
+    <Compile Include="VectorOfIWireHandles.cs" />
+    <Compile Include="VectorOfVertex.cs" />
     <Compile Include="XSControl_Reader.cs" />
     <Compile Include="XSControl_WorkSession.cs" />
   </ItemGroup>

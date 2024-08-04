@@ -57,11 +57,8 @@
 			SetFaceDiscret(new BRepMesh_FaceDiscret(aAlgoFactory));
 			//SetPostProcessor(new BRepMesh_ModelPostProcessor);
 		}  //! Sets instance of meshing algorithm.
-		void SetFaceDiscret(IMeshTools_ModelAlgo theFaceDiscret)
-		{
-			myFaceDiscret = theFaceDiscret;
-		}
-		IMeshTools_ModelAlgo myFaceDiscret;
+		
+		
 
 	}
 

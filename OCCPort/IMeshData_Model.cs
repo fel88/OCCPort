@@ -11,6 +11,10 @@
         //! Adds new edge to shape model.
         public abstract IMeshData_Edge AddEdge(TopoDS_Edge theEdge);
 
+        //! Gets model's face with the given index.
+        public abstract IMeshData_Face GetFace(int theIndex);
+
+
         //! Adds new face to shape model.
         public abstract IMeshData_Face AddFace(TopoDS_Face theFace);
 

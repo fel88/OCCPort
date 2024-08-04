@@ -13,11 +13,11 @@
             AngleInterior = (-1.0);
             DeflectionInterior = (-1.0);
             MinSize = (-1.0);
-    /*InParallel(Standard_False),
-    Relative(Standard_False),
-    InternalVerticesMode(Standard_True),
-    ControlSurfaceDeflection(Standard_True),
-    EnableControlSurfaceDeflectionAllSurfaces(Standard_False),
+            /*InParallel(Standard_False),
+            Relative(Standard_False),*/
+            InternalVerticesMode = true;/*
+    ControlSurfaceDeflection(Standard_True),*/
+            EnableControlSurfaceDeflectionAllSurfaces = (false);/*
     CleanModel(Standard_True),
     AdjustMinSize(Standard_False),
     ForceFaceDeflection(Standard_False),
@@ -51,7 +51,7 @@
 
         //! Mode to take or not to take internal face vertices into account
         //! in triangulation process
-        public double InternalVerticesMode;
+        public bool InternalVerticesMode;
 
         //! Parameter to check the deviation of triangulation and interior of
         //! the face
@@ -59,7 +59,7 @@
 
         // Enables/disables check triggered by ControlSurfaceDeflection flag 
         // for all types of surfaces including analytical.
-        public double EnableControlSurfaceDeflectionAllSurfaces;
+        public bool EnableControlSurfaceDeflectionAllSurfaces;
 
         //! Cleans temporary data model when algorithm is finished.
         public double CleanModel;
