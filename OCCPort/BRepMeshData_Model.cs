@@ -1,4 +1,6 @@
-﻿namespace OCCPort
+﻿using System;
+
+namespace OCCPort
 {
     //! Default implementation of model entity.
     public class BRepMeshData_Model : IMeshData_Model
@@ -20,14 +22,23 @@
         {
             return myDEdges.Size();
         }
-        IMeshData.VectorOfIEdgeHandles myDEdges;
 
-        public override IMeshData.IEdgeHandle AddEdge(TopoDS_Edge theEdge)
+        VectorOfIEdgeHandles myDEdges = new VectorOfIEdgeHandles();
+
+        public override IMeshData_Face AddFace(TopoDS_Face theFace)
         {
-            IMeshData.IEdgeHandle aEdge = new BRepMeshData_Edge();//(new(myAllocator) BRepMeshData_Edge(theEdge, myAllocator));
-            myDEdges.Append(aEdge);
-            return myDEdges(EdgesNb() - 1);
+            var aFace = new BRepMeshData_Face(theFace);
+            myDFaces.Append(aFace);
+            return myDFaces.Get(FacesNb() - 1);
         }
+
+        public override IMeshData_Edge AddEdge(TopoDS_Edge theEdge)
+        {
+            IMeshData_Edge aEdge = new BRepMeshData_Edge(theEdge);//(new(myAllocator) BRepMeshData_Edge(theEdge, myAllocator));
+            myDEdges.Append(aEdge);
+            return myDEdges.Get(EdgesNb() - 1);
+        }
+
         //=======================================================================
         // Function: FacesNb
         // Purpose : 
@@ -37,7 +48,7 @@
             return myDFaces.Size();
         }
 
-        IMeshData.VectorOfIFaceHandles myDFaces;
+        VectorOfIFaceHandles myDFaces = new VectorOfIFaceHandles();
 
         //! Sets maximum size of shape's bounding box.
         public void SetMaxSize(double theValue)
@@ -50,6 +61,19 @@
         //Handle(NCollection_IncAllocator) myAllocator;
         //IMeshData::VectorOfIFaceHandles myDFaces;
         //IMeshData::VectorOfIEdgeHandles myDEdges;
+    }
+
+    //! Default implementation of face data model entity.
+    public class BRepMeshData_Face : IMeshData_Face
+    {
+        public BRepMeshData_Face(TopoDS_Face theFace) : base(theFace)
+        {
+
+
+
+            //myDWires(256, myAllocator)
+            
+        }
     }
 
 }

@@ -11,12 +11,12 @@ namespace OCCPort
         }
         public void ClearStatus()
         {
-            /*myStatus.Clear();
-            myReportIntegers.Nullify();
+            myStatus.Clear();
+            /*myReportIntegers.Nullify();
             myReportStrings.Nullify();
             myReportMessages.Nullify();*/
         }
-        Message_ExecStatus myStatus;
+        Message_ExecStatus myStatus = new Message_ExecStatus();
         //Message_Messenger myMessenger;
 
     }

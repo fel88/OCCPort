@@ -64,7 +64,7 @@ namespace OCCPort
         {
             //initParameters();
 
-            //theContext.SetShape(Shape());
+            theContext.SetShape(Shape());
             //theContext->ChangeParameters() = myParameters;
             //theContext->ChangeParameters().CleanModel = Standard_False;
 

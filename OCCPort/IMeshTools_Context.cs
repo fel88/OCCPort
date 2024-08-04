@@ -10,7 +10,7 @@ namespace OCCPort
     {
         protected IMeshTools_ModelBuilder myModelBuilder;
         IMeshData_Model myModel;
-        IMeshTools_Parameters myParameters;
+        IMeshTools_Parameters myParameters = new IMeshTools_Parameters();
         public IMeshTools_Context()
         {
 
@@ -24,10 +24,8 @@ namespace OCCPort
         //! @return True on success, False elsewhere.
         public virtual bool BuildModel()
         {
-            if (myModelBuilder == null)
-            {
-                return false;
-            }
+            if (myModelBuilder == null)            
+                return false;            
 
             myModel = myModelBuilder.Perform(GetShape(), myParameters);
             return myModel != null;

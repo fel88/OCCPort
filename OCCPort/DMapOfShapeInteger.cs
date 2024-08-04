@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace OCCPort
@@ -8,6 +9,11 @@ namespace OCCPort
         internal class DMapOfShapeInteger
         {
 			public List<DMapOfShapeIntegerItem> Items = new List<DMapOfShapeIntegerItem>();
+
+            internal void Bind(TopoDS_Edge theEdge, int v)
+            {
+                throw new NotImplementedException();
+            }
 
             internal bool IsBound(TopoDS_Edge theEdge)
             {

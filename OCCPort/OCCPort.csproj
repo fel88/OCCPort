@@ -83,12 +83,14 @@
     <Compile Include="BndLib_Add3dCurve.cs" />
     <Compile Include="BndLib_AddSurface.cs" />
     <Compile Include="Bnd_Box.cs" />
+    <Compile Include="Bnd_Box2d.cs" />
     <Compile Include="BRepAdaptor_Curve.cs" />
     <Compile Include="BRepAdaptor_Surface.cs" />
     <Compile Include="BRepBndLib.cs" />
     <Compile Include="BRepBuilderAPI_Command.cs" />
     <Compile Include="BRepBuilderAPI_MakeShape.cs" />
     <Compile Include="BRepLib_ToolTriangulatedShape.cs" />
+    <Compile Include="BRepMeshData_Edge.cs" />
     <Compile Include="BRepMeshData_Model.cs" />
     <Compile Include="BRepMesh_Context.cs" />
     <Compile Include="BRepMesh_DelabellaMeshAlgoFactory.cs" />
@@ -262,9 +264,13 @@
     <Compile Include="Image_PixMap.cs" />
     <Compile Include="IMeshData.cs" />
     <Compile Include="IMeshData\IFaceHandle.cs" />
+    <Compile Include="IMeshData_Edge.cs" />
+    <Compile Include="IMeshData_Face.cs" />
     <Compile Include="IMeshData_Model.cs" />
     <Compile Include="IMeshData_Shape.cs" />
     <Compile Include="IMeshData_Status.cs" />
+    <Compile Include="IMeshData_StatusOwner.cs" />
+    <Compile Include="IMeshData_TessellatedShape.cs" />
     <Compile Include="IMeshTools_Context.cs" />
     <Compile Include="IMeshTools_MeshAlgoFactory.cs" />
     <Compile Include="IMeshTools_MeshAlgoType.cs" />
@@ -425,6 +431,8 @@
     <Compile Include="Graphic3d_Camera.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="V3d_Viewer.cs" />
+    <Compile Include="VectorOfIEdgeHandles.cs" />
+    <Compile Include="VectorOfIFaceHandles.cs" />
     <Compile Include="XSControl_Reader.cs" />
     <Compile Include="XSControl_WorkSession.cs" />
   </ItemGroup>

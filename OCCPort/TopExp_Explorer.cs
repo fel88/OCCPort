@@ -81,7 +81,7 @@ namespace OCCPort
 
         }
         const int theStackSize = 20;
-        public void Init(TopoDS_Shape S, TopAbs_ShapeEnum ToFind, TopAbs_ShapeEnum ToAvoid)
+        public void Init(TopoDS_Shape S, TopAbs_ShapeEnum ToFind, TopAbs_ShapeEnum ToAvoid= TopAbs_ShapeEnum.TopAbs_SHAPE)
         {
 
             Clear();

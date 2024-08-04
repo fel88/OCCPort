@@ -1,6 +1,6 @@
 ﻿namespace OCCPort
 {
-	/**
+    /**
 	 * Tiny class for extended handling of error / execution
 	 * status of algorithm in universal way.
 	 *
@@ -17,53 +17,87 @@
 	 *   user data, while not breaking algorithm execution
 	 * - Fail flags correspond to cases when algorithm failed to complete
 	 */
-	class Message_ExecStatus
-	{
+    public class Message_ExecStatus
+    {
+        //! Definition of types of execution status supported by
+        //! the class Message_ExecStatus
 
-		//! Returns status type (DONE, WARN, ALARM, or FAIL) 
-		static Message_StatusType TypeOfStatus(Message_Status theStatus)
-		{
-			return (Message_StatusType)((uint)theStatus & (uint)StatusMask.MType);
-		}
-		static int getBitFlag(int theStatus)
-		{
-			return 0x1 << (theStatus & (int)StatusMask.MIndex);
-		}
+        public enum Message_StatusType
+        {
+            Message_DONE = 0x00000100,
+            Message_WARN = 0x00000200,
+            Message_ALARM = 0x00000400,
+            Message_FAIL = 0x00000800
+        }
 
-		int myDone;
-		int myWarn;
-		int myAlarm;
-		int myFail;
+        //! Clear all statuses
+        public void Clear()
+        {
+            myDone = myWarn = myAlarm = myFail = (int)Message_Status.Message_None;
+        }
 
-		//! Create empty execution status
-		public Message_ExecStatus()
+        //! Clear one status
+        public void Clear(Message_Status theStatus)
+        {
+            switch (TypeOfStatus(theStatus))
+            {
+                case Message_StatusType.Message_DONE: myDone &= ~(getBitFlag(theStatus)); return;
+                case Message_StatusType.Message_WARN: myWarn &= ~(getBitFlag(theStatus)); return;
+                case Message_StatusType.Message_ALARM: myAlarm &= ~(getBitFlag(theStatus)); return;
+                case Message_StatusType.Message_FAIL: myFail &= ~(getBitFlag(theStatus)); return;
+            }
+        }
 
-		{
-			myDone = (int)Message_Status.Message_None;
-			myWarn = (int)Message_Status.Message_None;
-			myAlarm = (int)Message_Status.Message_None;
-			myFail = (int)Message_Status.Message_None;
-		}
+        //! Returns status type (DONE, WARN, ALARM, or FAIL) 
+        static Message_StatusType TypeOfStatus(Message_Status theStatus)
+        {
+            return (Message_StatusType)((uint)theStatus & (uint)StatusMask.MType);
+        }
 
-		//! Sets a status flag
-		public void Set(Message_Status theStatus)
-		{
-			switch (TypeOfStatus(theStatus))
-			{
-				case Message_StatusType.Message_DONE: myDone |= (getBitFlag((int)theStatus)); break;
-				case Message_StatusType.Message_WARN: myWarn |= (getBitFlag((int)theStatus)); break;
-				case Message_StatusType.Message_ALARM: myAlarm |= (getBitFlag((int)theStatus)); break;
-				case Message_StatusType.Message_FAIL: myFail |= (getBitFlag((int)theStatus)); break;
-			}
-		}
+        static int getBitFlag(int theStatus)
+        {
+            return 0x1 << (theStatus & (int)StatusMask.MIndex);
+        }
 
-		//! Mask to separate bits indicating status type and index within the type  
-		enum StatusMask
-		{
-			MType = 0x0000ff00,
-			MIndex = 0x000000ff
-		};
+        static int getBitFlag(Message_Status theStatus)
+        {
+            return getBitFlag((int)theStatus);
+        }
 
-	}
+        int myDone;
+        int myWarn;
+        int myAlarm;
+        int myFail;
+
+        //! Create empty execution status
+        public Message_ExecStatus()
+
+        {
+            myDone = (int)Message_Status.Message_None;
+            myWarn = (int)Message_Status.Message_None;
+            myAlarm = (int)Message_Status.Message_None;
+            myFail = (int)Message_Status.Message_None;
+        }
+
+        //! Sets a status flag
+        public void Set(Message_Status theStatus)
+        {
+            switch (TypeOfStatus(theStatus))
+            {
+                case Message_StatusType.Message_DONE: myDone |= (getBitFlag((int)theStatus)); break;
+                case Message_StatusType.Message_WARN: myWarn |= (getBitFlag((int)theStatus)); break;
+                case Message_StatusType.Message_ALARM: myAlarm |= (getBitFlag((int)theStatus)); break;
+                case Message_StatusType.Message_FAIL: myFail |= (getBitFlag((int)theStatus)); break;
+            }
+        }
+
+        //! Mask to separate bits indicating status type and index within the type  
+        enum StatusMask
+        {
+            MType = 0x0000ff00,
+            MIndex = 0x000000ff
+        };
+
+    }
 
 }
