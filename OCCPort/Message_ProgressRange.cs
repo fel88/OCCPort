@@ -1,4 +1,6 @@
-﻿namespace OCCPort
+﻿using System;
+
+namespace OCCPort
 {
     //! Auxiliary class representing a part of the global progress scale allocated by
     //! a step of the progress scope, see Message_ProgressScope::Next().
@@ -43,6 +45,11 @@
         double myStart;        //!< Start point on the global scale
         double myDelta;        //!< Step of incrementation on the global scale
         bool myWasUsed;      //!< Flag indicating that this range
-                             //!  was used to create a new scope
+
+        internal bool More()
+        {
+            throw new NotImplementedException();
+        }
+        //!  was used to create a new scope
     }
 }

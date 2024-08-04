@@ -1,4 +1,6 @@
-﻿namespace OCCPort
+﻿using System;
+
+namespace OCCPort
 {
     public class Message_ProgressScope
     {  //! Creates a new scope taking responsibility of the part of the progress 
@@ -79,5 +81,9 @@
             return myPortion * x / (1.0 + x);  // hyperbola
         }
 
+        internal bool More()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

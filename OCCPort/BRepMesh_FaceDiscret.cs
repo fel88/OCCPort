@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Net.Http.Headers;
 using System.Security.Cryptography;
 
 namespace OCCPort
@@ -12,6 +14,35 @@ namespace OCCPort
         public BRepMesh_FaceDiscret(IMeshTools_MeshAlgoFactory theAlgoFactory)
         {
             myAlgoFactory = (theAlgoFactory);
+        }
+        //! Auxiliary functor for parallel processing of Faces.
+        public class FaceListFunctor
+        {
+            BRepMesh_FaceDiscret myAlgo;
+            Message_ProgressScope myScope;
+            List<Message_ProgressRange> myRanges = new List<Message_ProgressRange>();
+
+            public FaceListFunctor(BRepMesh_FaceDiscret theAlgo,
+                   Message_ProgressRange theRange)
+
+            {
+                myAlgo = theAlgo;
+                myScope = new Message_ProgressScope(theRange, "Face Discret", theAlgo.myModel.FacesNb());
+                //myRanges.reserve(theAlgo->myModel->FacesNb());
+                for (int aFaceIter = 0; aFaceIter < theAlgo.myModel.FacesNb(); ++aFaceIter)
+                {
+                    myRanges.Add(myScope.Next());
+                }
+            }
+            public void call(int theFaceIndex)
+            {
+                if (!myScope.More())
+                {
+                    return;
+                }
+                Message_ProgressScope aFaceScope = new Message_ProgressScope(myRanges[theFaceIndex], null, 1);
+                myAlgo.process(theFaceIndex, aFaceScope.Next());
+            }
         }
 
         IMeshTools_MeshAlgoFactory myAlgoFactory;
@@ -47,12 +78,19 @@ namespace OCCPort
             {
                 return false;
             }
-            /*FaceListFunctor aFunctor(this, theRange);
-            OSD_Parallel::For(0, myModel->FacesNb(), aFunctor, !(myParameters.InParallel && myModel->FacesNb() > 1));
+
+            FaceListFunctor aFunctor = new FaceListFunctor(this, theRange);
+            //use Parallel here in future
+            for (int i = 0; i < myModel.FacesNb(); i++)
+            {
+                aFunctor.call(i);
+            }
+
+            //            OSD_Parallel::For(0, myModel->FacesNb(), aFunctor, !(myParameters.InParallel && myModel->FacesNb() > 1));
             if (!theRange.More())
             {
                 return false;
-            }*/
+            }
 
             myModel = null; // Do not hold link to model.
             return true;

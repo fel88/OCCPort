@@ -95,10 +95,15 @@
     <Compile Include="BRepMesh_BaseMeshAlgo.cs" />
     <Compile Include="BRepMesh_ConstrainedBaseMeshAlgo.cs" />
     <Compile Include="BRepMesh_Context.cs" />
+    <Compile Include="BRepMesh_CustomBaseMeshAlgo.cs" />
+    <Compile Include="BRepMesh_CustomDelaunayBaseMeshAlgo.cs" />
     <Compile Include="BRepMesh_DataStructureOfDelaun.cs" />
+    <Compile Include="BRepMesh_DefaultRangeSplitter.cs" />
+    <Compile Include="BRepMesh_DelabellaBaseMeshAlgo.cs" />
     <Compile Include="BRepMesh_DelabellaMeshAlgoFactory.cs" />
     <Compile Include="BRepMesh_Delaun.cs" />
     <Compile Include="BRepMesh_DelaunayBaseMeshAlgo.cs" />
+    <Compile Include="BRepMesh_DelaunayNodeInsertionMeshAlgo.cs" />
     <Compile Include="BRepMesh_DiscretFactory.cs" />
     <Compile Include="BRepMesh_DiscretFactory1.cs" />
     <Compile Include="BRepMesh_DiscretRoot.cs" />
@@ -106,6 +111,7 @@
     <Compile Include="BRepMesh_IncrementalMesh.cs" />
     <Compile Include="BRepMesh_MeshAlgoFactory.cs" />
     <Compile Include="BRepMesh_ModelBuilder.cs" />
+    <Compile Include="BRepMesh_NodeInsertionMeshAlgo.cs" />
     <Compile Include="BRepMesh_ShapeTool.cs" />
     <Compile Include="BRepMesh_ShapeVisitor.cs" />
     <Compile Include="BRepMesh_Vertex.cs" />
@@ -138,6 +144,7 @@
     <Compile Include="BVH_PrimitiveSet.cs" />
     <Compile Include="BVH_PrimitiveSet3d.cs" />
     <Compile Include="BVH_VecNt.cs" />
+    <Compile Include="CDelaBella.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="DataMapOfDrawerCompd.cs" />
     <Compile Include="DMapOfShapeInteger.cs" />
@@ -269,6 +276,7 @@
     <Compile Include="Helpers.cs" />
     <Compile Include="IBVHObject.cs" />
     <Compile Include="IBVHSet.cs" />
+    <Compile Include="IDelaBella.cs" />
     <Compile Include="Image_PixMap.cs" />
     <Compile Include="IMeshData.cs" />
     <Compile Include="IMeshData\IFaceHandle.cs" />
