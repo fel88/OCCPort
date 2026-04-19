@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace OCCPort
+namespace OCCPort.Interfaces
 {
     public abstract class IMeshTools_ModelBuilder : Message_Algorithm
     {

@@ -5,5 +5,14 @@
 
     public class BRepMesh_DelaunayNodeInsertionMeshAlgo : BRepMesh_NodeInsertionMeshAlgo
     {
+        //! Returns size of cell to be used by acceleration circles grid structure.
+        public override (int, int) getCellsCount(int theVerticesNb)
+        {
+            return BRepMesh_GeomTool.CellsCount(getDFace().GetSurface(), theVerticesNb,
+                                                  getDFace().GetDeflection(),
+                                                  getRangeSplitter());
+        }
+
     }
+
 }

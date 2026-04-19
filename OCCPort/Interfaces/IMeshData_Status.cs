@@ -1,4 +1,4 @@
-﻿namespace OCCPort
+﻿namespace OCCPort.Interfaces
 {
 	//! Enumerates statuses used to notify state of discrete model.
 	public enum IMeshData_Status

@@ -1,4 +1,4 @@
-﻿namespace OCCPort
+﻿namespace OCCPort.Interfaces
 {
 	//! Enumerates built-in meshing algorithms factories implementing IMeshTools_MeshAlgoFactory interface.
 	public enum IMeshTools_MeshAlgoType

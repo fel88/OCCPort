@@ -5,5 +5,12 @@
 
     public class BRepMesh_NodeInsertionMeshAlgo : BRepMesh_DelabellaBaseMeshAlgo //: BaseAlgo
     {
+        //! Returns range splitter.
+        public AbstractRangeSplitter getRangeSplitter()
+        {
+            return myRangeSplitter;
+        }
+
+        AbstractRangeSplitter myRangeSplitter;
     }
 }

@@ -39,10 +39,19 @@ namespace OCCPort
 			throw new ArgumentException("\"TopoDS::Vertex\"");
 		}
 
-		
 
 
-		public static TopoDS_Face Face(TopoDS_Shape S)
+        public static TopoDS_Wire Wire(TopoDS_Shape S)
+        {
+            if (S is TopoDS_Wire)
+            {
+                return S as TopoDS_Wire;
+            }
+            throw new ArgumentException("\"TopoDS::Wire\"");
+            throw new NotImplementedException();
+        }
+
+        public static TopoDS_Face Face(TopoDS_Shape S)
 		{
 			if (S is TopoDS_Face)
 			{

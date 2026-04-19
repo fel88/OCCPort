@@ -1,8 +1,10 @@
-﻿namespace OCCPort
+﻿using OCCPort.Interfaces;
+
+namespace OCCPort
 {
 	//! Class implementing default context of BRepMesh algorithm.
 	//! Initializes context by default algorithms.
-	public class BRepMesh_Context : IMeshTools_Context
+	public class BRepMesh_Context : MeshTools_Context
 	{ //! Sets instance of a tool to be used to build discrete model.
 		void SetModelBuilder(IMeshTools_ModelBuilder theBuilder)
 		{

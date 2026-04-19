@@ -1,4 +1,4 @@
-﻿namespace OCCPort
+﻿namespace OCCPort.Interfaces
 {
     //! Interface class providing API for algorithms intended to create mesh for discrete face.
     public interface IMeshTools_MeshAlgo

@@ -16,8 +16,8 @@
 
             buildBaseTriangulation();
 
-            //std::pair<Standard_Integer, Standard_Integer> aCellsCount = this->getCellsCount(aStructure->NbNodes());
-            //BRepMesh_Delaun aMesher(aStructure, aCellsCount.first, aCellsCount.second, Standard_False);
+            (int,int) aCellsCount = getCellsCount(aStructure.NbNodes());
+            BRepMesh_Delaun aMesher=new BRepMesh_Delaun (aStructure, aCellsCount.Item1, aCellsCount.Item2, false);
 
             //const Standard_Integer aNewNodesNb = aStructure->NbNodes();
             //const Standard_Boolean isRemoveAux = aNewNodesNb > aNodesNb;

@@ -1,4 +1,5 @@
-﻿using System.Reflection.Metadata;
+﻿using OCCPort.Interfaces;
+using System.Reflection.Metadata;
 
 namespace OCCPort
 {
@@ -11,6 +12,12 @@ namespace OCCPort
         {
             return myStructure;
         }
+        //! Gets discrete face.
+        public IMeshData_Face getDFace()
+        {
+            return myDFace;
+        }
+
         Poly_Triangulation collectTriangles()
         {
             MapOfInteger aTriangles = myStructure.ElementsOfDomain();
@@ -112,7 +119,7 @@ namespace OCCPort
             //myUsedNodes.Nullify();
             //myAllocator.Nullify();
         }
-        BRepMeshData_Face myDFace;
+        
         private bool initDataStructure()
         {
 
@@ -124,6 +131,13 @@ namespace OCCPort
 
             return true;
         }
+
+        IMeshData_Face myDFace;
+        IMeshTools_Parameters myParameters;
+       // Handle(NCollection_IncAllocator)       myAllocator;
+  
+  //Handle(VectorOfPnt)                    myNodesMap;
+  //Handle(DMapOfIntegerInteger)           myUsedNodes;
 
         BRepMesh_DataStructureOfDelaun myStructure;
     }

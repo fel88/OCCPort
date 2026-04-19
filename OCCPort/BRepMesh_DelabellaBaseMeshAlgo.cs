@@ -1,4 +1,5 @@
 ﻿using OCCPort.Enums;
+using System;
 
 namespace OCCPort
 {
@@ -70,38 +71,36 @@ namespace OCCPort
             //          aTriangulator->SetErrLog(logDelabella2Occ, NULL);
             //          try
             //          {
-            int aVerticesNb = aTriangulator.Triangulate(
-             (int)(aPoints.Length / 2),
-             aPoints, 0, 1, 2 * sizeof(double));
+            int aVerticesNb = aTriangulator.Triangulate((int)(aPoints.Length / 2), aPoints);
 
-            //              if (aVerticesNb > 0)
-            //              {
-            //                  const DelaBella_Triangle* aTrianglePtr = aTriangulator->GetFirstDelaunayTriangle();
-            //                  while (aTrianglePtr != NULL)
-            //                  {
-            //                      Standard_Integer aNodes[3] = {
-            //        aTrianglePtr->v[0]->i + 1,
-            //        aTrianglePtr->v[2]->i + 1,
-            //        aTrianglePtr->v[1]->i + 1
-            //      };
+            if (aVerticesNb > 0)
+            {
+                DelaBella_Triangle aTrianglePtr = aTriangulator.GetFirstDelaunayTriangle();
+                while (aTrianglePtr != null)
+                {
+                    int[] aNodes = {
+                    aTrianglePtr.v[0].i + 1,
+                    aTrianglePtr.v[2].i + 1,
+                    aTrianglePtr.v[1].i + 1
+                  };
 
-            int[] aEdges = new int[3];
-            bool[] aOrientations = new bool[3];
-            //                      for (Standard_Integer k = 0; k < 3; ++k)
-            //                      {
-            //                          const BRepMesh_Edge aLink(aNodes[k], aNodes[(k + 1) % 3], BRepMesh_Free);
+                    int[] aEdges = new int[3];
+                    bool[] aOrientations = new bool[3];
+                    for (int k = 0; k < 3; ++k)
+                    {
+                        BRepMesh_Edge aLink = new BRepMesh_Edge(aNodes[k], aNodes[(k + 1) % 3], BRepMesh_DegreeOfFreedom.BRepMesh_Free);
 
-            //                          const Standard_Integer aLinkInfo = aStructure->AddLink(aLink);
-            //                          aEdges[k] = Abs(aLinkInfo);
-            //                          aOrientations[k] = aLinkInfo > 0;
-            //                      }
+                        int aLinkInfo = aStructure.AddLink(aLink);
+                        aEdges[k] = Math.Abs(aLinkInfo);
+                        aOrientations[k] = aLinkInfo > 0;
+                    }
 
-            BRepMesh_Triangle aTriangle = new BRepMesh_Triangle(aEdges, aOrientations, BRepMesh_DegreeOfFreedom.BRepMesh_Free);
-            aStructure.AddElement(aTriangle);
+                    BRepMesh_Triangle aTriangle = new BRepMesh_Triangle(aEdges, aOrientations, BRepMesh_DegreeOfFreedom.BRepMesh_Free);
+                    aStructure.AddElement(aTriangle);
 
-            //                      aTrianglePtr = aTrianglePtr->next;
-            //                  }
-            //              }
+                    aTrianglePtr = aTrianglePtr.next;
+                }
+            }
 
             //              aTriangulator->Destroy();
             //              aTriangulator = NULL;

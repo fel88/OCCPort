@@ -1,4 +1,4 @@
-﻿namespace OCCPort
+﻿namespace OCCPort.Interfaces
 {
 	public class IMeshTools_Parameters
 	{
@@ -8,16 +8,16 @@
 
         {
             MeshAlgo = IMeshTools_MeshAlgoType.IMeshTools_MeshAlgoType_DEFAULT;
-            Angle = (0.5);
-            Deflection = (0.001);
-            AngleInterior = (-1.0);
-            DeflectionInterior = (-1.0);
-            MinSize = (-1.0);
+            Angle = 0.5;
+            Deflection = 0.001;
+            AngleInterior = -1.0;
+            DeflectionInterior = -1.0;
+            MinSize = -1.0;
             /*InParallel(Standard_False),
             Relative(Standard_False),*/
             InternalVerticesMode = true;/*
     ControlSurfaceDeflection(Standard_True),*/
-            EnableControlSurfaceDeflectionAllSurfaces = (false);/*
+            EnableControlSurfaceDeflectionAllSurfaces = false;/*
     CleanModel(Standard_True),
     AdjustMinSize(Standard_False),
     ForceFaceDeflection(Standard_False),

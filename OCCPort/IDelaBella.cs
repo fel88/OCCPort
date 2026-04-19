@@ -11,7 +11,8 @@ namespace OCCPort
         // if 'y' pointer is null, y coords are treated to be located immediately after every x
         // if advance_bytes is less than 2*sizeof coordinate type, it is treated as 2*sizeof coordinate type  
 
-        public abstract int Triangulate(int points, double[] x, int xi, int yi, int advance_bytes = 0);
+        public abstract DelaBella_Triangle GetFirstDelaunayTriangle(); // valid only if Triangulate() > 0
+        public abstract int Triangulate(int points, double[] xy,  int advance_bytes = 0);
         public static IDelaBella Create()
         {
             CDelaBella db = new CDelaBella();

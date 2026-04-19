@@ -1,4 +1,6 @@
-﻿namespace OCCPort
+﻿using OCCPort.Interfaces;
+
+namespace OCCPort
 {
     internal class BRepMesh_MeshAlgoFactory : IMeshTools_MeshAlgoFactory
     {

@@ -1,4 +1,4 @@
-﻿namespace OCCPort
+﻿namespace OCCPort.Interfaces
 {
     //! Interface class providing API for algorithms intended to update or modify discrete model.
     public abstract class IMeshTools_ModelAlgo

@@ -2,7 +2,7 @@
 using System.Security.Cryptography;
 using System.Xml.Linq;
 
-namespace OCCPort
+namespace OCCPort.Interfaces
 {
     //! Base interface for factories producing instances of triangulation
     //! algorithms taking into account type of surface of target face.

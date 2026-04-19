@@ -1,8 +1,10 @@
-﻿namespace OCCPort
+﻿using OCCPort.Interfaces;
+
+namespace OCCPort
 {
-    public abstract class IMeshData_Model : IMeshData_Shape
+    public abstract class AbstractMeshData_Model : AbstractMeshData_Shape, IMeshData_Model
     {
-        public IMeshData_Model(TopoDS_Shape theShape) : base(theShape)
+        public AbstractMeshData_Model(TopoDS_Shape theShape) : base(theShape)
         {
         }
         //! Returns number of edges in discrete model.
@@ -18,7 +20,6 @@
         //! Adds new face to shape model.
         public abstract IMeshData_Face AddFace(TopoDS_Face theFace);
 
-        //! Returns number of faces in discrete model.
-        public abstract int FacesNb();
+        
     }
 }

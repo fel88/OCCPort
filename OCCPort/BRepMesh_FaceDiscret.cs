@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OCCPort.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 
@@ -56,9 +57,6 @@ namespace OCCPort
             {
                 IMeshTools_MeshAlgo aMeshingAlgo =
                   myAlgoFactory.GetAlgo(aDFace.GetSurface().GetType(), ref myParameters);
-
-
-
 
                 aMeshingAlgo.Perform(aDFace, myParameters, theRange);
             }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OCCPort.Interfaces;
+using System;
 
 namespace OCCPort
 {
@@ -36,7 +37,7 @@ namespace OCCPort
 
                 IMeshTools_ShapeVisitor aVisitor = new BRepMesh_ShapeVisitor(aModel);
 
-                IMeshTools_ShapeExplorer aExplorer = new IMeshTools_ShapeExplorer(theShape);
+                IMeshTools_ShapeExplorer aExplorer = new MeshTools_ShapeExplorer(theShape);
                 aExplorer.Accept(aVisitor);
                 SetStatus(Message_Status.Message_Done1);
             }

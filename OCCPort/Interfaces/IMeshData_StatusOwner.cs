@@ -1,7 +1,7 @@
-﻿namespace OCCPort
+﻿namespace OCCPort.Interfaces
 {
     //! Extension interface class providing status functionality.
-    interface IMeshData_StatusOwner
+   public  interface IMeshData_StatusOwner
     {
 
     }

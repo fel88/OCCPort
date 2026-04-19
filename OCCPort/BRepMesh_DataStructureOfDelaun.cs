@@ -36,6 +36,12 @@ namespace OCCPort
 
             return aElementIndex;
         }
+
+        internal int AddLink(BRepMesh_Edge aLink)
+        {
+            throw new NotImplementedException();
+        }
+
         VectorOfElements myElements;
     }
 }

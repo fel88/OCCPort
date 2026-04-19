@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OCCPort.Interfaces;
+using System;
 using System.Net.NetworkInformation;
 using System.Security.Cryptography;
 
@@ -68,7 +69,7 @@ namespace OCCPort
             //theContext->ChangeParameters().CleanModel = Standard_False;
 
             Message_ProgressScope aPS = new Message_ProgressScope(theRange, "Perform incmesh", 10);
-            IMeshTools_MeshBuilder aIncMesh = new IMeshTools_MeshBuilder(theContext);
+            IMeshTools_MeshBuilder aIncMesh = new MeshTools_MeshBuilder(theContext);
             aIncMesh.Perform(aPS.Next(9));
             //if (!aPS.More())
             //{

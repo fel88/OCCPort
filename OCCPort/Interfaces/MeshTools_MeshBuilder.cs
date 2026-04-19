@@ -1,13 +1,10 @@
-﻿using OCCPort;
-using System.Security.Cryptography;
-
-namespace OCCPort
+﻿namespace OCCPort.Interfaces
 {
-    public class IMeshTools_MeshBuilder : Message_Algorithm
+    public class MeshTools_MeshBuilder : Message_Algorithm, IMeshTools_MeshBuilder
     {
-        public IMeshTools_MeshBuilder(IMeshTools_Context theContext)
+        public MeshTools_MeshBuilder(IMeshTools_Context theContext)
         {
-            myContext = (theContext);
+            myContext = theContext;
         }
         IMeshTools_Context myContext;
 

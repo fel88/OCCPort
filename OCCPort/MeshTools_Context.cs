@@ -1,12 +1,8 @@
-﻿using System;
-using System.Security.Cryptography;
+﻿using OCCPort.Interfaces;
 
 namespace OCCPort
 {
-    //! Interface class representing context of BRepMesh algorithm.
-    //! Intended to cache discrete model and instances of tools for 
-    //! its processing.
-    public class IMeshTools_Context : IMeshData_Shape
+    public class MeshTools_Context : AbstractMeshData_Shape, IMeshTools_Context
     {
         protected IMeshTools_ModelBuilder myModelBuilder;
         IMeshData_Model myModel;
@@ -33,7 +29,7 @@ namespace OCCPort
 
         IMeshTools_ModelAlgo myFaceDiscret;
 
-        public IMeshTools_Context()
+        public MeshTools_Context()
         {
 
         }
@@ -44,7 +40,7 @@ namespace OCCPort
             myFaceDiscret = theFaceDiscret;
         }
 
-        public IMeshTools_Context(TopoDS_Shape theShape) : base(theShape)
+        public MeshTools_Context(TopoDS_Shape theShape) : base(theShape)
         {
         }
 
