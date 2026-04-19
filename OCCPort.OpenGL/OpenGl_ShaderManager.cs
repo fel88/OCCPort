@@ -65,13 +65,7 @@ namespace OCCPort.OpenGL
             //mySRgbState = theContext->ToRenderSRGB();
         }
 
-        //! Bind program for filled primitives rendering
-        internal bool BindFaceProgram(OpenGl_TextureSet theTextures, Graphic3d_TypeOfShadingModel aShadingModel,
-            object value1, object value2,
-            object hasVertColor, object toEnableEnvMap, bool v, object value3)
-        {
-            throw new NotImplementedException();
-        }
+
 
         // =======================================================================
         // function : prepareStdProgramUnlit
@@ -221,12 +215,86 @@ namespace OCCPort.OpenGL
 
         }
 
+        //! Bind program for filled primitives rendering
+        public bool BindFaceProgram(OpenGl_TextureSet theTextures,
+                                    Graphic3d_TypeOfShadingModel theShadingModel,
+                                    Graphic3d_AlphaMode theAlphaMode,
+                                    bool theHasVertColor,
+                                    bool theEnableEnvMap,
+                                     OpenGl_ShaderProgram theCustomProgram)
+        {
+            return BindFaceProgram(theTextures, theShadingModel, theAlphaMode, Aspect_InteriorStyle.Aspect_IS_SOLID,
+                                    theHasVertColor, theEnableEnvMap, false, theCustomProgram);
+        }
+        //! Bind program for filled primitives rendering
+        public bool BindFaceProgram(OpenGl_TextureSet theTextures,
+                                     Graphic3d_TypeOfShadingModel theShadingModel,
+                                     Graphic3d_AlphaMode theAlphaMode,
+                                     Aspect_InteriorStyle theInteriorStyle,
+                                     bool theHasVertColor,
+                                     bool theEnableEnvMap,
+                                     bool theEnableMeshEdges,
+                                      OpenGl_ShaderProgram theCustomProgram)
+        {
+            Graphic3d_TypeOfShadingModel aShadeModelOnFace = theShadingModel != Graphic3d_TypeOfShadingModel.Graphic3d_TypeOfShadingModel_Unlit
+                                                       && (theTextures == null || theTextures.IsModulate())
+                                                       ? theShadingModel
+                                                       : Graphic3d_TypeOfShadingModel.Graphic3d_TypeOfShadingModel_Unlit;
+            if (theCustomProgram != null
+             || myContext.caps.ffpEnable)
+            {
+                return bindProgramWithState(theCustomProgram, aShadeModelOnFace);
+            }
+
+            int aBits = getProgramBits(theTextures, theAlphaMode, theInteriorStyle, theHasVertColor, theEnableEnvMap, theEnableMeshEdges);
+            OpenGl_ShaderProgram aProgram = getStdProgram(aShadeModelOnFace, aBits);
+            return bindProgramWithState(aProgram, aShadeModelOnFace);
+        }
+
+        //! Bind specified program to current context and apply state.
+        bool bindProgramWithState(OpenGl_ShaderProgram theProgram,
+                                                        Graphic3d_TypeOfShadingModel theShadingModel)
+        {
+            bool isBound = myContext.BindProgram(theProgram);
+            if (isBound
+            && theProgram != null)
+            {
+                theProgram.ApplyVariables(myContext);
+            }
+            PushState(theProgram, theShadingModel);
+            return isBound;
+        }
+
+        // =======================================================================
+        // function : PushState
+        // purpose  : Pushes state of OCCT graphics parameters to the program
+        // =======================================================================
+        void PushState(OpenGl_ShaderProgram theProgram,
+                                      Graphic3d_TypeOfShadingModel theShadingModel)
+        {
+
+
+        }
+
+        //! Define program bits.
+        int getProgramBits(OpenGl_TextureSet theTextures,
+                                   Graphic3d_AlphaMode theAlphaMode,
+                                   Aspect_InteriorStyle theInteriorStyle,
+                                   bool theHasVertColor,
+                                   bool theEnableEnvMap,
+                                   bool theEnableMeshEdges)
+        {
+            throw new NotImplementedException();
+        }
+
         //! Returns list of registered shader programs.
         public override OpenGl_ShaderProgramList ShaderPrograms() { return myProgramList; }
 
         //! Returns true if no program objects are registered in the manager.
         public bool IsEmpty() { return myProgramList.IsEmpty(); }
+        //! Returns current state of material.
+        public OpenGl_MaterialState MaterialState()  { return myMaterialState; }
 
-
+        
     }
 }

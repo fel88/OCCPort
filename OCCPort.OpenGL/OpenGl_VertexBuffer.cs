@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenTK.Graphics.OpenGL;
+using System;
 
 namespace OCCPort.OpenGL
 {
@@ -7,13 +8,18 @@ namespace OCCPort.OpenGL
 
 	public class OpenGl_VertexBuffer : OpenGl_Buffer
 	{
-		public override uint GetTarget()
+		public override BufferTarget GetTarget()
 		{
-			const int GL_ARRAY_BUFFER = 0x8892;
-			return GL_ARRAY_BUFFER;
+			return BufferTarget.ArrayBuffer;
+            //const int GL_ARRAY_BUFFER = 0x8892;			
 		}
 
-		internal bool HasNormalAttribute()
+        internal bool HasColorAttribute()
+        {
+            throw new NotImplementedException();
+        }
+
+        internal bool HasNormalAttribute()
 		{
 			return false;
 		}

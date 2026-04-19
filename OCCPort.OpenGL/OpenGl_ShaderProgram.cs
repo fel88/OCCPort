@@ -42,5 +42,10 @@ namespace OCCPort.OpenGL
         {
             throw new NotImplementedException();
         }
+
+        internal void ApplyVariables(OpenGl_Context myContext)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

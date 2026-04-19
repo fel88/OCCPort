@@ -15,7 +15,11 @@ namespace OCCPort
         }
         TopoDS_Shape myShape;
         bool myIsDone;
-
+        //! Sets IsDone flag.
+        public void setDone()
+        {
+            myIsDone = true;
+        }
         public TopoDS_Shape Shape()
         {
             return myShape;

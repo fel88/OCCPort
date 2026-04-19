@@ -61,6 +61,7 @@ namespace OCCPort
         bool myIsOwnName;   //!< flag indicating if name was allocated or not
         bool myIsInfinite;  //!< Option to advance by hyperbolic law
 
+       public  Message_ProgressIndicator myProgress; //!< Pointer to progress indicator instance
         double RealSmall()
         { return double.MinValue; }
 

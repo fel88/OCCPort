@@ -147,7 +147,7 @@ namespace OCCPort
 		//function : IsGeometric
 		//purpose  : Returns True if <F> has a surface.
 		//=======================================================================
-		public bool IsGeometric(TopoDS_Face F)
+		public static bool IsGeometric(TopoDS_Face F)
 		{
 			BRep_TFace TF = F.TShape() as BRep_TFace;
 			Geom_Surface S = TF.Surface();

@@ -1,6 +1,8 @@
-﻿using OCCPort.Tester;
-using OCCPort;
+﻿using OCCPort;
+using OCCPort.Tester;
 using System;
+using System.Diagnostics;
+using System.Reflection.Metadata;
 using System.Runtime.InteropServices;
 
 namespace OCCPort
@@ -11,6 +13,69 @@ namespace OCCPort
         {
 
         }
+
+        //! Removes all cached polygonal representation of the shape,
+        //! i.e. the triangulations of the faces of <S> and polygons on
+        //! triangulations and polygons 3d of the edges.
+        //! In case polygonal representation is the only available representation
+        //! for the shape (shape does not have geometry) it is not removed.
+        //! @param theShape  [in] the shape to clean
+        //! @param theForce  [in] allows removing all polygonal representations from the shape,
+        //!                       including polygons on triangulations irrelevant for the faces of the given shape.
+        public static void Clean(TopoDS_Shape theShape, bool theForce = false)
+        {
+            if (theShape.IsNull())
+                return;
+
+            BRep_Builder aBuilder = new BRep_Builder();
+            Poly_Triangulation aNullTriangulation = null;
+            Poly_PolygonOnTriangulation aNullPoly;
+
+            TopTools_MapOfShape aShapeMap = new TopTools_MapOfShape();
+            TopLoc_Location anEmptyLoc = new TopLoc_Location(); 
+
+            TopExp_Explorer aFaceIt = new TopExp_Explorer(theShape, TopAbs_ShapeEnum.TopAbs_FACE);
+            for (; aFaceIt.More(); aFaceIt.Next())
+            {
+                TopoDS_Shape aFaceNoLoc = aFaceIt.Value();
+                aFaceNoLoc.Location(anEmptyLoc);
+                if (!aShapeMap.Add(aFaceNoLoc))
+                {
+                    // the face has already been processed
+                    continue;
+                }
+
+                TopoDS_Face aFace = TopoDS.Face(aFaceIt.Current());
+                if (!BRep_Tool.IsGeometric(aFace))
+                {
+                    // Do not remove triangulation as there is no surface to recompute it.
+                    continue;
+                }
+
+
+                TopLoc_Location aLoc = null;
+                Poly_Triangulation aTriangulation =
+                  BRep_Tool.Triangulation(aFace, ref aLoc);
+
+                if (aTriangulation == null)
+                    continue;
+
+                // Nullify edges
+                // Theoretically, the edges on the face (with surface) may have no geometry
+                // (no curve 3d or 2d or both). Such faces should be considered as invalid and
+                // are not supported by current implementation. So, both triangulation of the face
+                // and polygon on triangulation of the edges are removed unconditionally.
+                TopExp_Explorer aEdgeIt=new TopExp_Explorer (aFace,TopAbs_ShapeEnum. TopAbs_EDGE);
+                for (; aEdgeIt.More(); aEdgeIt.Next())
+                {
+                    TopoDS_Edge anEdge = TopoDS.Edge(aEdgeIt.Current());
+                    //aBuilder.UpdateEdge(anEdge, aNullPoly, aTriangulation, aLoc);
+                }
+
+                aBuilder.UpdateFace(aFace, aNullTriangulation);
+            }
+        }
+
 
         //=======================================================================
         //function : UVBounds
@@ -104,7 +169,7 @@ namespace OCCPort
                                                     double theLinDefl,
                                                     bool theToCheckFreeEdges)
         {
-            TopExp_Explorer anEdgeIter;
+            TopExp_Explorer anEdgeIter = new TopExp_Explorer();
             TopLoc_Location aDummyLoc = new TopLoc_Location();
             for (TopExp_Explorer aFaceIter = new TopExp_Explorer(theShape, TopAbs_ShapeEnum.TopAbs_FACE); aFaceIter.More(); aFaceIter.Next())
             {
@@ -116,15 +181,15 @@ namespace OCCPort
                     return false;
                 }
 
-                //for (anEdgeIter.Init(aFace, TopAbs_ShapeEnum.TopAbs_EDGE); anEdgeIter.More(); anEdgeIter.Next())
-                //{
-                //    TopoDS_Edge anEdge = TopoDS.Edge(anEdgeIter.Current());
-                //    Poly_PolygonOnTriangulation aPoly = BRep_Tool.PolygonOnTriangulation(anEdge, aTri, aDummyLoc);
-                //    if (aPoly == null)
-                //    {
-                //        return false;
-                //    }
-                //}
+                for (anEdgeIter.Init(aFace, TopAbs_ShapeEnum.TopAbs_EDGE); anEdgeIter.More(); anEdgeIter.Next())
+                {
+                    TopoDS_Edge anEdge = TopoDS.Edge(anEdgeIter.Current());
+                    Poly_PolygonOnTriangulation aPoly = BRep_Tool.PolygonOnTriangulation(anEdge, aTri, aDummyLoc);
+                    if (aPoly == null)
+                    {
+                        return false;
+                    }
+                }
             }
             if (!theToCheckFreeEdges)
             {
@@ -206,7 +271,12 @@ namespace OCCPort
 
         internal static void Update(TopoDS_Shell s)
         {
-
+            TopExp_Explorer ex = new TopExp_Explorer(s, TopAbs_ShapeEnum.TopAbs_FACE);
+            while (ex.More())
+            {
+                Update(TopoDS.Face(ex.Current()));
+                ex.Next();
+            }
         }
 
         internal static void Update(TopoDS_Wire w)

@@ -22,6 +22,10 @@
             {
                 //Allocate(theSize);
             }
+        }//! @return buffer data
+        public byte[] Data()
+        {
+            return myData;
         }
     }
 }

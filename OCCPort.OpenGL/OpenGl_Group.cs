@@ -9,6 +9,10 @@ namespace OCCPort.OpenGL
     //! Implementation of low-level graphic group.
     public class OpenGl_Group : Graphic3d_Group
     {
+        public OpenGl_Group(Graphic3d_Structure theStruct) : base(theStruct)
+        {
+        }
+
 
         public override void SetGroupPrimitivesAspect(Graphic3d_Aspects theAspect)
         {
@@ -119,10 +123,7 @@ namespace OCCPort.OpenGL
         }
         bool myIsClosed;
 
-        public OpenGl_Group(Graphic3d_Structure theStruct):base(theStruct)
-        {
-        }
-
+        
         internal void Render(OpenGl_Workspace theWorkspace)
         {
             // Setup aspects

@@ -317,6 +317,11 @@ namespace OCCPort.OpenGL
             throw new NotImplementedException();
         }
 
+        internal void PushMessage(All debugSourceApplication, All debugTypePerformance, int v, All debugSeverityLow, string aMsg)
+        {
+            //throw new NotImplementedException();
+        }
+
         int[] myViewport = new int[4];     //!< current viewport
         int[] myViewportVirt = new int[4]; //!< virtual viewport
         int myPointSpriteOrig; //!< GL_POINT_SPRITE_COORD_ORIGIN state (

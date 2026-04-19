@@ -9,6 +9,10 @@ namespace OCCPort
     //! Class defining the list of layers.
     internal class OpenGl_LayerList
     {
+        public OpenGl_LayerList()
+        {
+
+        }
         LayersCollection myLayers = new LayersCollection();
         internal Graphic3d_Layer[] Layers()
         {

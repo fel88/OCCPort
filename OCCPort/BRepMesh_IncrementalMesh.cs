@@ -92,7 +92,7 @@ namespace OCCPort
                 }
             }
             //aPS.Next(1);
-            //setDone();
+            setDone();
         }
     }
 

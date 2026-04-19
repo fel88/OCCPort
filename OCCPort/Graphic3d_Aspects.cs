@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OCCPort.Enums;
+using System;
 
 namespace OCCPort
 {
@@ -94,6 +95,10 @@ namespace OCCPort
         //! Graphic3d_TOSM_DEFAULT means that Shading Model set as default for entire Viewer will be used.
         public Graphic3d_TypeOfShadingModel ShadingModel() { return myShadingModel; }
 
+        public Aspect_InteriorStyle InteriorStyle()
+        {
+            throw new NotImplementedException();
+        }
 
         Graphic3d_ShaderProgram myProgram;
 

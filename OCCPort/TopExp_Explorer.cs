@@ -62,9 +62,9 @@ namespace OCCPort
 
     public class TopExp_Explorer
     {
-		public TopExp_Explorer() { }
+        public TopExp_Explorer() { }
 
-		public TopExp_Explorer(TopoDS_Shape theS,
+        public TopExp_Explorer(TopoDS_Shape theS,
             TopAbs_ShapeEnum theToFind,
             TopAbs_ShapeEnum theToAvoid = TopAbs_ShapeEnum.TopAbs_SHAPE
 )
@@ -81,7 +81,7 @@ namespace OCCPort
 
         }
         const int theStackSize = 20;
-        public void Init(TopoDS_Shape S, TopAbs_ShapeEnum ToFind, TopAbs_ShapeEnum ToAvoid= TopAbs_ShapeEnum.TopAbs_SHAPE)
+        public void Init(TopoDS_Shape S, TopAbs_ShapeEnum ToFind, TopAbs_ShapeEnum ToAvoid = TopAbs_ShapeEnum.TopAbs_SHAPE)
         {
 
             Clear();
@@ -279,6 +279,15 @@ namespace OCCPort
                 }
             }
             hasMore = false;
+        }
+
+
+        //! Returns the current shape in the exploration.
+        //! Exceptions
+        //! Standard_NoSuchObject if this explorer has no more shapes to explore.
+        public TopoDS_Shape Value()
+        {
+            return Current();
         }
     }
 }

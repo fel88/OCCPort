@@ -61,5 +61,10 @@ namespace OCCPort.OpenGL
         {
             throw new NotImplementedException();
         }
+
+        internal OpenGl_ShaderProgram ShaderProgramRes(OpenGl_Context aCtx)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

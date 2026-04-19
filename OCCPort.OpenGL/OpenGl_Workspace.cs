@@ -129,6 +129,21 @@ namespace OCCPort.OpenGL
 			myUseDepthWrite = v;
         }
 
+        internal OpenGl_TextureSet TextureSet()
+        {
+            throw new NotImplementedException();
+        }
+
+        internal OpenGl_TextureSet EnvironmentTexture()
+        {
+            throw new NotImplementedException();
+        }
+
+        internal bool ToHighlight()
+        {
+            throw new NotImplementedException();
+        }
+
         OpenGl_View myView;
 		OpenGl_Window myWindow;
 		OpenGl_Context myGlContext;

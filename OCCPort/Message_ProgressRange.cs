@@ -40,6 +40,8 @@ namespace OCCPort
             myDelta = (0.0);
             myWasUsed = (false);
         }
+        //! Returns true if ProgressIndicator signals UserBreak
+        bool UserBreak() => myParentScope != null && myParentScope.myProgress != null && myParentScope.myProgress.UserBreak();
 
         Message_ProgressScope myParentScope;  //!< Pointer to parent scope
         double myStart;        //!< Start point on the global scale
@@ -48,7 +50,8 @@ namespace OCCPort
 
         internal bool More()
         {
-            throw new NotImplementedException();
+            return !UserBreak();
+
         }
         //!  was used to create a new scope
     }
