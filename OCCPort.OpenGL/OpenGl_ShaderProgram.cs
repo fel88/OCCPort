@@ -1,5 +1,4 @@
-﻿using OpenTK.Platform.MacOS;
-using System;
+﻿using System;
 
 namespace OCCPort.OpenGL
 {

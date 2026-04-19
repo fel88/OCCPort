@@ -1,5 +1,4 @@
-﻿using OpenTK.Graphics.ES10;
-
+﻿
 namespace OCCPort.OpenGL
 {
     //! Index buffer is just a VBO with special target (GL_ELEMENT_ARRAY_BUFFER).

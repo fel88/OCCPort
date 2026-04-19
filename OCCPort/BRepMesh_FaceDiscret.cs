@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net.Http.Headers;
 using System.Security.Cryptography;
 
 namespace OCCPort

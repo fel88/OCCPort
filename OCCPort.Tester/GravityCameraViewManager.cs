@@ -1,4 +1,6 @@
 ﻿using OpenTK;
+using OpenTK.GLControl;
+using OpenTK.Mathematics;
 using System;
 using System.Drawing;
 using System.Windows.Forms;

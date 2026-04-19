@@ -1,12 +1,13 @@
 ﻿using AutoDialog;
 using OCCPort.OpenGL;
 using OpenTK;
+using OpenTK.GLControl;
 using OpenTK.Graphics.OpenGL;
+using OpenTK.Mathematics;
 using System;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
-using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -19,24 +20,25 @@ namespace OCCPort.Tester
         public Form1()
         {
             InitializeComponent();
-            glControl = new OpenTK.GLControl(new OpenTK.Graphics.GraphicsMode(32, 24, 0, 8));
+            //glControl = new GLControl(new OpenTK.Graphics.GraphicsMode(32, 24, 0, 8));
+            glControl = new GLControl(new GLControlSettings()
+            {
+                Profile = OpenTK.Windowing.Common.ContextProfile.Compatability,
+                NumberOfSamples = 8
+            });
             v3d_viewer = new V3d_Viewer(new OpenGl_GraphicDriver(new Aspect_DisplayConnection()));
 
             myAISContext = new AIS_InteractiveContext(v3d_viewer);
 
 
-            if (glControl.Context.GraphicsMode.Samples == 0)
+            /*if (glControl.Context.GraphicsMode.Samples == 0)
             {
-                glControl = new OpenTK.GLControl(new OpenTK.Graphics.GraphicsMode(32, 24, 0, 8));
-            }
+                glControl = new GLControl(new OpenTK.Graphics.GraphicsMode(32, 24, 0, 8));
+            }*/
             evwrapper = new EventWrapperGlControl(glControl);
 
             glControl.Paint += Gl_Paint;
-            //V3d_View.CreateView = () => new OpenGL.OpenGl_View();
             ViewManager = GravityViewManager = new GravityCameraViewManager(glControl);
-            GravityViewManager.View = v3d_viewer.CreateView();
-            GravityViewManager.View.SetWindow(new Aspect_Window() { }, new Aspect_RenderingContext());
-
             ViewManager.Attach(evwrapper, camera1);
             /*GravityViewManager.View.myView.Items.Add(new Graphic3d_MapOfStructure(
                 new Graphic3d_Structure()
@@ -59,6 +61,7 @@ namespace OCCPort.Tester
         private EventWrapperGlControl evwrapper;
         GLControl glControl;
 
+        bool first = true;
         private void Gl_Paint(object sender, PaintEventArgs e)
         {
             //if (!loaded)
@@ -66,6 +69,15 @@ namespace OCCPort.Tester
             if (!glControl.Context.IsCurrent)
             {
                 glControl.MakeCurrent();
+            }
+            if (first)
+            {
+                first = false;
+                //V3d_View.CreateView = () => new OpenGL.OpenGl_View();
+
+                GravityViewManager.View = v3d_viewer.CreateView();
+                GravityViewManager.View.SetWindow(new Aspect_Window() { }, new Aspect_RenderingContext());
+
             }
             /*try
             {
@@ -328,7 +340,7 @@ namespace OCCPort.Tester
             var solid = box.Solid();
             var shape = new AIS_Shape(solid).Shape();
             var sm = v3d_viewer.StructureManager();
-            
+
             for (TopExp_Explorer aExpFace = new TopExp_Explorer(shape, TopAbs_ShapeEnum.TopAbs_FACE); aExpFace.More(); aExpFace.Next())
             {
                 TopoDS_Face aFace = TopoDS.Face(aExpFace.Current());

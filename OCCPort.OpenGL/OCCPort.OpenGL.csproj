@@ -1,138 +1,15 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{A668587E-3C75-4AFB-9DDC-984ABB80F9E4}</ProjectGuid>
+    <TargetFramework>net9.0</TargetFramework>
     <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>OCCPort.OpenGL</RootNamespace>
-    <AssemblyName>OCCPort.OpenGL</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <Deterministic>true</Deterministic>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
+    <PackageReference Include="OpenTK" Version="4.9.4" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Aspect_DisplayConnection.cs" />
-    <Compile Include="Aspect_GraphicsLibrary.cs" />
-    <Compile Include="Aspect_RenderingContext.cs" />
-    <Compile Include="GLConstants.cs" />
-    <Compile Include="Graphic3d_AlphaMode.cs" />
-    <Compile Include="Graphic3d_Aspects.cs" />
-    <Compile Include="Graphic3d_BoundBuffer.cs" />
-    <Compile Include="Graphic3d_Buffer.cs" />
-    <Compile Include="Graphic3d_IndexBuffer.cs" />
-    <Compile Include="Graphic3d_IndexedMapOfStructure.cs" />
-    <Compile Include="Graphic3d_MarkerImage.cs" />
-    <Compile Include="Graphic3d_MaterialAspect.cs" />
-    <Compile Include="Graphic3d_ShaderManager.cs" />
-    <Compile Include="Graphic3d_StereoMode.cs" />
-    <Compile Include="Graphic3d_TextureSet.cs" />
-    <Compile Include="Graphic3d_TransformUtils.cs" />
-    <Compile Include="Graphic3d_TypeOfPrimitiveArray.cs" />
-    <Compile Include="Graphic3d_TypeOfReflection.cs" />
-    <Compile Include="Graphic3d_TypeOfShadingModel.cs" />
-    <Compile Include="Graphic3d_ZLayerId.cs" />
-    <Compile Include="Graphic3d_ZLayerSettings.cs" />
-    <Compile Include="MyLayersDic.cs" />
-    <Compile Include="MyMapOfView.cs" />
-    <Compile Include="NCollection_Array1.cs" />
-    <Compile Include="OpenGl_ArbFBO.cs" />
-    <Compile Include="OpenGl_ArbFBOBlit.cs" />
-    <Compile Include="OpenGl_Aspects.cs" />
-    <Compile Include="OpenGl_AspectsProgram.cs" />
-    <Compile Include="OpenGl_AspectsSprite.cs" />
-    <Compile Include="OpenGl_AspectsTextureSet.cs" />
-    <Compile Include="OpenGl_BackgroundArray.cs" />
-    <Compile Include="OpenGl_Buffer.cs" />
-    <Compile Include="OpenGl_BufferCompatT.cs" />
-    <Compile Include="OpenGl_Caps.cs" />
-    <Compile Include="OpenGl_ColorFormats.cs" />
-    <Compile Include="OpenGl_Context.cs" />
-    <Compile Include="OpenGl_DepthPeeling.cs" />
-    <Compile Include="OpenGl_Element.cs" />
-    <Compile Include="OpenGl_ElementNode.cs" />
-    <Compile Include="OpenGl_FilteredIndexedLayerIterator.cs" />
-    <Compile Include="OpenGl_FrameBuffer.cs" />
-    <Compile Include="OpenGl_GlCore11.cs" />
-    <Compile Include="OpenGl_GlCore15.cs" />
-    <Compile Include="OpenGl_GlCore20.cs" />
-    <Compile Include="OpenGl_GlobalLayerSettings.cs" />
-    <Compile Include="OpenGl_GradientParameters.cs" />
-    <Compile Include="OpenGl_GraphicDriver.cs" />
-    <Compile Include="OpenGl_Group.cs" />
-    <Compile Include="OpenGl_IndexBuffer.cs" />
-    <Compile Include="OpenGl_IndexBufferCompat.cs" />
-    <Compile Include="OpenGl_IndexedLayerIterator.cs" />
-    <Compile Include="OpenGl_Layer.cs" />
-    <Compile Include="OpenGl_LayerList.cs" />
-    <Compile Include="OpenGl_LayerStack.cs" />
-    <Compile Include="OpenGl_MatrixState.cs" />
-    <Compile Include="OpenGl_NamedResource.cs" />
-    <Compile Include="OpenGl_PrimitiveArray.cs" />
-    <Compile Include="OpenGl_Raytrace.cs" />
-    <Compile Include="OpenGl_RaytraceGeometry.cs" />
-    <Compile Include="OpenGl_Resource.cs" />
-    <Compile Include="OpenGl_ResourcesMap.cs" />
-    <Compile Include="OpenGl_ShaderManager.cs" />
-    <Compile Include="OpenGl_ShaderProgram.cs" />
-    <Compile Include="OpenGl_ShaderProgramList.cs" />
-    <Compile Include="OpenGl_ShadowMapArray.cs" />
-    <Compile Include="OpenGl_StateCounter.cs" />
-    <Compile Include="OpenGl_Structure.cs" />
-    <Compile Include="OpenGl_Texture.cs" />
-    <Compile Include="OpenGl_TextureArray.cs" />
-    <Compile Include="OpenGl_TextureSet.cs" />
-    <Compile Include="OpenGl_VertexBuffer.cs" />
-    <Compile Include="OpenGl_VertexBufferCompat.cs" />
-    <Compile Include="OpenGl_VertexBufferT.cs" />
-    <Compile Include="OpenGl_View.cs" />
-    <Compile Include="OpenGl_Window.cs" />
-    <Compile Include="OpenGl_Workspace.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Select3D_BVHBuilder3d.cs" />
-    <Compile Include="Standard_Size.cs" />
-    <Compile Include="_core11fwd.cs" />
-    <Compile Include="_core15fwd.cs" />
+    <ProjectReference Include="..\OCCPort\OCCPort.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\OCCPort\OCCPort.csproj">
-      <Project>{26bf7edf-d7e8-4e6c-b77a-efb585cab6a1}</Project>
-      <Name>OCCPort</Name>
-    </ProjectReference>
+    <Folder Include="Properties\" />
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="OpenTK">
-      <Version>3.3.3</Version>
-    </PackageReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
