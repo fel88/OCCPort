@@ -4,7 +4,12 @@
     <OutputType>Library</OutputType>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Shaders\PhongShading.fs" />
+  </ItemGroup>
+  <ItemGroup>
     <EmbeddedResource Include="Quantity_ColorTable.pxx" />
+    <EmbeddedResource Include="Shaders\PhongShading.vs" />
+    <EmbeddedResource Include="Shaders\PhongShading.fs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />

@@ -1,4 +1,4 @@
-﻿namespace OCCPort
+﻿namespace OCCPort.Enums
 {
     //! Standard GLSL program combination bits.
     public enum Graphic3d_ShaderFlags
