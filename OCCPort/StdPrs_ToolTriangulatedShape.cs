@@ -71,6 +71,11 @@ namespace OCCPort
             return aDeflection;
         }
 
+        internal static void ComputeNormals(TopoDS_Face aFace, Poly_Triangulation aT)
+        {
+            throw new NotImplementedException();
+        }
+
         internal static bool Tessellate(TopoDS_Shape theShape, Prs3d_Drawer theDrawer)
         {
             bool wasRecomputed = false;

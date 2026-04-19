@@ -128,5 +128,10 @@ namespace OCCPort
         {
             throw new NotImplementedException();
         }
+
+        internal void SetClosed(bool theIsClosed)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

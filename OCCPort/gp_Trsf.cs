@@ -237,5 +237,10 @@ namespace OCCPort
 		{
 			throw new NotImplementedException();
 		}
+
+        internal object VectorialPart()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

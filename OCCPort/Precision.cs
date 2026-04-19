@@ -46,6 +46,10 @@ namespace OCCPort
 		//! number. Currently Abs(R) > 1e100
 		public static bool IsInfinite(double R) { return Math.Abs(R) >= (0.5 * Precision.Infinite()); }
         public static double Angular() { return 1e-12; }
-        
+
+        internal static double SquareConfusion()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

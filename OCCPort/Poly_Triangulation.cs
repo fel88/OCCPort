@@ -37,6 +37,14 @@ namespace OCCPort
         //! Returns the number of nodes for this triangulation.
         public int NbNodes() { return myNodes.Length(); }
 
+        internal int NbTriangles()
+        {
+            throw new NotImplementedException();
+        }
 
+        internal bool HasGeometry()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
