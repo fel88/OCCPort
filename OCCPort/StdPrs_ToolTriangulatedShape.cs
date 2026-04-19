@@ -1,5 +1,6 @@
 ﻿using OCCPort.Tester;
 using System;
+using System.Diagnostics;
 using System.Reflection.Metadata;
 
 namespace OCCPort
@@ -71,11 +72,27 @@ namespace OCCPort
             return aDeflection;
         }
 
-        internal static void ComputeNormals(TopoDS_Face aFace, Poly_Triangulation aT)
+        
+        //! Similar to BRepTools::Triangulation() but without extra checks.
+        //! @return true if all faces within shape are triangulated.
+        public static bool IsTriangulated(TopoDS_Shape theShape)
         {
-            throw new NotImplementedException();
+            TopLoc_Location aLocDummy = new TopLoc_Location();
+            for (TopExp_Explorer aFaceIter = new TopExp_Explorer(theShape, TopAbs_ShapeEnum.TopAbs_FACE); aFaceIter.More(); aFaceIter.Next())
+            {
+                TopoDS_Face aFace = TopoDS.Face(aFaceIter.Current());
+                Poly_Triangulation aTri = BRep_Tool.Triangulation(aFace, ref aLocDummy);
+                if (aTri == null)
+                {
+                    return false;
+                }
+            }
+            return true;
         }
-
+        //! Validates triangulation within the shape and performs tessellation if necessary.
+        //! @param theShape [in] the shape.
+        //! @param theDrawer [in] the display settings.
+        //! @return true if tessellation was recomputed and false otherwise.
         internal static bool Tessellate(TopoDS_Shape theShape, Prs3d_Drawer theDrawer)
         {
             bool wasRecomputed = false;

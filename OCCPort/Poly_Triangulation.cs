@@ -46,5 +46,10 @@ namespace OCCPort
         {
             throw new NotImplementedException();
         }
+
+        internal void SetNode(int aNodeIter, gp_Pnt aNode)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

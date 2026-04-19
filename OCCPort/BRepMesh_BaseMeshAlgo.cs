@@ -1,4 +1,6 @@
-﻿namespace OCCPort
+﻿using System.Reflection.Metadata;
+
+namespace OCCPort
 {
     //! Class provides base functionality for algorithms building face triangulation.
     //! Performs initialization of BRepMesh_DataStructureOfDelaun and nodes map structures.
@@ -54,11 +56,28 @@
                 return;
             }
 
-            // collectNodes(aTriangulation);
+            collectNodes(aTriangulation);
 
-            //BRepMesh_ShapeTool.AddInFace(myDFace.GetFace(), aTriangulation);
+            BRepMesh_ShapeTool.AddInFace(myDFace.GetFace(), aTriangulation);
         }
+        //=======================================================================
+        //function : collectNodes
+        //purpose  :
+        //=======================================================================
+        public void collectNodes(Poly_Triangulation theTriangulation)
+        {
+            //for (int i = 1; i <= myNodesMap.Size(); ++i)
+            {
+                //if (myUsedNodes->IsBound(i))
+                {
+                    //BRepMesh_Vertex aVertex = myStructure.GetNode(i);
 
+                    //const Standard_Integer aNodeIndex = myUsedNodes->Find(i);
+                    //theTriangulation->SetNode(aNodeIndex, myNodesMap->Value(aVertex.Location3d()));
+                    //theTriangulation->SetUVNode(aNodeIndex, getNodePoint2d(aVertex));
+                }
+            }
+        }
 
         //! Generates mesh for the contour stored in data structure.
         public abstract void generateMesh(Message_ProgressRange theRange);

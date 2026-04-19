@@ -85,9 +85,35 @@ namespace OCCPort.Tester
             }
         }
 
-        private static void ExploreSolids(TopoDS_Shape theShape, BRep_Builder aBuilder, TopoDS_Compound aClosed, TopoDS_Compound anOpened, bool v)
+        //! Searches closed and unclosed subshapes in shape structure and puts them
+        //! into two compounds for separate processing of closed and unclosed sub-shapes
+        public static void ExploreSolids(TopoDS_Shape theShape, BRep_Builder theBuilder, TopoDS_Compound theClosed, TopoDS_Compound theOpened, bool theIgnore1DSubShape)
         {
-            //            throw new NotImplementedException();
+            if (theShape.IsNull())
+            {
+                return;
+            }
+
+            switch (theShape.ShapeType())
+            {
+                case TopAbs_ShapeEnum.TopAbs_COMPOUND:
+                case TopAbs_ShapeEnum.TopAbs_COMPSOLID:
+                    {
+                        for (TopoDS_Iterator anIter = new TopoDS_Iterator(theShape); anIter.More(); anIter.Next())
+                        {
+                            ExploreSolids(anIter.Value(), theBuilder, theClosed, theOpened, theIgnore1DSubShape);
+                        }
+                        return;
+                    }
+                case TopAbs_ShapeEnum.TopAbs_FACE:
+                    {
+                        theBuilder.Add(theOpened, theShape);
+                        return;
+                    }
+            }
+            /*
+             * not finished here!
+             */
         }
 
 
@@ -138,7 +164,7 @@ namespace OCCPort.Tester
                 gp_Trsf aTrsf = aLoc.Transformation();
 
                 // Determinant of transform matrix less then 0 means that mirror transform applied.
-              //  bool isMirrored = aTrsf.VectorialPart().Determinant() < 0;
+                //  bool isMirrored = aTrsf.VectorialPart().Determinant() < 0;
 
                 // Extracts vertices & normals from nodes
                 StdPrs_ToolTriangulatedShape.ComputeNormals(aFace, aT);

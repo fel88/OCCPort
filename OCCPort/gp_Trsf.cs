@@ -242,5 +242,10 @@ namespace OCCPort
         {
             throw new NotImplementedException();
         }
+
+        internal void Invert()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

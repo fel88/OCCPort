@@ -12,4 +12,5 @@
         // obsolete aliases
         Aspect_IS_HOLLOW = Aspect_IS_EMPTY, //!< transparent surface interior
     };
+
 }

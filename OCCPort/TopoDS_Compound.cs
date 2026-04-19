@@ -1,6 +1,6 @@
-﻿namespace OCCPort.Tester
+﻿namespace OCCPort
 {
-	internal class TopoDS_Compound: TopoDS_Shape
+	public class TopoDS_Compound: TopoDS_Shape
 	{
 	}
 }

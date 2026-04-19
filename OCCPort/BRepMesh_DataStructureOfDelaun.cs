@@ -1,4 +1,6 @@
-﻿namespace OCCPort
+﻿using System;
+
+namespace OCCPort
 {
     //! Describes the data structure necessary for the mesh algorithms in 
     //! two dimensions plane or on surface by meshing in UV space.
@@ -17,5 +19,23 @@
         {
             return myNodes.Extent();
         }
+
+        //=======================================================================
+        //function : AddElement
+        //purpose  : 
+        //=======================================================================
+        public int AddElement(BRepMesh_Triangle theElement)
+        {
+            myElements.Append(theElement);
+            int aElementIndex = myElements.Size();
+            myElementsOfDomain.Add(aElementIndex);
+//
+           //  int (&e)[3] = theElement.myEdges;
+          //  for (int i = 0; i < 3; ++i)
+           //     myLinks(e[i]).Append(aElementIndex);
+
+            return aElementIndex;
+        }
+        VectorOfElements myElements;
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace OCCPort
+﻿using OCCPort.Enums;
+
+namespace OCCPort
 {
     //! Class provides base functionality to build face triangulation using Delabella project.
     //! Performs generation of mesh using raw data from model.
@@ -83,8 +85,8 @@
             //        aTrianglePtr->v[1]->i + 1
             //      };
 
-            //                      Standard_Integer aEdges[3];
-            //                      Standard_Boolean aOrientations[3];
+            int[] aEdges = new int[3];
+            bool[] aOrientations = new bool[3];
             //                      for (Standard_Integer k = 0; k < 3; ++k)
             //                      {
             //                          const BRepMesh_Edge aLink(aNodes[k], aNodes[(k + 1) % 3], BRepMesh_Free);
@@ -94,8 +96,8 @@
             //                          aOrientations[k] = aLinkInfo > 0;
             //                      }
 
-            //                      const BRepMesh_Triangle aTriangle(aEdges, aOrientations, BRepMesh_Free);
-            //                      aStructure->AddElement(aTriangle);
+            BRepMesh_Triangle aTriangle = new BRepMesh_Triangle(aEdges, aOrientations, BRepMesh_DegreeOfFreedom.BRepMesh_Free);
+            aStructure.AddElement(aTriangle);
 
             //                      aTrianglePtr = aTrianglePtr->next;
             //                  }

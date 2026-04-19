@@ -21,6 +21,29 @@ namespace OCCPort
 
             theMaxDimension = Math.Max(aMaxX - aMinX, Math.Max(aMaxY - aMinY, aMaxZ - aMinZ));
         }
+
+
+        //! Stores the given triangulation into the given face.
+        //! @param theFace face to be updated by triangulation.
+        //! @param theTriangulation triangulation to be stored into the face.
+        public static void AddInFace(TopoDS_Face theFace, Poly_Triangulation theTriangulation)
+        {
+            TopLoc_Location aLoc = theFace.Location();
+            if (!aLoc.IsIdentity())
+            {
+                gp_Trsf aTrsf = aLoc.Transformation();
+                aTrsf.Invert();
+                for (int aNodeIter = 1; aNodeIter <= theTriangulation.NbNodes(); ++aNodeIter)
+                {
+                    gp_Pnt aNode = theTriangulation.Node(aNodeIter);
+                    aNode.Transform(aTrsf);
+                    theTriangulation.SetNode(aNodeIter, aNode);
+                }
+            }
+
+            BRep_Builder aBuilder = new BRep_Builder();
+            aBuilder.UpdateFace(theFace, theTriangulation);
+        }
     }
 
 

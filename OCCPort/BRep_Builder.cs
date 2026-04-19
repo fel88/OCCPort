@@ -1,7 +1,6 @@
-﻿using OCCPort;
-using OCCPort.Tester;
-using System;
+﻿using System;
 using System.Diagnostics;
+using System.Reflection.Metadata;
 
 namespace OCCPort
 {
@@ -205,9 +204,25 @@ namespace OCCPort
             aTFace.Triangulation(theTriangulation, theToReset);
             theFace.TShape().Modified(true);
         }
+        //=======================================================================
+        //function : MakeFace
+        //purpose  :
+        //=======================================================================
+        public void MakeFace(TopoDS_Face theFace,
+                               Poly_ListOfTriangulation theTriangulations,
+                               Poly_Triangulation theActiveTriangulation)
+        {
+            BRep_TFace aTFace = new BRep_TFace();
+            if (!theFace.IsNull() && theFace.Locked())
+            {
+                throw new TopoDS_LockedShape("BRep_Builder::MakeFace");
+            }
+            aTFace.Triangulations(theTriangulations, theActiveTriangulation);
+            MakeShape(theFace, aTFace);
+        }
 
         internal void MakeFace(TopoDS_Face F, Geom_Surface S,
-                                    double Tol)
+                                            double Tol)
         {
             BRep_TFace TF = new BRep_TFace();
             if (!F.IsNull() && F.Locked())

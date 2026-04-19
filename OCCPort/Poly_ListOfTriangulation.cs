@@ -4,13 +4,36 @@ using System.Collections.Generic;
 
 namespace OCCPort
 {
-	internal class Poly_ListOfTriangulation: List<Poly_Triangulation>
+	public class Poly_ListOfTriangulation: List<Poly_Triangulation>
 	{
-		
 
-        public void Clear()
+
+        internal class Iterator
         {
-            this.Clear();
+
+
+
+            Poly_ListOfTriangulation target;
+            public Iterator(Poly_ListOfTriangulation theTriangulations)
+            {
+                target = theTriangulations;
+            }
+
+            internal bool More()
+            {
+                return index < target.Count - 1;
+            }
+            int index = 0;
+            internal Poly_Triangulation Next()
+            {
+                index++;
+                return target[index];
+            }
+
+            internal Poly_Triangulation Value()
+            {
+                return target[index];
+            }
         }
         public void Append(Poly_Triangulation p)
         {
@@ -32,6 +55,9 @@ namespace OCCPort
 			return this[0];
 		}
 
-        
+        internal int Size()
+        {
+            return Count;
+        }
     }
 }
