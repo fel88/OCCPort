@@ -1,5 +1,6 @@
 ﻿using OCCPort.Enums;
 using OpenTK.Compute.OpenCL;
+using OpenTK.Graphics.OpenGL;
 using System;
 using System.Reflection.Metadata;
 
@@ -13,7 +14,7 @@ namespace OCCPort.OpenGL
         {
             myContext = theCtx;
         }
-        //OpenGl_ShaderProgramFFP    myFfpProgram;
+
 
         Graphic3d_TypeOfShadingModel myShadingModel;       //!< lighting shading model
         OpenGl_ShaderProgramList myProgramList;        //!< The list of shader programs
@@ -57,9 +58,9 @@ namespace OCCPort.OpenGL
         public OpenGl_ShaderManager(OpenGl_Context theContext) : base(theContext.GraphicsLibrary())
 
         {
-            //myFfpProgram(new OpenGl_ShaderProgramFFP()),
-            //myShadingModel(Graphic3d_TypeOfShadingModel_Gouraud),
-            //myUnlitPrograms(new OpenGl_SetOfPrograms()),
+            myFfpProgram = new OpenGl_ShaderProgramFFP();
+            myShadingModel = Graphic3d_TypeOfShadingModel.Graphic3d_TypeOfShadingModel_Gouraud;
+            myUnlitPrograms = new OpenGl_SetOfPrograms();
             myContext = theContext;
             //myHasLocalOrigin(Standard_False)
             //mySRgbState = theContext->ToRenderSRGB();
@@ -264,16 +265,91 @@ namespace OCCPort.OpenGL
             PushState(theProgram, theShadingModel);
             return isBound;
         }
+        OpenGl_ShaderProgramFFP myFfpProgram;
+        //! Pushes current state of OCCT projection transform to specified program (only on state change).
+        public void PushProjectionState(OpenGl_ShaderProgram theProgram)
+        {
+            if (myProjectionState.Index() != theProgram.ActiveState(OpenGl_UniformStateType.OpenGl_PROJECTION_STATE))
+            {
+                pushProjectionState(theProgram);
+            }
+        }
+
+        private void pushProjectionState(OpenGl_ShaderProgram theProgram)
+        {
+            theProgram.UpdateState(OpenGl_UniformStateType.OpenGl_PROJECTION_STATE, myProjectionState.Index());
+            if (theProgram == myFfpProgram)
+            {
+                if (myContext.core11ffp != null)
+                {
+                    myContext.core11ffp.glMatrixMode(All.Projection);
+                    myContext.core11ffp.glLoadMatrixf(myProjectionState.ProjectionMatrix());
+                }
+                return;
+            }
+            /*
+             
+  theProgram->SetUniform (myContext,
+                          theProgram->GetStateLocation (OpenGl_OCC_PROJECTION_MATRIX),
+                          myProjectionState.ProjectionMatrix());
+
+  GLint aLocation = theProgram->GetStateLocation (OpenGl_OCC_PROJECTION_MATRIX_INVERSE);
+  if (aLocation != OpenGl_ShaderProgram::INVALID_LOCATION)
+  {
+    theProgram->SetUniform (myContext, aLocation, myProjectionState.ProjectionMatrixInverse());
+  }
+
+  theProgram->SetUniform (myContext,
+                          theProgram->GetStateLocation (OpenGl_OCC_PROJECTION_MATRIX_TRANSPOSE),
+                          myProjectionState.ProjectionMatrix(), true);
+
+  aLocation = theProgram->GetStateLocation (OpenGl_OCC_PROJECTION_MATRIX_INVERSE_TRANSPOSE);
+  if (aLocation != OpenGl_ShaderProgram::INVALID_LOCATION)
+  {
+    theProgram->SetUniform (myContext, aLocation, myProjectionState.ProjectionMatrixInverse(), true);
+  }*/
+        }
 
         // =======================================================================
         // function : PushState
         // purpose  : Pushes state of OCCT graphics parameters to the program
         // =======================================================================
-        void PushState(OpenGl_ShaderProgram theProgram,
-                                      Graphic3d_TypeOfShadingModel theShadingModel)
+        public void PushState(OpenGl_ShaderProgram theProgram,
+
+                    Graphic3d_TypeOfShadingModel theShadingModel = Graphic3d_TypeOfShadingModel.Graphic3d_TypeOfShadingModel_Unlit)
         {
+            OpenGl_ShaderProgram aProgram = theProgram != null ? theProgram : myFfpProgram;
+            /*PushClippingState(aProgram);
+            PushLightSourceState(aProgram); // should be before PushWorldViewState()
+            PushWorldViewState(aProgram);
+            PushModelWorldState(aProgram);*/
+            PushProjectionState(aProgram);/*
+            PushMaterialState(aProgram);
+            PushOitState(aProgram);*/
 
+            if (theProgram != null)
 
+            {
+                OpenGl_ShaderUniformLocation aLocViewPort = theProgram.GetStateLocation(OpenGl_StateVariable.OpenGl_OCCT_VIEWPORT);
+                if (aLocViewPort != null)
+                {
+                    //theProgram.SetUniform(myContext, aLocViewPort, OpenGl_Vec4((float)myContext.Viewport()[0], (float)myContext.Viewport()[1],
+                    //                                                            (float)myContext.Viewport()[2], (float)myContext.Viewport()[3]));
+                }
+            }
+            else if (myContext.core11ffp != null)
+            {
+                // manage FFP lighting
+                //myContext.SetShadeModel(theShadingModel);
+                if (theShadingModel == Graphic3d_TypeOfShadingModel.Graphic3d_TypeOfShadingModel_Unlit)
+                {
+                    myContext.core11fwd.glDisable((int)All.Lighting);
+                }
+                else
+                {
+                    myContext.core11fwd.glEnable((int)All.Lighting);
+                }
+            }
         }
 
         //! Define program bits.
@@ -293,8 +369,13 @@ namespace OCCPort.OpenGL
         //! Returns true if no program objects are registered in the manager.
         public bool IsEmpty() { return myProgramList.IsEmpty(); }
         //! Returns current state of material.
-        public OpenGl_MaterialState MaterialState()  { return myMaterialState; }
+        public OpenGl_MaterialState MaterialState() { return myMaterialState; }
 
-        
+
+    }
+
+    public class OpenGl_ShaderUniformLocation
+    {
+
     }
 }

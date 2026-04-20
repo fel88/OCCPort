@@ -423,12 +423,28 @@ namespace OCCPort.OpenGL
             render(theProjection, theReadDrawFbo, theOitAccumFbo, false);
         }
         OpenGl_FrameBuffer myFBO;
+        //=======================================================================
+        //function : SetFBO
+        //purpose  :
+        //=======================================================================
+        public void SetFBO(object theFbo)
+        {
+            myFBO = (OpenGl_FrameBuffer)theFbo;
+        }//=======================================================================
+         //function : FBOCreate
+         //purpose  :
+         //=======================================================================
+        public object FBOCreate(int theWidth,
+                                                   int theHeight)
+        {
+            return myWorkspace.FBOCreate(theWidth, theHeight);
+        }
 
         public override void Redraw()
         {
             bool wasDisabledMSAA = myToDisableMSAA;
             bool hadFboBlit = myHasFboBlit;
-            /*if (myRenderParams.Method == Graphic3d_RenderingMode.Graphic3d_RM_RAYTRACING
+            if (myRenderParams.Method == Graphic3d_RenderingMode.Graphic3d_RM_RAYTRACING
             && !myCaps.vboDisable
             && !myCaps.keepArrayData)
             {
@@ -436,11 +452,47 @@ namespace OCCPort.OpenGL
                 // if (myWasRedrawnGL) { myStructureManager->SetDeviceLost(); }
                 myDriver.setDeviceLost();
                 myCaps.keepArrayData = true;
-            }*/
+            }
 
-            OpenGl_FrameBuffer aFrameBuffer = myFBO;
+            if (!myWorkspace.Activate())
+            {
+                return;
+            }
+
+            //// implicitly disable VSync when using HMD composer (can be mirrored in window for debugging)
+            //myWindow->SetSwapInterval(IsActiveXR());
+
+            //++myFrameCounter;
+            //const Handle(OpenGl_Context)&aCtx = myWorkspace->GetGlContext();
+            //aCtx->FrameStats()->FrameStart(myWorkspace->View(), false);
+            //aCtx->SetLineFeather(myRenderParams.LineFeather);
+
+            //const Standard_Integer anSRgbState = aCtx->ToRenderSRGB() ? 1 : 0;
+            //if (mySRgbState != -1
+            // && mySRgbState != anSRgbState)
+            //{
+            //    releaseSrgbResources(aCtx);
+            //    initTextureEnv(aCtx);
+            //}
+            //mySRgbState = anSRgbState;
+            //aCtx->ShaderManager()->UpdateSRgbState();
+
+            //// release pending GL resources
+            //aCtx->ReleaseDelayed();
+
+            //// fetch OpenGl context state
+            //aCtx->FetchState();
 
             Graphic3d_Camera.Projection aProjectType = myCamera.ProjectionType();
+
+            if (!prepareFrameBuffers(aProjectType))
+            {
+                myBackBufferRestored = false;
+                myIsImmediateDrawn = false;
+                return;
+            }
+            OpenGl_FrameBuffer aFrameBuffer = myFBO;
+
             if (aProjectType == Graphic3d_Camera.Projection.Projection_Stereo)
             {
             }
@@ -449,12 +501,6 @@ namespace OCCPort.OpenGL
                 OpenGl_FrameBuffer aMainFbo = myMainSceneFbos[0].IsValid() ? myMainSceneFbos[0] : aFrameBuffer;
                 OpenGl_FrameBuffer aMainFboOit = myMainSceneFbosOit[0].IsValid() ? myMainSceneFbosOit[0] : null;
                 redraw(aProjectType, aMainFbo, aMainFboOit);
-            }
-            if (!prepareFrameBuffers(aProjectType))
-            {
-                myBackBufferRestored = false;
-                myIsImmediateDrawn = false;
-                return;
             }
         }
 

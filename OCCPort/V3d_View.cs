@@ -35,15 +35,15 @@ namespace OCCPort
         //=============================================================================
         public void Redraw()
         {
-            /*if (!myView.IsDefined()
-			 || !myView.IsActive())
-			{
-				return;
-			}*/
+            if (!myView.IsDefined()
+             || !myView.IsActive())
+            {
+                return;
+            }
 
-            //myIsInvalidatedImmediate = false;
+            myIsInvalidatedImmediate = false;
             Graphic3d_StructureManager aStructureMgr = MyViewer.StructureManager();
-            //	for (Standard_Integer aRetryIter = 0; aRetryIter < 2; ++aRetryIter)
+            for (int aRetryIter = 0; aRetryIter < 2; ++aRetryIter)
             {
                 if (aStructureMgr.IsDeviceLost())
                 {
@@ -66,7 +66,23 @@ namespace OCCPort
 
         private void AutoZFit()
         {
-            //throw new NotImplementedException();
+            if (!AutoZFitMode())
+            {
+                return;
+            }
+
+            ZFitAll(myAutoZFitScaleFactor);
+        }
+
+        //! returns TRUE if automatic z-fit mode is turned on.
+        bool AutoZFitMode() { return myAutoZFitIsOn; }
+
+        void ZFitAll(double theScaleFactor)
+        {
+            Bnd_Box aMinMaxBox = myView.MinMaxValues(false); // applicative min max boundaries
+            Bnd_Box aGraphicBox = myView.MinMaxValues(true);  // real graphical boundaries (not accounting infinite flag).
+
+            myView.Camera().ZFitAll(theScaleFactor, aMinMaxBox, aGraphicBox);
         }
 
         public void Rotation(int X,

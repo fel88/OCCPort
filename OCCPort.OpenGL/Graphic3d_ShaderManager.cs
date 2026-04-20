@@ -172,23 +172,7 @@ namespace OCCPort.OpenGL
 "}";
 
 
-        // =======================================================================
-        // function : prepareStdProgramUnlit
-        // purpose  :
-        // =======================================================================
-        public bool prepareStdProgramUnlit(OpenGl_ShaderProgram theProgram,
-                                                                       int theBits,
-                                                                       bool theIsOutline)
-        {
-            Graphic3d_ShaderProgram aProgramSrc = getStdProgramUnlit(theBits, theIsOutline);
-            string aKey = "";
-            if (!Create(aProgramSrc, ref aKey, theProgram))
-            {
-                theProgram = new OpenGl_ShaderProgram(); // just mark as invalid
-                return false;
-            }
-            return true;
-        }
+   
         protected OpenGl_ShaderProgramList myProgramList;        //!< The list of shader programs
 
         public virtual OpenGl_ShaderProgramList ShaderPrograms() { return myProgramList; }

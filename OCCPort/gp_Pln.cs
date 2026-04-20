@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenTK.Audio.OpenAL;
+using System;
 
 namespace OCCPort
 {
@@ -58,6 +59,22 @@ namespace OCCPort
             return new gp_Ax1(pos.Location(), pos.YDirection());
         }
 
+        //! Computes the distance between <me> and the point <theP>.
+        public double Distance(gp_Pnt theP)
+        {
 
+            {
+                gp_Pnt aLoc = pos.Location();
+                gp_Dir aDir = pos.Direction();
+                double aD = (aDir.X() * (theP.X() - aLoc.X()) +
+                                    aDir.Y() * (theP.Y() - aLoc.Y()) +
+                                    aDir.Z() * (theP.Z() - aLoc.Z()));
+                if (aD < 0)
+                {
+                    aD = -aD;
+                }
+                return aD;
+            }
+        }
     }
 }

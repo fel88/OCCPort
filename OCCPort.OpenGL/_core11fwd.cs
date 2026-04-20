@@ -34,6 +34,10 @@ namespace OCCPort.OpenGL
         {
             GL.Enable((EnableCap)v);
         }
+        internal void glEnable(int v)
+        {
+            GL.Enable((EnableCap)v);
+        }
 
         internal void glGetBooleanv(GetPName n, ref bool v)
         {

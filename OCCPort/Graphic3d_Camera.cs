@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OCCPort;
+using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices.ComTypes;
 using static System.Net.Mime.MediaTypeNames;
@@ -888,18 +889,278 @@ namespace OCCPort
             return myProjType;
         }
 
-		internal void SetAspect(double theAspect)
-		{
-			if (Aspect() == theAspect)
-			{
-				return;
-			}
+        internal void SetAspect(double theAspect)
+        {
+            if (Aspect() == theAspect)
+            {
+                return;
+            }
 
-			myAspect = theAspect;
-			myFOVx = myFOVy * theAspect;
+            myAspect = theAspect;
+            myFOVx = myFOVy * theAspect;
 
-			InvalidateProjection();
+            InvalidateProjection();
 
-		}
-	}
+        }
+
+        //! Change Z-min and Z-max planes of projection volume to match the displayed objects.
+        public void ZFitAll(double theScaleFactor, Bnd_Box theMinMax, Bnd_Box theGraphicBB)
+        {
+            double aZNear = 0.0, aZFar = 1.0;
+            ZFitAll(theScaleFactor, theMinMax, theGraphicBB, aZNear, aZFar);
+            SetZRange(aZNear, aZFar);
+        }
+        // (degrees -> radians) * 0.5
+        const double DTR_HALF = 0.5 * 0.0174532925;
+
+        // default property values
+        const double DEFAULT_ZNEAR = 0.001;
+        const double DEFAULT_ZFAR = 3000.0;
+
+        //! Estimate Z-min and Z-max planes of projection volume to match the
+        //! displayed objects. The methods ensures that view volume will
+        //! be close by depth range to the displayed objects. Fitting assumes that
+        //! for orthogonal projection the view volume contains the displayed objects
+        //! completely. For zoomed perspective view, the view volume is adjusted such
+        //! that it contains the objects or their parts, located in front of the camera.
+        //! @param[in] theScaleFactor the scale factor for Z-range.
+        //!   The range between Z-min, Z-max projection volume planes
+        //!   evaluated by z fitting method will be scaled using this coefficient.
+        //!   Program error exception is thrown if negative or zero value is passed.
+        //! @param[in] theMinMax applicative min max boundaries.
+        //! @param[in] theGraphicBB real graphical boundaries (not accounting infinite flag).
+        public bool ZFitAll(double theScaleFactor,
+                                 Bnd_Box theMinMax,
+                                 Bnd_Box theGraphicBB,
+                                double theZNear,
+                                double theZFar)
+        {
+            new Standard_ASSERT_RAISE(theScaleFactor > 0.0, "Zero or negative scale factor is not allowed.");
+
+            // Method changes zNear and zFar parameters of camera so as to fit graphical structures
+            // by their graphical boundaries. It precisely fits min max boundaries of primary application
+            // objects (second argument), while it can sacrifice the real graphical boundaries of the
+            // scene with infinite or helper objects (third argument) for the sake of perspective projection.
+            if (theGraphicBB.IsVoid())
+            {
+                theZNear = DEFAULT_ZNEAR;
+                theZFar = DEFAULT_ZFAR;
+                return false;
+            }
+
+            // Measure depth of boundary points from camera eye.
+            List<gp_Pnt> aPntsToMeasure = new List<gp_Pnt>();
+
+            double[] aGraphicBB = [6];
+            theGraphicBB.Get(out aGraphicBB[0], out aGraphicBB[1], out aGraphicBB[2], out aGraphicBB[3], out aGraphicBB[4], out aGraphicBB[5]);
+
+            aPntsToMeasure.Add(new gp_Pnt(aGraphicBB[0], aGraphicBB[1], aGraphicBB[2]));
+            aPntsToMeasure.Add(new gp_Pnt(aGraphicBB[0], aGraphicBB[1], aGraphicBB[5]));
+            aPntsToMeasure.Add(new gp_Pnt(aGraphicBB[0], aGraphicBB[4], aGraphicBB[2]));
+            aPntsToMeasure.Add(new gp_Pnt(aGraphicBB[0], aGraphicBB[4], aGraphicBB[5]));
+            aPntsToMeasure.Add(new gp_Pnt(aGraphicBB[3], aGraphicBB[1], aGraphicBB[2]));
+            aPntsToMeasure.Add(new gp_Pnt(aGraphicBB[3], aGraphicBB[1], aGraphicBB[5]));
+            aPntsToMeasure.Add(new gp_Pnt(aGraphicBB[3], aGraphicBB[4], aGraphicBB[2]));
+            aPntsToMeasure.Add(new gp_Pnt(aGraphicBB[3], aGraphicBB[4], aGraphicBB[5]));
+
+            bool isFiniteMinMax = !theMinMax.IsVoid() && !theMinMax.IsWhole();
+
+            if (isFiniteMinMax)
+            {
+                double[] aMinMax = [6];
+                theMinMax.Get(out aMinMax[0],out aMinMax[1], out aMinMax[2], out aMinMax[3], out aMinMax[4], out aMinMax[5]);
+
+                aPntsToMeasure.Add(new gp_Pnt(aMinMax[0], aMinMax[1], aMinMax[2]));
+                aPntsToMeasure.Add(new gp_Pnt(aMinMax[0], aMinMax[1], aMinMax[5]));
+                aPntsToMeasure.Add(new gp_Pnt(aMinMax[0], aMinMax[4], aMinMax[2]));
+                aPntsToMeasure.Add(new gp_Pnt(aMinMax[0], aMinMax[4], aMinMax[5]));
+                aPntsToMeasure.Add(new gp_Pnt(aMinMax[3], aMinMax[1], aMinMax[2]));
+                aPntsToMeasure.Add(new gp_Pnt(aMinMax[3], aMinMax[1], aMinMax[5]));
+                aPntsToMeasure.Add(new gp_Pnt(aMinMax[3], aMinMax[4], aMinMax[2]));
+                aPntsToMeasure.Add(new gp_Pnt(aMinMax[3], aMinMax[4], aMinMax[5]));
+            }
+
+            // Camera eye plane.
+            gp_Dir aCamDir = Direction();
+            gp_Pnt aCamEye = myEye;
+            gp_Pln aCamPln = new(aCamEye, aCamDir);
+
+            double aModelMinDist = RealLast();
+            double aModelMaxDist = RealFirst();
+            double aGraphMinDist = RealLast();
+            double aGraphMaxDist = RealFirst();
+
+            gp_XYZ anAxialScale = myAxialScale;
+
+            // Get minimum and maximum distances to the eye plane.
+            int aCounter = 0;
+            for (int i = 0; i < aPntsToMeasure.Count; i++)
+            {
+                gp_Pnt aPntIt = aPntsToMeasure[i];
+                gp_Pnt aMeasurePnt = aPntIt;
+
+                aPntsToMeasure[i] = new gp_Pnt(aMeasurePnt.X() * anAxialScale.X(),
+                                          aMeasurePnt.Y() * anAxialScale.Y(),
+                                          aMeasurePnt.Z() * anAxialScale.Z());
+
+                double aDistance = aCamPln.Distance(aMeasurePnt);
+
+                // Check if the camera is intruded into the scene.
+                gp_Vec aVecToMeasurePnt = new(aCamEye, aMeasurePnt);
+                if (aVecToMeasurePnt.Magnitude() > gp.Resolution()
+                 && aCamDir.IsOpposite(aVecToMeasurePnt, Math.PI * 0.5))
+                {
+                    aDistance *= -1;
+                }
+
+                // The first eight points are from theGraphicBB, the last eight points are from theMinMax (can be absent).
+                double aChangeMinDist = aCounter >= 8 ? aModelMinDist : aGraphMinDist;
+                double aChangeMaxDist = aCounter >= 8 ? aModelMaxDist : aGraphMaxDist;
+                aChangeMinDist = Math.Min(aDistance, aChangeMinDist);
+                aChangeMaxDist = Math.Max(aDistance, aChangeMaxDist);
+                aCounter++;
+            }
+
+            // Compute depth of bounding box center.
+            double aMidDepth = (aGraphMinDist + aGraphMaxDist) * 0.5;
+            double aHalfDepth = (aGraphMaxDist - aGraphMinDist) * 0.5;
+
+            // Compute enlarged or shrank near and far z ranges.
+            double aZNear = aMidDepth - aHalfDepth * theScaleFactor;
+            double aZFar = aMidDepth + aHalfDepth * theScaleFactor;
+
+            if (!IsOrthographic())
+            {
+                // Everything is behind the perspective camera.
+                if (aZFar < zEpsilon())
+                {
+                    theZNear = DEFAULT_ZNEAR;
+                    theZFar = DEFAULT_ZFAR;
+                    return false;
+                }
+            }
+
+            //
+            // Consider clipping errors due to double to single precision floating-point conversion.
+            //
+
+            // Model to view transformation performs translation of points against eye position
+            // in three dimensions. Both point coordinate and eye position values are converted from
+            // double to single precision floating point numbers producing conversion errors. 
+            // Epsilon (Mod) * 3.0 should safely compensate precision error for z coordinate after
+            // translation assuming that the:
+            // Epsilon (Eye.Mod()) * 3.0 > Epsilon (Eye.X()) + Epsilon (Eye.Y()) + Epsilon (Eye.Z()).
+            double aEyeConf = 3.0 * zEpsilon(myEye.XYZ().Modulus());
+
+            // Model to view transformation performs rotation of points according to view direction.
+            // New z coordinate is computed as a multiplication of point's x, y, z coordinates by the
+            // "forward" direction vector's x, y, z coordinates. Both point's and "z" direction vector's
+            // values are converted from double to single precision floating point numbers producing
+            // conversion errors.
+            // Epsilon (Mod) * 6.0 should safely compensate the precision errors for the multiplication
+            // of point coordinates by direction vector.
+            gp_Pnt aGraphicMin = theGraphicBB.CornerMin();
+            gp_Pnt aGraphicMax = theGraphicBB.CornerMax();
+
+            double aModelConf = 6.0 * zEpsilon(aGraphicMin.XYZ().Modulus()) +
+                                       6.0 * zEpsilon(aGraphicMax.XYZ().Modulus());
+
+            // Compensate floating point conversion errors by increasing zNear, zFar to avoid clipping.
+            aZNear -= zEpsilon(aZNear) + aEyeConf + aModelConf;
+            aZFar += zEpsilon(aZFar) + aEyeConf + aModelConf;
+
+            if (!IsOrthographic())
+            {
+                // For perspective projection, the value of z in normalized device coordinates is non-linear
+                // function of eye z coordinate. For fixed-point depth representation resolution of z in
+                // model-view space will grow towards zFar plane and its scale depends mostly on how far is zNear
+                // against camera's eye. The purpose of the code below is to select most appropriate zNear distance
+                // to balance between clipping (less zNear, more chances to observe closely small models without clipping)
+                // and resolution of depth. A well applicable criteria to this is a ratio between resolution of z at center
+                // of model boundaries and the distance to that center point. The ratio is chosen empirically and validated
+                // by tests database. It is considered to be ~0.001 (0.1%) for 24 bit depth buffer, for less depth bitness
+                // the zNear will be placed similarly giving lower resolution.
+                // Approximation of the formula for respectively large z range is:
+                // zNear = [z * (1 + k) / (k * c)],
+                // where:
+                // z - distance to center of model boundaries;
+                // k - chosen ratio, c - capacity of depth buffer;
+                // k = 0.001, k * c = 1677.216, (1 + k) / (k * c) ~ 5.97E-4
+                //
+                // The function uses center of model boundaries computed from "theMinMax" boundaries (instead of using real
+                // graphical boundaries of all displayed objects). That means that it can sacrifice resolution of presentation
+                // of non primary ("infinite") application graphical objects in favor of better perspective projection of the
+                // small applicative objects measured with "theMinMax" values.
+                double aZRange = isFiniteMinMax ? aModelMaxDist - aModelMinDist : aGraphMaxDist - aGraphMinDist;
+                double aZMin = isFiniteMinMax ? aModelMinDist : aGraphMinDist;
+                double aZ = aZMin < 0 ? aZRange / 2.0 : aZRange / 2.0 + aZMin;
+                double aZNearMin = aZ * 5.97E-4;
+                if (aZNear < aZNearMin)
+                {
+                    // Clip zNear according to the minimum value matching the quality.
+                    aZNear = aZNearMin;
+                    if (aZFar < aZNear)
+                    {
+                        aZFar = aZNear;
+                    }
+                }
+                else
+                {
+                    // Compensate zNear conversion errors for perspective projection.
+                    aZNear -= aZFar * zEpsilon(aZNear) / (aZFar - zEpsilon(aZNear));
+                }
+
+                // Compensate zFar conversion errors for perspective projection.
+                aZFar += zEpsilon(aZFar);
+
+                // Ensure that after all the zNear is not a negative value.
+                if (aZNear < zEpsilon())
+                {
+                    aZNear = zEpsilon();
+                }
+                new Standard_ASSERT_RAISE(aZFar > aZNear, "ZFar should be greater than ZNear");
+            }
+
+            theZNear = aZNear;
+            theZFar = aZFar;
+            new Standard_ASSERT_RAISE(aZFar > aZNear, "ZFar should be greater than ZNear");
+            return true;
+        }
+
+        private double RealFirst()
+        {
+             return -DBL_MAX; 
+        }
+
+        const double DBL_MAX = 1.7976931348623158e+308; // max value
+        private double RealLast()
+        {
+             return DBL_MAX; 
+
+        }
+
+        // relative z-range tolerance compatible with for floating point.
+        static double zEpsilon(double theValue)
+        {
+            double anAbsValue = Math.Abs(theValue);
+            if (anAbsValue <= (double)FLT_MIN)
+            {
+                return FLT_MIN;
+            }
+            double aLogRadix = Math.Log10(anAbsValue) / Math.Log10(FLT_RADIX);
+            double aExp = Math.Floor(aLogRadix);
+            return FLT_EPSILON * Math.Pow(FLT_RADIX, aExp);
+        }
+        const double FLT_MIN = 1.175494351e-38F;// min normalized positive value
+
+        const double FLT_EPSILON = 1.192092896e-07F; // smallest such that 1.0+FLT_EPSILON != 1.0
+        const int FLT_RADIX = 2;                       // exponent radix
+
+        // z-range tolerance compatible with for floating point.
+        static double zEpsilon()
+        {
+            return FLT_EPSILON;
+        }
+
+    }
 }

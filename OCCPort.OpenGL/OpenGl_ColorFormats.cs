@@ -1,6 +1,8 @@
-﻿namespace OCCPort
+﻿using System.Collections.Generic;
+
+namespace OCCPort
 {
-    internal class OpenGl_ColorFormats
+    public class OpenGl_ColorFormats:List<int>
     {
     }
 }

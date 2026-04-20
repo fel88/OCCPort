@@ -1,6 +1,8 @@
 ﻿using OCCPort;
 using OCCPort.OpenGL;
+using OpenTK.Graphics.ES11;
 using System;
+using System.Reflection.Metadata;
 
 namespace OCCPort
 {
@@ -26,7 +28,7 @@ namespace OCCPort
             throw new NotImplementedException();
         }
 
-        
+
 
         internal void InitLazy(OpenGl_Context aCtx, Graphic3d_Vec2i aSizeXY, int myFboColorFormat, int myFboDepthFormat, int v)
         {
@@ -67,7 +69,28 @@ namespace OCCPort
         {
             return myGlFBufferId != NO_FRAMEBUFFER;
         }
+        public bool Init(OpenGl_Context theGlContext,
+                                           Graphic3d_Vec2i theSize,
+                                           int theColorFormat,
+                                           int theDepthFormat,
+                                           int theNbSamples)
+        {
+            OpenGl_ColorFormats aColorFormats = new OpenGl_ColorFormats();
+            if (theColorFormat != 0)
+            {
+                aColorFormats.Add(theColorFormat);
+            }
+            return Init(theGlContext, theSize, aColorFormats, theDepthFormat, theNbSamples);
+        }
 
+        public bool Init(OpenGl_Context theGlContext,
+                                           Graphic3d_Vec2i theSize,
+                                           OpenGl_ColorFormats theColorFormats,
+                                           int theDepthFormat,
+                                           int theNbSamples)
+        {
+            throw new NotImplementedException();
+        }
 
         int myInitVPSizeX;         //!< viewport width  specified during initialization (kept even on failure)
         int myInitVPSizeY;         //!< viewport height specified during initialization (kept even on failure)
@@ -85,7 +108,7 @@ namespace OCCPort
         OpenGl_TextureArray myColorTextures;       //!< color texture objects
         OpenGl_Texture myDepthStencilTexture; //!< depth-stencil texture object
 
-        public OpenGl_FrameBuffer(string theResourceId) : base(theResourceId)
+        public OpenGl_FrameBuffer(string theResourceId = null) : base(theResourceId)
         {
 
         }

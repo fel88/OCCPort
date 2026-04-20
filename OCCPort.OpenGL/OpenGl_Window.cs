@@ -1,4 +1,5 @@
 ﻿using OCCPort.OpenGL;
+using OpenTK.Mathematics;
 using System;
 using System.Reflection.Metadata;
 
@@ -16,23 +17,23 @@ namespace OCCPort
         Aspect_Window myPlatformWindow; //!< software platform window wrapper
         Aspect_Window mySizeWindow;     //!< window object defining dimensions
 
-        Graphic3d_Vec2i mySize;        //!< window width x height in pixels
+        Vector2i mySize;        //!< window width x height in pixels
 
         int mySwapInterval;//!< last assigned swap interval (VSync) for this window
 
-        public int Width() { return mySize.x(); }
-        public int Height() { return mySize.y(); }
+        public int Width() { return mySize.X; }
+        public int Height() { return mySize.Y; }
         // =======================================================================
         // function : Resize
         // purpose  : call_subr_resize
         // =======================================================================
         public void Resize()
         {
-            Graphic3d_Vec2i aWinSize;
+            Vector2i aWinSize;
             int xx, yy;
             mySizeWindow.Size(out xx, out yy);
-            aWinSize = new Graphic3d_Vec2i(xx, yy);
-            if (mySize.x() == aWinSize.x() && mySize.y() == aWinSize.y())
+            aWinSize = new Vector2i(xx, yy);
+            if (mySize.X == aWinSize.X && mySize.Y == aWinSize.Y)
             {
                 // if the size is not changed - do nothing
                 return;
@@ -47,11 +48,30 @@ namespace OCCPort
         // function : Activate
         // purpose  :
         // =======================================================================
-        bool Activate()
+        public bool Activate()
         {
             return myGlContext.MakeCurrent();
         }
 
+        public void Init(OpenGl_GraphicDriver theDriver,
+                          Aspect_Window thePlatformWindow,
+                          Aspect_Window theSizeWindow,
+                          Aspect_RenderingContext theGContext,
+                          OpenGl_Caps theCaps,
+                          OpenGl_Context theShareCtx)
+        {
+            myGlContext = new OpenGl_Context(theCaps);
+            myOwnGContext = (theGContext == null);
+            myPlatformWindow = thePlatformWindow;
+            mySizeWindow = theSizeWindow;
+            if (theCaps != null)
+                mySwapInterval = theCaps.swapInterval;
+
+            mySize = new Vector2i();
+            mySizeWindow.Size(out mySize.X, out mySize.Y);
+
+            bool isCoreProfile = false;
+        }
         // =======================================================================
         // function : init
         // purpose  :
@@ -67,7 +87,7 @@ namespace OCCPort
 
             //myGlContext->core11fwd->glDisable(GL_DITHER);
             //  myGlContext->core11fwd->glDisable(GL_SCISSOR_TEST);
-            int[] aViewport = new[] { 0, 0, mySize.x(), mySize.y() };
+            int[] aViewport = new[] { 0, 0, mySize.X, mySize.Y };
             /*   myGlContext->ResizeViewport(aViewport);
                myGlContext->SetDrawBuffer(GL_BACK);
                if (myGlContext->core11ffp != NULL)
@@ -81,21 +101,7 @@ namespace OCCPort
             return myGlContext;
         }
 
-        internal void Init(OpenGl_GraphicDriver theDriver,
-            Aspect_Window thePlatformWindow,
-            Aspect_Window theSizeWindow,
-            Aspect_RenderingContext theGContext,
-            OpenGl_Caps theCaps,
-            OpenGl_Context theShareCtx)
-        {
-            myGlContext = new OpenGl_Context(theCaps);
-            //myOwnGContext = (theGContext == 0);
-            myPlatformWindow = thePlatformWindow;
-            mySizeWindow = theSizeWindow;
-            //mySwapInterval = theCaps->swapInterval;
 
-
-        }
 
         //! Return platform window.
         public Aspect_Window PlatformWindow() { return myPlatformWindow; }
