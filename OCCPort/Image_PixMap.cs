@@ -1,6 +1,6 @@
 ﻿namespace OCCPort
 {
-    internal class Image_PixMap
+    public class Image_PixMap
     {
     }
 }

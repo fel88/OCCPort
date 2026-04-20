@@ -1,6 +1,8 @@
-﻿using OpenTK.Graphics.OpenGL;
+﻿using OpenTK.Compute.OpenCL;
+using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;
+using System.Reflection.Metadata;
 using System.Xml.Linq;
 
 namespace OCCPort.OpenGL
@@ -30,7 +32,8 @@ namespace OCCPort.OpenGL
             myWorkspace = new OpenGl_Workspace(this, null);
 
         }
-
+        //! Return true if view content cache has been invalidated.
+        public override bool IsInvalidated() { return !myBackBufferRestored; }
         public override void eraseStructure(Graphic3d_CStructure theStructure)
         {
             OpenGl_Structure aStruct = (OpenGl_Structure)(theStructure);
@@ -45,26 +48,36 @@ namespace OCCPort.OpenGL
                                   Aspect_Window theWindow,
                                   Aspect_RenderingContext theContext)
         {
+            if (theContext != null
+&& theParentVIew != null)
+            {
+                throw new Standard_ProgramError("OpenGl_View::SetWindow(), internal error");
+            }
 
+            if (myParentView != null)
+            {
+                myParentView.RemoveSubview(this);
+                myParentView = null;
+            }
             OpenGl_View aParentView = (OpenGl_View)(theParentVIew);
             if (theParentVIew != null)
             {
-                /*if (aParentView == null
-				 || aParentView.GlWindow().IsNull()
-				 || aParentView.GlWindow()->GetGlContext().IsNull())
-				{
-					throw new Standard_ProgramError("OpenGl_View::SetWindow(), internal error");
-				}
+                if (aParentView == null
+                 || aParentView.GlWindow() == null
+                 || aParentView.GlWindow().GetGlContext() == null)
+                {
+                    throw new Standard_ProgramError("OpenGl_View::SetWindow(), internal error");
+                }
 
-				myParentView = aParentView;
-				myParentView.AddSubview(this);
+                myParentView = aParentView;
+                myParentView.AddSubview(this);
 
-				Aspect_NeutralWindow aSubWindow = (Aspect_NeutralWindow)(theWindow);
-				SubviewResized(aSubWindow);
+                Aspect_NeutralWindow aSubWindow = (Aspect_NeutralWindow)(theWindow);
+                SubviewResized(aSubWindow);
 
-				OpenGl_Window aParentGlWindow = aParentView.GlWindow();
-				Aspect_RenderingContext aRendCtx = aParentGlWindow.GetGlContext().RenderingContext();
-				myWindow = myDriver.CreateRenderWindow(aParentGlWindow.PlatformWindow(), theWindow, aRendCtx);*/
+                OpenGl_Window aParentGlWindow = aParentView.GlWindow();
+                Aspect_RenderingContext aRendCtx = aParentGlWindow.GetGlContext().RenderingContext();
+                myWindow = myDriver.CreateRenderWindow(aParentGlWindow.PlatformWindow(), theWindow, aRendCtx);
             }
             else
             {
@@ -76,6 +89,14 @@ namespace OCCPort.OpenGL
             }
             myWorkspace = new OpenGl_Workspace(this, myWindow);
 
+        }
+        public override void Resized()
+        {
+            base.Resized();
+            if (myWindow != null)
+            {
+                myWindow.Resize();
+            }
         }
 
         //! Returns OpenGL window implementation.
@@ -429,7 +450,500 @@ namespace OCCPort.OpenGL
                 OpenGl_FrameBuffer aMainFboOit = myMainSceneFbosOit[0].IsValid() ? myMainSceneFbosOit[0] : null;
                 redraw(aProjectType, aMainFbo, aMainFboOit);
             }
+            if (!prepareFrameBuffers(aProjectType))
+            {
+                myBackBufferRestored = false;
+                myIsImmediateDrawn = false;
+                return;
+            }
+        }
 
+        //! Format Frame Buffer format for logging messages.
+        static string printFboFormat(OpenGl_FrameBuffer theFbo)
+        {
+            return "" + theFbo.GetInitVPSizeX() + "x" + theFbo.GetInitVPSizeY() + "@" + theFbo.NbSamples();
+        }
+
+
+        bool prepareFrameBuffers(Graphic3d_Camera.Projection theProj)
+        {
+            theProj = myCamera.ProjectionType();
+            OpenGl_Context aCtx = myWorkspace.GetGlContext();
+
+            int aSizeX = 0, aSizeY = 0;
+            OpenGl_FrameBuffer aFrameBuffer = myFBO;
+            if (aFrameBuffer != null)
+            {
+                aSizeX = aFrameBuffer.GetVPSizeX();
+                aSizeY = aFrameBuffer.GetVPSizeY();
+            }
+            else if (IsActiveXR())
+            {
+                aSizeX = myXRSession.RecommendedViewport().X;
+                aSizeY = myXRSession.RecommendedViewport().Y;
+            }
+            else
+            {
+                aSizeX = myWindow.Width();
+                aSizeY = myWindow.Height();
+            }
+
+            Graphic3d_Vec2i aRendSize = new Graphic3d_Vec2i((int)(myRenderParams.RenderResolutionScale * aSizeX + 0.5f),
+                                  (int)(myRenderParams.RenderResolutionScale * aSizeY + 0.5f));
+            if (aSizeX < 1
+             || aSizeY < 1
+             || aRendSize.x() < 1
+             || aRendSize.y() < 1)
+            {
+                myBackBufferRestored = false;
+                myIsImmediateDrawn = false;
+                return false;
+            }
+
+            //// determine multisampling parameters
+            //int aNbSamples = !myToDisableMSAA && aSizeX == aRendSize.x()
+            //                            ? Max(Min(myRenderParams.NbMsaaSamples, aCtx.MaxMsaaSamples()), 0)
+            //                            : 0;
+            //if (aNbSamples != 0)
+            //{
+            //    aNbSamples = OpenGl_Context::GetPowerOfTwo(aNbSamples, aCtx.MaxMsaaSamples());
+            //}
+            //// Only MSAA textures can be blit into MSAA target,
+            //// while render buffers could be resolved only into non-MSAA targets.
+            //// As result, within obsolete OpenGL ES 3.0 context, we may create only one MSAA render buffer for main scene content
+            //// and blit it into non-MSAA immediate FBO.
+            //const bool hasTextureMsaa = aCtx.HasTextureMultisampling();
+
+            //bool toUseOit = myRenderParams.TransparencyMethod != Graphic3d_RTM_BLEND_UNORDERED
+            //             && !myIsSubviewComposer
+            //             && checkOitCompatibility(aCtx, aNbSamples > 0);
+
+            //const bool toInitImmediateFbo = myTransientDrawToFront && !myIsSubviewComposer
+            //                             && (!aCtx->caps->useSystemBuffer || (toUseOit && HasImmediateStructures()));
+
+            //if (aFrameBuffer == null
+            // && !aCtx->DefaultFrameBuffer().IsNull()
+            // && aCtx->DefaultFrameBuffer()->IsValid())
+            //{
+            //    aFrameBuffer = aCtx->DefaultFrameBuffer().operator->();
+            //}
+
+            //if (myHasFboBlit
+            // && (myTransientDrawToFront
+            //  || theProj == Graphic3d_Camera.Projection.Projection_Stereo
+            //  || aNbSamples != 0
+            //  || toUseOit
+            //  || aSizeX != aRendSize.x()))
+            //{
+            //    if (myMainSceneFbos[0].GetVPSize() != aRendSize
+            //     || myMainSceneFbos[0].NbSamples() != aNbSamples)
+            //    {
+            //        if (!myTransientDrawToFront)
+            //        {
+            //            myImmediateSceneFbos[0].Release(aCtx.operator->());
+            //            myImmediateSceneFbos[1].Release(aCtx.operator->());
+            //            myImmediateSceneFbos[0].ChangeViewport(0, 0);
+            //            myImmediateSceneFbos[1].ChangeViewport(0, 0);
+            //        }
+
+            //        // prepare FBOs containing main scene
+            //        // for further blitting and rendering immediate presentations on top
+            //        if (aCtx.core20fwd != null)
+            //        {
+            //            const bool wasFailedMain0 = checkWasFailedFbo(myMainSceneFbos[0], aRendSize.x(), aRendSize.y(), aNbSamples);
+            //            if (!myMainSceneFbos[0]->Init(aCtx, aRendSize, myFboColorFormat, myFboDepthFormat, aNbSamples)
+            //             && !wasFailedMain0)
+            //            {
+            //                string aMsg = "Error! Main FBO "
+            //                                                + printFboFormat(myMainSceneFbos[0]) + " initialization has failed";
+            //                aCtx->PushMessage(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_HIGH, aMsg);
+            //            }
+            //        }
+            //    }
+
+            //    if (myMainSceneFbos[0]->IsValid() && (toInitImmediateFbo || myImmediateSceneFbos[0]->IsValid()))
+            //    {
+            //        const bool wasFailedImm0 = checkWasFailedFbo(myImmediateSceneFbos[0], myMainSceneFbos[0]);
+            //        if (!myImmediateSceneFbos[0]->InitLazy(aCtx, *myMainSceneFbos[0], hasTextureMsaa)
+            //         && !wasFailedImm0)
+            //        {
+            //            TCollection_ExtendedString aMsg = TCollection_ExtendedString() + "Error! Immediate FBO "
+            //                                            + printFboFormat(myImmediateSceneFbos[0]) + " initialization has failed";
+            //            aCtx->PushMessage(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_HIGH, aMsg);
+            //        }
+            //    }
+            //}
+            //else
+            //{
+            //    myMainSceneFbos[0]->Release(aCtx.operator->());
+            //    myMainSceneFbos[1]->Release(aCtx.operator->());
+            //    myImmediateSceneFbos[0]->Release(aCtx.operator->());
+            //    myImmediateSceneFbos[1]->Release(aCtx.operator->());
+            //    myXrSceneFbo->Release(aCtx.operator->());
+            //    myMainSceneFbos[0]->ChangeViewport(0, 0);
+            //    myMainSceneFbos[1]->ChangeViewport(0, 0);
+            //    myImmediateSceneFbos[0]->ChangeViewport(0, 0);
+            //    myImmediateSceneFbos[1]->ChangeViewport(0, 0);
+            //    myXrSceneFbo->ChangeViewport(0, 0);
+            //}
+
+            //bool hasXRBlitFbo = false;
+            //if (theProj == Graphic3d_Camera::Projection_Stereo
+            // && IsActiveXR()
+            // && myMainSceneFbos[0]->IsValid())
+            //{
+            //    if (aNbSamples != 0
+            //     || aSizeX != aRendSize.x())
+            //    {
+            //        hasXRBlitFbo = myXrSceneFbo->InitLazy(aCtx, Graphic3d_Vec2i(aSizeX, aSizeY), myFboColorFormat, myFboDepthFormat, 0);
+            //        if (!hasXRBlitFbo)
+            //        {
+            //            string aMsg = "Error! VR FBO "
+            //                                            + printFboFormat(myXrSceneFbo) + " initialization has failed";
+            //            aCtx.PushMessage(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_HIGH, aMsg);
+            //        }
+            //    }
+            //}
+            //else if (theProj == Graphic3d_Camera.Projection.Projection_Stereo
+            //      && myMainSceneFbos[0].IsValid())
+            //{
+            //    const bool wasFailedMain1 = checkWasFailedFbo(myMainSceneFbos[1], myMainSceneFbos[0]);
+            //    if (!myMainSceneFbos[1]->InitLazy(aCtx, *myMainSceneFbos[0], true)
+            //     && !wasFailedMain1)
+            //    {
+            //        TCollection_ExtendedString aMsg = TCollection_ExtendedString() + "Error! Main FBO (second) "
+            //                                        + printFboFormat(myMainSceneFbos[1]) + " initialization has failed";
+            //        aCtx->PushMessage(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_HIGH, aMsg);
+            //    }
+            //    if (!myMainSceneFbos[1]->IsValid())
+            //    {
+            //        // no enough memory?
+            //        theProj = Graphic3d_Camera::Projection_Perspective;
+            //    }
+            //    else if (!myTransientDrawToFront)
+            //    {
+            //        //
+            //    }
+            //    else if (!aCtx->HasStereoBuffers()
+            //           || myRenderParams.StereoMode != Graphic3d_StereoMode_QuadBuffer)
+            //    {
+            //        const bool wasFailedImm0 = checkWasFailedFbo(myImmediateSceneFbos[0], myMainSceneFbos[0]);
+            //        const bool wasFailedImm1 = checkWasFailedFbo(myImmediateSceneFbos[1], myMainSceneFbos[0]);
+            //        if (!myImmediateSceneFbos[0]->InitLazy(aCtx, *myMainSceneFbos[0], hasTextureMsaa)
+            //         && !wasFailedImm0)
+            //        {
+            //            TCollection_ExtendedString aMsg = TCollection_ExtendedString() + "Error! Immediate FBO (first) "
+            //                                            + printFboFormat(myImmediateSceneFbos[0]) + " initialization has failed";
+            //            aCtx->PushMessage(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_HIGH, aMsg);
+            //        }
+            //        if (!myImmediateSceneFbos[1]->InitLazy(aCtx, *myMainSceneFbos[0], hasTextureMsaa)
+            //         && !wasFailedImm1)
+            //        {
+            //            TCollection_ExtendedString aMsg = TCollection_ExtendedString() + "Error! Immediate FBO (first) "
+            //                                            + printFboFormat(myImmediateSceneFbos[1]) + " initialization has failed";
+            //            aCtx->PushMessage(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_HIGH, aMsg);
+            //        }
+            //        if (!myImmediateSceneFbos[0].IsValid()
+            //         || !myImmediateSceneFbos[1].IsValid())
+            //        {
+            //            theProj = Graphic3d_Camera.Projection.Projection_Perspective;
+            //        }
+            //    }
+            //}
+            //if (!hasXRBlitFbo)
+            //{
+            //    myXrSceneFbo->Release(aCtx.get());
+            //    myXrSceneFbo->ChangeViewport(0, 0);
+            //}
+
+            //// process PBR environment
+            //if (myRenderParams.ShadingModel == Graphic3d_TypeOfShadingModel.Graphic3d_TypeOfShadingModel_Pbr
+            // || myRenderParams.ShadingModel == Graphic3d_TypeOfShadingModel.Graphic3d_TypeOfShadingModel_PbrFacet)
+            //{
+            //    if (myPBREnvironment != null
+            //      && myPBREnvironment.SizesAreDifferent(myRenderParams.PbrEnvPow2Size,
+            //                                              myRenderParams.PbrEnvSpecMapNbLevels))
+            //    {
+            //        myPBREnvironment.Release(aCtx);
+            //        myPBREnvironment = null;
+            //        myPBREnvState = PBREnvironmentState.OpenGl_PBREnvState_NONEXISTENT;
+            //        myPBREnvRequest = true;
+            //        ++myLightsRevision;
+            //    }
+
+            //    if (myPBREnvState == PBREnvironmentState.OpenGl_PBREnvState_NONEXISTENT
+            //     && aCtx->HasPBR())
+            //    {
+            //        myPBREnvironment = OpenGl_PBREnvironment::Create(aCtx, myRenderParams.PbrEnvPow2Size, myRenderParams.PbrEnvSpecMapNbLevels);
+            //        myPBREnvState = myPBREnvironment.IsNull() ? OpenGl_PBREnvState_UNAVAILABLE : OpenGl_PBREnvState_CREATED;
+            //        if (myPBREnvState == OpenGl_PBREnvState_CREATED)
+            //        {
+            //            Handle(OpenGl_Texture) anEnvLUT;
+            //            static const TCollection_AsciiString THE_SHARED_ENV_LUT_KEY("EnvLUT");
+            //            if (!aCtx->GetResource(THE_SHARED_ENV_LUT_KEY, anEnvLUT))
+            //            {
+            //                bool toConvertHalfFloat = false;
+
+            //                // GL_RG32F is not texture-filterable format in OpenGL ES without OES_texture_float_linear extension.
+            //                // GL_RG16F is texture-filterable since OpenGL ES 3.0 or OpenGL ES 2.0 + OES_texture_half_float_linear.
+            //                // OpenGL ES 3.0 allows initialization of GL_RG16F from 32-bit float data, but OpenGL ES 2.0 + OES_texture_half_float does not.
+            //                // Note that it is expected that GL_RG16F has enough precision for this table, so that it can be used also on desktop OpenGL.
+            //                const bool hasHalfFloat = aCtx->GraphicsLibrary() == Aspect_GraphicsLibrary_OpenGLES
+            //                                      && (aCtx->IsGlGreaterEqual(3, 0) || aCtx->CheckExtension("GL_OES_texture_half_float_linear"));
+            //                if (aCtx.GraphicsLibrary() == Aspect_GraphicsLibrary.Aspect_GraphicsLibrary_OpenGLES)
+            //                {
+            //                    toConvertHalfFloat = !aCtx->IsGlGreaterEqual(3, 0) && hasHalfFloat;
+            //                }
+
+            //                Image_Format anImgFormat = Image_Format.Image_Format_UNKNOWN;
+            //                if (aCtx.arbTexRG)
+            //                {
+            //                    anImgFormat = toConvertHalfFloat ? Image_Format.Image_Format_RGF_half : Image_Format.Image_Format_RGF;
+            //                }
+            //                else
+            //                {
+            //                    anImgFormat = toConvertHalfFloat ? Image_Format.Image_Format_RGBAF_half : Image_Format.Image_Format_RGBAF;
+            //                }
+
+            //                Image_PixMap aPixMap = new Image_PixMap();
+            //                if (anImgFormat == Image_Format.Image_Format_RGF)
+            //                {
+            //                    aPixMap->InitWrapper(Image_Format_RGF, (Standard_Byte*)Textures_EnvLUT, Textures_EnvLUTSize, Textures_EnvLUTSize);
+            //                }
+            //                else
+            //                {
+            //                    aPixMap->InitZero(anImgFormat, Textures_EnvLUTSize, Textures_EnvLUTSize);
+            //                    Image_PixMap aPixMapRG;
+            //                    aPixMapRG.InitWrapper(Image_Format_RGF, (Standard_Byte*)Textures_EnvLUT, Textures_EnvLUTSize, Textures_EnvLUTSize);
+            //                    for (Standard_Size aRowIter = 0; aRowIter < aPixMapRG.SizeY(); ++aRowIter)
+            //                    {
+            //                        for (Standard_Size aColIter = 0; aColIter < aPixMapRG.SizeX(); ++aColIter)
+            //                        {
+            //                            const Image_ColorRGF&aPixelRG = aPixMapRG.Value<Image_ColorRGF>(aRowIter, aColIter);
+            //                            if (toConvertHalfFloat)
+            //                            {
+            //                                NCollection_Vec2<uint16_t> & aPixelRGBA = aPixMap->ChangeValue<NCollection_Vec2<uint16_t>>(aRowIter, aColIter);
+            //                                aPixelRGBA.x() = Image_PixMap::ConvertToHalfFloat(aPixelRG.r());
+            //                                aPixelRGBA.y() = Image_PixMap::ConvertToHalfFloat(aPixelRG.g());
+            //                            }
+            //                            else
+            //                            {
+            //                                Image_ColorRGBAF & aPixelRGBA = aPixMap->ChangeValue<Image_ColorRGBAF>(aRowIter, aColIter);
+            //                                aPixelRGBA.r() = aPixelRG.r();
+            //                                aPixelRGBA.g() = aPixelRG.g();
+            //                            }
+            //                        }
+            //                    }
+            //                }
+
+            //                OpenGl_TextureFormat aTexFormat = OpenGl_TextureFormat::FindFormat(aCtx, aPixMap->Format(), false);
+            //                if (aCtx->GraphicsLibrary() == Aspect_GraphicsLibrary_OpenGLES
+            //                 && aTexFormat.IsValid()
+            //                 && hasHalfFloat)
+            //                {
+            //                    aTexFormat.SetInternalFormat(aCtx->arbTexRG ? GL_RG16F : GL_RGBA16F);
+            //                }
+
+            //                Handle(Graphic3d_TextureParams) aParams = new Graphic3d_TextureParams();
+            //                aParams->SetFilter(Graphic3d_TOTF_BILINEAR);
+            //                aParams->SetRepeat(Standard_False);
+            //                aParams->SetTextureUnit(aCtx->PBREnvLUTTexUnit());
+            //                anEnvLUT = new OpenGl_Texture(THE_SHARED_ENV_LUT_KEY, aParams);
+            //                if (!aTexFormat.IsValid()
+            //                 || !anEnvLUT->Init(aCtx, aTexFormat, Graphic3d_Vec2i((Standard_Integer)Textures_EnvLUTSize), Graphic3d_TypeOfTexture_2D, aPixMap.get()))
+            //                {
+            //                    aCtx->PushMessage(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_HIGH, "Failed allocation of LUT for PBR");
+            //                    anEnvLUT.Nullify();
+            //                }
+            //                aCtx->ShareResource(THE_SHARED_ENV_LUT_KEY, anEnvLUT);
+            //            }
+            //            if (!anEnvLUT.IsNull())
+            //            {
+            //                anEnvLUT->Bind(aCtx);
+            //            }
+            //            myWorkspace->ApplyAspects();
+            //        }
+            //    }
+            //    updatePBREnvironment(aCtx);
+            //}
+
+            //// create color and coverage accumulation buffers required for OIT algorithm
+            //if (toUseOit
+            // && myRenderParams.TransparencyMethod == Graphic3d_RTM_DEPTH_PEELING_OIT)
+            //{
+            //    if (myDepthPeelingFbos->BlendBackFboOit()->GetSize() != aRendSize)
+            //    {
+            //        if (myDepthPeelingFbos->BlendBackFboOit()->Init(aCtx, aRendSize, GL_RGBA16F, 0))
+            //        {
+            //            for (int aPairIter = 0; aPairIter < 2; ++aPairIter)
+            //            {
+            //                OpenGl_ColorFormats aColorFormats;
+            //                aColorFormats.Append(GL_RG32F);
+            //                aColorFormats.Append(GL_RGBA16F);
+            //                aColorFormats.Append(GL_RGBA16F);
+            //                myDepthPeelingFbos->DepthPeelFbosOit()[aPairIter]->Init(aCtx, aRendSize, aColorFormats, 0);
+
+            //                NCollection_Sequence < Handle(OpenGl_Texture) > anAttachments;
+            //                anAttachments.Append(myDepthPeelingFbos->DepthPeelFbosOit()[aPairIter]->ColorTexture(1));
+            //                anAttachments.Append(myDepthPeelingFbos->DepthPeelFbosOit()[aPairIter]->ColorTexture(2));
+            //                myDepthPeelingFbos->FrontBackColorFbosOit()[aPairIter]->InitWrapper(aCtx, anAttachments);
+            //            }
+            //        }
+            //        else
+            //        {
+            //            toUseOit = false;
+            //            aCtx->PushMessage(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_HIGH,
+            //                               "Initialization of float texture framebuffer for use with\n"
+
+
+            //                               "  Depth-Peeling order-independent transparency rendering algorithm has failed.");
+            //        }
+            //    }
+            //}
+            //if (!toUseOit)
+            //{
+            //    myDepthPeelingFbos->Release(aCtx.operator->());
+            //}
+
+            //if (toUseOit
+            // && myRenderParams.TransparencyMethod == Graphic3d_RTM_BLEND_OIT)
+            //{
+            //    Standard_Integer anFboIt = 0;
+            //    for (; anFboIt < 2; ++anFboIt)
+            //    {
+            //        Handle(OpenGl_FrameBuffer) & aMainSceneFbo = myMainSceneFbos[anFboIt];
+            //        Handle(OpenGl_FrameBuffer) & aMainSceneFboOit = myMainSceneFbosOit[anFboIt];
+            //        Handle(OpenGl_FrameBuffer) & anImmediateSceneFbo = myImmediateSceneFbos[anFboIt];
+            //        Handle(OpenGl_FrameBuffer) & anImmediateSceneFboOit = myImmediateSceneFbosOit[anFboIt];
+            //        if (aMainSceneFbo->IsValid()
+            //         && (aMainSceneFboOit->GetVPSize() != aRendSize
+            //          || aMainSceneFboOit->NbSamples() != aNbSamples))
+            //        {
+            //            Standard_Integer aColorConfig = 0;
+            //            for (; ; ) // seemly responding to driver limitation (GL_FRAMEBUFFER_UNSUPPORTED)
+            //            {
+            //                if (myFboOitColorConfig.IsEmpty())
+            //                {
+            //                    if (!chooseOitColorConfiguration(aCtx, aColorConfig++, myFboOitColorConfig))
+            //                    {
+            //                        break;
+            //                    }
+            //                }
+            //                if (aMainSceneFboOit->Init(aCtx, aRendSize, myFboOitColorConfig, aMainSceneFbo->DepthStencilTexture(), aNbSamples))
+            //                {
+            //                    break;
+            //                }
+            //                myFboOitColorConfig.Clear();
+            //            }
+            //            if (!aMainSceneFboOit->IsValid())
+            //            {
+            //                break;
+            //            }
+            //        }
+            //        else if (!aMainSceneFbo->IsValid())
+            //        {
+            //            aMainSceneFboOit->Release(aCtx.operator->());
+            //            aMainSceneFboOit->ChangeViewport(0, 0);
+            //        }
+
+            //        if (anImmediateSceneFbo->IsValid()
+            //         && (anImmediateSceneFboOit->GetVPSize() != aRendSize
+            //          || anImmediateSceneFboOit->NbSamples() != aNbSamples))
+            //        {
+            //            if (!anImmediateSceneFboOit->Init(aCtx, aRendSize, myFboOitColorConfig,
+            //                                               anImmediateSceneFbo->DepthStencilTexture(), aNbSamples))
+            //            {
+            //                break;
+            //            }
+            //        }
+            //        else if (!anImmediateSceneFbo->IsValid())
+            //        {
+            //            anImmediateSceneFboOit->Release(aCtx.operator->());
+            //            anImmediateSceneFboOit->ChangeViewport(0, 0);
+            //        }
+            //    }
+            //    if (anFboIt == 0) // only the first OIT framebuffer is mandatory
+            //    {
+            //        aCtx->PushMessage(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_HIGH,
+            //                           "Initialization of float texture framebuffer for use with\n"
+
+
+            //                           "  blended order-independent transparency rendering algorithm has failed.\n"
+
+
+            //                           "  Blended order-independent transparency will not be available.\n");
+            //        if (aNbSamples > 0)
+            //        {
+            //            myToDisableOITMSAA = Standard_True;
+            //        }
+            //        else
+            //        {
+            //            myToDisableOIT = Standard_True;
+            //        }
+            //        toUseOit = false;
+            //    }
+            //}
+            //if (!toUseOit && myMainSceneFbosOit[0]->IsValid())
+            //{
+            //    myDepthPeelingFbos->Release(aCtx.operator->());
+            //    myMainSceneFbosOit[0]->Release(aCtx.operator->());
+            //    myMainSceneFbosOit[1]->Release(aCtx.operator->());
+            //    myImmediateSceneFbosOit[0]->Release(aCtx.operator->());
+            //    myImmediateSceneFbosOit[1]->Release(aCtx.operator->());
+            //    myMainSceneFbosOit[0]->ChangeViewport(0, 0);
+            //    myMainSceneFbosOit[1]->ChangeViewport(0, 0);
+            //    myImmediateSceneFbosOit[0]->ChangeViewport(0, 0);
+            //    myImmediateSceneFbosOit[1]->ChangeViewport(0, 0);
+            //}
+
+            //// allocate shadow maps
+            //const Handle(Graphic3d_LightSet)&aLights = myRenderParams.ShadingModel == Graphic3d_TypeOfShadingModel_Unlit ? myNoShadingLight : myLights;
+            //if (!aLights.IsNull())
+            //{
+            //    aLights->UpdateRevision();
+            //}
+            //bool toUseShadowMap = myRenderParams.IsShadowEnabled
+            //                   && myRenderParams.ShadowMapResolution > 0
+            //                   && !myLights.IsNull()
+            //                   && myLights->NbCastShadows() > 0
+            //                   && myRenderParams.Method != Graphic3d_RM_RAYTRACING;
+            //if (toUseShadowMap)
+            //{
+            //    if (myShadowMaps->Size() != myLights->NbCastShadows())
+            //    {
+            //        myShadowMaps->Release(aCtx.get());
+            //        myShadowMaps->Resize(0, myLights->NbCastShadows() - 1, true);
+            //    }
+
+            //    const GLint aSamplFrom = GLint(aCtx->ShadowMapTexUnit()) - myLights->NbCastShadows() + 1;
+            //    for (Standard_Integer aShadowIter = 0; aShadowIter < myShadowMaps->Size(); ++aShadowIter)
+            //    {
+            //        Handle(OpenGl_ShadowMap) & aShadow = myShadowMaps->ChangeValue(aShadowIter);
+            //        if (aShadow.IsNull())
+            //        {
+            //            aShadow = new OpenGl_ShadowMap();
+            //        }
+            //        aShadow->SetShadowMapBias(myRenderParams.ShadowMapBias);
+            //        aShadow->Texture()->Sampler()->Parameters()->SetTextureUnit((Graphic3d_TextureUnit)(aSamplFrom + aShadowIter));
+
+            //        const Handle(OpenGl_FrameBuffer)&aShadowFbo = aShadow->FrameBuffer();
+            //        if (aShadowFbo->GetVPSizeX() != myRenderParams.ShadowMapResolution
+            //         && toUseShadowMap)
+            //        {
+            //            OpenGl_ColorFormats aDummy;
+            //            if (!aShadowFbo->Init(aCtx, Graphic3d_Vec2i(myRenderParams.ShadowMapResolution), aDummy, myFboDepthFormat, 0))
+            //            {
+            //                toUseShadowMap = false;
+            //            }
+            //        }
+            //    }
+            //}
+            //if (!toUseShadowMap && myShadowMaps->IsValid())
+            //{
+            //    myShadowMaps->Release(aCtx.get());
+            //}
+
+            return true;
         }
 
         public override void RedrawImmediate()
@@ -580,7 +1094,19 @@ namespace OCCPort.OpenGL
              */
             return true;
         }
+        OpenGl_PBREnvironment myPBREnvironment; //!< manager of IBL maps used in PBR pipeline
+        PBREnvironmentState myPBREnvState;    //!< state of PBR environment
+                                              //! State of PBR environment.
+        bool myPBREnvRequest;  //!< update PBR environment
 
+        int myLightsRevision;
+
+        enum PBREnvironmentState
+        {
+            OpenGl_PBREnvState_NONEXISTENT,
+            OpenGl_PBREnvState_UNAVAILABLE, // indicates failed try to create PBR environment
+            OpenGl_PBREnvState_CREATED
+        };
         //! Returns true if there are immediate structures to display
         private bool HasImmediateStructures()
         {
@@ -739,7 +1265,7 @@ namespace OCCPort.OpenGL
             myBackBufferRestored = false;
         }
 
-
+        OpenGl_FrameBuffer[] myImmediateSceneFbos = new OpenGl_FrameBuffer[2];    //!< Additional buffers for immediate layer in stereo mode.
 
         public override Graphic3d_Layer Layer(Graphic3d_ZLayerId theLayerId)
         {
@@ -752,7 +1278,4 @@ namespace OCCPort.OpenGL
 
         }
     }
-    //public enum { Graphic3d_StereoMode_NB = Graphic3d_StereoMode_OpenVR + 1 };
-
-
 }

@@ -28,8 +28,8 @@ namespace OCCPort.Tester
             });
             v3d_viewer = new V3d_Viewer(new OpenGl_GraphicDriver(new Aspect_DisplayConnection()));
 
+            aIS_ViewController = new AIS_ViewController();
             myAISContext = new AIS_InteractiveContext(v3d_viewer);
-
 
             /*if (glControl.Context.GraphicsMode.Samples == 0)
             {
@@ -76,7 +76,8 @@ namespace OCCPort.Tester
                 //V3d_View.CreateView = () => new OpenGL.OpenGl_View();
 
                 GravityViewManager.View = v3d_viewer.CreateView();
-                GravityViewManager.View.SetWindow(new Aspect_Window() { }, new Aspect_RenderingContext());
+                GravityViewManager.View.SetWindow(new Aspect_Window() { Width = glControl.Width, Height = glControl.Height }, new Aspect_RenderingContext());
+                GravityViewManager.View.MustBeResized();
 
             }
             /*try
@@ -270,7 +271,7 @@ namespace OCCPort.Tester
         {
             GravityViewManager.View.myView.Items.Clear();
         }
-
+        AIS_ViewController aIS_ViewController;
         V3d_Viewer v3d_viewer;
         AIS_InteractiveContext myAISContext;
         public void AddBox()
@@ -325,8 +326,10 @@ namespace OCCPort.Tester
 
         private void toolStripButton9_Click(object sender, EventArgs e)
         {
+
             GravityViewManager.View.MyViewer.StructureManager().SetDeviceLost();
-            GravityViewManager.View.Redraw();
+            //GravityViewManager.View.Redraw();
+            aIS_ViewController.FlushViewEvents(myAISContext, GravityViewManager.View);
 
         }
 

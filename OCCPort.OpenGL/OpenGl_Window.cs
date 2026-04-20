@@ -1,5 +1,6 @@
 ﻿using OCCPort.OpenGL;
 using System;
+using System.Reflection.Metadata;
 
 namespace OCCPort
 {
@@ -25,7 +26,7 @@ namespace OCCPort
         // function : Resize
         // purpose  : call_subr_resize
         // =======================================================================
-        void Resize()
+        public void Resize()
         {
             Graphic3d_Vec2i aWinSize;
             int xx, yy;
@@ -95,6 +96,9 @@ namespace OCCPort
 
 
         }
+
+        //! Return platform window.
+        public Aspect_Window PlatformWindow() { return myPlatformWindow; }
     }
 
 }

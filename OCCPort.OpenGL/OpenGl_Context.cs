@@ -122,9 +122,9 @@ namespace OCCPort.OpenGL
         }
 
         // =======================================================================
-         // function : SetDrawBuffer
-         // purpose  :
-         // =======================================================================
+        // function : SetDrawBuffer
+        // purpose  :
+        // =======================================================================
         public void SetDrawBuffer(int theDrawBuffer)
         {
             if (myGapi == Aspect_GraphicsLibrary.Aspect_GraphicsLibrary_OpenGLES)
@@ -164,9 +164,10 @@ namespace OCCPort.OpenGL
                && !caps.vboDisable;
         }
 
+        //! Return active graphics library.
         internal Aspect_GraphicsLibrary GraphicsLibrary()
         {
-            throw new NotImplementedException();
+            return myGapi;
         }
 
         //! Allow GL_SAMPLE_ALPHA_TO_COVERAGE usage.
@@ -321,6 +322,11 @@ namespace OCCPort.OpenGL
         {
             //throw new NotImplementedException();
         }
+        Aspect_RenderingContext myGContext; //!< rendering context EGLContext | HGLRC | GLXContext | EAGLContext* | NSOpenGLContext*
+
+
+        //! Return rendering context (EGLContext | HGLRC | GLXContext | EAGLContext* | NSOpenGLContext*).
+        public Aspect_RenderingContext RenderingContext() { return myGContext; }
 
         int[] myViewport = new int[4];     //!< current viewport
         int[] myViewportVirt = new int[4]; //!< virtual viewport

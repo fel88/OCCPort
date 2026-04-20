@@ -1,4 +1,6 @@
-﻿using System.Reflection.Metadata;
+﻿using OCCPort;
+using System;
+using System.Reflection.Metadata;
 
 namespace OCCPort
 {
@@ -10,6 +12,114 @@ namespace OCCPort
         public void handleViewRedraw(AIS_InteractiveContext ctx, V3d_View theView)
         {
             V3d_View aParentView = theView.IsSubview() ? theView.ParentView() : theView;
+
+            // manage animation state
+//            if (!myViewAnimation.IsNull()
+//             && !myViewAnimation->IsStopped())
+//            {
+//                myViewAnimation->UpdateTimer();
+//                ResetPreviousMoveTo();
+//                setAskNextFrame();
+//            }
+//
+/*
+            if (!myObjAnimation.IsNull()
+             && !myObjAnimation->IsStopped())
+            {
+                myObjAnimation->UpdateTimer();
+                ResetPreviousMoveTo();
+                setAskNextFrame();
+            }*/
+
+            if (myIsContinuousRedraw)
+            {
+                myToAskNextFrame = true;
+            }
+            if (theView.View().IsActiveXR())
+            {
+                // VR requires continuous rendering
+                myToAskNextFrame = true;
+            }
+
+            for (int aSubViewPass = 0; aSubViewPass < 2; ++aSubViewPass)
+            {
+                bool isSubViewPass = (aSubViewPass == 0);
+                foreach (var aView in theView.Viewer().ActiveViews())
+                {
+                    
+                    if (isSubViewPass
+                    && !aView.IsSubview())
+                    {
+                        foreach (var aSubviewIter in aView.Subviews())
+                        {
+
+
+                            if (aSubviewIter.Viewer() != theView.Viewer())
+                            {
+                                if (aSubviewIter.IsInvalidated())
+                                {
+                                   // if (aSubviewIter.ComputedMode())
+                                    {
+                                       // aSubviewIter.Update();
+                                    }
+                                  //  else
+                                    {
+                                        aSubviewIter.Redraw();
+                                    }
+                                }
+                                else if (aSubviewIter.IsInvalidatedImmediate())
+                                {
+                                    aSubviewIter.RedrawImmediate();
+                                }
+                            }
+                        }
+                        continue;
+                    }
+                    else if (!isSubViewPass
+                           && aView.IsSubview())
+                    {
+                        continue;
+                    }
+
+                    if (aView.IsInvalidated()
+                     || (myToAskNextFrame && aView == theView))
+                    {
+                        if (aView.ComputedMode())
+                        {
+                            aView.Update();
+                        }
+                        else
+                        {
+                            aView.Redraw();
+                        }
+
+                        if (aView.IsSubview())
+                        {
+                            aView.ParentView().InvalidateImmediate();
+                        }
+                    }
+                    else if (aView.IsInvalidatedImmediate())
+                    {
+                        if (aView.IsSubview())
+                        {
+                            aView.ParentView().InvalidateImmediate();
+                        }
+
+                        aView.RedrawImmediate();
+                    }
+                }
+            }
+            if (theView.IsSubview()
+             && theView.Viewer() != aParentView.Viewer())
+            {
+                aParentView.RedrawImmediate();
+            }
+
+            if (myToAskNextFrame)
+            {
+                // ask more frames
+                //??aParentView.Window().InvalidateContent(Handle(Aspect_DisplayConnection)());
+            }
 
         }
         //! Reset previous position of MoveTo.
@@ -94,7 +204,7 @@ namespace OCCPort
                         if (!aBndBox.IsVoid())
                         {
                             var r = ((aBndBox.CornerMin().XYZ() + aBndBox.CornerMax().XYZ()) * 0.5);
-                            return new gp_Pnt (r);
+                            return new gp_Pnt(r);
                         }
                         break;
                     }
@@ -124,8 +234,66 @@ namespace OCCPort
                                                  V3d_View theView,
                                                 bool theToHandle = false)
         {
+            flushBuffers(theCtx, theView);
+            flushGestures(theCtx, theView);
 
+            //if (theView.IsSubview())
+            //{
+            //    // move input coordinates inside the view
+            //    const Graphic3d_Vec2i aDelta = theView->View()->SubviewTopLeft();
+            //    if (myGL.MoveTo.ToHilight || myGL.Dragging.ToStart)
+            //    {
+            //        myGL.MoveTo.Point -= aDelta;
+            //    }
+            //    if (myGL.Panning.ToStart)
+            //    {
+            //        myGL.Panning.PointStart -= aDelta;
+            //    }
+            //    if (myGL.Dragging.ToStart)
+            //    {
+            //        myGL.Dragging.PointStart -= aDelta;
+            //    }
+            //    if (myGL.Dragging.ToMove)
+            //    {
+            //        myGL.Dragging.PointTo -= aDelta;
+            //    }
+            //    if (myGL.OrbitRotation.ToStart)
+            //    {
+            //        myGL.OrbitRotation.PointStart -= Graphic3d_Vec2d(aDelta);
+            //    }
+            //    if (myGL.OrbitRotation.ToRotate)
+            //    {
+            //        myGL.OrbitRotation.PointTo -= Graphic3d_Vec2d(aDelta);
+            //    }
+            //    if (myGL.ViewRotation.ToStart)
+            //    {
+            //        myGL.ViewRotation.PointStart -= Graphic3d_Vec2d(aDelta);
+            //    }
+            //    if (myGL.ViewRotation.ToRotate)
+            //    {
+            //        myGL.ViewRotation.PointTo -= Graphic3d_Vec2d(aDelta);
+            //    }
+            //    for (Graphic3d_Vec2i & aPntIter : myGL.Selection.Points)
+            //    {
+            //        aPntIter -= aDelta;
+            //    }
+            //    for (Aspect_ScrollDelta & aZoomIter : myGL.ZoomActions)
+            //    {
+            //        aZoomIter.Point -= aDelta;
+            //    }
+            //}
+
+            if (theToHandle)
+            {
+                HandleViewEvents(theCtx, theView);
+            }
         }
+
+        private void flushGestures(AIS_InteractiveContext theCtx, V3d_View theView)
+        {
+            
+        }
+
         //! Process events within rendering thread.
         public void HandleViewEvents(AIS_InteractiveContext theCtx, V3d_View theView)
         {
@@ -225,7 +393,7 @@ namespace OCCPort
         //AIS_AnimationCamera myViewAnimation;    //!< view animation
         //AIS_Animation myObjAnimation;     //!< objects animation
         bool myToPauseObjAnimation;   //!< flag to pause objects animation on mouse click; FALSE by default
-        //AIS_RubberBand myRubberBand;            //!< Rubber-band presentation
+                                      //AIS_RubberBand myRubberBand;            //!< Rubber-band presentation
         SelectMgr_EntityOwner myDragOwner;      //!< detected owner of currently dragged object
         AIS_InteractiveObject myDragObject;     //!< currently dragged object
         Graphic3d_Vec2i myPrevMoveTo;               //!< previous position of MoveTo event in 3D viewer

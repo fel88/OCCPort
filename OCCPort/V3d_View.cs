@@ -9,6 +9,21 @@ using System.Threading.Tasks;
 
 namespace OCCPort
 {
+    //! Defines the application object VIEW for the
+    //! VIEWER application.
+    //! The methods of this class allow the editing
+    //! and inquiring the parameters linked to the view.
+    //! Provides a set of services common to all types of view.
+    //! Warning: The default parameters are defined by the class
+    //! Viewer (Example : SetDefaultViewSize()).
+    //! Certain methods are mouse oriented, and it is
+    //! necessary to know the difference between the start and
+    //! the continuation of this gesture in putting the method
+    //! into operation.
+    //! Example : Shifting the eye-view along the screen axes.
+    //!
+    //! View->Move(10.,20.,0.,True)     (Starting motion)
+    //! View->Move(15.,-5.,0.,False)    (Next motion)
     public class V3d_View
     {
 
@@ -47,7 +62,7 @@ namespace OCCPort
         }
 
         //! Returns the viewer in which the view has been created.
-        public V3d_Viewer Viewer()  { return MyViewer; }
+        public V3d_Viewer Viewer() { return MyViewer; }
 
         private void AutoZFit()
         {
@@ -135,6 +150,27 @@ namespace OCCPort
             MyWindow = theWindow;
             myView.SetWindow(null, theWindow, theContext);
             MyViewer.SetViewOn(this);
+            SetRatio();
+            if (myImmediateUpdate)
+            {
+                Redraw();
+            }
+        }
+
+        //! Must be called when the window supporting the
+        //! view changes size.
+        //! if the view is not mapped on a window.
+        //! Warning: The view is centered and resized to preserve
+        //! the height/width ratio of the window.
+        public void MustBeResized()
+        {
+            if (!myView.IsDefined())
+            {
+                return;
+            }
+
+            myView.Resized();
+
             SetRatio();
             if (myImmediateUpdate)
             {
@@ -967,6 +1003,53 @@ namespace OCCPort
 
         //! Returns the associated Graphic3d view.
         public Graphic3d_CView View() { return myView; }
+        List<V3d_View> mySubviews = new List<V3d_View>();
+        //! Return subview list.
+        public V3d_View[] Subviews() { return mySubviews.ToArray(); }
 
+        public void RedrawImmediate()
+        {
+            if (!myView.IsDefined()
+             || !myView.IsActive())
+            {
+                return;
+            }
+
+            myIsInvalidatedImmediate = false;
+            myView.RedrawImmediate();
+        }
+
+
+        //=============================================================================
+        //function : IsInvalidated
+        //purpose  :
+        //=============================================================================
+        public bool IsInvalidated()
+        {
+            return !myView.IsDefined()
+                 || myView.IsInvalidated();
+        }
+
+        internal bool ComputedMode()
+        {
+
+            return myView.ComputedMode();
+
+        }
+
+        internal void Update()
+        {
+            if (!myView.IsDefined()
+   || !myView.IsActive())
+            {
+                return;
+            }
+
+            myIsInvalidatedImmediate = false;
+            myView.Update();
+            myView.Compute();
+            AutoZFit();
+            myView.Redraw();
+        }
     }
 }

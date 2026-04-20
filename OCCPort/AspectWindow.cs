@@ -1,4 +1,7 @@
-﻿namespace OCCPort
+﻿using OpenTK.Mathematics;
+using System;
+
+namespace OCCPort
 {
     public class Aspect_Window
     {
@@ -9,6 +12,14 @@
             x = Width;
             y = Height;
         }
-        
+
+        //! Returns window dimensions.
+        public Vector2i Dimensions()
+        {
+            Vector2i aSize;
+            Size(out aSize.X, out aSize.Y);
+            return aSize;
+
+        }
     }
 }

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using OpenTK.Mathematics;
+using OpenTK.Windowing.GraphicsLibraryFramework;
+using System;
 using System.Collections.Generic;
 using System.Reflection.Metadata;
 using System.Threading.Tasks;
@@ -134,7 +136,7 @@ namespace OCCPort
 
             Bnd_Box aResult = new Bnd_Box();
             foreach (var aLayer in Layers())
-            {                
+            {
                 Bnd_Box aBox = aLayer.BoundingBox(Identification(),
                                                     aCamera,
                                                     aWinSize.x(), aWinSize.y(),
@@ -457,6 +459,154 @@ namespace OCCPort
         {
             throw new NotImplementedException();
         }
-    }
+        List<Graphic3d_CView> mySubviews; //!< list of child views
 
+        public abstract bool IsInvalidated();
+        protected Aspect_XRSession myXRSession;
+
+        public bool IsActiveXR() => myXRSession != null
+                 && myXRSession.IsOpen();
+        //! Returns the computed HLR mode state
+        internal bool ComputedMode()
+        {
+
+            return myIsInComputedMode;
+        }
+
+        internal void Compute()
+        {
+
+
+            // force HLRValidation to False on all structures calculated in the view
+            foreach (var aStructIter in myStructsComputed)
+            {
+                aStructIter.SetHLRValidation(false);
+            }
+
+            if (!ComputedMode())
+            {
+                return;
+            }
+
+            // Change of orientation or of projection type =>
+            // Remove structures that were calculated for the previous orientation.
+            // Recalculation of new structures.
+            List<Graphic3d_Structure> aStructsSeq = new List<Graphic3d_Structure>();
+            foreach (var aStructIter in myStructsDisplayed)
+            {
+                Graphic3d_TypeOfAnswer anAnswer = acceptDisplay(aStructIter.Visual());
+                if (anAnswer == Graphic3d_TypeOfAnswer.Graphic3d_TOA_COMPUTE)
+                {
+                    aStructsSeq.Add(aStructIter); // if the structure was calculated, it is recalculated
+                }
+            }
+            foreach (var aStructIter in aStructsSeq)
+            {
+                //Display(aStructIter.ChangeValue());
+                Display(aStructIter);
+            }
+
+
+        }
+
+        public bool RemoveSubview(Graphic3d_CView theView)
+        {
+            foreach (var aViewIter in mySubviews)
+            {
+                if (aViewIter == theView)
+                {
+                    mySubviews.Remove(aViewIter);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        Vector2i mySubviewTopLeft;           //!< subview top-left position relative to parent view
+        Vector2i mySubviewMargins;           //!< subview margins in pixels
+        Vector2d mySubviewSize;              //!< subview size
+        Vector2d mySubviewOffset;            //!< subview corner offset within parent view
+        Aspect_TypeOfTriedronPosition mySubviewCorner;            //!< position within parent view
+
+        protected Graphic3d_CView myParentView;               //!< back-pointer to the parent view
+
+        //! Return TRUE if this is a subview of another view.
+        public bool IsSubview() { return myParentView != null; }
+        public virtual void Resized()
+        {
+            if (IsSubview())
+            {
+                Aspect_NeutralWindow aWindow = (Aspect_NeutralWindow)Window();
+                SubviewResized(aWindow);
+            }
+        }
+
+        //! Calculate offset in pixels from fraction.
+        public static int getSubViewOffset(double theOffset, int theWinSize)
+        {
+            if (theOffset >= 1.0)
+            {
+                return (int)(theOffset);
+            }
+            else
+            {
+                return (int)(theOffset * theWinSize);
+            }
+        }
+        public void AddSubview(Graphic3d_CView theView)
+        {
+            mySubviews.Add(theView);
+        }
+        public void SubviewResized(Aspect_NeutralWindow theWindow)
+        {
+            if (!IsSubview()
+    || theWindow == null)
+            {
+                return;
+            }
+
+            Vector2i aWinSize = myParentView.Window().Dimensions();
+            Vector2i aViewSize = new Vector2i((int)(aWinSize.X * mySubviewSize.X), (int)(aWinSize.Y * mySubviewSize.Y));
+            if (mySubviewSize.X > 1.0)
+            {
+                aViewSize.X = (int)mySubviewSize.X;
+            }
+            if (mySubviewSize.Y > 1.0)
+            {
+                aViewSize.Y = (int)mySubviewSize.Y;
+            }
+
+            Vector2i anOffset = new Vector2i(getSubViewOffset(mySubviewOffset.X, aWinSize.X),
+                            getSubViewOffset(mySubviewOffset.Y, aWinSize.Y));
+            mySubviewTopLeft = (aWinSize - aViewSize) / 2; // Aspect_TOTP_CENTER
+            if ((mySubviewCorner & Aspect_TypeOfTriedronPosition.Aspect_TOTP_LEFT) != 0)
+            {
+                mySubviewTopLeft.X = anOffset.X;
+            }
+            else if ((mySubviewCorner & Aspect_TypeOfTriedronPosition.Aspect_TOTP_RIGHT) != 0)
+            {
+                mySubviewTopLeft.X = Math.Max(aWinSize.X - anOffset.X - aViewSize.X, 0);
+            }
+
+            if ((mySubviewCorner & Aspect_TypeOfTriedronPosition.Aspect_TOTP_TOP) != 0)
+            {
+                mySubviewTopLeft.Y = anOffset.Y;
+            }
+            else if ((mySubviewCorner & Aspect_TypeOfTriedronPosition.Aspect_TOTP_BOTTOM) != 0)
+            {
+                mySubviewTopLeft.Y = Math.Max(aWinSize.Y - anOffset.Y - aViewSize.Y, 0);
+            }
+
+            mySubviewTopLeft += mySubviewMargins;
+            aViewSize -= mySubviewMargins * 2;
+
+            int aRight = Math.Min(mySubviewTopLeft.X + aViewSize.X, aWinSize.X);
+            aViewSize.X = aRight - mySubviewTopLeft.X;
+
+            int aBot = Math.Min(mySubviewTopLeft.Y + aViewSize.Y, aWinSize.Y);
+            aViewSize.Y = aBot - mySubviewTopLeft.Y;
+
+            theWindow.SetSize(aViewSize.X, aViewSize.Y);
+        }
+    }
 }

@@ -4,8 +4,11 @@ using System.Linq;
 namespace OCCPort
 {
 	public class V3d_Viewer
-	{
-		public V3d_Viewer(Graphic3d_GraphicDriver theDriver)
+    {
+        //! Return a list of active views.
+        public V3d_ListOfView ActiveViews()  { return myActiveViews; }
+
+        public V3d_Viewer(Graphic3d_GraphicDriver theDriver)
 		{
 			myDriver = theDriver;
 			myStructureManager = (new Graphic3d_StructureManager(theDriver));
