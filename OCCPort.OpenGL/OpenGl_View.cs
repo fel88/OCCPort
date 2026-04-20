@@ -505,7 +505,6 @@ namespace OCCPort.OpenGL
             {
                 if (aCtx.GraphicsLibrary() != Aspect_GraphicsLibrary.Aspect_GraphicsLibrary_OpenGLES)
                 {
-                    
                     aCtx.core11fwd.glGetBooleanv(GetPName.Doublebuffer, ref toCopyBackToFront);
                 }
                 if (toCopyBackToFront
@@ -536,7 +535,7 @@ namespace OCCPort.OpenGL
             myIsImmediateDrawn = true;
 
             myWorkspace.SetUseZBuffer(true);
-            myWorkspace.SetUseDepthWrite(true) ;
+            myWorkspace.SetUseDepthWrite(true);
             aCtx.core11fwd.glDepthFunc(All.Lequal);
             aCtx.core11fwd.glDepthMask(true);
             aCtx.core11fwd.glEnable(All.DepthTest);
@@ -549,21 +548,50 @@ namespace OCCPort.OpenGL
             return !toCopyBackToFront;
         }
 
-        private bool blitBuffers(OpenGl_FrameBuffer theReadFbo, OpenGl_FrameBuffer theDrawFbo)
+        private bool blitBuffers(OpenGl_FrameBuffer theReadFbo, OpenGl_FrameBuffer theDrawFbo, bool theToFlip = false)
         {
-            throw new NotImplementedException();
+            OpenGl_Context aCtx = myWorkspace.GetGlContext();
+            int aReadSizeX = theReadFbo != null ? theReadFbo.GetVPSizeX() : myWindow.Width();
+            int aReadSizeY = theReadFbo != null ? theReadFbo.GetVPSizeY() : myWindow.Height();
+            int aDrawSizeX = theDrawFbo != null ? theDrawFbo.GetVPSizeX() : myWindow.Width();
+            int aDrawSizeY = theDrawFbo != null ? theDrawFbo.GetVPSizeY() : myWindow.Height();
+            if (theReadFbo == null || aCtx.IsFeedback())
+            {
+                return false;
+            }
+            else if (theReadFbo == theDrawFbo)
+            {
+                return true;
+            }
+
+            // clear destination before blitting
+            if (theDrawFbo != null && theDrawFbo.IsValid())
+            {
+                theDrawFbo.BindBuffer(aCtx);
+            }
+            else
+            {
+                aCtx.arbFBO.glBindFramebuffer(All.Framebuffer, OpenGl_FrameBuffer.NO_FRAMEBUFFER);
+                aCtx.SetFrameBufferSRGB(false);
+            }
+
+            /*
+             more code here
+             */
+            return true;
         }
 
+        //! Returns true if there are immediate structures to display
         private bool HasImmediateStructures()
         {
-            throw new NotImplementedException();
+            return myZLayers.NbImmediateStructures() != 0;
         }
 
         private void blitSubviews(Graphic3d_Camera.Projection theProjection, OpenGl_FrameBuffer theDrawFbo)
         {
             throw new NotImplementedException();
         }
-        
+
 
         private bool copyBackToFront()
         {

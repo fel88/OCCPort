@@ -2,7 +2,7 @@
 
 namespace OCCPort
 {
-	internal class Graphic3d_Mat4d : NCollection_Mat4
+	public class Graphic3d_Mat4d : NCollection_Mat4
 	{
 
 

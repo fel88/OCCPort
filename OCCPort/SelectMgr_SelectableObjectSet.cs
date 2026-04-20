@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace OCCPort
 {
-	internal class SelectMgr_SelectableObjectSet
+	public class SelectMgr_SelectableObjectSet
 	{
 		public SelectMgr_SelectableObjectSet()
 		{

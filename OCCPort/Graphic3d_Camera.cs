@@ -487,11 +487,11 @@ namespace OCCPort
             return myZNear;
 
         }
-        Graphic3d_Mat4d OrientationMatrix()
+        public Graphic3d_Mat4d OrientationMatrix()
         {
             return UpdateOrientation(myMatricesD).Orientation;
         }
-        NCollection_Mat4 ProjectionMatrix()
+        public NCollection_Mat4 ProjectionMatrix()
         {
             return UpdateProjection(myMatricesD).MProjection;
         }

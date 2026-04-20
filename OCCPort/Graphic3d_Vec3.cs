@@ -2,7 +2,7 @@
 
 namespace OCCPort
 {
-    internal class Graphic3d_Vec3: NCollection_Vec3
+    public class Graphic3d_Vec3: NCollection_Vec3
     {
         
     }

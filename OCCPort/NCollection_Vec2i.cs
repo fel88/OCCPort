@@ -12,6 +12,16 @@
             v[1] = theY;
         }
 
+        public NCollection_Vec2i(int theXY)
+        {
+            v[0] = v[1] = theXY;
+        }
+        //! Compute per-component division by scale factor.
+        public static NCollection_Vec2i operator /(NCollection_Vec2i vv, int theInvFactor)
+        {
+            return new NCollection_Vec2i(vv.v[0] / theInvFactor,
+                    vv.v[1] / theInvFactor);
+        }
         public NCollection_Vec2i()
         {
 
@@ -22,6 +32,6 @@
         //! Alias to 2nd component as Y coordinate in XY.
         public int y() { return v[1]; }
 
-        int[] v = new int[2];
+        public int[] v = new int[2];
     }
 }

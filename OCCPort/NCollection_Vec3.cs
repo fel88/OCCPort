@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace OCCPort
 {
-	internal class NCollection_Vec3
+	public class NCollection_Vec3
 	{
 		protected double[] v;
 		//! Assign new values to the vector.

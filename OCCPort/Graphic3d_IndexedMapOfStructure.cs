@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace OCCPort
 {
-	public class Graphic3d_IndexedMapOfStructure : IEnumerable<Graphic3d_CStructure>
+	public class Graphic3d_IndexedMapOfStructure : NCollection_IndexedMap<Graphic3d_CStructure>
 	{
 		List<Graphic3d_CStructure> list = new List<Graphic3d_CStructure>();
 		public IEnumerator<Graphic3d_CStructure> GetEnumerator()
@@ -23,9 +23,6 @@ namespace OCCPort
 			return list.Count;
 		}
 
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return list.GetEnumerator();
-		}
+		
 	}
 }

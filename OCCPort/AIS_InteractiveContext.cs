@@ -3,6 +3,7 @@ using OCCPort.Tester;
 using System;
 using System.Net.NetworkInformation;
 using System.Reflection;
+using System.Reflection.Metadata;
 using System.Runtime.InteropServices;
 using System.Security.Policy;
 
@@ -71,6 +72,17 @@ namespace OCCPort
 
             InitAttributes();
         }
+
+
+
+        //! Return rotation gravity point.
+        public gp_Pnt GravityPoint(V3d_View theView)
+        {
+            return theView.GravityPoint();
+        }
+
+
+
         void InitAttributes()
         {
             /*  Graphic3d_MaterialAspect aMat=new Graphic3d_MaterialAspect ( Graphic3d_NameOfMaterial_Brass);
@@ -156,7 +168,7 @@ namespace OCCPort
 
 
         SelectMgr_SelectionManager mgrSelector;
-        StdSelect_ViewerSelector3d MainSelector()
+        public StdSelect_ViewerSelector3d MainSelector()
         {
             return mgrSelector.Selector();
         }
@@ -386,12 +398,12 @@ namespace OCCPort
                                                                    V3d_View theView,
                                                                    AIS_SelectionScheme theSelScheme)
         {
-            //if (theView.Viewer() != myMainVwr)
+            if (theView.Viewer() != myMainVwr)
             {
-                //throw new Exception("AIS_InteractiveContext::SelectRectangle() - invalid argument");
+                throw new Exception("AIS_InteractiveContext::SelectRectangle() - invalid argument");
             }
 
-            //myLastActiveView = theView.get();
+            myLastActiveView = theView;
             MainSelector().Pick(thePntMin.x(), thePntMin.y(), thePntMax.x(), thePntMax.y(), theView);
 
             AIS_NArray1OfEntityOwner aPickedOwners = new AIS_NArray1OfEntityOwner();

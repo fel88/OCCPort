@@ -1,4 +1,5 @@
-﻿using OCCPort.OpenGL;
+﻿using OCCPort;
+using OCCPort.OpenGL;
 using System;
 
 namespace OCCPort
@@ -25,10 +26,7 @@ namespace OCCPort
             throw new NotImplementedException();
         }
 
-        internal Graphic3d_Vec2i GetVPSize()
-        {
-            throw new NotImplementedException();
-        }
+        
 
         internal void InitLazy(OpenGl_Context aCtx, Graphic3d_Vec2i aSizeXY, int myFboColorFormat, int myFboDepthFormat, int v)
         {
@@ -45,6 +43,26 @@ namespace OCCPort
         public const int NO_FRAMEBUFFER = 0;
         public const int NO_RENDERBUFFER = 0;
 
+        //! Return viewport width x height.
+        public Graphic3d_Vec2i GetVPSize() { return new Graphic3d_Vec2i(myVPSizeX, myVPSizeY); }
+
+        //! Viewport width.
+        public int GetVPSizeX() { return myVPSizeX; }
+
+        //! Viewport height.
+        public int GetVPSizeY() { return myVPSizeY; }
+
+        //! Return viewport width x height.
+        public Graphic3d_Vec2i GetInitVPSize()
+        {
+            return new Graphic3d_Vec2i(myInitVPSizeX, myInitVPSizeY);
+        }
+
+        //! Viewport width.
+        public int GetInitVPSizeX() { return myInitVPSizeX; }
+
+        //! Viewport height.
+        public int GetInitVPSizeY() { return myInitVPSizeY; }
         bool isValidFrameBuffer()
         {
             return myGlFBufferId != NO_FRAMEBUFFER;

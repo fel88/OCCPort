@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Reflection.Metadata;
+using System.Text.RegularExpressions;
 
 namespace OCCPort
 {
@@ -108,10 +110,183 @@ namespace OCCPort
             return myArray[(int)thePriority];
 
         }
-
-        internal Bnd_Box BoundingBox(object v, object aCamera, object value1, object value2, bool theToIncludeAuxiliary)
+        void updateBVH()
         {
-            throw new NotImplementedException();
+            if (!myIsBVHPrimitivesNeedsReset)
+            {
+                return;
+            }
+
+            myBVHPrimitives.Clear();
+            //myBVHPrimitivesTrsfPers.Clear();
+            //myAlwaysRenderedMap.Clear();
+            //myIsBVHPrimitivesNeedsReset = false;
+            //for (Standard_Integer aPriorIter = Graphic3d_DisplayPriority_Bottom; aPriorIter <= Graphic3d_DisplayPriority_Topmost; ++aPriorIter)
+            //{
+            //    const Graphic3d_IndexedMapOfStructure&aStructures = myArray[aPriorIter];
+            //    for (Graphic3d_IndexedMapOfStructure::Iterator aStructIter (aStructures); aStructIter.More(); aStructIter.Next())
+            //    {
+            //        const Graphic3d_CStructure* aStruct = aStructIter.Value();
+            //        if (aStruct->IsAlwaysRendered())
+            //        {
+            //            aStruct->MarkAsNotCulled();
+            //            myAlwaysRenderedMap.Add(aStruct);
+            //        }
+            //        else if (aStruct->TransformPersistence().IsNull())
+            //        {
+            //            myBVHPrimitives.Add(aStruct);
+            //        }
+            //        else
+            //        {
+            //            myBVHPrimitivesTrsfPers.Add(aStruct);
+            //        }
+            //    }
+            //}
+        }
+        //! Returns layer bounding box.
+        //! @param theViewId             view index to consider View Affinity in structure
+        //! @param theCamera             camera definition
+        //! @param theWindowWidth        viewport width  (for applying transformation-persistence)
+        //! @param theWindowHeight       viewport height (for applying transformation-persistence)
+        //! @param theToIncludeAuxiliary consider also auxiliary presentations (with infinite flag or with trihedron transformation persistence)
+        //! @return computed bounding box
+        public Bnd_Box BoundingBox(int theViewId,
+                                       Graphic3d_Camera theCamera,
+                                       int theWindowWidth,
+                                       int theWindowHeight,
+                                       bool theToIncludeAuxiliary)
+        {
+            updateBVH();
+            return new Bnd_Box();
+            int aBoxId = !theToIncludeAuxiliary ? 0 : 1;
+  //          Graphic3d_Mat4d aProjectionMat = theCamera.ProjectionMatrix();
+  //          Graphic3d_Mat4d aWorldViewMat = theCamera.OrientationMatrix();
+  //          if (myIsBoundingBoxNeedsReset[aBoxId])
+  //          {
+  //              // Recompute layer bounding box
+  //              myBoundingBox[aBoxId].SetVoid();
+
+  //              for (Standard_Integer aPriorIter = Graphic3d_DisplayPriority_Bottom; aPriorIter <= Graphic3d_DisplayPriority_Topmost; ++aPriorIter)
+  //              {
+  //                  const Graphic3d_IndexedMapOfStructure&aStructures = myArray[aPriorIter];
+  //                  for (Graphic3d_IndexedMapOfStructure::Iterator aStructIter (aStructures); aStructIter.More(); aStructIter.Next())
+  //                  {
+  //                      const Graphic3d_CStructure* aStructure = aStructIter.Value();
+  //                      if (!aStructure->IsVisible(theViewId))
+  //                      {
+  //                          continue;
+  //                      }
+
+  //                      // "FitAll" operation ignores object with transform persistence parameter
+  //                      // but adds transform persistence point in a bounding box of layer (only zoom pers. objects).
+  //                      if (!aStructure->TransformPersistence().IsNull())
+  //                      {
+  //                          if (!theToIncludeAuxiliary
+  //                            && aStructure->TransformPersistence()->IsZoomOrRotate())
+  //                          {
+  //                              const gp_Pnt anAnchor = aStructure->TransformPersistence()->AnchorPoint();
+  //                              myBoundingBox[aBoxId].Add(anAnchor);
+  //                              continue;
+  //                          }
+  //                          // Panning and 2d persistence apply changes to projection or/and its translation components.
+  //                          // It makes them incompatible with z-fitting algorithm. Ignored by now.
+  //                          else if (!theToIncludeAuxiliary
+  //                                 || aStructure->TransformPersistence()->IsTrihedronOr2d())
+  //                          {
+  //                              continue;
+  //                          }
+  //                      }
+
+  //                      if (!theToIncludeAuxiliary
+  //                        && aStructure->HasGroupTransformPersistence())
+  //                      {
+  //                          // add per-group transform-persistence point in a bounding box
+  //                          for (Graphic3d_SequenceOfGroup::Iterator aGroupIter (aStructure->Groups()); aGroupIter.More(); aGroupIter.Next())
+  //                          {
+  //                              const Handle(Graphic3d_Group)&aGroup = aGroupIter.Value();
+  //                              if (!aGroup->TransformPersistence().IsNull()
+  //                                && aGroup->TransformPersistence()->IsZoomOrRotate())
+  //                              {
+  //                                  const gp_Pnt anAnchor = aGroup->TransformPersistence()->AnchorPoint();
+  //                                  myBoundingBox[aBoxId].Add(anAnchor);
+  //                              }
+  //                          }
+  //                      }
+
+  //                      Graphic3d_BndBox3d aBox = aStructure->BoundingBox();
+  //                      if (!aBox.IsValid())
+  //                      {
+  //                          continue;
+  //                      }
+
+  //                      if (aStructure->IsInfinite
+  //                      && !theToIncludeAuxiliary)
+  //                      {
+  //                          // include center of infinite object
+  //                          aBox = centerOfinfiniteBndBox(aBox);
+  //                      }
+
+  //                      if (!aStructure->TransformPersistence().IsNull())
+  //                      {
+  //                          aStructure->TransformPersistence()->Apply(theCamera, aProjectionMat, aWorldViewMat, theWindowWidth, theWindowHeight, aBox);
+  //                      }
+  //                      addBox3dToBndBox(myBoundingBox[aBoxId], aBox);
+  //                  }
+  //              }
+
+  //              myIsBoundingBoxNeedsReset[aBoxId] = false;
+  //          }
+
+  //          Bnd_Box aResBox = myBoundingBox[aBoxId];
+  //          if (!theToIncludeAuxiliary
+  //            || myAlwaysRenderedMap.IsEmpty())
+  //          {
+  //              return aResBox;
+  //          }
+
+  //          // add transformation-persistent objects which depend on camera position (and thus can not be cached) for operations like Z-fit
+  //          for (NCollection_IndexedMap <const Graphic3d_CStructure*>::Iterator aStructIter(myAlwaysRenderedMap); aStructIter.More(); aStructIter.Next())
+  //{
+  //              const Graphic3d_CStructure* aStructure = aStructIter.Value();
+  //              if (!aStructure->IsVisible(theViewId))
+  //              {
+  //                  continue;
+  //              }
+
+  //              // handle per-group transformation persistence specifically
+  //              if (aStructure->HasGroupTransformPersistence())
+  //              {
+  //                  for (Graphic3d_SequenceOfGroup::Iterator aGroupIter (aStructure->Groups()); aGroupIter.More(); aGroupIter.Next())
+  //                  {
+  //                      const Handle(Graphic3d_Group)&aGroup = aGroupIter.Value();
+  //                      const Graphic3d_BndBox4f&aBoxF = aGroup->BoundingBox();
+  //                      if (aGroup->TransformPersistence().IsNull()
+  //                      || !aBoxF.IsValid())
+  //                      {
+  //                          continue;
+  //                      }
+
+  //                      Graphic3d_BndBox3d aBoxCopy(Graphic3d_Vec3d (aBoxF.CornerMin().xyz()),
+  //                                   Graphic3d_Vec3d(aBoxF.CornerMax().xyz()));
+  //                  aGroup->TransformPersistence()->Apply(theCamera, aProjectionMat, aWorldViewMat, theWindowWidth, theWindowHeight, aBoxCopy);
+  //                  addBox3dToBndBox(aResBox, aBoxCopy);
+  //              }
+  //          }
+
+  //          const Graphic3d_BndBox3d&aStructBox = aStructure->BoundingBox();
+  //          if (!aStructBox.IsValid()
+  //           || aStructure->TransformPersistence().IsNull()
+  //           || !aStructure->TransformPersistence()->IsTrihedronOr2d())
+  //          {
+  //              continue;
+  //          }
+
+  //          Graphic3d_BndBox3d aBoxCopy = aStructBox;
+  //          aStructure->TransformPersistence()->Apply(theCamera, aProjectionMat, aWorldViewMat, theWindowWidth, theWindowHeight, aBoxCopy);
+  //          addBox3dToBndBox(aResBox, aBoxCopy);
+  //      }
+
+  //return aResBox;
         }
 
         internal void InvalidateBoundingBox()
