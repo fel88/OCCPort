@@ -1,4 +1,4 @@
-﻿using OpenTK.Graphics.ES11;
+﻿using OpenTK.Graphics.OpenGL;
 using System;
 using System.Reflection.Metadata;
 
@@ -94,22 +94,46 @@ namespace OCCPort.OpenGL
 
         internal void ResetAppliedAspect()
         {
-            throw new NotImplementedException();
+            myGlContext.BindDefaultVao();
+
+            myHighlightStyle = null;
+            //myToAllowFaceCulling = false;
+            // myAspectsSet = &myDefaultAspects;
+            // myAspectsApplied = null;
+            // myGlContext.SetPolygonOffset(Graphic3d_PolygonOffset());
+
+            ApplyAspects();
+            //   myGlContext.SetLineStipple(myDefaultAspects.Aspect().LinePattern());
+            //  myGlContext.SetLineWidth(myDefaultAspects.Aspect().LineWidth());
+            if (myGlContext.core15fwd != null)
+            {
+                myGlContext.core15fwd.glActiveTexture(All.Texture0);
+            }
+        }
+
+        private void ApplyAspects()
+        {
+            //throw new NotImplementedException();
         }
 
         internal void SetAllowFaceCulling(object value)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
 
-        internal OpenGl_Aspects SetAspects(OpenGl_Aspects myCubeMapParams)
+        internal OpenGl_Aspects SetAspects(OpenGl_Aspects theAspect)
         {
-            throw new NotImplementedException();
+            OpenGl_Aspects aPrevAspects = myAspectsSet;
+            myAspectsSet = theAspect;
+            return aPrevAspects;
         }
 
-        internal void SetRenderFilter(int aPrevFilter)
+        //! Set filter for restricting rendering of particular elements.
+
+        internal void SetRenderFilter(int theFilter)
         {
-            throw new NotImplementedException();
+          myRenderFilter = theFilter;
+
         }
 
         internal bool SetUseZBuffer(bool theToUse)

@@ -1,6 +1,7 @@
 ﻿using OCCPort.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Security.Cryptography;
 
 namespace OCCPort
@@ -76,6 +77,7 @@ namespace OCCPort
                 return false;
             }
 
+            
             FaceListFunctor aFunctor = new FaceListFunctor(this, theRange);
             //use Parallel here in future
             for (int i = 0; i < myModel.FacesNb(); i++)

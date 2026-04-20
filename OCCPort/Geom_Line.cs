@@ -25,7 +25,10 @@
 
         public override double LastParameter()
         { return Precision.Infinite(); }
-
+        public override void D0(double U, ref gp_Pnt P)
+        {
+            P = ElCLib.LineValue(U, pos);
+        }
 
         public Geom_Line(gp_Lin L)
         {

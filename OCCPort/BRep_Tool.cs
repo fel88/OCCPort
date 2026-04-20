@@ -358,9 +358,13 @@ namespace OCCPort
             return aTFace.Triangulation(theMeshPurpose);
         }
 
-        internal static Geom_Surface Surface(TopoDS_Face aFace, TopLoc_Location aDummyLoc)
+        //! Returns the geometric surface of the face. Returns
+        //! in <L> the location for the surface.
+        internal static Geom_Surface Surface(TopoDS_Face F, TopLoc_Location L)
         {
-            throw new NotImplementedException();
+            BRep_TFace TF = (BRep_TFace)(F.TShape());
+            L = F.Location() * TF.Location();
+            return TF.Surface();
         }
 
         internal static Poly_PolygonOnTriangulation PolygonOnTriangulation(TopoDS_Edge anEdge, Poly_Triangulation aTriangulation, TopLoc_Location aTrsf)
@@ -424,6 +428,10 @@ namespace OCCPort
             return uTrim1;
         }
 
+        public override void D0(double U, ref gp_Pnt P)
+        {
+            throw new NotImplementedException();
+        }
     }
 
 

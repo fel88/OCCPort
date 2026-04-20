@@ -10,7 +10,11 @@
     public struct gp_XY
 
     {
+        //! Returns the X coordinate of this number pair.
+        public double X() { return x; }
 
+        //! Returns the Y coordinate of this number pair.
+        public double Y() { return y; }
 
         //! a number pair defined by the XY coordinates
         public gp_XY(double theX, double theY)
@@ -25,7 +29,7 @@
         //! Assigns the given value to the Y  coordinate of this number pair.
         public void SetY(double theY) { y = theY; }
 
-        double x;
+         double x;
         double y;
 
     }

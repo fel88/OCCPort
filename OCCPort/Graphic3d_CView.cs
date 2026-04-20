@@ -158,10 +158,10 @@ namespace OCCPort
 
         internal void Display(Graphic3d_Structure theStructure)
         {
-            //if (!IsActive())
-            //{
-            //	return;
-            //}
+            if (!IsActive())
+            {
+                return;
+            }
 
             //// If Display on a structure present in the list of calculated structures while it is not
             //// or more, of calculated type =>

@@ -36,7 +36,7 @@ namespace OCCPort
     //! "main Direction", respectively, as their unit vectors.
     //! -   The "Z Axis" is also the "main Axis".
     //! -   gp_Ax2 is used to define a coordinate system that must be always right-handed.
-    internal struct gp_Ax3
+    public struct gp_Ax3
     {
 
 

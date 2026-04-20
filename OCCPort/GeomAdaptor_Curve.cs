@@ -229,7 +229,13 @@ namespace OCCPort
 		{
 			return flatknots.Value(deg + 1);
 		}
-		TColStd_HArray1OfReal flatknots;
+
+        public override void D0(double U, ref gp_Pnt P)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        TColStd_HArray1OfReal flatknots;
 		int deg;
 
 	}

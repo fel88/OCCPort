@@ -29,7 +29,7 @@
             Initialize(F, R);
 
         }
-        GeomAdaptor_Surface mySurf;
+        GeomAdaptor_Surface mySurf = new GeomAdaptor_Surface();
         gp_Trsf myTrsf;
         TopoDS_Face myFace;
         void Initialize(TopoDS_Face F,

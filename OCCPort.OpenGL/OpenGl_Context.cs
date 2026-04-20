@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices.ComTypes;
+using System.Runtime.Intrinsics.Arm;
 using static System.Net.Mime.MediaTypeNames;
 
 
@@ -21,7 +22,7 @@ namespace OCCPort.OpenGL
         public OpenGl_MatrixState<float> ModelWorldState; //!< state of orientation matrix
         public OpenGl_MatrixState<float> WorldViewState;  //!< state of orientation matrix
         public OpenGl_MatrixState<float> ProjectionState; //!< state of projection  matrix
-
+        OpenGl_GlCore32 core32;     //!< OpenGL 3.2 core profile
         internal bool GetResource<T>(string theShareKey, T theProgram)
         {
             throw new NotImplementedException();
@@ -327,6 +328,18 @@ namespace OCCPort.OpenGL
 
         //! Return rendering context (EGLContext | HGLRC | GLXContext | EAGLContext* | NSOpenGLContext*).
         public Aspect_RenderingContext RenderingContext() { return myGContext; }
+        uint myDefaultVao;      //!< default Vertex Array Object
+
+        internal void BindDefaultVao()
+        {
+            if (myDefaultVao == 0
+   || core32 == null)
+            {
+                return;
+            }
+
+            core32.glBindVertexArray(myDefaultVao);
+        }
 
         int[] myViewport = new int[4];     //!< current viewport
         int[] myViewportVirt = new int[4]; //!< virtual viewport
@@ -348,6 +361,8 @@ namespace OCCPort.OpenGL
             core15fwd = new _core15fwd();
 
             caps = (theCaps != null ? theCaps : new OpenGl_Caps());
+            myShaderManager = new OpenGl_ShaderManager(this);
+
 
         }
     }

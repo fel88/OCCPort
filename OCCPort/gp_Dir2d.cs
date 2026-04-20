@@ -9,6 +9,10 @@ namespace OCCPort
         private double dV;
 
         gp_XY coord;
+        //! For this unit vector, returns its two coordinates as a number pair.
+        //! Comparison between Directions
+        //! The precision value is an input data.
+        public gp_XY XY() { return coord; }
 
         public gp_Dir2d(double theXv, double theYv)
         {

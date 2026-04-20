@@ -158,12 +158,11 @@
             // 
             // toolStripButton8
             // 
-            toolStripButton8.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             toolStripButton8.Image = (System.Drawing.Image)resources.GetObject("toolStripButton8.Image");
             toolStripButton8.ImageTransparentColor = System.Drawing.Color.Magenta;
             toolStripButton8.Name = "toolStripButton8";
-            toolStripButton8.Size = new System.Drawing.Size(23, 22);
-            toolStripButton8.Text = "toolStripButton8";
+            toolStripButton8.Size = new System.Drawing.Size(114, 22);
+            toolStripButton8.Text = "add box+redraw";
             toolStripButton8.Click += toolStripButton8_Click;
             // 
             // toolStripButton9

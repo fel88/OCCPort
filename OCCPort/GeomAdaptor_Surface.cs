@@ -1,4 +1,5 @@
 ﻿using OCCPort;
+using System.Reflection.Metadata;
 using System.Security.AccessControl;
 
 namespace OCCPort
@@ -69,8 +70,8 @@ namespace OCCPort
                                  double ULast,
                                 double VFirst,
                                 double VLast,
-                                double TolU=0.0,
-                                double TolV=0.0)
+                                double TolU = 0.0,
+                                double TolV = 0.0)
         {
             myTolU = TolU;
             myTolV = TolV;
@@ -149,6 +150,12 @@ namespace OCCPort
                 else
                     mySurfaceType = GeomAbs_SurfaceType.GeomAbs_OtherSurface;
             }
+        }
+        public GeomAdaptor_Surface(Geom_Surface theSurf)
+
+        {
+            myTolU = (0.0); myTolV = (0.0);
+            Load(theSurf);
         }
 
         public GeomAdaptor_Surface()

@@ -50,33 +50,34 @@ namespace OCCPort.Interfaces
 
             // Explore all related to some face edges in shape.
             // make array of faces suitable for processing (excluding faces without surface)
-            TopTools_ListOfShape aFaceList;
-            //BRepLib.ReverseSortFaces(GetShape(), aFaceList);
-            //TopTools_MapOfShape aFaceMap;
+            TopTools_ListOfShape aFaceList = new TopTools_ListOfShape();
+            BRepLib.ReverseSortFaces(GetShape(), aFaceList);
+            TopTools_MapOfShape aFaceMap = new TopTools_MapOfShape();
 
-            //TopLoc_Location aEmptyLoc;
+            TopLoc_Location aEmptyLoc = new TopLoc_Location();
             //TopTools_ListIteratorOfListOfShape aFaceIter(aFaceList);
-            //for (; aFaceIter.More(); aFaceIter.Next())
-            //{
-            //	TopoDS_Shape aFaceNoLoc = aFaceIter.Value();
-            //	aFaceNoLoc.Location(aEmptyLoc);
-            //	if (!aFaceMap.Add(aFaceNoLoc))
-            //	{
-            //		continue; // already processed
-            //	}
 
-            //	TopoDS_Face aFace = TopoDS.Face(aFaceIter.Value());
-            //	if (!BRep_Tool.IsGeometric(aFace))
-            //	{
-            //		continue;
-            //	}
+            foreach (var aFaceIter in aFaceList)
+            {
+                TopoDS_Shape aFaceNoLoc = aFaceIter;
+                aFaceNoLoc.Location(aEmptyLoc);
+                if (!aFaceMap.Add(aFaceNoLoc))
+                {
+                    continue; // already processed
+                }
 
-            //	// Explore all edges in face.
-            //	visitEdges(theVisitor, aFace, false, TopAbs_ShapeEnum. TopAbs_EDGE);
+                TopoDS_Face aFace = TopoDS.Face(aFaceIter);
+                if (!BRep_Tool.IsGeometric(aFace))
+                {
+                    continue;
+                }
 
-            //	// Store only forward faces in order to prevent inverse issue.
-            //	theVisitor->Visit(TopoDS::Face(aFace.Oriented(TopAbs_FORWARD)));
-            //}
+                //	// Explore all edges in face.
+                visitEdges(theVisitor, aFace, false, TopAbs_ShapeEnum.TopAbs_EDGE);
+
+                //	// Store only forward faces in order to prevent inverse issue.
+                theVisitor.Visit(TopoDS.Face(aFace.Oriented(TopAbs_Orientation.TopAbs_FORWARD)));
+            }
         }
     }
 

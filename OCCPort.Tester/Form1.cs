@@ -315,12 +315,12 @@ namespace OCCPort.Tester
             box.Build();
             var solid = box.Solid();
             var shape = new AIS_Shape(solid);
-            var sm = v3d_viewer.StructureManager();
-
+            
             myAISContext.Display(shape, true);
             myAISContext.SetDisplayMode(shape, AIS_DisplayMode.AIS_Shaded, false);
 
-            //shape.Compute(sm,);
+            
+
             GravityViewManager.View.Redraw();
         }
 
