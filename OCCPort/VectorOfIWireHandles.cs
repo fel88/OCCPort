@@ -5,18 +5,18 @@ namespace OCCPort
 {
     internal class VectorOfIWireHandles
     {
-        List<IMeshData_Wire> items = new List<IMeshData_Wire>();
+        List<IWireHandle> items = new List<IWireHandle>();
         public int Size()
         {
             return items.Count;
         }
 
-        internal void Append(IMeshData_Wire aEdge)
+        internal void Append(IWireHandle aEdge)
         {
             items.Add(aEdge);
         }
 
-        internal IMeshData_Wire Get(int v)
+        internal IWireHandle Get(int v)
         {
             return items[v];
         }

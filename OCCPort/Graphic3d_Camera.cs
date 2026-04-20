@@ -951,7 +951,7 @@ namespace OCCPort
             // Measure depth of boundary points from camera eye.
             List<gp_Pnt> aPntsToMeasure = new List<gp_Pnt>();
 
-            double[] aGraphicBB = [6];
+            double[] aGraphicBB =new  double [6];
             theGraphicBB.Get(out aGraphicBB[0], out aGraphicBB[1], out aGraphicBB[2], out aGraphicBB[3], out aGraphicBB[4], out aGraphicBB[5]);
 
             aPntsToMeasure.Add(new gp_Pnt(aGraphicBB[0], aGraphicBB[1], aGraphicBB[2]));
@@ -967,7 +967,7 @@ namespace OCCPort
 
             if (isFiniteMinMax)
             {
-                double[] aMinMax = [6];
+                double[] aMinMax = new double[6];
                 theMinMax.Get(out aMinMax[0],out aMinMax[1], out aMinMax[2], out aMinMax[3], out aMinMax[4], out aMinMax[5]);
 
                 aPntsToMeasure.Add(new gp_Pnt(aMinMax[0], aMinMax[1], aMinMax[2]));

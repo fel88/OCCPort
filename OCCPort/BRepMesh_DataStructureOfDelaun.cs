@@ -29,10 +29,10 @@ namespace OCCPort
             myElements.Append(theElement);
             int aElementIndex = myElements.Size();
             myElementsOfDomain.Add(aElementIndex);
-//
-           //  int (&e)[3] = theElement.myEdges;
-          //  for (int i = 0; i < 3; ++i)
-           //     myLinks(e[i]).Append(aElementIndex);
+            //
+            //  int (&e)[3] = theElement.myEdges;
+            //  for (int i = 0; i < 3; ++i)
+            //     myLinks(e[i]).Append(aElementIndex);
 
             return aElementIndex;
         }
@@ -43,5 +43,10 @@ namespace OCCPort
         }
 
         VectorOfElements myElements;
+
+        public BRepMesh_DataStructureOfDelaun(NCollection_IncAllocator myAllocator)
+        {
+            myNodes = (new BRepMesh_VertexTool(myAllocator));
+        }
     }
 }

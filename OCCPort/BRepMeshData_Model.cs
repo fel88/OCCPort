@@ -60,4 +60,8 @@ namespace OCCPort
         //IMeshData::VectorOfIEdgeHandles myDEdges;
     }
 
+    public interface IWireHandle : IMeshData_Wire
+    {
+    }
+
 }

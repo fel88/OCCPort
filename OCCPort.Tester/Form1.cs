@@ -327,6 +327,7 @@ namespace OCCPort.Tester
         private void toolStripButton9_Click(object sender, EventArgs e)
         {
 
+            
             GravityViewManager.View.MyViewer.StructureManager().SetDeviceLost();
             //GravityViewManager.View.Redraw();
             aIS_ViewController.FlushViewEvents(myAISContext, GravityViewManager.View);

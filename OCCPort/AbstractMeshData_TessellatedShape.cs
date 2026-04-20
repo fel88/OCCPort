@@ -16,7 +16,12 @@ namespace OCCPort
         {
             return myDeflection;
         }
+        IMeshData_Status myStatus;
 
+        public bool IsSet(IMeshData_Status theValue)
+        {
+            return (myStatus & theValue) != 0;
+        }
         public double myDeflection { get; set; }
     }
 }

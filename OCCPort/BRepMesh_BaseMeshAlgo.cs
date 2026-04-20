@@ -1,5 +1,6 @@
 ﻿using OCCPort.Interfaces;
 using System.Reflection.Metadata;
+using System.Security.Cryptography;
 
 namespace OCCPort
 {
@@ -85,6 +86,7 @@ namespace OCCPort
                 }
             }
         }
+        NCollection_IncAllocator myAllocator;
 
         //! Generates mesh for the contour stored in data structure.
         public abstract void generateMesh(Message_ProgressRange theRange);
@@ -92,10 +94,10 @@ namespace OCCPort
         {
             try
             {
-                //myDFace = theDFace;
-                //myParameters = theParameters;
-                //myAllocator = new NCollection_IncAllocator(IMeshData::MEMORY_BLOCK_SIZE_HUGE);
-                myStructure = new BRepMesh_DataStructureOfDelaun();
+                myDFace = theDFace;
+                myParameters = theParameters;
+                myAllocator = new NCollection_IncAllocator(IMeshData.MEMORY_BLOCK_SIZE_HUGE);
+                myStructure = new BRepMesh_DataStructureOfDelaun(myAllocator);
                 //myNodesMap = new VectorOfPnt(256, myAllocator);
                 //myUsedNodes = new DMapOfIntegerInteger(1, myAllocator);
 
@@ -119,12 +121,28 @@ namespace OCCPort
             //myUsedNodes.Nullify();
             //myAllocator.Nullify();
         }
-        
+
         private bool initDataStructure()
         {
 
             for (int aWireIt = 0; aWireIt < myDFace.WiresNb(); ++aWireIt)
             {
+                var aDWire = myDFace.GetWire(aWireIt);
+                if (aDWire.IsSet(IMeshData_Status.IMeshData_SelfIntersectingWire))
+                {
+                    // TODO: here we can add points of self-intersecting wire as fixed points
+                    // in order to keep consistency of nodes with adjacent faces.
+                    continue;
+                }
+
+                for (int aEdgeIt = 0; aEdgeIt < aDWire.EdgesNb(); ++aEdgeIt)
+                {
+                    IEdgeHandle aDEdge = aDWire.GetEdge(aEdgeIt);
+                    //ICurveHandle & aCurve = aDEdge->GetCurve();
+                    // IPCurveHandle & aPCurve = aDEdge->GetPCurve(
+                    //   myDFace.get(), aDWire->GetEdgeOrientation(aEdgeIt));
+                }
+
             }
 
 
@@ -134,11 +152,17 @@ namespace OCCPort
 
         IMeshData_Face myDFace;
         IMeshTools_Parameters myParameters;
-       // Handle(NCollection_IncAllocator)       myAllocator;
-  
-  //Handle(VectorOfPnt)                    myNodesMap;
-  //Handle(DMapOfIntegerInteger)           myUsedNodes;
+        // Handle(NCollection_IncAllocator)       myAllocator;
+
+        //Handle(VectorOfPnt)                    myNodesMap;
+        //Handle(DMapOfIntegerInteger)           myUsedNodes;
 
         BRepMesh_DataStructureOfDelaun myStructure;
     }
+
+    public interface IEdgeHandle : IMeshData_Edge
+    {
+
+    }
+
 }

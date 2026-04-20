@@ -61,7 +61,7 @@ namespace OCCPort
         bool myIsOwnName;   //!< flag indicating if name was allocated or not
         bool myIsInfinite;  //!< Option to advance by hyperbolic law
 
-       public  Message_ProgressIndicator myProgress; //!< Pointer to progress indicator instance
+        public Message_ProgressIndicator myProgress; //!< Pointer to progress indicator instance
         double RealSmall()
         { return double.MinValue; }
 
@@ -82,9 +82,17 @@ namespace OCCPort
             return myPortion * x / (1.0 + x);  // hyperbola
         }
 
+        //! Returns true if ProgressIndicator signals UserBreak
+        public bool UserBreak()
+        {
+            return myProgress != null && myProgress.UserBreak();
+        }
+
+
+        //! Returns false if ProgressIndicator signals UserBreak
         internal bool More()
         {
-            throw new NotImplementedException();
+            return !UserBreak();
         }
     }
 }

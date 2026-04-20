@@ -34,7 +34,12 @@ namespace OCCPort
 
         public void SetStatus(IMeshData_Status meshData_Failure)
         {
-            throw new System.NotImplementedException();
+            
+        }
+
+        public IWireHandle GetWire(int theIndex)
+        {
+            return myDWires.Get(theIndex);
         }
     }
 }

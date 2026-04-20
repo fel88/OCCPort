@@ -4,5 +4,6 @@
    public  interface IMeshData_StatusOwner
     {
 
+        bool IsSet(IMeshData_Status meshData_SelfIntersectingWire);
     }
 }

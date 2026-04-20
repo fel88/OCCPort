@@ -6,6 +6,12 @@
     public class BRepMesh_VertexTool
     {
         BRepMesh_VertexInspector mySelector;
+
+        public BRepMesh_VertexTool(NCollection_IncAllocator myAllocator)
+        {
+            mySelector = new BRepMesh_VertexInspector(myAllocator);
+        }
+
         //! Returns a number of vertices.
         public int Extent()
         {

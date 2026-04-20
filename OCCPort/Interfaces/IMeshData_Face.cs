@@ -10,9 +10,7 @@
         TopoDS_Face GetFace();
         int WiresNb();
         void SetStatus(IMeshData_Status meshData_Failure);
-
-
-
+        IWireHandle GetWire(int aWireIt);
     }
 
 }
