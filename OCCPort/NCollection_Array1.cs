@@ -2,9 +2,9 @@
 
 namespace OCCPort
 {
-	public class NCollection_Array1
+	public class NCollection_Array1<T>
 	{
-		protected List<int> list = new List<int>();
+		protected List<T> list = new List<T>();
 		//! Empty constructor; should be used with caution.
 		//! @sa methods Resize() and Move().
 		public NCollection_Array1()
@@ -17,7 +17,7 @@ namespace OCCPort
 			//
 		}
 
-		public int this[int key]
+		public T this[int key]
 		{
 			get => list[key];
 			set => list[key] = value;
@@ -25,7 +25,7 @@ namespace OCCPort
 
 		int myLowerBound;
 		int myUpperBound;
-		public void Init(int val)
+		public void Init(T val)
 		{
 			for (int i = myLowerBound; i <= myUpperBound; i++)
 			{
@@ -38,7 +38,7 @@ namespace OCCPort
 			return myLowerBound;
 		}
 
-		public void SetValue(int v, int aDrawBuffer)
+		public void SetValue(int v, T aDrawBuffer)
 		{
 			list[v] = aDrawBuffer;
 		}
@@ -47,7 +47,7 @@ namespace OCCPort
 		{
 			return myUpperBound;
 		}
-		public int Value(int index)
+		public T Value(int index)
 		{//Standard_OutOfRange_Raise_if(theIndex<myLowerBound || theIndex> myUpperBound, "NCollection_Array1::Value");
 			return list[index];
 		}

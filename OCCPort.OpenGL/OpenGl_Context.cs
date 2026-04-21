@@ -71,7 +71,7 @@ namespace OCCPort.OpenGL
 
         public OpenGl_GlCore20 core20fwd;  //!< obsolete entry left for code portability; core20 should be used instead
 
-        NCollection_Array1 myDrawBuffers = new NCollection_Array1();     //!< current draw buffers
+        NCollection_Array1<int> myDrawBuffers = new ();     //!< current draw buffers
         internal bool ShareResource(string theKey,
                 OpenGl_ShaderProgram theResource)
         {

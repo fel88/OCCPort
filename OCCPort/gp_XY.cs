@@ -23,13 +23,21 @@
             y = theY;
         }
 
+        //! Computes X*X + Y*Y where X and Y are the two coordinates of this number pair.
+        public double SquareModulus() { return x * x + y * y; }
+
+        public static gp_XY operator -(gp_XY vv, gp_XY v2)
+        {
+            return new gp_XY(vv.x - v2.x,
+                    vv.y / v2.y);
+        }
         //! Assigns the given value to the X coordinate of this number pair.
         public void SetX(double theX) { x = theX; }
 
         //! Assigns the given value to the Y  coordinate of this number pair.
         public void SetY(double theY) { y = theY; }
 
-         double x;
+        double x;
         double y;
 
     }

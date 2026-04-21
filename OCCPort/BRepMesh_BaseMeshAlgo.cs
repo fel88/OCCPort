@@ -1,4 +1,5 @@
-﻿using OCCPort.Interfaces;
+﻿using OCCPort.Enums;
+using OCCPort.Interfaces;
 using System.Reflection.Metadata;
 using System.Security.Cryptography;
 
@@ -17,6 +18,36 @@ namespace OCCPort
         public IMeshData_Face getDFace()
         {
             return myDFace;
+        }
+
+        //! Registers the given point in vertex map and adds 2d point to mesh data structure.
+        //! Returns index of node in the structure.
+        public int registerNode(
+  gp_Pnt thePoint,
+  gp_Pnt2d thePoint2d,
+  BRepMesh_DegreeOfFreedom theMovability,
+  bool isForceAdd)
+        {
+            int aNodeIndex = addNodeToStructure(
+              thePoint2d, myNodesMap.Size(), theMovability, isForceAdd);
+
+            if (aNodeIndex > myNodesMap.Size())
+            {
+                myNodesMap.Append(thePoint);
+            }
+
+            return aNodeIndex;
+        }
+        VectorOfPnt myNodesMap;
+
+        public int addNodeToStructure(
+          gp_Pnt2d thePoint,
+          int theLocation3d,
+          BRepMesh_DegreeOfFreedom theMovability,
+          bool isForceAdd)
+        {
+            BRepMesh_Vertex aNode = new BRepMesh_Vertex(thePoint.XY(), theLocation3d, theMovability);
+            return myStructure.AddNode(aNode, isForceAdd);
         }
 
         Poly_Triangulation collectTriangles()
@@ -138,9 +169,20 @@ namespace OCCPort
                 for (int aEdgeIt = 0; aEdgeIt < aDWire.EdgesNb(); ++aEdgeIt)
                 {
                     IEdgeHandle aDEdge = aDWire.GetEdge(aEdgeIt);
-                    //ICurveHandle & aCurve = aDEdge->GetCurve();
-                    // IPCurveHandle & aPCurve = aDEdge->GetPCurve(
-                    //   myDFace.get(), aDWire->GetEdgeOrientation(aEdgeIt));
+                    ICurveHandle  aCurve = aDEdge.GetCurve();
+                    IPCurveHandle aPCurve = aDEdge.GetPCurve(
+                      myDFace, aDWire.GetEdgeOrientation(aEdgeIt));
+
+                    int aPrevNodeIndex = -1;
+                    int aLastPoint = aPCurve.ParametersNb() - 1;
+                    for (int aPointIt = 0; aPointIt <= aLastPoint; ++aPointIt)
+                    {
+                        int aNodeIndex = registerNode(
+                          aCurve.GetPoint(aPointIt),
+                          aPCurve.GetPoint(aPointIt),
+                          BRepMesh_DegreeOfFreedom.BRepMesh_Frontier, false/*aPointIt > 0 && aPointIt < aLastPoint*/);
+
+                    }
                 }
 
             }
@@ -158,11 +200,6 @@ namespace OCCPort
         //Handle(DMapOfIntegerInteger)           myUsedNodes;
 
         BRepMesh_DataStructureOfDelaun myStructure;
-    }
-
-    public interface IEdgeHandle : IMeshData_Edge
-    {
-
     }
 
 }

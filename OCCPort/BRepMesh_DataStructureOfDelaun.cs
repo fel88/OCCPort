@@ -19,6 +19,25 @@ namespace OCCPort
         {
             return myNodes.Extent();
         }
+        //! Adds node to the mesh if it is not already in the mesh.
+        //! @param theNode node to be added to the mesh.
+        //! @param isForceAdd adds the given node to structure without 
+        //! checking on coincidence with other nodes.
+        //! @return index of the node in the structure.
+        public int AddNode(
+     BRepMesh_Vertex theNode,
+     bool isForceAdd = false)
+        {
+            int aNodeId = myNodes.Add(theNode, isForceAdd);
+            if (!myNodeLinks.IsBound(aNodeId))
+                myNodeLinks.Bind(aNodeId, new ListOfInteger(myAllocator));
+
+            return aNodeId;
+        }
+        NCollection_IncAllocator myAllocator;
+
+        //typedef NCollection_Shared<NCollection_DataMap<Standard_Integer, ListOfInteger> >                             DMapOfIntegerListOfInteger;
+        DMapOfIntegerListOfInteger myNodeLinks;
 
         //=======================================================================
         //function : AddElement

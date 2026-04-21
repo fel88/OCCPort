@@ -275,7 +275,7 @@ namespace OCCPort
             if (theShape.ShapeType() == TopAbs_ShapeEnum.TopAbs_SHELL)
             {
                 //Dictionary<TopoDS_Shape, TopTools_ShapeMapHasher> aMap(101, new NCollection_IncAllocator);
-                NCollection_Map aMap = new NCollection_Map();
+                NCollection_Map<TopoDS_Edge> aMap = new ();
                 TopExp_Explorer exp = new TopExp_Explorer(theShape.Oriented(TopAbs_Orientation.TopAbs_FORWARD), TopAbs_ShapeEnum.TopAbs_EDGE);
                 bool hasBound = false;
                 for (; exp.More(); exp.Next())
@@ -292,7 +292,7 @@ namespace OCCPort
             else if (theShape.ShapeType() == TopAbs_ShapeEnum.TopAbs_WIRE)
             {
                 //NCollection_Map<TopoDS_Shape, TopTools_ShapeMapHasher> aMap(101, new NCollection_IncAllocator);
-                NCollection_Map aMap = new NCollection_Map();
+                NCollection_Map<TopoDS_Shape> aMap = new ();
                 TopExp_Explorer exp = new TopExp_Explorer(theShape.Oriented(TopAbs_Orientation.TopAbs_FORWARD), TopAbs_ShapeEnum.TopAbs_VERTEX);
                 bool hasBound = false;
                 for (; exp.More(); exp.Next())
