@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using OpenTK.Core.Native;
+using System;
+using System.Collections.Generic;
 
 namespace OCCPort
 {
@@ -51,5 +53,14 @@ namespace OCCPort
 		{//Standard_OutOfRange_Raise_if(theIndex<myLowerBound || theIndex> myUpperBound, "NCollection_Array1::Value");
 			return list[index];
 		}
-	}
+
+		public int Length()
+		{
+			return list.Count;
+		}
+        public void Resize(int v1, int v2, bool v3)
+        {
+            //throw new NotImplementedException();
+        }
+    }
 }

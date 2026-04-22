@@ -5,6 +5,13 @@ namespace OCCPort
     public abstract class Geom2d_Curve : Geom2d_Geometry
     {
 
+        public gp_Pnt2d Value(double U)
+        {
+            gp_Pnt2d P = new gp_Pnt2d();
+            D0(U, ref P);
+            return P;
+        }
+
         //! Returns the value of the first parameter.
         //! Warnings :
         //! It can be RealFirst or RealLast from package Standard
@@ -27,7 +34,7 @@ namespace OCCPort
         //! compute the current point. For example when the first
         //! derivative on the basis curve and the offset direction
         //! are parallel.
-        public abstract void D0(double U,ref  gp_Pnt2d P);
+        public abstract void D0(double U, ref gp_Pnt2d P);
 
     }
 }

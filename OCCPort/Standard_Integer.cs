@@ -1,4 +1,6 @@
-﻿namespace OCCPort
+﻿using System;
+
+namespace OCCPort
 {
     public static class Standard_Integer
     {
@@ -35,6 +37,10 @@
         public static double RealEpsilon()
         { return double.Epsilon; }
 
+        internal static double RealSmall()
+        {
+            return double.MinValue;
+        }
     }
 
 }

@@ -297,6 +297,7 @@ namespace OCCPort.Tester
             var shape = new AIS_Shape(solid);
             myAISContext.Display(shape, true);
             myAISContext.SetDisplayMode(shape, AIS_DisplayMode.AIS_Shaded, false);
+            myAISContext.UpdateCurrentViewer();
             //auto hn = GetHandle(*shape);
             //hh->FromObjHandle(hn);
         }
@@ -315,11 +316,11 @@ namespace OCCPort.Tester
             box.Build();
             var solid = box.Solid();
             var shape = new AIS_Shape(solid);
-            
+
             myAISContext.Display(shape, true);
             myAISContext.SetDisplayMode(shape, AIS_DisplayMode.AIS_Shaded, false);
 
-            
+
 
             GravityViewManager.View.Redraw();
         }
@@ -327,10 +328,10 @@ namespace OCCPort.Tester
         private void toolStripButton9_Click(object sender, EventArgs e)
         {
 
-            
+
             GravityViewManager.View.MyViewer.StructureManager().SetDeviceLost();
             //GravityViewManager.View.Redraw();
-            aIS_ViewController.FlushViewEvents(myAISContext, GravityViewManager.View);
+            aIS_ViewController.FlushViewEvents(myAISContext, GravityViewManager.View, true);
 
         }
 

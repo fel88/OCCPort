@@ -9,6 +9,9 @@
         BRepAdaptor_Surface GetSurface();
         TopoDS_Face GetFace();
         int WiresNb();
+
+        //! Adds wire to discrete model of face.
+        IWireHandle AddWire(TopoDS_Wire theWire, int theEdgeNb = 0);
         void SetStatus(IMeshData_Status meshData_Failure);
         IWireHandle GetWire(int aWireIt);
     }

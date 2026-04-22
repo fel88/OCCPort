@@ -2,11 +2,11 @@
 
 namespace OCCPort.OpenGL
 {
-    internal class MyMapOfView : List<OpenGl_View>
+    internal class NCollection_DataMap<T1, T2>:Dictionary<T1,T2>
     {
         public bool IsEmpty()
         {
-            return Count == 0;
+            return this.Count == 0;
         }
     }
 }

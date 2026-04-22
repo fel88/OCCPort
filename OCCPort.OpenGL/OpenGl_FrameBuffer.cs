@@ -17,7 +17,11 @@ namespace OCCPort
         {
             throw new NotImplementedException();
         }
-
+        public void SetupViewport(OpenGl_Context theGlCtx)
+        {
+            int[] aViewport = new int[4] { 0, 0, myVPSizeX, myVPSizeY };
+            theGlCtx.ResizeViewport(aViewport);
+        }
         internal void BindDrawBuffer(OpenGl_Context aCtx)
         {
             throw new NotImplementedException();

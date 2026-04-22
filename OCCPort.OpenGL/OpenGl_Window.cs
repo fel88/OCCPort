@@ -20,7 +20,15 @@ namespace OCCPort
         Vector2i mySize;        //!< window width x height in pixels
 
         int mySwapInterval;//!< last assigned swap interval (VSync) for this window
-
+        public void SetSwapInterval(bool theToForceNoSync)
+        {
+            int aSwapInterval = theToForceNoSync ? 0 : myGlContext.caps.swapInterval;
+            if (mySwapInterval != aSwapInterval)
+            {
+                mySwapInterval = aSwapInterval;
+                myGlContext.SetSwapInterval(mySwapInterval);
+            }
+        }
         public int Width() { return mySize.X; }
         public int Height() { return mySize.Y; }
         // =======================================================================

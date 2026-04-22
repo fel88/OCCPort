@@ -358,8 +358,8 @@ namespace OCCPort
             //myToAskNextFrame = false;
         }
 
-        AIS_ViewInputBuffer myUI;                       //!< buffer for UI thread
-        AIS_ViewInputBuffer myGL;                       //!< buffer for rendering thread
+        AIS_ViewInputBuffer myUI=new AIS_ViewInputBuffer ();                       //!< buffer for UI thread
+        AIS_ViewInputBuffer myGL=new AIS_ViewInputBuffer ();                       //!< buffer for rendering thread
 
 
         double myLastEventsTime;           //!< last fetched events timer value for computing delta/progress

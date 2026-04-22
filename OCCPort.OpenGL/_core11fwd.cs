@@ -39,14 +39,29 @@ namespace OCCPort.OpenGL
             GL.Enable((EnableCap)v);
         }
 
+        internal void glFlush()
+        {
+            GL.Flush();
+        }
+
         internal void glGetBooleanv(GetPName n, ref bool v)
         {
             v = GL.GetBoolean(n);
         }
 
+        internal void glGetIntegerv(GetPName drawBuffer, ref int aDrawBuffer)
+        {            
+            GL.GetInteger(drawBuffer, out aDrawBuffer);
+        }
+
         internal void glReadBuffer(int myReadBuffer)
         {
             GL.ReadBuffer((ReadBufferMode)myReadBuffer);
+        }
+
+        internal void glViewport(int x, int y, int w, int h)
+        {
+            GL.Viewport(x, y, w, h);
         }
     }
 }

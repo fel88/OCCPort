@@ -19,6 +19,8 @@ namespace OCCPort
         double myDisplayPlaneLength;
         bool myGridEcho;
 
+        [Obsolete("! Deprecated, Redraw() should be used instead.")]
+        public void Update() { Redraw(); }
         public V3d_Viewer(Graphic3d_GraphicDriver theDriver)
         {
             myDriver = theDriver;
@@ -54,11 +56,7 @@ namespace OCCPort
         V3d_TypeOfView myDefaultTypeOfView;
         Graphic3d_StructureManager myStructureManager;
 
-        internal void Update()
-        {
-            Redraw();
-        }
-
+        
         public void AddView(V3d_View theView)
         {
             if (!myDefinedViews.Contains(theView))
@@ -109,7 +107,7 @@ namespace OCCPort
 
         V3d_ListOfView myActiveViews = new V3d_ListOfView();
 
-        
+
         internal void SetViewOn(V3d_View theView)
         {
             Graphic3d_CView aViewImpl = theView.View();

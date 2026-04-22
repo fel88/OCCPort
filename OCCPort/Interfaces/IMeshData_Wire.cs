@@ -8,6 +8,7 @@ namespace OCCPort.Interfaces
     {
         int EdgesNb();
         IEdgeHandle GetEdge(int aEdgeIt);
+        TopAbs_Orientation GetEdgeOrientation(int aEdgeIt);
 
     }
 }

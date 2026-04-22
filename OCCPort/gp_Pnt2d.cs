@@ -1,4 +1,5 @@
 ﻿using static System.Net.Mime.MediaTypeNames;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace OCCPort
 {
@@ -8,6 +9,14 @@ namespace OCCPort
     {
 
         gp_XY coord;
+        //=======================================================================
+        public double SquareDistance(gp_Pnt2d theOther)
+        {
+            gp_XY aXY = theOther.coord;
+            double aX = coord.X() - aXY.X();
+            double aY = coord.Y() - aXY.Y();
+            return (aX * aX + aY * aY);
+        }
 
         public double X()
            => coord.X();
@@ -24,5 +33,9 @@ namespace OCCPort
 
         }
 
+        public gp_Pnt2d(gp_XY gp_XY) : this()
+        {
+            coord = new gp_XY(gp_XY.X(), gp_XY.Y());
+        }
     }
 }

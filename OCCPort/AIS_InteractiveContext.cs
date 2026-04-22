@@ -192,11 +192,16 @@ namespace OCCPort
         SelectMgr_PickingStrategy myPickingStrategy; //!< picking strategy to be applied within MoveTo()
         bool myAutoHilight;
         bool myIsAutoActivateSelMode;
+        public void UpdateCurrentViewer()
+        {
+            if (myMainVwr != null)
+                myMainVwr.Update();
+        }
 
         //=======================================================================
         //function : Display
         //purpose  :
-        //=======================================================================
+        //===========================================v============================
         public void Display(AIS_InteractiveObject theIObj,
                                        bool theToUpdateViewer)
         {

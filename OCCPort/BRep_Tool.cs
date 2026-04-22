@@ -3,6 +3,7 @@ using OCCPort.Tester;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Reflection.Metadata;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Security.Policy;
@@ -11,40 +12,49 @@ namespace OCCPort
 {
     public class BRep_Tool
     {
-        //=======================================================================
-        //function : CurveOnSurface
-        //purpose  : Returns the curve  associated to the  edge in  the
-        //           parametric  space of  the  face.  Returns   a NULL
-        //           handle  if this curve  does not exist.  Returns in
-        //           <First> and <Last> the parameter range.
-        //=======================================================================
-
-        public static Geom2d_Curve CurveOnSurface(TopoDS_Edge E,
-                                               TopoDS_Face F,
-                                               double First,
-                                               double Last,
-                                               ref bool theIsStored)
+        public static void CurveOnSurface(TopoDS_Edge E,
+                              ref Geom2d_Curve C,
+                             ref Geom_Surface S,
+                                TopLoc_Location L,
+                                double First,
+                                double Last)
         {
-            TopLoc_Location l = new TopLoc_Location();
-            Geom_Surface S = BRep_Tool.Surface(F, ref l);
-            TopoDS_Edge aLocalEdge = E;
-            if (F.Orientation() == TopAbs_Orientation.TopAbs_REVERSED)
+            // find the representation
+            BRep_TEdge TE = (BRep_TEdge)(E.TShape());
+            BRep_ListIteratorOfListOfCurveRepresentation itcr = new BRep_ListIteratorOfListOfCurveRepresentation(TE.Curves());
+
+            while (itcr.More())
             {
-                aLocalEdge.Reverse();
+                BRep_CurveRepresentation cr = itcr.Value();
+                if (cr.IsCurveOnSurface())
+                {
+                    BRep_GCurve GC = (BRep_GCurve)(cr);
+                    C = GC.PCurve();
+                    S = GC.Surface();//strange code here??
+                    L = E.Location() * GC.Location();
+                    GC.Range(First, Last);
+                    return;
+                }
+                itcr.Next();
             }
-            return CurveOnSurface(aLocalEdge, S, l, First, Last, ref theIsStored);
+
+            C = null;
+            S = null;
+            L.Identity();
+            First = Last = 0.0;
         }
 
+
         public static Geom2d_Curve CurveOnSurface(TopoDS_Edge E,
-                                               Geom_Surface S,
-                                               TopLoc_Location L,
-                                               double First,
-                                               double Last,
-                                               ref bool theIsStored)
+                                           Geom_Surface S,
+                                           TopLoc_Location L,
+                                          ref double First,
+                                         ref double Last,
+                                           bool? theIsStored = null)
         {
             TopLoc_Location loc = L.Predivided(E.Location());
             bool Eisreversed = (E.Orientation() == TopAbs_Orientation.TopAbs_REVERSED);
-            if (theIsStored)
+            if (theIsStored.HasValue)
                 theIsStored = true;
 
             // find the representation
@@ -67,10 +77,37 @@ namespace OCCPort
             }
 
             // Curve is not found. Try projection on plane
-            if (theIsStored)
+            if (theIsStored.HasValue)
                 theIsStored = false;
             return CurveOnPlane(E, S, L, First, Last);
         }
+
+
+
+        //=======================================================================
+        //function : CurveOnSurface
+        //purpose  : Returns the curve  associated to the  edge in  the
+        //           parametric  space of  the  face.  Returns   a NULL
+        //           handle  if this curve  does not exist.  Returns in
+        //           <First> and <Last> the parameter range.
+        //=======================================================================
+
+        public static Geom2d_Curve CurveOnSurface(TopoDS_Edge E,
+                                               TopoDS_Face F,
+                                               ref double First,
+                                               ref double Last,
+                                               ref bool theIsStored)
+        {
+            TopLoc_Location l = new TopLoc_Location();
+            Geom_Surface S = BRep_Tool.Surface(F, ref l);
+            TopoDS_Edge aLocalEdge = E;
+            if (F.Orientation() == TopAbs_Orientation.TopAbs_REVERSED)
+            {
+                aLocalEdge.Reverse();
+            }
+            return CurveOnSurface(aLocalEdge, S, l, ref First, ref Last, theIsStored);
+        }
+
 
         static Geom2d_Curve nullPCurve = null;
 
@@ -275,7 +312,7 @@ namespace OCCPort
             if (theShape.ShapeType() == TopAbs_ShapeEnum.TopAbs_SHELL)
             {
                 //Dictionary<TopoDS_Shape, TopTools_ShapeMapHasher> aMap(101, new NCollection_IncAllocator);
-                NCollection_Map<TopoDS_Edge> aMap = new ();
+                NCollection_Map<TopoDS_Edge> aMap = new();
                 TopExp_Explorer exp = new TopExp_Explorer(theShape.Oriented(TopAbs_Orientation.TopAbs_FORWARD), TopAbs_ShapeEnum.TopAbs_EDGE);
                 bool hasBound = false;
                 for (; exp.More(); exp.Next())
@@ -292,7 +329,7 @@ namespace OCCPort
             else if (theShape.ShapeType() == TopAbs_ShapeEnum.TopAbs_WIRE)
             {
                 //NCollection_Map<TopoDS_Shape, TopTools_ShapeMapHasher> aMap(101, new NCollection_IncAllocator);
-                NCollection_Map<TopoDS_Shape> aMap = new ();
+                NCollection_Map<TopoDS_Shape> aMap = new();
                 TopExp_Explorer exp = new TopExp_Explorer(theShape.Oriented(TopAbs_Orientation.TopAbs_FORWARD), TopAbs_ShapeEnum.TopAbs_VERTEX);
                 bool hasBound = false;
                 for (; exp.More(); exp.Next())
@@ -458,8 +495,8 @@ namespace OCCPort
         AppParCurves_Constraint myBndPnt;
 
         public ProjLib_ProjectedCurve
-(Adaptor3d_Surface S,
- Adaptor3d_Curve C)
+    (Adaptor3d_Surface S,
+    Adaptor3d_Curve C)
         {
             myTolerance = (Precision.Confusion());
             myDegMin = (-1);

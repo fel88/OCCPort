@@ -3,16 +3,22 @@
 namespace OCCPort
 {
     //! Default implementation of edge data model entity.
-    public class BRepMeshData_Wire : AbstractMeshData_TessellatedShape, IMeshData_Wire
+    public class BRepMeshData_Wire : AbstractMeshData_Wire, IWireHandle
     {
-        public int EdgesNb()
+        public override  int EdgesNb()
         {
             return myDEdges.Count;
         }
 
-        public IEdgeHandle GetEdge(int aEdgeIt)
+        public override IEdgeHandle GetEdge(int aEdgeIt)
         {
             return myDEdges[aEdgeIt];
+        }
+        //! Returns True if orientation of discrete edge with the given index is forward.
+
+        public override  TopAbs_Orientation GetEdgeOrientation(int theIndex)
+        {
+            return myDEdgesOri[theIndex];
         }
 
         VectorOfIEdgePtrs myDEdges;
@@ -22,6 +28,8 @@ namespace OCCPort
         {
         }
 
-
+        public BRepMeshData_Wire(TopoDS_Shape theShape, int theEdgeNb, NCollection_IncAllocator myAllocator) : this(theShape)
+        {
+        }
     }
 }

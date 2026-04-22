@@ -23,7 +23,8 @@ namespace OCCPort
 
         //! Returns layer with given ID or NULL if undefined.
         public abstract Graphic3d_Layer Layer(Graphic3d_ZLayerId theLayerId);
-
+        //! Returns the structure manager handle which manage structures associated with this view.
+        public Graphic3d_StructureManager StructureManager() { return myStructureManager; }
         public void Update(Graphic3d_ZLayerId theLayerId = Graphic3d_ZLayerId.Graphic3d_ZLayerId_UNKNOWN)
         {
             InvalidateZLayerBoundingBox(theLayerId);

@@ -123,7 +123,7 @@ namespace OCCPort.OpenGL
         OpenGl_Window myWindow;
         OpenGl_Workspace myWorkspace;
         OpenGl_Caps myCaps;
-        bool myWasRedrawnGL;
+        public bool myWasRedrawnGL;
 
         //GLint myFboColorFormat;        //!< sized format for color attachments
         //  GLint myFboDepthFormat;        //!< sized format for depth-stencil attachments
@@ -460,10 +460,10 @@ namespace OCCPort.OpenGL
             }
 
             //// implicitly disable VSync when using HMD composer (can be mirrored in window for debugging)
-            //myWindow->SetSwapInterval(IsActiveXR());
+            myWindow.SetSwapInterval(IsActiveXR());
 
-            //++myFrameCounter;
-            //const Handle(OpenGl_Context)&aCtx = myWorkspace->GetGlContext();
+            ++myFrameCounter;
+            OpenGl_Context aCtx = myWorkspace.GetGlContext();
             //aCtx->FrameStats()->FrameStart(myWorkspace->View(), false);
             //aCtx->SetLineFeather(myRenderParams.LineFeather);
 
@@ -492,6 +492,16 @@ namespace OCCPort.OpenGL
                 return;
             }
             OpenGl_FrameBuffer aFrameBuffer = myFBO;
+            bool toSwap = aCtx.IsRender()
+          && !aCtx.caps.buffersNoSwap
+          && aFrameBuffer == null
+          && (!IsActiveXR() || myRenderParams.ToMirrorComposer);
+            if (aFrameBuffer == null
+             && aCtx.DefaultFrameBuffer() != null
+             && aCtx.DefaultFrameBuffer().IsValid())
+            {
+                aFrameBuffer = aCtx.DefaultFrameBuffer();
+            }
 
             if (aProjectType == Graphic3d_Camera.Projection.Projection_Stereo)
             {
@@ -502,6 +512,50 @@ namespace OCCPort.OpenGL
                 OpenGl_FrameBuffer aMainFboOit = myMainSceneFbosOit[0].IsValid() ? myMainSceneFbosOit[0] : null;
                 redraw(aProjectType, aMainFbo, aMainFboOit);
             }
+
+            /*
+             
+             
+             ............
+             */
+
+            // bind default FBO
+            bindDefaultFbo();
+
+            if (wasDisabledMSAA != myToDisableMSAA
+             || hadFboBlit != myHasFboBlit)
+            {
+                // retry on error
+                Redraw();
+            }
+
+            // reset state for safety
+            aCtx.BindProgram(null);
+            if (aCtx.caps.ffpEnable)
+            {
+                aCtx.ShaderManager().PushState(null);
+            }
+
+            // Swap the buffers
+            if (toSwap
+             && myParentView == null)
+            {
+                aCtx.SwapBuffers();
+                if (!myMainSceneFbos[0].IsValid())
+                {
+                    myBackBufferRestored = false;
+                }
+            }
+            else
+            {
+                aCtx.core11fwd.glFlush();
+            }
+
+            // reset render mode state
+            aCtx.FetchState();
+            aCtx.FrameStats().FrameEnd(myWorkspace.View(), false);
+
+            myWasRedrawnGL = true;
         }
 
         //! Format Frame Buffer format for logging messages.
@@ -1034,6 +1088,99 @@ namespace OCCPort.OpenGL
                                      anImmFbos[0],
                                      anImmFbosOit[0],
                                      true) || toSwap;
+
+
+                if (anImmFbos[0] != null)
+                {
+                    //                    drawStereoPair(aFrameBuffer);
+                }
+
+
+            }
+            else
+            {
+                //OpenGl_FrameBuffer aMainFbo = myMainSceneFbos[0].IsValid() ? myMainSceneFbos[0].operator->() : null;
+                OpenGl_FrameBuffer aMainFbo = myMainSceneFbos[0].IsValid() ? myMainSceneFbos[0] : null;
+                OpenGl_FrameBuffer anImmFbo = aFrameBuffer;
+                OpenGl_FrameBuffer anImmFboOit = null;
+                if (myImmediateSceneFbos[0].IsValid())
+                {
+                    //anImmFbo = myImmediateSceneFbos[0].operator->();
+                    // anImmFboOit = myImmediateSceneFbosOit[0]->IsValid() ? myImmediateSceneFbosOit[0].operator->() : NULL;
+                }
+                if (aMainFbo == null)
+                {
+                    //aCtx.SetReadDrawBuffer(GL_BACK);
+                }
+                // aCtx->SetResolution(myRenderParams.Resolution, myRenderParams.ResolutionRatio(),
+                //                    anImmFbo != aFrameBuffer ? myRenderParams.RenderResolutionScale : 1.0f);
+                toSwap = redrawImmediate(aProjectType,
+                                          aMainFbo,
+                                          anImmFbo,
+                                          anImmFboOit,
+                                          true) || toSwap;
+                if (anImmFbo != null
+                 && anImmFbo != aFrameBuffer)
+                {
+                    blitBuffers(anImmFbo, aFrameBuffer, myToFlipOutput);
+                }
+            }
+
+            // bind default FBO
+            bindDefaultFbo();
+
+            // reset state for safety
+            aCtx.BindProgram(null);
+            if (aCtx.caps.ffpEnable)
+            {
+                aCtx.ShaderManager().PushState(null);
+            }
+
+            if (toSwap
+            && myFBO == null
+            && !aCtx.caps.buffersNoSwap
+            && myParentView == null)
+            {
+                aCtx.SwapBuffers();
+            }
+            else
+            {
+                aCtx.core11fwd.glFlush();
+            }
+            //aCtx->FrameStats()->FrameEnd(myWorkspace->View(), true);
+
+            myWasRedrawnGL = true;
+
+
+        }
+
+        public void bindDefaultFbo(OpenGl_FrameBuffer theCustomFbo = null)
+        {
+            OpenGl_Context aCtx = myWorkspace.GetGlContext();
+            OpenGl_FrameBuffer anFbo = (theCustomFbo != null && theCustomFbo.IsValid())
+                                      ? theCustomFbo
+                                      : (aCtx.DefaultFrameBuffer() != null
+                                       && aCtx.DefaultFrameBuffer().IsValid()
+                                        ? aCtx.DefaultFrameBuffer()
+                              : null);
+            if (anFbo != null)
+            {
+                anFbo.BindBuffer(aCtx);
+                anFbo.SetupViewport(aCtx);
+            }
+            else
+            {
+                if (aCtx.GraphicsLibrary() != Aspect_GraphicsLibrary.Aspect_GraphicsLibrary_OpenGLES)
+                {
+                    aCtx.SetReadDrawBuffer((int)All.Back);
+                }
+                else if (aCtx.arbFBO != null)
+                {
+                    aCtx.arbFBO.glBindFramebuffer(All.Framebuffer, OpenGl_FrameBuffer.NO_FRAMEBUFFER);
+                }
+
+                int[] aViewport = new int[4] { 0, 0, myWindow.Width(), myWindow.Height() };
+                aCtx.ResizeViewport(aViewport);
             }
         }
 

@@ -1,8 +1,10 @@
-﻿using OpenTK.Graphics.OpenGL;
+﻿using OCCPort;
+using OpenTK.Graphics.OpenGL;
 
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Reflection.Metadata;
 using System.Runtime.InteropServices.ComTypes;
 using System.Runtime.Intrinsics.Arm;
 using static System.Net.Mime.MediaTypeNames;
@@ -37,7 +39,16 @@ namespace OCCPort.OpenGL
                  : 0; // GL_NONE
         }
 
+        Graphic3d_Camera myCamera;          //!< active camera object
+        OpenGl_FrameStats myFrameStats;      //!< structure accumulating frame statistics
         OpenGl_ShaderProgram myActiveProgram;   //!< currently active GLSL program
+        OpenGl_TextureSet myActiveTextures;  //!< currently bound textures
+                                             //!< currently active sampler objects
+
+        //! Return structure holding frame statistics.
+        public OpenGl_FrameStats FrameStats() { return myFrameStats; }
+
+
         // =======================================================================
         // function : BindProgram
         // purpose  :
@@ -69,9 +80,24 @@ namespace OCCPort.OpenGL
             return true;
         }
 
+
+        //! Switch read/draw buffers.
+        public void SetReadDrawBuffer(int theBuffer)
+        {
+            SetReadBuffer(theBuffer);
+            SetDrawBuffer(theBuffer);
+        }
+
+        //! Default Frame Buffer Object.
+        public OpenGl_FrameBuffer DefaultFrameBuffer()
+        {
+            return myDefaultFbo;
+        }
+        OpenGl_FrameBuffer myDefaultFbo;      //!< default Frame Buffer Object
+
         public OpenGl_GlCore20 core20fwd;  //!< obsolete entry left for code portability; core20 should be used instead
 
-        NCollection_Array1<int> myDrawBuffers = new ();     //!< current draw buffers
+        NCollection_Array1<int> myDrawBuffers = new();     //!< current draw buffers
         internal bool ShareResource(string theKey,
                 OpenGl_ShaderProgram theResource)
         {
@@ -81,7 +107,7 @@ namespace OCCPort.OpenGL
             }
             return mySharedResources.Bind(theKey, theResource);
         }
-        int myPolygonMode;
+
         internal int SetPolygonMode(int theMode)
         {
             if (myPolygonMode == theMode)
@@ -99,7 +125,7 @@ namespace OCCPort.OpenGL
             return anOldPolygonMode;
 
         }
-        bool myIsStereoBuffers;      //!< context supports stereo buffering
+
         int myReadBuffer;      //!< current read buffer
         Aspect_GraphicsLibrary myGapi;           //!< GAPI name
         // =======================================================================
@@ -341,9 +367,116 @@ namespace OCCPort.OpenGL
             core32.glBindVertexArray(myDefaultVao);
         }
 
+        public void SwapBuffers()
+        {
+
+            if (myDisplay != null)
+            {
+                //??SwapBuffers((HDC)myDisplay);
+                core11fwd.glFlush();
+            }
+
+        }
+
+        float myRenderScale;     //!< scaling factor for rendering resolution
+
+        float myRenderScaleInv;  //!< scaling factor for rendering resolution (inverted value)
+                                 //! Return TRUE if rendering scale factor is not 1.
+        public bool HasRenderScale() { return Math.Abs(myRenderScale - 1.0f) > 0.0001f; }
+
+        public void ResizeViewport(int[] theRect)
+        {
+            core11fwd.glViewport(theRect[0], theRect[1], theRect[2], theRect[3]);
+            myViewport[0] = theRect[0];
+            myViewport[1] = theRect[1];
+            myViewport[2] = theRect[2];
+            myViewport[3] = theRect[3];
+            if (HasRenderScale())
+            {
+                myViewportVirt[0] = (int)(theRect[0] * myRenderScaleInv);
+                myViewportVirt[1] = (int)(theRect[1] * myRenderScaleInv);
+                myViewportVirt[2] = (int)(theRect[2] * myRenderScaleInv);
+                myViewportVirt[3] = (int)(theRect[3] * myRenderScaleInv);
+            }
+            else
+            {
+                myViewportVirt[0] = theRect[0];
+                myViewportVirt[1] = theRect[1];
+                myViewportVirt[2] = theRect[2];
+                myViewportVirt[3] = theRect[3];
+            }
+        }
+
+        internal void SetSwapInterval(int mySwapInterval)
+        {
+            //??
+        }
         int[] myViewport = new int[4];     //!< current viewport
         int[] myViewportVirt = new int[4]; //!< virtual viewport
-        int myPointSpriteOrig; //!< GL_POINT_SPRITE_COORD_ORIGIN state (
+        int myPointSpriteOrig; //!< GL_POINT_SPRITE_COORD_ORIGIN state (GL_UPPER_LEFT by default)
+        int myRenderMode;      //!< value for active rendering mode
+        int myShadeModel;      //!< currently used shade model (glShadeModel)
+        int myPolygonMode;     //!< currently used polygon rasterization mode (glPolygonMode)
+        public void FetchState()
+        {
+            if (myGapi == Aspect_GraphicsLibrary.Aspect_GraphicsLibrary_OpenGLES)
+            {
+                return;
+            }
+
+            // cache feedback mode state
+            if (core11ffp != null)
+            {
+                core11fwd.glGetIntegerv(GetPName.RenderMode, ref myRenderMode);
+                core11fwd.glGetIntegerv(GetPName.ShadeModel, ref myShadeModel);
+            }
+
+            // cache read buffers state
+            core11fwd.glGetIntegerv(GetPName.ReadBuffer, ref myReadBuffer);
+
+            // cache draw buffers state
+            if (myDrawBuffers.Length() < myMaxDrawBuffers)
+            {
+                myDrawBuffers.Resize(0, myMaxDrawBuffers - 1, false);
+            }
+            myDrawBuffers.Init((int)All.None);
+
+            int aDrawBuffer = (int)All.None;
+            if (myMaxDrawBuffers == 1)
+            {
+                core11fwd.glGetIntegerv(GetPName.DrawBuffer, ref aDrawBuffer);
+                myDrawBuffers.SetValue(0, aDrawBuffer);
+            }
+            else
+            {
+                for (int anI = 0; anI < myMaxDrawBuffers; ++anI)
+                {
+                    core11fwd.glGetIntegerv(GetPName.DrawBuffer0 + anI, ref aDrawBuffer);
+                    myDrawBuffers.SetValue(anI, aDrawBuffer);
+                }
+            }
+        }
+
+        int myAnisoMax;             //!< maximum level of anisotropy texture filter
+        int myTexClamp;             //!< either GL_CLAMP_TO_EDGE (1.2+) or GL_CLAMP (1.1)
+        int myMaxTexDim;            //!< value for GL_MAX_TEXTURE_SIZE
+        int myMaxTexCombined;       //!< value for GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS
+        int myMaxTexUnitsFFP;       //!< value for GL_MAX_TEXTURE_UNITS (fixed-function pipeline only)
+        int myMaxDumpSizeX;         //!< maximum FBO width  for image dump
+        int myMaxDumpSizeY;         //!< maximum FBO height for image dump
+        int myMaxClipPlanes;        //!< value for GL_MAX_CLIP_PLANES
+        int myMaxMsaaSamples;       //!< value for GL_MAX_SAMPLES
+        int myMaxDrawBuffers;       //!< value for GL_MAX_DRAW_BUFFERS
+        int myMaxColorAttachments;  //!< value for GL_MAX_COLOR_ATTACHMENTS
+        int myGlVerMajor;           //!< cached GL version major number
+        int myGlVerMinor;           //!< cached GL version minor number
+        bool myIsInitialized;        //!< flag indicates initialization state
+        bool myIsStereoBuffers;      //!< context supports stereo buffering
+        bool myHasMsaaTextures;      //!< context supports MSAA textures
+        Aspect_Display myDisplay;  //!< display           EGLDisplay | HDC   | Display*
+
+
+
 
         OpenGl_ResourcesMap mySharedResources; //!< shared resources with unique identification key
         public OpenGl_Caps caps; //!< context options
@@ -359,8 +492,76 @@ namespace OCCPort.OpenGL
 
             core11fwd = new _core11fwd();
             core15fwd = new _core15fwd();
+            /*
+             *  mySupportedFormats (new Image_SupportedFormats()),
+  myAnisoMax   (1),
+  myTexClamp   (GL_CLAMP_TO_EDGE),
+  myMaxTexDim  (1024),
+  myMaxTexCombined (1),
+  myMaxTexUnitsFFP (1),
+  myMaxDumpSizeX (1024),
+  myMaxDumpSizeY (1024),
+  myMaxClipPlanes (6),
+  myMaxMsaaSamples(0),
+  myMaxDrawBuffers (1),
+  myMaxColorAttachments (1),
+  myGlVerMajor (0),
+  myGlVerMinor (0),
+  myIsInitialized (Standard_False),
+  myIsStereoBuffers (Standard_False),
+  myHasMsaaTextures (Standard_False),
+  myIsGlNormalizeEnabled (Standard_False),
+  mySpriteTexUnit (Graphic3d_TextureUnit_PointSprite),
+  myHasRayTracing (Standard_False),
+  myHasRayTracingTextures (Standard_False),
+  myHasRayTracingAdaptiveSampling (Standard_False),
+  myHasRayTracingAdaptiveSamplingAtomic (Standard_False),
+  myHasPBR (Standard_False),
+  myPBREnvLUTTexUnit       (Graphic3d_TextureUnit_PbrEnvironmentLUT),
+  myPBRDiffIBLMapSHTexUnit (Graphic3d_TextureUnit_PbrIblDiffuseSH),
+  myPBRSpecIBLMapTexUnit   (Graphic3d_TextureUnit_PbrIblSpecular),
+  myShadowMapTexUnit       (Graphic3d_TextureUnit_ShadowMap),
+  myDepthPeelingDepthTexUnit (Graphic3d_TextureUnit_DepthPeelingDepth),
+  myDepthPeelingFrontColorTexUnit (Graphic3d_TextureUnit_DepthPeelingFrontColor),
+  myFrameStats (new OpenGl_FrameStats()),
+  myActiveMockTextures (0),
+  myActiveHatchType (Aspect_HS_SOLID),
+  myHatchIsEnabled (false),
+  myPointSpriteOrig (GL_UPPER_LEFT),
+  myRenderMode (GL_RENDER),
+  myShadeModel (GL_SMOOTH),
+  myPolygonMode (GL_FILL),
+  myFaceCulling (Graphic3d_TypeOfBackfacingModel_DoubleSided),
+  myReadBuffer (0),
+  myDrawBuffers (0, 7),
+  myDefaultVao (0),
+  myColorMask (true),
+  myAlphaToCoverage (false),
+  myIsGlDebugCtx (false),
+  myIsWindowDeepColor (false),
+  myIsSRgbWindow (false),
+  myIsSRgbActive (false),
+  myResolution (Graphic3d_RenderingParams::THE_DEFAULT_RESOLUTION),
+  myResolutionRatio (1.0f),
+  myLineWidthScale (1.0f),
+  myLineFeather (1.0f),*/
+            myRenderScale = (1.0f);
+            myRenderScaleInv = 1.0f;
 
             caps = (theCaps != null ? theCaps : new OpenGl_Caps());
+            myViewport[0] = 0;
+            myViewport[1] = 0;
+            myViewport[2] = 0;
+            myViewport[3] = 0;
+            myViewportVirt[0] = 0;
+            myViewportVirt[1] = 0;
+            myViewportVirt[2] = 0;
+            myViewportVirt[3] = 0;
+
+
+            /*myPolygonOffset.Mode = Aspect_POM_Off;
+            myPolygonOffset.Factor = 0.0f;
+            myPolygonOffset.Units = 0.0f;*/
             myShaderManager = new OpenGl_ShaderManager(this);
 
 

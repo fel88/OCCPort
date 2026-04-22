@@ -13,6 +13,16 @@ namespace OCCPort
             //mySurface = new BRepAdaptor_Surface(aSurfAdaptor);
             mySurface = aSurfAdaptor;//todo:Clone??
         }
+        //=======================================================================
+        public IWireHandle AddWire(
+  TopoDS_Wire theWire,
+  int theEdgeNb)
+        {
+            IWireHandle aWire = new BRepMeshData_Wire(theWire, theEdgeNb, myAllocator);
+            myDWires.Append(aWire);
+            return GetWire(WiresNb() - 1);
+        }
+        NCollection_IncAllocator myAllocator;
 
         VectorOfIWireHandles myDWires = new VectorOfIWireHandles();
         public int WiresNb()
@@ -34,7 +44,7 @@ namespace OCCPort
 
         public void SetStatus(IMeshData_Status meshData_Failure)
         {
-            
+
         }
 
         public IWireHandle GetWire(int theIndex)

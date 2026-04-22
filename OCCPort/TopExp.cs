@@ -4,11 +4,41 @@ using System;
 namespace OCCPort
 {
     internal class TopExp
-    {
+    {  //! Returns the Vertex of orientation FORWARD in E. If
+       //! there is none returns a Null Shape.
+       //! CumOri = True : taking account the edge orientation
+        public static TopoDS_Vertex FirstVertex(TopoDS_Edge E,
+                   bool CumOri = false)
+        {
+            TopoDS_Iterator ite = new TopoDS_Iterator(E, CumOri);
+            while (ite.More())
+            {
+                if (ite.Value().Orientation() == TopAbs_Orientation.TopAbs_FORWARD)
+                    return TopoDS.Vertex(ite.Value());
+                ite.Next();
+            }
+            return new TopoDS_Vertex();
+        }
+        //! Returns the Vertex of orientation REVERSED in E. If
+        //! there is none returns a Null Shape.
+        //! CumOri = True : taking account the edge orientation
+        public static TopoDS_Vertex LastVertex(TopoDS_Edge E,
+                  bool CumOri = false)
+        {
+            TopoDS_Iterator ite = new TopoDS_Iterator(E, CumOri);
+            while (ite.More())
+            {
+                if (ite.Value().Orientation() == TopAbs_Orientation.TopAbs_REVERSED)
+                    return TopoDS.Vertex(ite.Value());
+                ite.Next();
+            }
+            return new TopoDS_Vertex();
+        }
+
         internal static void MapShapesAndAncestors(TopoDS_Shape S,
-    TopAbs_ShapeEnum TS,
-    TopAbs_ShapeEnum TA,
-   TopTools_IndexedDataMapOfShapeListOfShape M)
+                    TopAbs_ShapeEnum TS,
+                    TopAbs_ShapeEnum TA,
+                   TopTools_IndexedDataMapOfShapeListOfShape M)
         {
             TopTools_ListOfShape empty = new TopTools_ListOfShape();
 

@@ -35,40 +35,40 @@ IMeshData_Face theDFace)
                 return false;
             }
 
-            //ShapeExtend_WireData aWireData = new ShapeExtend_WireData(theWire, true,false );
-            //ShapeAnalysis_Wire aWireTool(aWireData, theDFace->GetFace (), Precision::Confusion ());
+            ShapeExtend_WireData aWireData = new ShapeExtend_WireData(theWire, true, false);
+            ShapeAnalysis_Wire aWireTool = new ShapeAnalysis_Wire(aWireData, theDFace.GetFace(), Precision.Confusion());
 
-            //ShapeAnalysis_WireOrder aOrderTool;
-            //aWireTool.CheckOrder(aOrderTool, Standard_True, Standard_False);
-            //if (aWireTool.LastCheckStatus(ShapeExtend_FAIL))
-            //{
-            //    return Standard_False;
-            //}
+            ShapeAnalysis_WireOrder aOrderTool = new ShapeAnalysis_WireOrder();
+            aWireTool.CheckOrder(aOrderTool, true, false);
+            if (aWireTool.LastCheckStatus(ShapeExtend_Status.ShapeExtend_FAIL))
+            {
+                return false;
+            }
 
-            //if (aWireTool.LastCheckStatus(ShapeExtend_DONE3))
-            //{
-            //    theDFace->SetStatus(IMeshData_UnorientedWire);
-            //}
+            if (aWireTool.LastCheckStatus(ShapeExtend_Status.ShapeExtend_DONE3))
+            {
+                theDFace.SetStatus(IMeshData_Status.IMeshData_UnorientedWire);
+            }
 
-            //int aEdgesNb = aOrderTool.NbEdges();
-            //if (aEdgesNb != aWireData->NbEdges())
-            //{
-            //    return false;
-            //}
+            int aEdgesNb = aOrderTool.NbEdges();
+            if (aEdgesNb != aWireData.NbEdges())
+            {
+                return false;
+            }
 
-            //IWireHandle aDWire = theDFace.AddWire(theWire, aEdgesNb);
-            //for (Standard_Integer i = 1; i <= aEdgesNb; ++i)
-            //{
-            //    const Standard_Integer aEdgeIndex = aOrderTool.Ordered(i);
-            //    const TopoDS_Edge&aEdge = aWireData->Edge(aEdgeIndex);
-            //    if (aEdge.Orientation() != TopAbs_EXTERNAL)
-            //    {
-            //        const IMeshData::IEdgeHandle&aDEdge = myModel->GetEdge(myDEdgeMap.Find(aEdge));
+            IWireHandle aDWire = theDFace.AddWire(theWire, aEdgesNb);
+            for (int i = 1; i <= aEdgesNb; ++i)
+            {
+              /*  int  aEdgeIndex = aOrderTool.Ordered(i);
+                 TopoDS_Edge aEdge = aWireData.Edge(aEdgeIndex);
+                if (aEdge.Orientation() != TopAbs_Orientation.TopAbs_EXTERNAL)
+                {
+                    IEdgeHandle aDEdge = myModel.GetEdge(myDEdgeMap.Find(aEdge));
 
-            //        aDEdge->AddPCurve(theDFace.get(), aEdge.Orientation());
-            //        aDWire->AddEdge(aDEdge.get(), aEdge.Orientation());
-            //    }
-            //}
+                    aDEdge.AddPCurve(theDFace, aEdge.Orientation());
+                    aDWire.AddEdge(aDEdge, aEdge.Orientation());
+                }*/
+            }
 
             return true;
         }

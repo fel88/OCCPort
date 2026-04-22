@@ -1,97 +1,112 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection.Metadata;
 using System.Runtime.InteropServices;
 
 namespace OCCPort.OpenGL
 {
-	//! This class defines an OpenGl graphic driver
-	public class OpenGl_GraphicDriver : Graphic3d_GraphicDriver
-	{
+    //! This class defines an OpenGl graphic driver
+    public class OpenGl_GraphicDriver : Graphic3d_GraphicDriver
+    {
 
-		OpenGl_Caps myCaps;
-		MyMapOfView myMapOfView = new MyMapOfView();
-		Dictionary<int, OpenGl_Structure> myMapOfStructure = new Dictionary<int, OpenGl_Structure>();
+        OpenGl_Caps myCaps;
+        MyMapOfView myMapOfView = new MyMapOfView();
+        NCollection_DataMap<int, OpenGl_Structure> myMapOfStructure = new ();
 
 
-		OpenGl_StateCounter myStateCounter; //!< State counter for OpenGl structures.
+        OpenGl_StateCounter myStateCounter; //!< State counter for OpenGl structures.
 
-		public override Graphic3d_CStructure CreateStructure(Graphic3d_StructureManager theManager)
-		{
-			OpenGl_Structure aStructure = new OpenGl_Structure(theManager);
-			myMapOfStructure.Add(aStructure.Identification(), aStructure);
-			return aStructure;
+        public override Graphic3d_CStructure CreateStructure(Graphic3d_StructureManager theManager)
+        {
+            OpenGl_Structure aStructure = new OpenGl_Structure(theManager);
+            myMapOfStructure.Add(aStructure.Identification(), aStructure);
+            return aStructure;
 
-		}
+        }
 
-		public override Graphic3d_CView CreateView(Graphic3d_StructureManager theMgr)
-		{
+        public override Graphic3d_CView CreateView(Graphic3d_StructureManager theMgr)
+        {
 
-			OpenGl_View aView = new OpenGl_View(theMgr, this, myCaps, myStateCounter);
-			myMapOfView.Add(aView);
-			foreach (var aLayer in myLayers)
-			{
-				aView.InsertLayerAfter(aLayer.LayerId(), aLayer.LayerSettings(), Graphic3d_ZLayerId.Graphic3d_ZLayerId_UNKNOWN);
+            OpenGl_View aView = new OpenGl_View(theMgr, this, myCaps, myStateCounter);
+            myMapOfView.Add(aView);
+            foreach (var aLayer in myLayers)
+            {
+                aView.InsertLayerAfter(aLayer.LayerId(), aLayer.LayerSettings(), Graphic3d_ZLayerId.Graphic3d_ZLayerId_UNKNOWN);
 
-			}
-			/*for (NCollection_List < Handle(Graphic3d_Layer) >::Iterator aLayerIter(myLayers); aLayerIter.More(); aLayerIter.Next())
+            }
+            /*for (NCollection_List < Handle(Graphic3d_Layer) >::Iterator aLayerIter(myLayers); aLayerIter.More(); aLayerIter.Next())
 			{
 				Graphic3d_Layer aLayer = aLayerIter.Value();
 				aView.InsertLayerAfter(aLayer->LayerId(), aLayer->LayerSettings(), Graphic3d_ZLayerId_UNKNOWN);
 			}*/
-			return aView;
+            return aView;
 
-		}
+        }
 
-		internal OpenGl_Window CreateRenderWindow(Aspect_Window theNativeWindow,
-			Aspect_Window theSizeWindow, Aspect_RenderingContext theContext)
-		{
-			OpenGl_Context aShareCtx = GetSharedContext();
-			OpenGl_Window aWindow = new OpenGl_Window();
-			aWindow.Init(this, theNativeWindow, theSizeWindow, theContext, myCaps, aShareCtx);
-			return aWindow;
+        internal OpenGl_Window CreateRenderWindow(Aspect_Window theNativeWindow,
+            Aspect_Window theSizeWindow, Aspect_RenderingContext theContext)
+        {
+            OpenGl_Context aShareCtx = GetSharedContext();
+            OpenGl_Window aWindow = new OpenGl_Window();
+            aWindow.Init(this, theNativeWindow, theSizeWindow, theContext, myCaps, aShareCtx);
+            return aWindow;
 
-		}
+        }
 
-		internal int GetNextPrimitiveArrayUID()
-		{
-			throw new NotImplementedException();
-		}
+        internal int GetNextPrimitiveArrayUID()
+        {
+            throw new NotImplementedException();
+        }
 
-		const OpenGl_Context TheNullGlCtx = null;
+        const OpenGl_Context TheNullGlCtx = null;
 
-		public OpenGl_GraphicDriver(Aspect_DisplayConnection theDisp) : base(theDisp)
-		{
-		}
+        public OpenGl_GraphicDriver(Aspect_DisplayConnection theDisp) : base(theDisp)
+        {
+        }
 
-		internal OpenGl_Context GetSharedContext(bool theBound = false)
-		{
-			if (myMapOfView.IsEmpty())
-			{
-				return TheNullGlCtx;
-			}
+        internal OpenGl_Context GetSharedContext(bool theBound = false)
+        {
+            if (myMapOfView.IsEmpty())
+            {
+                return TheNullGlCtx;
+            }
 
-			foreach (var aViewIter in myMapOfView)
-			{
-				OpenGl_Window aWindow = aViewIter.GlWindow();
-				if (aWindow != null)
-				{
-					if (!theBound)
-					{
-						return aWindow.GetGlContext();
-					}
-					else if (aWindow.GetGlContext().IsCurrent())
-					{
-						return aWindow.GetGlContext();
-					}
-				}
-			}
+            foreach (var aViewIter in myMapOfView)
+            {
+                OpenGl_Window aWindow = aViewIter.GlWindow();
+                if (aWindow != null)
+                {
+                    if (!theBound)
+                    {
+                        return aWindow.GetGlContext();
+                    }
+                    else if (aWindow.GetGlContext().IsCurrent())
+                    {
+                        return aWindow.GetGlContext();
+                    }
+                }
+            }
 
-			return TheNullGlCtx;
-		}
+            return TheNullGlCtx;
+        }
+        
+  
+  
+        //! Set device lost flag for redrawn views.
+        internal void setDeviceLost()
+        {
+            if (myMapOfStructure.IsEmpty())
+            {
+                return;
+            }
 
-		internal void setDeviceLost()
-		{
-			throw new NotImplementedException();
-		}
-	}
+            foreach (var aView in myMapOfView)
+            {               
+                if (aView.myWasRedrawnGL)
+                {
+                    aView.StructureManager().SetDeviceLost();
+                }
+            }
+        }
+    }
 }

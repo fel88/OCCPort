@@ -10,5 +10,6 @@
         public abstract int EdgesNb();
 
         public abstract IEdgeHandle GetEdge(int aEdgeIt);
+        public abstract TopAbs_Orientation GetEdgeOrientation(int aEdgeIt);
     }
 }
