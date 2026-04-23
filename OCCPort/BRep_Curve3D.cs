@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics.Contracts;
+using System.Reflection.Metadata;
 
 namespace OCCPort
 {
@@ -7,24 +9,25 @@ namespace OCCPort
     internal class BRep_Curve3D : BRep_GCurve
     {
         public BRep_Curve3D(Geom_Curve C, TopLoc_Location L)
-            : base(L, C == null ? RealFirst() : C.FirstParameter(),
-C == null ? RealLast() : C.LastParameter())
+            : base(L, C == null ? Standard_Real.RealFirst() : C.FirstParameter(),
+C == null ? Standard_Real.RealLast() : C.LastParameter())
         {
-
             myCurve = C;
-
         }
+
+        public override Geom_Curve Curve3D()
+        {
+            return myCurve;
+        }
+
 
         Geom_Curve myCurve;
 
-        private static double RealLast()
-        {
-            throw new NotImplementedException();
-        }
 
-        private static double RealFirst()
+
+        public override bool IsCurve3D()
         {
-            throw new NotImplementedException();
+            return true;
         }
 
         public void SetRange(double First, double Last)

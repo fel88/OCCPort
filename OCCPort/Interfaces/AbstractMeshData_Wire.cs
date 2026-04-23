@@ -9,7 +9,7 @@
 
         public abstract int EdgesNb();
 
-        public abstract IEdgeHandle GetEdge(int aEdgeIt);
+        public abstract IMeshData_Edge GetEdge(int aEdgeIt);
         public abstract TopAbs_Orientation GetEdgeOrientation(int aEdgeIt);
     }
 }

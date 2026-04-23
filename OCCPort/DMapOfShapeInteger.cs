@@ -16,11 +16,16 @@ namespace OCCPort
         //#else
         //      public const size_t MEMORY_BLOCK_SIZE_HUGE = 512 * 1024;
         //#endif
-        internal class DMapOfShapeInteger
+        public class DMapOfShapeInteger
         {
             public List<DMapOfShapeIntegerItem> Items = new List<DMapOfShapeIntegerItem>();
 
             internal void Bind(TopoDS_Edge theEdge, int v)
+            {
+                Items.Add(new DMapOfShapeIntegerItem() { Int = v, Shape = theEdge });
+            }
+
+            internal int Find(TopoDS_Edge aEdge)
             {
                 throw new NotImplementedException();
             }

@@ -54,6 +54,11 @@ namespace OCCPort
             myMaxSize = theValue;
         }
 
+        public override IMeshData_Edge GetEdge(int v)
+        {
+            return myDEdges.Get(v);            
+        }
+
         double myMaxSize;
         //Handle(NCollection_IncAllocator) myAllocator;
         //IMeshData::VectorOfIFaceHandles myDFaces;

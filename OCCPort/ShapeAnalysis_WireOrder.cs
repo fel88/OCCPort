@@ -77,6 +77,14 @@ namespace OCCPort
             return myXYZ.Count / 2;
         }
 
+        public int Ordered(int theIdx)
+        {
+            if (myOrd==null || myOrd.GetUpperBound(0) < theIdx)
+                return theIdx;
+
+            int anOldIdx = myOrd[theIdx];
+            return (anOldIdx == 0 ? theIdx : anOldIdx);
+        }
 
         public void Perform(bool closed)
         {

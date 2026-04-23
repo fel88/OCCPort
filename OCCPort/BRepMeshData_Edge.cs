@@ -1,4 +1,5 @@
 ﻿using OCCPort.Interfaces;
+using System.Linq;
 
 namespace OCCPort
 {
@@ -30,6 +31,38 @@ namespace OCCPort
             IPCurveHandle aPCurve1 = myPCurves.get(aListOfPCurves.First());
             return (aPCurve1.GetOrientation() == theOrientation) ?
     aPCurve1 : myPCurves.get(aListOfPCurves.Last());
+        }
+
+        public int PCurvesNb()
+        {
+            return myPCurves.Count;
+        }
+
+        public IPCurveHandle AddPCurve(IMeshData_Face theDFace, TopAbs_Orientation theOrientation)
+        {
+
+            int aPCurveIndex = PCurvesNb();
+            // Add pcurve to list of pcurves
+            IMeshData_PCurve aPCurve = new BRepMeshData_PCurve(theDFace, theOrientation);
+            myPCurves.Append(aPCurve);
+
+            // Map pcurve to faces.
+            if (!myPCurvesMap.IsBound(theDFace))
+            {
+                myPCurvesMap.Bind(theDFace, new ListOfInteger());
+
+            }
+
+            ListOfInteger aListOfPCurves = myPCurvesMap.ChangeFind(theDFace);
+            aListOfPCurves.Append(aPCurveIndex);
+
+            return GetPCurve(aPCurveIndex);
+
+        }
+
+        public IPCurveHandle GetPCurve(int theIndex)
+        {
+            return myPCurves[theIndex];
         }
 
         public BRepMeshData_Edge(TopoDS_Edge theEdge) : base(theEdge)

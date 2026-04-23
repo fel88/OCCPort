@@ -7,7 +7,7 @@ namespace OCCPort.Interfaces
     public interface IMeshData_Wire : IMeshData_TessellatedShape, IMeshData_StatusOwner
     {
         int EdgesNb();
-        IEdgeHandle GetEdge(int aEdgeIt);
+        IMeshData_Edge GetEdge(int aEdgeIt);
         TopAbs_Orientation GetEdgeOrientation(int aEdgeIt);
 
     }

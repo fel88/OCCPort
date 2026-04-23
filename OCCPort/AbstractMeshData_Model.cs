@@ -20,6 +20,7 @@ namespace OCCPort
         //! Adds new face to shape model.
         public abstract IMeshData_Face AddFace(TopoDS_Face theFace);
 
+        public abstract IMeshData_Edge GetEdge(int v);
         
     }
 }

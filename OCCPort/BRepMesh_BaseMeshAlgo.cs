@@ -168,7 +168,7 @@ namespace OCCPort
 
                 for (int aEdgeIt = 0; aEdgeIt < aDWire.EdgesNb(); ++aEdgeIt)
                 {
-                    IEdgeHandle aDEdge = aDWire.GetEdge(aEdgeIt);
+                    IMeshData_Edge aDEdge = aDWire.GetEdge(aEdgeIt);
                     ICurveHandle  aCurve = aDEdge.GetCurve();
                     IPCurveHandle aPCurve = aDEdge.GetPCurve(
                       myDFace, aDWire.GetEdgeOrientation(aEdgeIt));

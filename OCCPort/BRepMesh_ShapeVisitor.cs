@@ -19,7 +19,7 @@ namespace OCCPort
 
         {
             myModel = (theModel);
-            //myDEdgeMap(1, new NCollection_IncAllocator(IMeshData::MEMORY_BLOCK_SIZE_HUGE))
+            myDEdgeMap = new IMeshData.DMapOfShapeInteger(/*1, new NCollection_IncAllocator(IMeshData::MEMORY_BLOCK_SIZE_HUGE)*/);
         }
 
         //=======================================================================
@@ -59,15 +59,15 @@ IMeshData_Face theDFace)
             IWireHandle aDWire = theDFace.AddWire(theWire, aEdgesNb);
             for (int i = 1; i <= aEdgesNb; ++i)
             {
-              /*  int  aEdgeIndex = aOrderTool.Ordered(i);
-                 TopoDS_Edge aEdge = aWireData.Edge(aEdgeIndex);
+                int aEdgeIndex = aOrderTool.Ordered(i);
+                TopoDS_Edge aEdge = aWireData.Edge(aEdgeIndex);
                 if (aEdge.Orientation() != TopAbs_Orientation.TopAbs_EXTERNAL)
                 {
-                    IEdgeHandle aDEdge = myModel.GetEdge(myDEdgeMap.Find(aEdge));
+                    IMeshData_Edge aDEdge = myModel.GetEdge(myDEdgeMap.Find(aEdge));
 
                     aDEdge.AddPCurve(theDFace, aEdge.Orientation());
                     aDWire.AddEdge(aDEdge, aEdge.Orientation());
-                }*/
+                }
             }
 
             return true;
@@ -103,6 +103,7 @@ IMeshData_Face theDFace)
                 }
             }
         }
+
         public override void Visit(TopoDS_Edge theEdge)
         {
             if (!myDEdgeMap.IsBound(theEdge))

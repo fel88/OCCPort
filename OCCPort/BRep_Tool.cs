@@ -21,24 +21,23 @@ namespace OCCPort
         {
             // find the representation
             BRep_TEdge TE = (BRep_TEdge)(E.TShape());
-            BRep_ListIteratorOfListOfCurveRepresentation itcr = new BRep_ListIteratorOfListOfCurveRepresentation(TE.Curves());
-
-            while (itcr.More())
+            
+            foreach (var cr in TE.Curves())
             {
-                BRep_CurveRepresentation cr = itcr.Value();
                 if (cr.IsCurve3D())
                 {
                     BRep_Curve3D GC = (BRep_Curve3D)(cr);
                     L = E.Location() * GC.Location();
                     GC.Range(First, Last);
                     return GC.Curve3D();
-                }
-                itcr.Next();
+                }                
             }
+
             L.Identity();
             First = Last = 0.0;
             return null;
         }
+
         public static void CurveOnSurface(TopoDS_Edge E,
                               ref Geom2d_Curve C,
                              ref Geom_Surface S,
@@ -225,23 +224,20 @@ namespace OCCPort
         {
             // find the representation
             BRep_TEdge TE = (BRep_TEdge)(E.TShape());
-            BRep_ListIteratorOfListOfCurveRepresentation itcr = new BRep_ListIteratorOfListOfCurveRepresentation(TE.Curves());
-
-            while (itcr.More())
-            {
-                BRep_CurveRepresentation cr = itcr.Value();
+            
+            foreach (var cr in TE.Curves())
+            {                        
                 if (cr.IsCurve3D())
                 {
                     BRep_Curve3D GC = cr as BRep_Curve3D;
                     if (GC != null && GC.Curve3D() != null)
                         return true;
                 }
-                else if (cr.IsCurveOnSurface()) return true;
-                itcr.Next();
+                else if (cr.IsCurveOnSurface()) 
+                    return true;                
             }
             return false;
         }
-
 
         public static gp_Pnt Pnt(TopoDS_Vertex V)
         {

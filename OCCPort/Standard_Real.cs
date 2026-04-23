@@ -28,7 +28,7 @@ namespace OCCPort
         }
      static    double DBL_MAX = 1.7976931348623158e+308;// max value
 
-        internal static object RealFirst()
+        internal static double RealFirst()
         {
             return -DBL_MAX;
         }
