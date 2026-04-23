@@ -2,12 +2,12 @@
 
 namespace OCCPort
 {
-    public class BRep_ListOfCurveRepresentation
+    public class BRep_ListOfCurveRepresentation : List<BRep_CurveRepresentation>
     {
-        public List<BRep_CurveRepresentation> list = new List<BRep_CurveRepresentation>();
+        
         internal void Append(BRep_Curve3D c3d)
         {
-            list.Add(c3d);
+            Add(c3d);
         }
 
     }

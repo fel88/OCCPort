@@ -11,6 +11,7 @@ namespace OCCPort
         {
             return coord.X();
         }
+        public void Reverse() { coord.Reverse(); }
         internal double Y()
         {
             return coord.Y();
@@ -46,8 +47,17 @@ namespace OCCPort
         {
             return v.Dot(theOther);
         }
+        public static gp_Vec operator *(double theScalar, gp_Dir theV)
+        {
+            return theV.Multiplied(theScalar);
+        }
 
-
+        //! Multiplies a vector by a scalar
+        public gp_Vec Multiplied(double theScalar)
+        {
+            this.coord.Multiply(theScalar);
+            return new gp_Vec(this);
+        }
         public static gp_Dir operator -(gp_Dir temp)
         {
             return temp.Reversed();
@@ -88,7 +98,7 @@ namespace OCCPort
 
         }
 
-      
+
 
         //! Creates a direction with its 3 cartesian coordinates. Raises ConstructionError if Sqrt(theXv*theXv + theYv*theYv + theZv*theZv) <= Resolution
         //! Modification of the direction's coordinates
@@ -112,7 +122,7 @@ namespace OCCPort
         //! Computes the angular value in radians between <me> and
         //! <theOther>. This value is always positive in 3D space.
         //! Returns the angle in the range [0, PI]
-       public  double Angle(gp_Dir Other)
+        public double Angle(gp_Dir Other)
         {
             //    Commentaires :
             //    Au dessus de 45 degres l'arccos donne la meilleur precision pour le
@@ -150,7 +160,7 @@ namespace OCCPort
             aV.coord.Divide(aD);
             return aV;
         }
-        void Reverse() { coord.Reverse(); }
+        
 
         //! Reverses the orientation of a direction
         //! geometric transformations

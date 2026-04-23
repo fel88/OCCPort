@@ -1,13 +1,53 @@
 ﻿using System;
 using System.Net.NetworkInformation;
+using System.Reflection.Metadata;
 
 namespace OCCPort
 {
     internal class ShapeAnalysis_Wire
     {
-        public ShapeAnalysis_Wire(ShapeExtend_WireData aWireData, TopoDS_Face topoDS_Face, double v)
+        public ShapeAnalysis_Wire(ShapeExtend_WireData sbwd, TopoDS_Face face, double precision)
         {
+            Init(sbwd, face, precision);
         }
+        public void Init(ShapeExtend_WireData sbwd,
+                   TopoDS_Face face, double precision)
+        {
+            Load(sbwd);
+            SetFace(face);
+            SetPrecision(precision);
+        }
+
+        public void SetFace(TopoDS_Face face)
+        {
+            myFace = face;
+            if (!face.IsNull())
+                mySurf = new ShapeAnalysis_Surface(BRep_Tool.Surface(myFace));
+        }
+
+        public void SetPrecision(double precision)
+        {
+            myPrecision = precision;
+        }
+
+        public void Load(ShapeExtend_WireData sbwd)
+        {
+            ClearStatuses();
+            myWire = sbwd;
+        }
+        public void ClearStatuses()
+        {
+            myStatusOrder = myStatusConnected =
+              myStatusEdgeCurves = myStatusDegenerated =
+                myStatusClosed = myStatusLacking =
+                  myStatusSelfIntersection = myStatusSmall =
+                    myStatusGaps3d = myStatusGaps2d =
+                      myStatusCurveGaps = myStatusLoop = myStatus = 0;
+
+            myMin3d = myMin2d = myMax3d = myMax2d = 0.0;
+        }
+
+
         public bool CheckOrder(bool isClosed, bool mode3d)
         {
             ShapeAnalysis_WireOrder sawo = new ShapeAnalysis_WireOrder();
@@ -128,7 +168,7 @@ namespace OCCPort
             return LastCheckStatus(ShapeExtend_Status.ShapeExtend_DONE);
         }
         ShapeExtend_WireData myWire;
-        TopoDS_Face myFace;
+        TopoDS_Face myFace = new TopoDS_Face();
         ShapeAnalysis_Surface mySurf;
         double myPrecision;
         double myMin3d;

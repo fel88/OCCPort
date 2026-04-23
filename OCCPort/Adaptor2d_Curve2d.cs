@@ -1,4 +1,6 @@
-﻿namespace OCCPort
+﻿using System;
+
+namespace OCCPort
 {
     //! Root class for 2D curves on which geometric
     //! algorithms work.
@@ -17,5 +19,11 @@
         {
             throw new Standard_NotImplemented("Adaptor2d_Curve2d::GetType");
         }
+
+        public virtual gp_Lin2d Line()
+        {
+            throw new Standard_NotImplemented("Adaptor2d_Curve2d::Line");
+        }
+
     }
 }

@@ -15,6 +15,12 @@ namespace OCCPort
             vdir = (theV);
         }
 
+        //! Applies the transformation theT to this axis and assigns the result to this axis.
+        public void Transform(gp_Trsf theT)
+        {
+            loc.Transform(theT);
+            vdir.Transform(theT);
+        }
 
 
         public gp_Dir Direction()
@@ -26,5 +32,8 @@ namespace OCCPort
         {
             return loc;
         }
+        //! Reverses the unit vector of this axis and assigns the result to this axis.
+
+        public void Reverse() => vdir.Reverse();
     }
 }

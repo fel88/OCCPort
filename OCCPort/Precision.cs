@@ -53,5 +53,21 @@ namespace OCCPort
         //! Returns square of Confusion.
         //! Created for speed and convenience.
         public static double SquareConfusion() { return Confusion() * Confusion(); }
+
+
+        //! Returns the precision value in real space, frequently used
+        //! by approximation algorithms.
+        //! This function provides an acceptable level of precision for
+        //! an approximation process to define adjustment limits.
+        //! The tolerance of approximation is designed to ensure
+        //! an acceptable computation time when performing an
+        //! approximation process. That is why the tolerance of
+        //! approximation is greater than the tolerance of confusion.
+        //! The tolerance of approximation is equal to :
+        //! Precision::Confusion() * 10.
+        //! (that is, 1.e-6).
+        //! You may use a smaller tolerance in an approximation
+        //! algorithm, but this option might be costly.
+        public static double Approximation() { return Confusion() * 10.0; }
     }
 }

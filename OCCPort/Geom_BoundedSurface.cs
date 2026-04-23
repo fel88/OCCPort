@@ -25,7 +25,7 @@
     //! trims a surface using four isoparametric curves, i.e. it
     //! limits the variation of its parameters to a rectangle in
     //! 2D parametric space.
-    public class Geom_BoundedSurface : Geom_Surface
+    public abstract class Geom_BoundedSurface : Geom_Surface
     {
         public override void Bounds(ref double U1, ref double U2, ref double V1, ref double V2)
         {

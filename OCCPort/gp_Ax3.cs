@@ -38,10 +38,16 @@ namespace OCCPort
     //! -   gp_Ax2 is used to define a coordinate system that must be always right-handed.
     public struct gp_Ax3
     {
+        public void Transform(gp_Trsf theT)
+        {
+            axis.Transform(theT);
+            vxdir.Transform(theT);
+            vydir.Transform(theT);
+        }
 
         //! Returns the main axis of <me>. It is the "Location" point
         //! and the main "Direction".
-        public  gp_Ax1 Axis()  { return axis; }
+        public gp_Ax1 Axis() { return axis; }
 
         //! Creates an object corresponding to the reference
         //! coordinate system (OXYZ).

@@ -19,7 +19,18 @@ namespace OCCPort
             x += theOther.x;
             y += theOther.y;
             z += theOther.z;
+        } //! @code
+          //! <me>.X() = <me>.X() - theOther.X()
+          //! <me>.Y() = <me>.Y() - theOther.Y()
+          //! <me>.Z() = <me>.Z() - theOther.Z()
+          //! @endcode
+        public void Subtract(gp_XYZ theOther)
+        {
+            x -= theOther.x;
+            y -= theOther.y;
+            z -= theOther.z;
         }
+
         public void Coord(ref double theX, ref double theY, ref double theZ)
         {
 

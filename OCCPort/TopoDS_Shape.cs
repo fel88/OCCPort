@@ -16,6 +16,14 @@ namespace OCCPort
             myTShape = theOther.myTShape;
             myLocation = theOther.myLocation.Clone();
         }
+        //! Returns True if two shapes are same, i.e.  if they
+        //! share  the  same TShape  with the same  Locations.
+        //! Orientations may differ.
+        public bool IsSame(TopoDS_Shape theOther)
+        {
+            return myTShape == theOther.myTShape
+                && myLocation == theOther.myLocation;
+        }
 
         public static int idx = 0;
         public int HashCode(int theUpperBound)
@@ -158,13 +166,5 @@ namespace OCCPort
         }
 
 
-        //! Returns True if two shapes are same, i.e.  if they
-        //! share  the  same TShape  with the same  Locations.
-        //! Orientations may differ.
-        public bool IsSame(TopoDS_Shape theOther)
-        {
-            return myTShape == theOther.myTShape
-                && myLocation == theOther.myLocation;
-        }
     }
 }

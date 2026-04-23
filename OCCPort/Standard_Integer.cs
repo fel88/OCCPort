@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace OCCPort
+﻿namespace OCCPort
 {
     public static class Standard_Integer
     {
@@ -15,32 +13,6 @@ namespace OCCPort
         public static int IntegerFirst()
         { return int.MinValue; }
 
-    }
-
-    public static class Standard_Real
-    {//-------------------------------------------------------------------
-     // RealLast : Returns the maximum value of a real
-     //-------------------------------------------------------------------
-        public static double RealLast()
-        { return double.MaxValue; }
-
-        public static float RealToShortReal(double theVal)
-        {
-            var FLT_MAX = float.MaxValue;
-            var FLT_MIN = float.MinValue;
-
-            return theVal < -FLT_MAX ? -FLT_MAX
-    : theVal > FLT_MAX ? FLT_MAX
-    : (float)theVal;
-
-        }
-        public static double RealEpsilon()
-        { return double.Epsilon; }
-
-        internal static double RealSmall()
-        {
-            return double.MinValue;
-        }
     }
 
 }

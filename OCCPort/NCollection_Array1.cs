@@ -20,7 +20,22 @@ namespace OCCPort
 
             //
         }
+        bool myDeletable; //!< Flag showing who allocated the array
 
+        //! Constructor
+        public NCollection_Array1(int theLower,
+                     int theUpper)
+        {
+            myLowerBound = (theLower);
+            myUpperBound = (theUpper);
+            myDeletable = true;
+
+            //new Standard_RangeError_Raise_if(theUpper < theLower, "NCollection_Array1::Create");
+            //TheItemType* pBegin = new TheItemType[Length()];
+            //Standard_OutOfMemory_Raise_if(!pBegin, "NCollection_Array1 : Allocation failed");
+
+            //myData = pBegin - theLower;
+        }
         //! Copy constructor 
         public NCollection_Array1(T[] theOther, int lower, int upper)
         {

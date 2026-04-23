@@ -74,8 +74,8 @@ namespace OCCPort
                     {
                         for (int aVertIter = 0; aVertIter < aNbVerts; ++aVertIter)
                         {
-                            //const Graphic3d_Vec2&aVert = *reinterpret_cast <const Graphic3d_Vec2* > (aDataPtr + anAttribStride * aVertIter);
-                            Graphic3d_Vec2 aVert = new Graphic3d_Vec2();
+                            var offset = anAttribStride * aVertIter;
+                            Graphic3d_Vec2 aVert = new Graphic3d_Vec2(aDataPtr, offset);
 
                             myBounds.Add(new Graphic3d_Vec4(aVert.x(), aVert.y(), 0.0f, 1.0f));
                         }
@@ -86,8 +86,9 @@ namespace OCCPort
                     {
                         for (int aVertIter = 0; aVertIter < aNbVerts; ++aVertIter)
                         {
-                            Graphic3d_Vec3 aVert = new Graphic3d_Vec3();
-                            //(Graphic3d_Vec3)(aDataPtr + anAttribStride * aVertIter);
+                            var offset = anAttribStride * aVertIter;
+                            Graphic3d_Vec3 aVert = new Graphic3d_Vec3(aDataPtr, offset);
+
                             myBounds.Add(new Graphic3d_Vec4(aVert.x(), aVert.y(), aVert.z(), 1.0f));
                         }
                         break;

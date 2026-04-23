@@ -1,171 +1,230 @@
-﻿namespace OCCPort
+﻿using System;
+
+namespace OCCPort
 {
 
-	//! Describes a BSpline surface.
-	//! In each parametric direction, a BSpline surface can be:
-	//! - uniform or non-uniform,
-	//! - rational or non-rational,
-	//! - periodic or non-periodic.
-	//! A BSpline surface is defined by:
-	//! - its degrees, in the u and v parametric directions,
-	//! - its periodic characteristic, in the u and v parametric directions,
-	//! - a table of poles, also called control points (together
-	//! with the associated weights if the surface is rational), and
-	//! - a table of knots, together with the associated multiplicities.
-	//! The degree of a Geom_BSplineSurface is limited to
-	//! a value (25) which is defined and controlled by the
-	//! system. This value is returned by the function MaxDegree.
-	//! Poles and Weights
-	//! Poles and Weights are manipulated using two associative double arrays:
-	//! - the poles table, which is a double array of gp_Pnt points, and
-	//! - the weights table, which is a double array of reals.
-	//! The bounds of the poles and weights arrays are:
-	//! - 1 and NbUPoles for the row bounds (provided
-	//! that the BSpline surface is not periodic in the u
-	//! parametric direction), where NbUPoles is the
-	//! number of poles of the surface in the u parametric direction, and
-	//! - 1 and NbVPoles for the column bounds (provided
-	//! that the BSpline surface is not periodic in the v
-	//! parametric direction), where NbVPoles is the
-	//! number of poles of the surface in the v parametric direction.
-	//! The poles of the surface are the points used to shape
-	//! and reshape the surface. They comprise a rectangular network.
-	//! If the surface is not periodic:
-	//! - The points (1, 1), (NbUPoles, 1), (1,
-	//! NbVPoles), and (NbUPoles, NbVPoles)
-	//! are the four parametric "corners" of the surface.
-	//! - The first column of poles and the last column of
-	//! poles define two BSpline curves which delimit the
-	//! surface in the v parametric direction. These are the
-	//! v isoparametric curves corresponding to the two
-	//! bounds of the v parameter.
-	//! - The first row of poles and the last row of poles
-	//! define two BSpline curves which delimit the surface
-	//! in the u parametric direction. These are the u
-	//! isoparametric curves corresponding to the two bounds of the u parameter.
-	//! If the surface is periodic, these geometric properties are not verified.
-	//! It is more difficult to define a geometrical significance
-	//! for the weights. However they are useful for
-	//! representing a quadric surface precisely. Moreover, if
-	//! the weights of all the poles are equal, the surface has
-	//! a polynomial equation, and hence is a "non-rational surface".
-	//! The non-rational surface is a special, but frequently
-	//! used, case, where all poles have identical weights.
-	//! The weights are defined and used only in the case of
-	//! a rational surface. The rational characteristic is
-	//! defined in each parametric direction. A surface can be
-	//! rational in the u parametric direction, and
-	//! non-rational in the v parametric direction.
-	//! Knots and Multiplicities
-	//! For a Geom_BSplineSurface the table of knots is
-	//! made up of two increasing sequences of reals, without
-	//! repetition, one for each parametric direction. The
-	//! multiplicities define the repetition of the knots.
-	//! A BSpline surface comprises multiple contiguous
-	//! patches, which are themselves polynomial or rational
-	//! surfaces. The knots are the parameters of the
-	//! isoparametric curves which limit these contiguous
-	//! patches. The multiplicity of a knot on a BSpline
-	//! surface (in a given parametric direction) is related to
-	//! the degree of continuity of the surface at that knot in
-	//! that parametric direction:
-	//! Degree of continuity at knot(i) = Degree - Multi(i) where:
-	//! - Degree is the degree of the BSpline surface in
-	//! the given parametric direction, and
-	//! - Multi(i) is the multiplicity of knot number i in
-	//! the given parametric direction.
-	//! There are some special cases, where the knots are
-	//! regularly spaced in one parametric direction (i.e. the
-	//! difference between two consecutive knots is a constant).
-	//! - "Uniform": all the multiplicities are equal to 1.
-	//! - "Quasi-uniform": all the multiplicities are equal to 1,
-	//! except for the first and last knots in this parametric
-	//! direction, and these are equal to Degree + 1.
-	//! - "Piecewise Bezier": all the multiplicities are equal to
-	//! Degree except for the first and last knots, which
-	//! are equal to Degree + 1. This surface is a
-	//! concatenation of Bezier patches in the given
-	//! parametric direction.
-	//! If the BSpline surface is not periodic in a given
-	//! parametric direction, the bounds of the knots and
-	//! multiplicities tables are 1 and NbKnots, where
-	//! NbKnots is the number of knots of the BSpline
-	//! surface in that parametric direction.
-	//! If the BSpline surface is periodic in a given parametric
-	//! direction, and there are k periodic knots and p
-	//! periodic poles in that parametric direction:
-	//! - the period is such that:
-	//! period = Knot(k+1) - Knot(1), and
-	//! - the poles and knots tables in that parametric
-	//! direction can be considered as infinite tables, such that:
-	//! Knot(i+k) = Knot(i) + period, and
-	//! Pole(i+p) = Pole(i)
-	//! Note: The data structure tables for a periodic BSpline
-	//! surface are more complex than those of a non-periodic one.
-	//! References :
-	//! . A survey of curve and surface methods in CADG Wolfgang BOHM
-	//! CAGD 1 (1984)
-	//! . On de Boor-like algorithms and blossoming Wolfgang BOEHM
-	//! cagd 5 (1988)
-	//! . Blossoming and knot insertion algorithms for B-spline curves
-	//! Ronald N. GOLDMAN
-	//! . Modelisation des surfaces en CAO, Henri GIAUME Peugeot SA
-	//! . Curves and Surfaces for Computer Aided Geometric Design,
-	//! a practical guide Gerald Farin
-	public class Geom_BSplineSurface : Geom_BoundedSurface
-	{
+    //! Describes a BSpline surface.
+    //! In each parametric direction, a BSpline surface can be:
+    //! - uniform or non-uniform,
+    //! - rational or non-rational,
+    //! - periodic or non-periodic.
+    //! A BSpline surface is defined by:
+    //! - its degrees, in the u and v parametric directions,
+    //! - its periodic characteristic, in the u and v parametric directions,
+    //! - a table of poles, also called control points (together
+    //! with the associated weights if the surface is rational), and
+    //! - a table of knots, together with the associated multiplicities.
+    //! The degree of a Geom_BSplineSurface is limited to
+    //! a value (25) which is defined and controlled by the
+    //! system. This value is returned by the function MaxDegree.
+    //! Poles and Weights
+    //! Poles and Weights are manipulated using two associative double arrays:
+    //! - the poles table, which is a double array of gp_Pnt points, and
+    //! - the weights table, which is a double array of reals.
+    //! The bounds of the poles and weights arrays are:
+    //! - 1 and NbUPoles for the row bounds (provided
+    //! that the BSpline surface is not periodic in the u
+    //! parametric direction), where NbUPoles is the
+    //! number of poles of the surface in the u parametric direction, and
+    //! - 1 and NbVPoles for the column bounds (provided
+    //! that the BSpline surface is not periodic in the v
+    //! parametric direction), where NbVPoles is the
+    //! number of poles of the surface in the v parametric direction.
+    //! The poles of the surface are the points used to shape
+    //! and reshape the surface. They comprise a rectangular network.
+    //! If the surface is not periodic:
+    //! - The points (1, 1), (NbUPoles, 1), (1,
+    //! NbVPoles), and (NbUPoles, NbVPoles)
+    //! are the four parametric "corners" of the surface.
+    //! - The first column of poles and the last column of
+    //! poles define two BSpline curves which delimit the
+    //! surface in the v parametric direction. These are the
+    //! v isoparametric curves corresponding to the two
+    //! bounds of the v parameter.
+    //! - The first row of poles and the last row of poles
+    //! define two BSpline curves which delimit the surface
+    //! in the u parametric direction. These are the u
+    //! isoparametric curves corresponding to the two bounds of the u parameter.
+    //! If the surface is periodic, these geometric properties are not verified.
+    //! It is more difficult to define a geometrical significance
+    //! for the weights. However they are useful for
+    //! representing a quadric surface precisely. Moreover, if
+    //! the weights of all the poles are equal, the surface has
+    //! a polynomial equation, and hence is a "non-rational surface".
+    //! The non-rational surface is a special, but frequently
+    //! used, case, where all poles have identical weights.
+    //! The weights are defined and used only in the case of
+    //! a rational surface. The rational characteristic is
+    //! defined in each parametric direction. A surface can be
+    //! rational in the u parametric direction, and
+    //! non-rational in the v parametric direction.
+    //! Knots and Multiplicities
+    //! For a Geom_BSplineSurface the table of knots is
+    //! made up of two increasing sequences of reals, without
+    //! repetition, one for each parametric direction. The
+    //! multiplicities define the repetition of the knots.
+    //! A BSpline surface comprises multiple contiguous
+    //! patches, which are themselves polynomial or rational
+    //! surfaces. The knots are the parameters of the
+    //! isoparametric curves which limit these contiguous
+    //! patches. The multiplicity of a knot on a BSpline
+    //! surface (in a given parametric direction) is related to
+    //! the degree of continuity of the surface at that knot in
+    //! that parametric direction:
+    //! Degree of continuity at knot(i) = Degree - Multi(i) where:
+    //! - Degree is the degree of the BSpline surface in
+    //! the given parametric direction, and
+    //! - Multi(i) is the multiplicity of knot number i in
+    //! the given parametric direction.
+    //! There are some special cases, where the knots are
+    //! regularly spaced in one parametric direction (i.e. the
+    //! difference between two consecutive knots is a constant).
+    //! - "Uniform": all the multiplicities are equal to 1.
+    //! - "Quasi-uniform": all the multiplicities are equal to 1,
+    //! except for the first and last knots in this parametric
+    //! direction, and these are equal to Degree + 1.
+    //! - "Piecewise Bezier": all the multiplicities are equal to
+    //! Degree except for the first and last knots, which
+    //! are equal to Degree + 1. This surface is a
+    //! concatenation of Bezier patches in the given
+    //! parametric direction.
+    //! If the BSpline surface is not periodic in a given
+    //! parametric direction, the bounds of the knots and
+    //! multiplicities tables are 1 and NbKnots, where
+    //! NbKnots is the number of knots of the BSpline
+    //! surface in that parametric direction.
+    //! If the BSpline surface is periodic in a given parametric
+    //! direction, and there are k periodic knots and p
+    //! periodic poles in that parametric direction:
+    //! - the period is such that:
+    //! period = Knot(k+1) - Knot(1), and
+    //! - the poles and knots tables in that parametric
+    //! direction can be considered as infinite tables, such that:
+    //! Knot(i+k) = Knot(i) + period, and
+    //! Pole(i+p) = Pole(i)
+    //! Note: The data structure tables for a periodic BSpline
+    //! surface are more complex than those of a non-periodic one.
+    //! References :
+    //! . A survey of curve and surface methods in CADG Wolfgang BOHM
+    //! CAGD 1 (1984)
+    //! . On de Boor-like algorithms and blossoming Wolfgang BOEHM
+    //! cagd 5 (1988)
+    //! . Blossoming and knot insertion algorithms for B-spline curves
+    //! Ronald N. GOLDMAN
+    //! . Modelisation des surfaces en CAO, Henri GIAUME Peugeot SA
+    //! . Curves and Surfaces for Computer Aided Geometric Design,
+    //! a practical guide Gerald Farin
+    public class Geom_BSplineSurface : Geom_BoundedSurface
+    {
 
 
-		//! Returns the number of knots in the V direction.
-		//=======================================================================
+        //! Returns the number of knots in the V direction.
+        //=======================================================================
 
-		public int NbVKnots()
-		{
-			return vknots.Length();
-		}
+        public int NbVKnots()
+        {
+            return vknots.Length();
+        }
 
-		//=======================================================================
-		//function : UDegree
-		//purpose  : 
-		//=======================================================================
+        //=======================================================================
+        //function : UDegree
+        //purpose  : 
+        //=======================================================================
 
-		public int UDegree()
-		{
-			return udeg;
-		}
+        public int UDegree()
+        {
+            return udeg;
+        }
 
-		//=======================================================================
-		//function : VDegree
-		//purpose  : 
-		//=======================================================================
+        //=======================================================================
+        //function : VDegree
+        //purpose  : 
+        //=======================================================================
 
-		public int VDegree()
-		{
-			return vdeg;
-		}
+        public int VDegree()
+        {
+            return vdeg;
+        }
 
-		//=======================================================================
-		//function : NbUKnots
-		//purpose  : 
-		//=======================================================================
+        //=======================================================================
+        //function : NbUKnots
+        //purpose  : 
+        //=======================================================================
 
-		public int NbUKnots()
-		{
-			return uknots.Length();
-		}//=======================================================================
-		 //function : UDegree
-		 //purpose  : 
-		 //=======================================================================
+        public int NbUKnots()
+        {
+            return uknots.Length();
+        }//=======================================================================
+
+        public override void Transform(gp_Trsf t)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override Geom_Geometry Copy()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        //function : UDegree
+        //purpose  : 
+        //=======================================================================
 
 
-		GeomAbs_Shape Usmooth;
-		GeomAbs_Shape Vsmooth;
-		int udeg;
-		int vdeg;
-		//TColStd_HArray2OfReal weights;
-		TColStd_HArray1OfReal ufknots;
-		TColStd_HArray1OfReal vfknots;
-		TColStd_HArray1OfReal uknots;
-		TColStd_HArray1OfReal vknots;
-	}
+        GeomAbs_Shape Usmooth;
+        GeomAbs_Shape Vsmooth;
+        int udeg;
+        int vdeg;
+        //TColStd_HArray2OfReal weights;
+        TColStd_HArray1OfReal ufknots;
+        TColStd_HArray1OfReal vfknots;
+        TColStd_HArray1OfReal uknots;
+        TColStd_HArray1OfReal vknots;
+    }
+
+
+    //! The "XAxis" and the "YAxis" define the placement plane of the
+    //! surface (Z = 0, and parametric value V = 0)  perpendicular to
+    //! the symmetry axis. The "XAxis" defines the origin of the
+    //! parameter U = 0.  The trigonometric sense gives the positive
+    //! orientation for the parameter U.
+    //!
+    //! When you create a CylindricalSurface the U and V directions of
+    //! parametrization are such that at each point of the surface the
+    //! normal is oriented towards the "outside region".
+    //!
+    //! The methods UReverse VReverse change the orientation of the
+    //! surface.
+    public class Geom_CylindricalSurface : Geom_ElementarySurface
+    {
+        public override void Bounds(ref double U1, ref double U2, ref double V1, ref double V2)
+        {
+            U1 = 0.0; U2 = 2.0 * Math.PI;
+            V1 = -Precision.Infinite(); V2 = Precision.Infinite();
+
+        }
+        double radius;
+
+        public override Geom_Geometry Copy()
+        {
+            Geom_CylindricalSurface Cs = new Geom_CylindricalSurface(pos, radius);
+            return Cs;
+        }
+        public Geom_CylindricalSurface(gp_Ax3 A3,
+                           double R)
+
+        {
+            radius = (R);
+            if (R < 0.0)
+                throw new Standard_ConstructionError();
+            pos = A3;
+        }
+
+
+        public override void Transform(gp_Trsf T)
+        {
+            radius = radius * Math.Abs(T.ScaleFactor());
+            pos.Transform(T);
+        }
+    }
 }

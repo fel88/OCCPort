@@ -74,7 +74,7 @@ namespace OCCPort
             Clear();
             myManifoldMode = theManifold;
             bool OK = true;
-            TopoDS_Vertex Vlast = null;
+            TopoDS_Vertex Vlast = new TopoDS_Vertex();
             for (TopoDS_Iterator it = new TopoDS_Iterator(wire); it.More(); it.Next())
             {
                 TopoDS_Edge E = TopoDS.Edge(it.Value());
@@ -87,7 +87,7 @@ namespace OCCPort
                     continue;
                 }
 
-                TopoDS_Vertex V1 = null, V2 = null;
+                TopoDS_Vertex V1 = new TopoDS_Vertex(), V2 = new TopoDS_Vertex();
                 for (TopoDS_Iterator itv = new TopoDS_Iterator(E); itv.More(); itv.Next())
                 {
                     TopoDS_Vertex V = TopoDS.Vertex(itv.Value());
@@ -99,7 +99,8 @@ namespace OCCPort
                 if (!Vlast.IsNull() && !Vlast.IsSame(V1) && theManifold)
                 {
                     OK = false;
-                    if (!chained) break;
+                    if (!chained)
+                        break;
                 }
                 Vlast = V2;
                 if (wire.Orientation() == TopAbs_Orientation.TopAbs_REVERSED)
@@ -117,11 +118,12 @@ namespace OCCPort
                 myNonmanifoldEdges.Clear();
             }
             //    refaire chainage ?  Par WireExplorer
-            if (OK || chained) return OK;
+            if (OK || chained)
+                return OK;
 
             Clear();
 
-            for (BRepTools_WireExplorer we=new BRepTools_WireExplorer (wire); we.More(); we.Next())
+            for (BRepTools_WireExplorer we = new BRepTools_WireExplorer(wire); we.More(); we.Next())
                 myEdges.Append(TopoDS.Edge(we.Current()));
 
             return OK;

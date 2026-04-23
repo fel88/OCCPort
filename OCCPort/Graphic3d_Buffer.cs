@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Drawing;
+using System.Linq;
 using System.Security.Policy;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace OCCPort
 {
@@ -23,17 +26,56 @@ namespace OCCPort
 
         public void Validate()
         {
-            
+
         }
 
         public bool IsMutable()
         {
-            return false;        
+            return false;
         }
+        //! Flag indicating that attributes in the buffer are interleaved; TRUE by default.
+        //! Requires sub-classing for creating a non-interleaved buffer (advanced usage).
+        public virtual bool IsInterleaved() { return true; }
 
-        internal byte[] AttributeData(Graphic3d_TypeOfAttribute graphic3d_TOA_POS, int anAttribIndex, int anAttribStride)
+        //! Return the attribute data with stride size specific to this attribute.
+        public byte[] AttributeData(Graphic3d_TypeOfAttribute theAttrib,
+            int theAttribIndex, int theAttribStride)
         {
-            throw new NotImplementedException();
+            int aDataPtr = 0;
+            if (IsInterleaved())
+            {
+                for (int anAttribIter = 0; anAttribIter < NbAttributes; ++anAttribIter)
+                {
+                    Graphic3d_Attribute anAttrib = Attribute(anAttribIter);
+                    int anAttribStride = Graphic3d_Attribute.Stride(anAttrib.DataType);
+                    if (anAttrib.Id == theAttrib)
+                    {
+                        theAttribIndex = anAttribIter;
+                        theAttribStride = Stride;
+                        return Data().Skip(aDataPtr).ToArray();
+                    }
+
+                    aDataPtr += anAttribStride;
+                }
+            }
+            else
+            {
+                int aNbMaxVerts = NbMaxElements();
+                for (int anAttribIter = 0; anAttribIter < NbAttributes; ++anAttribIter)
+                {
+                    Graphic3d_Attribute anAttrib = Attribute(anAttribIter);
+                    int anAttribStride = Graphic3d_Attribute.Stride(anAttrib.DataType);
+                    if (anAttrib.Id == theAttrib)
+                    {
+                        theAttribIndex = anAttribIter;
+                        theAttribStride = anAttribStride;
+                        return Data().Skip(aDataPtr).ToArray();
+                    }
+
+                    aDataPtr += anAttribStride * aNbMaxVerts;
+                }
+            }
+            return null;
         }
 
         //! @return attribute definition
@@ -53,16 +95,12 @@ namespace OCCPort
             return new NCollection_BaseAllocator();
         }
 
-        public bool IsInterleaved()
-        {
-            throw new NotImplementedException();
-        }
 
-        public int NbMaxElements()
-        {
-            throw new NotImplementedException();
-        }
+        //! Return number of initially allocated elements which can fit into this buffer,
+        //! while NbElements can be overwritten to smaller value.
+        public int NbMaxElements() { return Stride != 0 ? (int)(mySize / (int)(Stride)) : 0; }
+
     }
 
-    
+
 }

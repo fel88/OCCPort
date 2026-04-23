@@ -65,6 +65,12 @@ namespace OCCPort
             return aV;
         }
 
+
+
+        public static double operator *(gp_Vec one, gp_Vec theOther)
+        {
+            return one.Dot(theOther);
+        }
         public static gp_Vec operator *(gp_Vec v, double theScalar)
         {
             return v.Multiplied(theScalar);
@@ -82,6 +88,17 @@ namespace OCCPort
         {
             return v.Multiplied(theScalar);
         }
+
+
+        //! Subtracts two vectors
+        public void Subtract(gp_Vec theRight) { coord.Subtract(theRight.coord); }
+
+        public static gp_Vec operator -(gp_Vec theRight, gp_Vec v)
+        {
+            v.Subtract(theRight);
+            return v;
+        }
+
         public static gp_Vec operator -(gp_Vec f)
         {
             return f.Reversed();

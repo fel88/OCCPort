@@ -23,7 +23,11 @@ namespace OCCPort
 
 
 
+        public override bool IsCurveOnSurface()
+        {
+            return true;
+        }
 
-        
+
     }
 }

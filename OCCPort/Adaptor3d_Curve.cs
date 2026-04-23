@@ -1,4 +1,6 @@
-﻿namespace OCCPort
+﻿using System;
+
+namespace OCCPort
 {
 	//! Root class for 3D curves on which geometric
 	//! algorithms work.
@@ -13,14 +15,14 @@
 	//! Polynomial coefficients of BSpline curves used for their evaluation are
 	//! cached for better performance. Therefore these evaluations are not
 	//! thread-safe and parallel evaluations need to be prevented.
-	public class Adaptor3d_Curve
+	public abstract class Adaptor3d_Curve
 	{
 		//=======================================================================
 		//function : GetType
 		//purpose  : 
 		//=======================================================================
 
-		public new GeomAbs_CurveType GetType()
+		public new virtual GeomAbs_CurveType GetType()
 		{
 			throw new Standard_NotImplemented("Adaptor3d_Curve::GetType");
 		}
@@ -34,8 +36,13 @@
 		{
 			throw new Standard_NotImplemented("Adaptor3d_Curve::Line");
 		}
+		public virtual gp_Pnt Value(double d)
+		{
+			throw new NotImplementedException();
+		}
 
-		public double FirstParameter()
+
+        public double FirstParameter()
 		{
 			throw new Standard_NotImplemented("Adaptor3d_Curve::FirstParameter");
 		}

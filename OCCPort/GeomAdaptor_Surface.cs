@@ -95,8 +95,8 @@ namespace OCCPort
                 }
                 else if (TheType == typeof(Geom_Plane))
                     mySurfaceType = GeomAbs_SurfaceType.GeomAbs_Plane;
-                /*else if (TheType == typeof(Geom_CylindricalSurface))
-                    mySurfaceType = GeomAbs_SurfaceType.GeomAbs_Cylinder;
+                else if (TheType == typeof(Geom_CylindricalSurface))
+                    mySurfaceType = GeomAbs_SurfaceType.GeomAbs_Cylinder;/*
                 else if (TheType == typeof(Geom_ConicalSurface))
                     mySurfaceType = GeomAbs_SurfaceType.GeomAbs_Cone;
                 else if (TheType == typeof(Geom_SphericalSurface))

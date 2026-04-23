@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace OCCPort
 {
-	public class NCollection_Vec3
+	public class NCollection_Vec3_double
 	{
 		protected double[] v;
 		//! Assign new values to the vector.
@@ -25,7 +25,7 @@ namespace OCCPort
 							   : (v[1] > v[2] ? v[1] : v[2]);
 		}
 
-		public NCollection_Vec3()
+		public NCollection_Vec3_double()
 		{
 			v = new double[3];
 		}
@@ -36,7 +36,7 @@ namespace OCCPort
 			return x() * x() + y() * y() + z() * z();
 		}
 
-		public NCollection_Vec3(double value1, double value2, double value3)
+		public NCollection_Vec3_double(double value1, double value2, double value3)
 		{
 			v = new double[3];
 
@@ -45,28 +45,28 @@ namespace OCCPort
 			v[2] = value3;
 		}
 
-		public NCollection_Vec3(float[] myRgb)
+		public NCollection_Vec3_double(float[] myRgb)
 		{
 			v = myRgb.Cast<double>().ToArray();
 		}
 
-		public static NCollection_Vec3 operator -(NCollection_Vec3 temp)
+		public static NCollection_Vec3_double operator -(NCollection_Vec3_double temp)
 		{
-			return new NCollection_Vec3(-temp.x(), -temp.y(), -temp.z());
+			return new NCollection_Vec3_double(-temp.x(), -temp.y(), -temp.z());
 		}
 
 		//! Compute per-component subtraction.
-		public static NCollection_Vec3 operator -(NCollection_Vec3 temp, NCollection_Vec3 temp2)
+		public static NCollection_Vec3_double operator -(NCollection_Vec3_double temp, NCollection_Vec3_double temp2)
 		{
-			return new NCollection_Vec3(temp.x() - temp2.x(), temp.y() - temp2.y(), temp.z() - temp2.z());
+			return new NCollection_Vec3_double(temp.x() - temp2.x(), temp.y() - temp2.y(), temp.z() - temp2.z());
 		}
 
 
 
 
-		internal static NCollection_Vec3 Cross(NCollection_Vec3 theVec1, NCollection_Vec3 theVec2)
+		internal static NCollection_Vec3_double Cross(NCollection_Vec3_double theVec1, NCollection_Vec3_double theVec2)
 		{
-			return new NCollection_Vec3(theVec1.y() * theVec2.z() - theVec1.z() * theVec2.y(),
+			return new NCollection_Vec3_double(theVec1.y() * theVec2.z() - theVec1.z() * theVec2.y(),
 			theVec1.z() * theVec2.x() - theVec1.x() * theVec2.z(),
 			theVec1.x() * theVec2.y() - theVec1.y() * theVec2.x());
 

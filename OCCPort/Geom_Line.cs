@@ -30,6 +30,35 @@
             P = ElCLib.LineValue(U, pos);
         }
 
+        public override void Transform(gp_Trsf t)
+        {
+            pos.Transform(t);
+        }
+
+        public override Geom_Geometry Copy()
+        {
+            Geom_Line L = new Geom_Line(pos);
+            return L;
+        }
+
+        public override bool IsPeriodic()
+        {
+            return false;
+        }
+
+        public override void Reverse()
+        {
+            pos.Reverse();
+
+        }
+
+        public override double ReversedParameter(double U)
+        {
+            return -U;
+        }
+
+        public Geom_Line(gp_Ax1 A) { pos = (A); }
+
         public Geom_Line(gp_Lin L)
         {
             pos = L.Position();

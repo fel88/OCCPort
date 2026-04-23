@@ -18,10 +18,13 @@ namespace OCCPort
             coord = new gp_XYZ(theCoord);
         }
         public gp_Pnt Translated(gp_Vec theV)
-        {            
+        {
             this.coord.Add(theV.XYZ());
             return this;
         }
+
+        //! Assigns the three coordinates of theCoord to this point.
+        public void SetXYZ(gp_XYZ theCoord) { coord = theCoord; }
 
         //=======================================================================
         public double SquareDistance(gp_Pnt theOther)

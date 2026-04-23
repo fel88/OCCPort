@@ -40,7 +40,7 @@ namespace OCCPort
             return false;
         }
 
-        public bool IsCurveOnSurface(Geom_Surface a, TopLoc_Location f)
+        public virtual bool IsCurveOnSurface(Geom_Surface a, TopLoc_Location f)
         {
             return false;
         }
@@ -61,7 +61,7 @@ namespace OCCPort
         }
 
 
-        public bool IsCurveOnSurface()
+        public virtual bool IsCurveOnSurface()
         {
             return false;
         }

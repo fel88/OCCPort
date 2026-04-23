@@ -25,6 +25,17 @@
         {
             return basisSurf;
         }
+
+        public override void Transform(gp_Trsf t)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override Geom_Geometry Copy()
+        {
+            throw new System.NotImplementedException();
+        }
+
         Geom_Surface basisSurf;
         double utrim1;
         double vtrim1;

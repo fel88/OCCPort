@@ -3,7 +3,7 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace OCCPort
 {
-    internal class gp_Dir2d
+    public class gp_Dir2d
     {
         private double dU;
         private double dV;

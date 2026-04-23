@@ -114,7 +114,7 @@ namespace OCCPort
 		//! Returns the square of distance between two colors.
 		public double SquareDistance(Quantity_Color theColor)
 		{
-			return (new NCollection_Vec3(myRgb) - new NCollection_Vec3(theColor.myRgb)).SquareModulus();
+			return (new NCollection_Vec3_double(myRgb) - new NCollection_Vec3_double(theColor.myRgb)).SquareModulus();
 		}
 
 		private static float[] Convert_LinearRGB_To_sRGB(float[] anRgb)

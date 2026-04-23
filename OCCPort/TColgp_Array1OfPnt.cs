@@ -1,13 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace OCCPort
 {
-	public class TColgp_Array1OfPnt : List<gp_Pnt>
-	{
-		//public List<gp_Pnt> list = new List<gp_Pnt>();
-		public int Length()
-		{
-			return Count;
-		}
-	}
+    public class TColgp_Array1OfPnt : NCollection_Array1<gp_Pnt>
+    {
+        public TColgp_Array1OfPnt(int theLower, int theUpper) : base(theLower, theUpper)
+        {
+        }
+    }
+
 }

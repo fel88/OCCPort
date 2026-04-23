@@ -33,6 +33,14 @@ namespace OCCPort
         public gp_Ax1 Position() { return pos; }
 
 
+        //! Creates a line passing through point theP and parallel to
+        //! vector theV (theP and theV are, respectively, the origin and
+        //! the unit vector of the positioning axis of the line).
+        public gp_Lin(gp_Pnt theP, gp_Dir theV)
+
+        {
+            pos = new gp_Ax1(theP, theV);
+        }
 
         public gp_Lin(gp_Ax1 value)
         {

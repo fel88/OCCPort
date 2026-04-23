@@ -214,7 +214,7 @@ namespace OCCPort
 		
 
 
-		internal void Translate(NCollection_Vec3 theVec)
+		internal void Translate(NCollection_Vec3_double theVec)
 		{
 			NCollection_Mat4 aTempMat = new NCollection_Mat4();
 			aTempMat.SetColumn(3, theVec);
@@ -256,7 +256,7 @@ namespace OCCPort
 			}
 		}
 
-		internal void SetRow(int theRow, NCollection_Vec3 theVec)
+		internal void SetRow(int theRow, NCollection_Vec3_double theVec)
 		{
 			SetValue(theRow, 0, theVec.x());
 			SetValue(theRow, 1, theVec.y());
@@ -276,7 +276,7 @@ namespace OCCPort
 
 		}
 
-		internal void SetColumn(int theCol, NCollection_Vec3 theVec)
+		internal void SetColumn(int theCol, NCollection_Vec3_double theVec)
 		{
 
 			SetValue(0, theCol, theVec.x());

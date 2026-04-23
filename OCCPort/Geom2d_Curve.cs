@@ -11,6 +11,14 @@ namespace OCCPort
             D0(U, ref P);
             return P;
         }
+        //! curve becomes the StartPoint of the reversed curve.
+        public abstract void Reverse();
+        //! Computes the parameter on the reversed curve for
+        //! the point of parameter U on this curve.
+        //! Note: The point of parameter U on this curve is
+        //! identical to the point of parameter
+        //! ReversedParameter(U) on the reversed curve.
+        public abstract double ReversedParameter(double U);
 
         //! Returns the value of the first parameter.
         //! Warnings :
