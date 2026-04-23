@@ -1,6 +1,7 @@
 ﻿using OCCPort;
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Runtime.InteropServices.ComTypes;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -17,7 +18,258 @@ namespace OCCPort
         Aspect_FrustumLRBT myCustomFrustumR;
         //! Get current tile.
         public Graphic3d_CameraTile Tile() { return myTile; }
+        //! Get stereographic focus value.
+        //! @return absolute or relative stereographic focus value
+        //! depending on its definition type.
+        public double ZFocus()
+        {
+            return myZFocus;
+        }
 
+        //! Check whether the camera projection is stereo.
+        //! Please note that stereo rendering is now implemented with support of
+        //! Quad buffering.
+        //! @return boolean flag indicating whether the stereographic L/R projection
+        //! is chosen.
+        public bool IsStereo()
+        {
+            return (myProjType == Projection.Projection_Stereo);
+        }
+
+        public void SetZFocus(FocusType theType, double theZFocus)
+        {
+            if (ZFocusType() == theType
+             && ZFocus() == theZFocus)
+            {
+                return;
+            }
+
+            myZFocusType = theType;
+            myZFocus = theZFocus;
+
+            InvalidateProjection();
+        }
+        public bool FitMinMax(Bnd_Box theBox,
+                                  double theResolution,
+                                  bool theToEnlargeIfLine)
+        {
+            // Check bounding box for validness
+            if (theBox.IsVoid())
+            {
+                return false; // bounding box is out of bounds...
+            }
+
+            // Apply "axial scaling" to the bounding points.
+            // It is not the best approach to make this scaling as a part of fit all operation,
+            // but the axial scale is integrated into camera orientation matrix and the other
+            // option is to perform frustum plane adjustment algorithm in view camera space,
+            // which will lead to a number of additional world-view space conversions and
+            // loosing precision as well.
+            gp_Pnt aBndMin = theBox.CornerMin().XYZ().Multiplied(myAxialScale).To_gp_Pnt();
+            gp_Pnt aBndMax = theBox.CornerMax().XYZ().Multiplied(myAxialScale).To_gp_Pnt();
+            if (aBndMax.IsEqual(aBndMin, Standard_Real.RealEpsilon()))
+            {
+                return false; // nothing to fit all
+            }
+
+            // Prepare camera frustum planes.
+            gp_Pln[] aFrustumPlaneArray = new gp_Pln[6];
+            NCollection_Array1<gp_Pln> aFrustumPlane = new NCollection_Array1<gp_Pln>(aFrustumPlaneArray, 1, 6);
+            Frustum(aFrustumPlane[1], aFrustumPlane[2], aFrustumPlane[3],
+                     aFrustumPlane[4], aFrustumPlane[5], aFrustumPlane[6]);
+
+            // Prepare camera up, side, direction vectors.
+            gp_Dir aCamUp = OrthogonalizedUp();
+            gp_Dir aCamDir = Direction();
+            gp_Dir aCamSide = aCamDir ^ aCamUp;
+
+            // Prepare scene bounding box parameters.
+            gp_Pnt aBndCenter = ((aBndMin.XYZ() + aBndMax.XYZ()) / 2.0).To_gp_Pnt();
+
+            gp_Pnt[] aBndCornerArray = new gp_Pnt[8];
+            NCollection_Array1<gp_Pnt> aBndCorner = new NCollection_Array1<gp_Pnt>(aBndCornerArray, 1, 8);
+            aBndCorner[1].SetCoord(aBndMin.X(), aBndMin.Y(), aBndMin.Z());
+            aBndCorner[2].SetCoord(aBndMin.X(), aBndMin.Y(), aBndMax.Z());
+            aBndCorner[3].SetCoord(aBndMin.X(), aBndMax.Y(), aBndMin.Z());
+            aBndCorner[4].SetCoord(aBndMin.X(), aBndMax.Y(), aBndMax.Z());
+            aBndCorner[5].SetCoord(aBndMax.X(), aBndMin.Y(), aBndMin.Z());
+            aBndCorner[6].SetCoord(aBndMax.X(), aBndMin.Y(), aBndMax.Z());
+            aBndCorner[7].SetCoord(aBndMax.X(), aBndMax.Y(), aBndMin.Z());
+            aBndCorner[8].SetCoord(aBndMax.X(), aBndMax.Y(), aBndMax.Z());
+
+            // Perspective-correct camera projection vector, matching the bounding box is determined geometrically.
+            // Knowing the initial shape of a frustum it is possible to match it to a bounding box.
+            // Then, knowing the relation of camera projection vector to the frustum shape it is possible to
+            // set up perspective-correct camera projection matching the bounding box.
+            // These steps support non-asymmetric transformations of view-projection space provided by camera.
+            // The zooming can be done by calculating view plane size matching the bounding box at center of
+            // the bounding box. The only limitation here is that the scale of camera should define size of
+            // its view plane passing through the camera center, and the center of camera should be on the
+            // same line with the center of bounding box.
+
+            // The following method is applied:
+            // 1) Determine normalized asymmetry of camera projection vector by frustum planes.
+            // 2) Determine new location of frustum planes, "matching" the bounding box.
+            // 3) Determine new camera projection vector using the normalized asymmetry.
+            // 4) Determine new zooming in view space.
+
+            // 1. Determine normalized projection asymmetry (if any).
+            double anAssymX = Math.Tan((aCamSide).Angle(aFrustumPlane[1].Axis().Direction()))
+                                   - Math.Tan((-aCamSide).Angle(aFrustumPlane[2].Axis().Direction()));
+            double anAssymY = Math.Tan((aCamUp).Angle(aFrustumPlane[3].Axis().Direction()))
+                                   - Math.Tan((-aCamUp).Angle(aFrustumPlane[4].Axis().Direction()));
+
+            // 2. Determine how far should be the frustum planes placed from center
+            //    of bounding box, in order to match the bounding box closely.
+            double[] aFitDistanceArray = new double[6];
+            NCollection_Array1<double> aFitDistance = new NCollection_Array1<double>(aFitDistanceArray, 1, 6);
+            aFitDistance.Init(0.0);
+            for (int anI = aFrustumPlane.Lower(); anI <= aFrustumPlane.Upper(); ++anI)
+            {
+                // Measure distances from center of bounding box to its corners towards the frustum plane.
+                gp_Dir aPlaneN = aFrustumPlane[anI].Axis().Direction();
+
+                double aFitDist = aFitDistance[anI];
+                for (int aJ = aBndCorner.Lower(); aJ <= aBndCorner.Upper(); ++aJ)
+                {
+                    aFitDist = Math.Max(aFitDist, new gp_Vec(aBndCenter, aBndCorner[aJ]).Dot(aPlaneN.to_gp_Vec()));
+                    //write back aFitDist to aFitDistance[anI];??
+                }
+            }
+            // The center of camera is placed on the same line with center of bounding box.
+            // The view plane section crosses the bounding box at its center.
+            // To compute view plane size, evaluate coefficients converting "point -> plane distance"
+            // into view section size between the point and the frustum plane.
+            //       proj
+            //       /|\   right half of frame     //
+            //        |                           //
+            //  point o<--  distance * coeff  -->//---- (view plane section)
+            //         \                        //
+            //      (distance)                 //
+            //                ~               //
+            //                 (distance)    //
+            //                           \/\//
+            //                            \//
+            //                            //
+            //                      (frustum plane)
+            aFitDistance[1] *= Math.Sqrt(1 + Math.Pow(Math.Tan(aCamSide.Angle(aFrustumPlane[1].Axis().Direction())), 2.0));
+            aFitDistance[2] *= Math.Sqrt(1 + Math.Pow(Math.Tan((-aCamSide).Angle(aFrustumPlane[2].Axis().Direction())), 2.0));
+            aFitDistance[3] *= Math.Sqrt(1 + Math.Pow(Math.Tan(aCamUp.Angle(aFrustumPlane[3].Axis().Direction())), 2.0));
+            aFitDistance[4] *= Math.Sqrt(1 + Math.Pow(Math.Tan((-aCamUp).Angle(aFrustumPlane[4].Axis().Direction())), 2.0));
+            aFitDistance[5] *= Math.Sqrt(1 + Math.Pow(Math.Tan(aCamDir.Angle(aFrustumPlane[5].Axis().Direction())), 2.0));
+            aFitDistance[6] *= Math.Sqrt(1 + Math.Pow(Math.Tan((-aCamDir).Angle(aFrustumPlane[6].Axis().Direction())), 2.0));
+
+            double aViewSizeXv = aFitDistance[1] + aFitDistance[2];
+            double aViewSizeYv = aFitDistance[3] + aFitDistance[4];
+            double aViewSizeZv = aFitDistance[5] + aFitDistance[6];
+
+            // 3. Place center of camera on the same line with center of bounding
+            //    box applying corresponding projection asymmetry (if any).
+            double anAssymXv = anAssymX * aViewSizeXv * 0.5;
+            double anAssymYv = anAssymY * aViewSizeYv * 0.5;
+            double anOffsetXv = (aFitDistance[2] - aFitDistance[1]) * 0.5 + anAssymXv;
+            double anOffsetYv = (aFitDistance[4] - aFitDistance[3]) * 0.5 + anAssymYv;
+            gp_Vec aTranslateSide = new gp_Vec(aCamSide) * anOffsetXv;
+            gp_Vec aTranslateUp = new gp_Vec(aCamUp) * anOffsetYv;
+            gp_Pnt aCamNewCenter = aBndCenter.Translated(aTranslateSide).Translated(aTranslateUp);
+
+            gp_Trsf aCenterTrsf = new gp_Trsf();
+            aCenterTrsf.SetTranslation(Center(), aCamNewCenter);
+            Transform(aCenterTrsf);
+            SetDistance(aFitDistance[6] + aFitDistance[5]);
+
+            if (aViewSizeXv < theResolution
+             && aViewSizeYv < theResolution)
+            {
+                // Bounding box collapses to a point or thin line going in depth of the screen
+                if (aViewSizeXv < theResolution || !theToEnlargeIfLine)
+                {
+                    return false; // This is just one point or line and zooming has no effect.
+                }
+
+                // Looking along line and "theToEnlargeIfLine" is requested.
+                // Fit view to see whole scene on rotation.
+                aViewSizeXv = aViewSizeZv;
+                aViewSizeYv = aViewSizeZv;
+            }
+
+            double anAspect = Aspect();
+            if (anAspect > 1.0)
+            {
+                SetScale(Math.Max(aViewSizeXv / anAspect, aViewSizeYv));
+            }
+            else
+            {
+                SetScale(Math.Max(aViewSizeXv, aViewSizeYv * anAspect));
+            }
+            return true;
+        }
+
+
+        public void Frustum(gp_Pln theLeft,
+                                   gp_Pln theRight,
+                                   gp_Pln theBottom,
+                                   gp_Pln theTop,
+                                   gp_Pln theNear,
+                                   gp_Pln theFar)
+        {
+            gp_Vec aProjection = new gp_Vec(Direction());
+            var anUp = new gp_Vec(OrthogonalizedUp());
+            gp_Vec aSide = aProjection ^ anUp;
+
+            new Standard_ASSERT_RAISE(
+         !aProjection.IsParallel(anUp, Precision.Angular()),
+          "Can not derive SIDE = PROJ x UP - directions are parallel");
+
+            theNear = new gp_Pln(Eye().Translated(aProjection * ZNear()), aProjection.To_gp_Dir());
+            theFar = new gp_Pln(Eye().Translated(aProjection * ZFar()), -aProjection.To_gp_Dir());
+
+            double aHScaleHor = 0.0, aHScaleVer = 0.0;
+            if (Aspect() >= 1.0)
+            {
+                aHScaleHor = Scale() * 0.5 * Aspect();
+                aHScaleVer = Scale() * 0.5;
+            }
+            else
+            {
+                aHScaleHor = Scale() * 0.5;
+                aHScaleVer = Scale() * 0.5 / Aspect();
+            }
+
+            gp_Pnt aPntLeft = Center().Translated(aHScaleHor * -aSide);
+            gp_Pnt aPntRight = Center().Translated(aHScaleHor * aSide);
+            gp_Pnt aPntBottom = Center().Translated(aHScaleVer * -anUp);
+            gp_Pnt aPntTop = Center().Translated(aHScaleVer * anUp);
+
+            gp_Vec aDirLeft = aSide;
+            gp_Vec aDirRight = -aSide;
+            gp_Vec aDirBottom = anUp;
+            gp_Vec aDirTop = -anUp;
+            if (!IsOrthographic())
+            {
+                double aHFOVHor = Math.Atan(Math.Tan(DTR_HALF * FOVy()) * Aspect());
+                double aHFOVVer = DTR_HALF * FOVy();
+                aDirLeft.Rotate(new gp_Ax1(gp.Origin(), anUp.To_gp_Dir()), aHFOVHor);
+                aDirRight.Rotate(new gp_Ax1(gp.Origin(), anUp.To_gp_Dir()), -aHFOVHor);
+                aDirBottom.Rotate(new gp_Ax1(gp.Origin(), aSide.To_gp_Dir()), -aHFOVVer);
+                aDirTop.Rotate(new gp_Ax1(gp.Origin(), aSide.To_gp_Dir()), aHFOVVer);
+            }
+
+            theLeft = new gp_Pln(aPntLeft, aDirLeft.To_gp_Dir());
+            theRight = new gp_Pln(aPntRight, aDirRight.To_gp_Dir());
+            theBottom = new gp_Pln(aPntBottom, aDirBottom.To_gp_Dir());
+            theTop = new gp_Pln(aPntTop, aDirTop.To_gp_Dir());
+        }
+        //! Get Field Of View (FOV) in y axis.
+        //! @return the FOV value in degrees.
+        public double FOVy() { return myFOVy; }
+
+        //! Get stereographic focus definition type.
+        //! @return definition type used for stereographic focus.
+        public FocusType ZFocusType()
+        {
+            return myZFocusType;
+        }
         public void stereoEyeProj(NCollection_Mat4 theOutMx,
 
                                                    Aspect_FrustumLRBT theLRBT,
@@ -259,7 +511,7 @@ namespace OCCPort
         //! Check that the camera projection is orthographic.
         //! @return boolean flag that indicates whether the camera's projection is
         //! orthographic or not.
-        bool IsOrthographic()
+        public bool IsOrthographic()
         {
             return (myProjType == Projection.Projection_Orthographic);
         }
@@ -951,7 +1203,7 @@ namespace OCCPort
             // Measure depth of boundary points from camera eye.
             List<gp_Pnt> aPntsToMeasure = new List<gp_Pnt>();
 
-            double[] aGraphicBB =new  double [6];
+            double[] aGraphicBB = new double[6];
             theGraphicBB.Get(out aGraphicBB[0], out aGraphicBB[1], out aGraphicBB[2], out aGraphicBB[3], out aGraphicBB[4], out aGraphicBB[5]);
 
             aPntsToMeasure.Add(new gp_Pnt(aGraphicBB[0], aGraphicBB[1], aGraphicBB[2]));
@@ -968,7 +1220,7 @@ namespace OCCPort
             if (isFiniteMinMax)
             {
                 double[] aMinMax = new double[6];
-                theMinMax.Get(out aMinMax[0],out aMinMax[1], out aMinMax[2], out aMinMax[3], out aMinMax[4], out aMinMax[5]);
+                theMinMax.Get(out aMinMax[0], out aMinMax[1], out aMinMax[2], out aMinMax[3], out aMinMax[4], out aMinMax[5]);
 
                 aPntsToMeasure.Add(new gp_Pnt(aMinMax[0], aMinMax[1], aMinMax[2]));
                 aPntsToMeasure.Add(new gp_Pnt(aMinMax[0], aMinMax[1], aMinMax[5]));
@@ -1129,13 +1381,13 @@ namespace OCCPort
 
         private double RealFirst()
         {
-             return -DBL_MAX; 
+            return -DBL_MAX;
         }
 
         const double DBL_MAX = 1.7976931348623158e+308; // max value
         private double RealLast()
         {
-             return DBL_MAX; 
+            return DBL_MAX;
 
         }
 

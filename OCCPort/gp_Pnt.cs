@@ -17,6 +17,12 @@ namespace OCCPort
         {
             coord = new gp_XYZ(theCoord);
         }
+        public gp_Pnt Translated(gp_Vec theV)
+        {            
+            this.coord.Add(theV.XYZ());
+            return this;
+        }
+
         //=======================================================================
         public double SquareDistance(gp_Pnt theOther)
         {
@@ -27,6 +33,9 @@ namespace OCCPort
             aDD = coord.Z(); aDD -= XYZ.Z(); aDD *= aDD; aD += aDD;
             return aD;
         }
+        //! For this point, returns its three coordinates as a XYZ object.
+        public gp_XYZ Coord() { return coord; }
+
         public double SquareDistance(gp_XYZ theOther)
         {
             return SquareDistance(new gp_Pnt(theOther));

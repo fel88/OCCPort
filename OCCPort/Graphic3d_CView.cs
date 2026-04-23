@@ -18,6 +18,31 @@ namespace OCCPort
 
         }
 
+        //! Returns anchor camera definition (without tracked head orientation).
+        public Graphic3d_Camera BaseXRCamera() { return myBaseXRCamera; }
+        Graphic3d_Camera myBaseXRCamera;       //!< neutral camera orientation defining coordinate system in which head tracking is defined
+
+        public double ConsiderZoomPersistenceObjects()
+        {
+            if (!IsDefined())
+            {
+                return 1.0;
+            }
+
+            Graphic3d_Camera aCamera = Camera();
+            Vector2i aWinSize;
+            Window().Size(out aWinSize.X, out aWinSize.Y);
+
+            double aMaxCoef = 1.0;
+            foreach (var aLayer in Layers())
+            {
+                aMaxCoef = Math.Max(aMaxCoef, aLayer.considerZoomPersistenceObjects(Identification(), aCamera, aWinSize.X, aWinSize.Y));
+            }
+
+            return aMaxCoef;
+        }
+        //! Returns number of displayed structures in the view.
+        public virtual int NumberOfDisplayedStructures() { return myStructsDisplayed.Extent(); }
         //! Returns the identification number of the view.
         public int Identification() { return myId; }
 
@@ -361,7 +386,30 @@ namespace OCCPort
 
         }
 
-        private int IsComputed(Graphic3d_Structure theStructure)
+
+        // ========================================================================
+        // function : IsComputed
+        // purpose  :
+        // ========================================================================
+        public bool IsComputed(int theStructId,
+                                                    ref Graphic3d_Structure theComputedStruct)
+        {
+            //theComputedStruct.Nullify(); back write up??
+            if (!ComputedMode())
+                return false;
+
+            int aNbStructs = myStructsToCompute.Length();
+            for (int aStructIter = 1; aStructIter <= aNbStructs; ++aStructIter)
+            {
+                if (myStructsToCompute.Value(aStructIter).Identification() == theStructId)
+                {
+                    theComputedStruct = myStructsComputed.Value(aStructIter);
+                    return true;
+                }
+            }
+            return false;
+        }
+        public int IsComputed(Graphic3d_Structure theStructure)
         {
             int aStructId = theStructure.Identification();
             int aStructIndex = 1;

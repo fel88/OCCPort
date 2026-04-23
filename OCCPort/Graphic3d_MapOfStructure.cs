@@ -1,5 +1,7 @@
 ﻿using OCCPort.Tester;
+using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Net.Security;
 
 
@@ -16,6 +18,11 @@ namespace OCCPort
         public Prs3d_Presentation Key()
         {
             return key;
+        }
+
+        internal int Extent()
+        {
+            return Count;
         }
     }
 }

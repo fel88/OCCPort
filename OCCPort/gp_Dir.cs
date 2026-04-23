@@ -88,6 +88,8 @@ namespace OCCPort
 
         }
 
+      
+
         //! Creates a direction with its 3 cartesian coordinates. Raises ConstructionError if Sqrt(theXv*theXv + theYv*theYv + theZv*theZv) <= Resolution
         //! Modification of the direction's coordinates
         //! If Sqrt (theXv*theXv + theYv*theYv + theZv*theZv) <= Resolution from gp where
@@ -110,7 +112,7 @@ namespace OCCPort
         //! Computes the angular value in radians between <me> and
         //! <theOther>. This value is always positive in 3D space.
         //! Returns the angle in the range [0, PI]
-        double Angle(gp_Dir Other)
+       public  double Angle(gp_Dir Other)
         {
             //    Commentaires :
             //    Au dessus de 45 degres l'arccos donne la meilleur precision pour le
@@ -200,6 +202,11 @@ namespace OCCPort
         {
             return Math.PI - Angle(new gp_Dir(theOther)) <= theAngularTolerance;
 
+        }
+
+        internal gp_Vec to_gp_Vec()
+        {
+            return new gp_Vec(this);
         }
     }
 }

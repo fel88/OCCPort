@@ -604,7 +604,10 @@ namespace OCCPort
 
     public static class Extensions
     {
-
+        public static gp_Dir To_gp_Dir(this gp_Vec z)
+        {
+            return new gp_Dir(z);
+        }
         public static gp_Pnt To_gp_Pnt(this gp_XYZ z)
         {
             return new gp_Pnt(z);

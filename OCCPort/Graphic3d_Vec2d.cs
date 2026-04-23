@@ -1,6 +1,6 @@
 ﻿namespace OCCPort
 {
-    public class Graphic3d_Vec2d: NCollection_Vec2
+    public class Graphic3d_Vec2d: NCollection_Vec2<double>
     {
     }
 }

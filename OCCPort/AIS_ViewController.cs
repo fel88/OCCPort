@@ -1,6 +1,9 @@
 ﻿using OCCPort;
 using System;
+using System.Linq;
 using System.Reflection.Metadata;
+using System.Threading.Tasks;
+using static OCCPort.Graphic3d_Camera;
 
 namespace OCCPort
 {
@@ -14,22 +17,22 @@ namespace OCCPort
             V3d_View aParentView = theView.IsSubview() ? theView.ParentView() : theView;
 
             // manage animation state
-//            if (!myViewAnimation.IsNull()
-//             && !myViewAnimation->IsStopped())
-//            {
-//                myViewAnimation->UpdateTimer();
-//                ResetPreviousMoveTo();
-//                setAskNextFrame();
-//            }
-//
-/*
-            if (!myObjAnimation.IsNull()
-             && !myObjAnimation->IsStopped())
-            {
-                myObjAnimation->UpdateTimer();
-                ResetPreviousMoveTo();
-                setAskNextFrame();
-            }*/
+            //            if (!myViewAnimation.IsNull()
+            //             && !myViewAnimation->IsStopped())
+            //            {
+            //                myViewAnimation->UpdateTimer();
+            //                ResetPreviousMoveTo();
+            //                setAskNextFrame();
+            //            }
+            //
+            /*
+                        if (!myObjAnimation.IsNull()
+                         && !myObjAnimation->IsStopped())
+                        {
+                            myObjAnimation->UpdateTimer();
+                            ResetPreviousMoveTo();
+                            setAskNextFrame();
+                        }*/
 
             if (myIsContinuousRedraw)
             {
@@ -46,7 +49,7 @@ namespace OCCPort
                 bool isSubViewPass = (aSubViewPass == 0);
                 foreach (var aView in theView.Viewer().ActiveViews())
                 {
-                    
+
                     if (isSubViewPass
                     && !aView.IsSubview())
                     {
@@ -58,11 +61,11 @@ namespace OCCPort
                             {
                                 if (aSubviewIter.IsInvalidated())
                                 {
-                                   // if (aSubviewIter.ComputedMode())
+                                    // if (aSubviewIter.ComputedMode())
                                     {
-                                       // aSubviewIter.Update();
+                                        // aSubviewIter.Update();
                                     }
-                                  //  else
+                                    //  else
                                     {
                                         aSubviewIter.Redraw();
                                     }
@@ -122,6 +125,36 @@ namespace OCCPort
             }
 
         }
+        double myMouseClickThreshold;      //!< mouse click threshold in pixels; 3 by default
+        double myMouseDoubleClickInt;      //!< double click interval in seconds; 0.4 by default
+        float myScrollZoomRatio;          //!< distance ratio for mapping mouse scroll event to zoom; 15.0 by default
+
+        public bool UpdateMouseScroll(Aspect_ScrollDelta theDelta)
+        {
+            Aspect_ScrollDelta aDelta = theDelta;
+            aDelta.Delta *= myScrollZoomRatio;
+            return UpdateZoom(aDelta);
+        }
+
+
+        public bool UpdateZoom(Aspect_ScrollDelta theDelta)
+        {
+            if (!myUI.ZoomActions.IsEmpty())
+            {
+                var last = myUI.ZoomActions.Last();
+                //if (myUI.ZoomActions.ChangeLast().Point == theDelta.Point)
+                if (last.Point == theDelta.Point)
+                {
+                    //myUI.ZoomActions.ChangeLast().Delta += theDelta.Delta;
+                    last.Delta += theDelta.Delta;
+                    return false;
+                }
+            }
+
+            myUI.ZoomActions.Append(theDelta);
+            return true;
+        }
+
         //! Reset previous position of MoveTo.
         void ResetPreviousMoveTo() { myPrevMoveTo = new Graphic3d_Vec2i(-1); }
 
@@ -291,7 +324,7 @@ namespace OCCPort
 
         private void flushGestures(AIS_InteractiveContext theCtx, V3d_View theView)
         {
-            
+
         }
 
         //! Process events within rendering thread.
@@ -331,14 +364,14 @@ namespace OCCPort
             //}
 
             //handleViewOrientationKeys(theCtx, theView);
-            //const AIS_WalkDelta aWalk = handleNavigationKeys(theCtx, theView);
+            AIS_WalkDelta aWalk = handleNavigationKeys(theCtx, theView);
             //handleXRInput(theCtx, theView, aWalk);
             //if (theView->View()->IsActiveXR())
             //{
             //    theView->View()->SetupXRPosedCamera();
             //}
             //handleMoveTo(theCtx, theView);
-            //handleCameraActions(theCtx, theView, aWalk);
+            handleCameraActions(theCtx, theView, aWalk);
             //theView->View()->SynchronizeXRPosedToBaseCamera(); // handleCameraActions() may modify posed camera position - copy this modifications also to the base camera
             //handleXRPresentations(theCtx, theView);
 
@@ -358,8 +391,291 @@ namespace OCCPort
             //myToAskNextFrame = false;
         }
 
-        AIS_ViewInputBuffer myUI=new AIS_ViewInputBuffer ();                       //!< buffer for UI thread
-        AIS_ViewInputBuffer myGL=new AIS_ViewInputBuffer ();                       //!< buffer for rendering thread
+        AIS_Point myAnchorPointPrs1;          //!< anchor point presentation (Graphic3d_ZLayerId_Top)
+        AIS_Point myAnchorPointPrs2;          //!< anchor point presentation (Graphic3d_ZLayerId_Topmost)
+        private AIS_WalkDelta handleNavigationKeys(AIS_InteractiveContext theCtx, V3d_View theView)
+        {
+            // navigation keys
+            double aCrouchRatio = 1.0, aRunRatio = 1.0;
+            if (myNavigationMode == AIS_NavigationMode.AIS_NavigationMode_FirstPersonFlight)
+            {
+                aRunRatio = 3.0;
+            }
+
+            double aRotSpeed = 0.5;
+            double aWalkSpeedCoef = WalkSpeedRelative();
+            AIS_WalkDelta aWalk = FetchNavigationKeys(aCrouchRatio, aRunRatio);
+            /*
+             ...............
+             */
+
+            return new AIS_WalkDelta();
+        }
+
+        AIS_WalkDelta FetchNavigationKeys(double theCrouchRatio,
+                                                       double theRunRatio)
+        {
+            AIS_WalkDelta aWalk = new AIS_WalkDelta();
+            return aWalk;
+
+        }
+        //! Return walking speed relative to scene bounding box; 0.1 by default.
+        public float WalkSpeedRelative() { return myWalkSpeedRelative; }
+        float myWalkSpeedAbsolute;        //!< normal walking speed, in m/s; 1.5 by default
+        float myWalkSpeedRelative;        //!< walking speed relative to scene bounding box; 0.1 by default
+        float myThrustSpeed;              //!< active thrust value
+
+
+        AIS_NavigationMode myNavigationMode;           //!< navigation mode (orbit rotation / first person)
+        private void handleCameraActions(AIS_InteractiveContext theCtx, V3d_View theView, AIS_WalkDelta theWalk)
+        {
+            // apply view actions
+            if (myGL.Orientation.ToSetViewOrient)
+            {
+                theView.SetProj(myGL.Orientation.ViewOrient);
+                myGL.Orientation.ToFitAll = true;
+            }
+
+            // apply fit all
+            if (myGL.Orientation.ToFitAll)
+            {
+                const double aFitMargin = 0.01;
+                theView.FitAll(aFitMargin, false);
+                theView.Invalidate();
+                myGL.Orientation.ToFitAll = false;
+            }
+
+            //if (myGL.IsNewGesture)
+            //{
+            //    if (myAnchorPointPrs1.HasInteractiveContext())
+            //    {
+            //        theCtx.Remove(myAnchorPointPrs1, false);
+            //        if (!theView.Viewer().ZLayerSettings(myAnchorPointPrs1.ZLayer()).IsImmediate())
+            //        {
+            //            theView.Invalidate();
+            //        }
+            //        else
+            //        {
+            //            theView.InvalidateImmediate();
+            //        }
+            //    }
+            //    if (myAnchorPointPrs2.HasInteractiveContext())
+            //    {
+            //        theCtx.Remove(myAnchorPointPrs2, false);
+            //        if (!theView.Viewer().ZLayerSettings(myAnchorPointPrs2.ZLayer()).IsImmediate())
+            //        {
+            //            theView.Invalidate();
+            //        }
+            //        else
+            //        {
+            //            theView.InvalidateImmediate();
+            //        }
+            //    }
+
+            //    if (myHasHlrOnBeforeRotation)
+            //    {
+            //        myHasHlrOnBeforeRotation = false;
+            //        theView.SetComputedMode(true);
+            //        theView.Invalidate();
+            //    }
+            //}
+
+            //if (myNavigationMode != AIS_NavigationMode.AIS_NavigationMode_FirstPersonWalk)
+            //{
+            //    if (myGL.Panning.ToStart
+            //     && myToAllowPanning)
+            //    {
+            //        gp_Pnt aPanPnt = new gp_Pnt(Precision.Infinite(), 0.0, 0.0);
+            //        if (!theView.Camera().IsOrthographic())
+            //        {
+            //            bool toStickToRay = false;
+            //            if (myGL.Panning.PointStart.x() >= 0
+            //             && myGL.Panning.PointStart.y() >= 0)
+            //            {
+            //                PickPoint(aPanPnt, theCtx, theView, myGL.Panning.PointStart, toStickToRay);
+            //            }
+            //            if (Precision.IsInfinite(aPanPnt.X()))
+            //            {
+            //                Graphic3d_Vec2i aWinSize;
+            //                theView.Window().Size(aWinSize.x(), aWinSize.y());
+            //                PickPoint(aPanPnt, theCtx, theView, aWinSize / 2, toStickToRay);
+            //            }
+            //            if (!Precision.IsInfinite(aPanPnt.X())
+            //              && myToShowPanAnchorPoint)
+            //            {
+            //                gp_Trsf aPntTrsf;
+            //                aPntTrsf.SetTranslation(new gp_Vec(aPanPnt.XYZ()));
+            //                theCtx.SetLocation(myAnchorPointPrs2, aPntTrsf);
+            //            }
+            //        }
+            //        setPanningAnchorPoint(aPanPnt);
+            //    }
+
+            //    if (myToShowPanAnchorPoint
+            //    && hasPanningAnchorPoint()
+            //    && myGL.Panning.ToPan
+            //    && !myGL.IsNewGesture
+            //    && !myAnchorPointPrs2.HasInteractiveContext())
+            //    {
+            //        theCtx.Display(myAnchorPointPrs2, 0, -1, false, PrsMgr_DisplayStatus.AIS_DS_Displayed);
+            //    }
+
+            //    handlePanning(theView);
+            //    handleZRotate(theView);
+            //}
+
+            if ((myNavigationMode == AIS_NavigationMode.AIS_NavigationMode_Orbit
+              || myGL.OrbitRotation.ToStart
+              || myGL.OrbitRotation.ToRotate)
+             && myToAllowRotation)
+            {
+                if (myGL.OrbitRotation.ToStart
+                && !myHasHlrOnBeforeRotation)
+                {
+                    myHasHlrOnBeforeRotation = theView.ComputedMode();
+                    if (myHasHlrOnBeforeRotation)
+                    {
+                        theView.SetComputedMode(false);
+                    }
+                }
+
+                gp_Pnt aGravPnt = new gp_Pnt();
+                if (myGL.OrbitRotation.ToStart)
+                {
+                    aGravPnt = GravityPoint(theCtx, theView);
+                    if (myToShowRotateCenter)
+                    {
+                        gp_Trsf aPntTrsf = new gp_Trsf();
+                        aPntTrsf.SetTranslation(new gp_Vec(aGravPnt.XYZ()));
+                        theCtx.SetLocation(myAnchorPointPrs1, new TopLoc_Location(aPntTrsf));
+                        theCtx.SetLocation(myAnchorPointPrs2, new TopLoc_Location(aPntTrsf));
+                    }
+                }
+
+                if (myToShowRotateCenter
+                && myGL.OrbitRotation.ToRotate
+                && !myGL.IsNewGesture
+                && !myAnchorPointPrs1.HasInteractiveContext())
+                {
+                    theCtx.Display(myAnchorPointPrs1, 0, -1, false, PrsMgr_DisplayStatus.AIS_DS_Displayed);
+                    theCtx.Display(myAnchorPointPrs2, 0, -1, false, PrsMgr_DisplayStatus.AIS_DS_Displayed);
+                }
+                handleOrbitRotation(theView, aGravPnt,
+                                     myToLockOrbitZUp || myNavigationMode != AIS_NavigationMode.AIS_NavigationMode_Orbit);
+            }
+
+            //if ((myNavigationMode != AIS_NavigationMode.AIS_NavigationMode_Orbit
+            //  || myGL.ViewRotation.ToStart
+            //  || myGL.ViewRotation.ToRotate)
+            // && myToAllowRotation)
+            //{
+            //    if (myGL.ViewRotation.ToStart
+            //    && !myHasHlrOnBeforeRotation)
+            //    {
+            //        myHasHlrOnBeforeRotation = theView.ComputedMode();
+            //        if (myHasHlrOnBeforeRotation)
+            //        {
+            //            theView.SetComputedMode(false);
+            //        }
+            //    }
+
+            //    double aRoll = 0.0;
+            //    if (!theWalk[AIS_WalkRotation_Roll].IsEmpty()
+            //     && !myToLockOrbitZUp)
+            //    {
+            //        aRoll = (M_PI / 12.0) * theWalk[AIS_WalkRotation_Roll].Pressure;
+            //        aRoll *= Min(1000.0 * theWalk[AIS_WalkRotation_Roll].Duration, 100.0) / 100.0;
+            //        if (theWalk[AIS_WalkRotation_Roll].Value < 0.0)
+            //        {
+            //            aRoll = -aRoll;
+            //        }
+            //    }
+
+            //    handleViewRotation(theView, theWalk[AIS_WalkRotation_Yaw].Value, theWalk[AIS_WalkRotation_Pitch].Value, aRoll,
+            //                        myNavigationMode == AIS_NavigationMode.AIS_NavigationMode_FirstPersonFlight);
+            //}
+
+            //if (!myGL.ZoomActions.IsEmpty())
+            //{
+            //    foreach (var aZoomParams in myGL.ZoomActions)
+            //    {
+            //        if (myToAllowZFocus
+            //         && (aZoomParams.Flags & Aspect_VKeyFlags_CTRL) != 0
+            //         && theView.Camera().IsStereo())
+            //        {
+            //            handleZFocusScroll(theView, aZoomParams);
+            //            continue;
+            //        }
+
+            //        if (!myToAllowZooming)
+            //        {
+            //            continue;
+            //        }
+
+            //        if (!theView.Camera().IsOrthographic())
+            //        {
+            //            gp_Pnt aPnt;
+            //            if (aZoomParams.HasPoint()
+            //             && PickPoint(aPnt, theCtx, theView, aZoomParams.Point, myToStickToRayOnZoom))
+            //            {
+            //                handleZoom(theView, aZoomParams, &aPnt);
+            //                continue;
+            //            }
+
+            //            Graphic3d_Vec2i aWinSize;
+            //            theView->Window()->Size(aWinSize.x(), aWinSize.y());
+            //            if (PickPoint(aPnt, theCtx, theView, aWinSize / 2, myToStickToRayOnZoom))
+            //            {
+            //                aZoomParams.ResetPoint(); // do not pretend to zoom at 'nothing'
+            //                handleZoom(theView, aZoomParams, &aPnt);
+            //                continue;
+            //            }
+            //        }
+            //        handleZoom(theView, aZoomParams, null);
+            //    }
+            //    myGL.ZoomActions.Clear();
+            //}
+        }
+
+        public void handleOrbitRotation(V3d_View theView,
+                                              gp_Pnt thePnt,
+                                              bool theToLockZUp)
+        {
+            if (!myToAllowRotation)
+            {
+                return;
+            }
+
+            Graphic3d_Camera aCam = theView.View().IsActiveXR()
+                                                 ? theView.View().BaseXRCamera()
+                                                 : theView.Camera();
+
+
+            /*
+             ....
+             */
+        }
+
+        public void handleZFocusScroll(V3d_View theView,
+                                                Aspect_ScrollDelta theParams)
+        {
+            if (!myToAllowZFocus
+             || !theView.Camera().IsStereo())
+            {
+                return;
+            }
+
+            double aFocus = theView.Camera().ZFocus() + (theParams.Delta > 0.0 ? 0.05 : -0.05);
+            if (aFocus > 0.2
+             && aFocus < 2.0)
+            {
+                theView.Camera().SetZFocus(theView.Camera().ZFocusType(), aFocus);
+                theView.Invalidate();
+            }
+        }
+
+        AIS_ViewInputBuffer myUI = new AIS_ViewInputBuffer();                       //!< buffer for UI thread
+        AIS_ViewInputBuffer myGL = new AIS_ViewInputBuffer();                       //!< buffer for rendering thread
 
 
         double myLastEventsTime;           //!< last fetched events timer value for computing delta/progress
@@ -401,7 +717,4 @@ namespace OCCPort
 
 
     }
-
-
-
 }

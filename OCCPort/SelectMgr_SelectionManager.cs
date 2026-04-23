@@ -1,6 +1,8 @@
-﻿using System;
+﻿using OCCPort;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Reflection.Metadata;
 using System.Security.Policy;
 
 namespace OCCPort
@@ -14,9 +16,58 @@ namespace OCCPort
             mySelector = (theSelector);
         }
 
+        //=======================================================================
+        //function : Update
+        //purpose  : Selections are recalculated if they are flagged
+        //           "TO RECALCULATE" and activated in one of selectors.
+        //           If ForceUpdate = True, and they are "TO RECALCULATE"
+        //           This is done without caring for the state of activation.
+        //=======================================================================
+        public void Update(SelectMgr_SelectableObject theObject,
+                                         bool theIsForce)
+        {
+            /*for (PrsMgr_ListOfPresentableObjectsIter aChildIter (theObject.Children()); aChildIter.More(); aChildIter.Next())
+            {
+                Update((SelectMgr_SelectableObject)(aChildIter.Value()), theIsForce);
+            }*/
+            if (!theObject.HasOwnPresentations())
+            {
+                return;
+            }
+
+            foreach (var item in theObject.Selections())
+            {
+                //SelectMgr_Selection aSelection = aSelIter.Value();
+                //if (theIsForce || mySelector.Status(aSelection) ==  SelectMgr_SOS_Activated)
+                //{
+                //    switch (aSelection.UpdateStatus())
+                //    {
+                //        case SelectMgr_TypeOfUpdate.SelectMgr_TOU_Full:
+                //            {
+                //                ClearSelectionStructures(theObject, aSelection.Mode());
+                //                theObject.RecomputePrimitives(aSelection.Mode()); // no break on purpose...
+                //                RestoreSelectionStructures(theObject, aSelection.Mode());
+                //                // pass through SelectMgr_TOU_Partial
+                //            }break;//???
+                //        //  Standard_FALLTHROUGH
+                //        case SelectMgr_TypeOfUpdate.SelectMgr_TOU_Partial:
+                //            {
+                //                theObject.UpdateTransformations(aSelection);
+                //                mySelector.RebuildObjectsTree();
+                //                break;
+                //            }
+                //        default:
+                //            break;
+                //    }
+                ///  aSelection.UpdateStatus(SelectMgr_TypeOfUpdate.SelectMgr_TOU_None);
+                //  aSelection.UpdateBVHStatus(SelectMgr_TypeOfBVHUpdate.SelectMgr_TBU_None);
+            }
+        }
+
+
         internal void Activate(AIS_InteractiveObject theIObj, int theSelectionMode)
         {
-            
+
         }
 
         internal bool Contains(SelectMgr_SelectableObject theObject)

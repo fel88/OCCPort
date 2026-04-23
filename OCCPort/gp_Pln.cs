@@ -3,13 +3,16 @@ using System;
 
 namespace OCCPort
 {
-    internal class gp_Pln
+    public class gp_Pln
     {
 
         //! Returns the local coordinate system of the plane .
         public gp_Ax3 Position() { return pos; }
 
         private gp_Ax3 pos;
+
+        //! Returns the plane's normal Axis.
+        public gp_Ax1 Axis()  { return pos.Axis(); }
 
         public gp_Pln(gp_Pnt P, gp_Dir V)
         {

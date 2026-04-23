@@ -14,22 +14,22 @@ namespace OCCPort.OpenGL
         static int THE_NB_UNROLLED_LIGHTS_MAX = 32;
         // This file has been automatically generated from resource file src/Shaders/TangentSpaceNormal.glsl
 
-        static string  Shaders_TangentSpaceNormal_glsl =
+        static string Shaders_TangentSpaceNormal_glsl =
           "//! Calculates transformation from tangent space and apply it to value from normal map to get normal in object space\n"
- +"vec3 TangentSpaceNormal (in mat2 theDeltaUVMatrix,\n"
-+  "                         in mat2x3 theDeltaVectorMatrix,\n"
-+  "                         in vec3 theNormalMapValue,\n"
-+  "                         in vec3 theNormal,\n"
-+  "                         in bool theIsInverse)\n"
-+  "{\n"
-+  "  theNormalMapValue = normalize(theNormalMapValue * 2.0 - vec3(1.0));\n"
-+  "  // Inverse matrix\n"
-+  "  theDeltaUVMatrix = mat2 (theDeltaUVMatrix[1][1], -theDeltaUVMatrix[0][1], -theDeltaUVMatrix[1][0], theDeltaUVMatrix[0][0]);\n"
-+  "  theDeltaVectorMatrix = theDeltaVectorMatrix * theDeltaUVMatrix;\n"
-+  "  // Gram-Schmidt orthogonalization\n"
-+  "  theDeltaVectorMatrix[1] = normalize(theDeltaVectorMatrix[1] - dot(theNormal, theDeltaVectorMatrix[1]) * theNormal);\n"
-+  "  theDeltaVectorMatrix[0] = cross(theDeltaVectorMatrix[1], theNormal);\n"
-+  "  float aDirection = theIsInverse ? -1.0 : 1.0;\n"
+ + "vec3 TangentSpaceNormal (in mat2 theDeltaUVMatrix,\n"
++ "                         in mat2x3 theDeltaVectorMatrix,\n"
++ "                         in vec3 theNormalMapValue,\n"
++ "                         in vec3 theNormal,\n"
++ "                         in bool theIsInverse)\n"
++ "{\n"
++ "  theNormalMapValue = normalize(theNormalMapValue * 2.0 - vec3(1.0));\n"
++ "  // Inverse matrix\n"
++ "  theDeltaUVMatrix = mat2 (theDeltaUVMatrix[1][1], -theDeltaUVMatrix[0][1], -theDeltaUVMatrix[1][0], theDeltaUVMatrix[0][0]);\n"
++ "  theDeltaVectorMatrix = theDeltaVectorMatrix * theDeltaUVMatrix;\n"
++ "  // Gram-Schmidt orthogonalization\n"
++ "  theDeltaVectorMatrix[1] = normalize(theDeltaVectorMatrix[1] - dot(theNormal, theDeltaVectorMatrix[1]) * theNormal);\n"
++ "  theDeltaVectorMatrix[0] = cross(theDeltaVectorMatrix[1], theNormal);\n"
++ "  float aDirection = theIsInverse ? -1.0 : 1.0;\n"
 + "  return mat3 (aDirection * theDeltaVectorMatrix[0], aDirection * theDeltaVectorMatrix[1], theNormal) * theNormalMapValue;\n"
  + "}\n";
 
@@ -172,7 +172,7 @@ namespace OCCPort.OpenGL
 "}";
 
 
-   
+
         protected OpenGl_ShaderProgramList myProgramList;        //!< The list of shader programs
 
         public virtual OpenGl_ShaderProgramList ShaderPrograms() { return myProgramList; }
@@ -335,7 +335,7 @@ namespace OCCPort.OpenGL
                         }
                         else
                         {
-                            Message.SendWarning("Warning: ignoring Normal Map texture in GLSL due to hardware capabilities");
+                            OCCPort. Message.SendWarning("Warning: ignoring Normal Map texture in GLSL due to hardware capabilities");
                         }
                     }
                     aProgramSrc.SetTextureSetBits((int)aTextureBits);

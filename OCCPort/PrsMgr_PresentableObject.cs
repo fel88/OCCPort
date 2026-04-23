@@ -1,25 +1,51 @@
 ﻿using OCCPort.Tester;
 using System;
+using System.Reflection.Metadata;
 
 namespace OCCPort
 {
     public abstract class PrsMgr_PresentableObject
     {
+        public virtual void ResetTransformation()
+        {
+            setLocalTransformation(null);
+        }
+        //! Sets local transformation to theTransformation.
+        //! Note that the local transformation of the object having Transformation Persistence
+        //! is applied within Local Coordinate system defined by this Persistence.
+        public void SetLocalTransformation(gp_Trsf theTrsf) { setLocalTransformation(new TopLoc_Datum3D(theTrsf)); }
+
+        public void setLocalTransformation(TopLoc_Datum3D theTransformation)
+        {
+            myLocalTransformation = theTransformation;
+            UpdateTransformation();
+        }
+
+        //! Returns parent of current object in scene hierarchy.
+        public PrsMgr_PresentableObject Parent() { return myParent; }
 
         public PrsMgr_PresentableObject()
         {
             myChildren = new PrsMgr_ListOfPresentableObjects();
         }
-
+        //! Get ID of Z layer for main presentation.
+        public Graphic3d_ZLayerId ZLayer() { return myDrawer.ZLayer(); }
         //! Return view affinity mask.
         public Graphic3d_ViewAffinity ViewAffinity() { return myViewAffinity; }
         //! Return presentations.
         public PrsMgr_Presentations Presentations() { return myPresentations; }
 
+        //! Returns true if object has a transformation that is different from the identity.
+        public bool HasTransformation() { return myTransformation != null && myTransformation.Form() != gp_TrsfForm.gp_Identity; }
+
         //! Returns the display mode setting of the Interactive Object.
         //! The range of supported display mode indexes should be specified within object definition and filtered by AccepDisplayMode().
         //! @sa AcceptDisplayMode()
         public int DisplayMode() { return myDrawer.DisplayMode(); }
+        //! Return the local transformation.
+        //! Note that the local transformation of the object having Transformation Persistence
+        //! is applied within Local Coordinate system defined by this Persistence.
+        public TopLoc_Datum3D LocalTransformationGeom() { return myLocalTransformation; }
 
         //! Sets the display mode for the interactive object.
         //! An object can have its own temporary display mode, which is different from that proposed by the interactive context.

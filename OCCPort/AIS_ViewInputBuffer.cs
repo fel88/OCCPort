@@ -2,6 +2,10 @@
 {
     public class AIS_ViewInputBuffer
     {
+
+        public bool IsNewGesture;     //!< transition from one action to another
+
+        public NCollection_Sequence<Aspect_ScrollDelta> ZoomActions = new NCollection_Sequence<Aspect_ScrollDelta>(); //!< the queue with zoom actions
         public struct _panningParams
         {
             public bool ToStart;    //!< start panning
@@ -52,16 +56,29 @@
 
         public _draggingParams Dragging;
 
+        public struct _orientation
+        {
+            public bool ToFitAll;         //!< perform FitAll operation
+            public bool ToSetViewOrient;  //!< set new view orientation
+            public V3d_TypeOfOrientation ViewOrient;       //!< new view orientation
+
+            public _orientation()
+            {
+                //ToFitAll(false), ToSetViewOrient(false),
+                ViewOrient = V3d_TypeOfOrientation.V3d_Xpos;
+            }
+        }
+        public _orientation Orientation;
 
         //! Reset events buffer.
         public void Reset()
         {
-            /*  Orientation.ToFitAll = false;
-              Orientation.ToSetViewOrient = false;
-              MoveTo.ToHilight = false;
-              Selection.ToApplyTool = false;
-              IsNewGesture = false;
-              ZoomActions.Clear();*/
+            Orientation.ToFitAll = false;
+            Orientation.ToSetViewOrient = false;
+            //MoveTo.ToHilight = false;
+            //Selection.ToApplyTool = false;
+            IsNewGesture = false;
+            ZoomActions.Clear();
             Panning.ToStart = false;
             Panning.ToPan = false;
             Dragging.ToStart = false;

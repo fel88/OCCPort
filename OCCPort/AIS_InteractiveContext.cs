@@ -165,7 +165,46 @@ namespace OCCPort
 
         //! Returns the current viewer.
         public V3d_Viewer CurrentViewer() { return myMainVwr; }
+        public void SetLocation(AIS_InteractiveObject theIObj,
+                                           TopLoc_Location theLoc)
+        {
+            if (theIObj == null)
+            {
+                return;
+            }
 
+            if (theIObj.HasTransformation()
+             && theLoc.IsIdentity())
+            {
+                theIObj.ResetTransformation();
+                mgrSelector.Update(theIObj, false);
+                return;
+            }
+            else if (theLoc.IsIdentity())
+            {
+                return;
+            }
+
+            // first reset the previous location to properly clean everything...
+            if (theIObj.HasTransformation())
+            {
+                theIObj.ResetTransformation();
+            }
+
+            theIObj.SetLocalTransformation(theLoc.Transformation());
+
+            mgrSelector.Update(theIObj, false);
+
+            // if the object or its part is highlighted dynamically, it is necessary to apply location transformation
+            // to its highlight structure immediately
+            if (myLastPicked != null && myLastPicked.IsSameSelectable(theIObj))
+            {
+                int aHiMod = theIObj.HasHilightMode() ? theIObj.HilightMode() : 0;
+                myLastPicked.UpdateHighlightTrsf(myMainVwr,
+                                                   myMainPM,
+                                                   aHiMod);
+            }
+        }
 
         SelectMgr_SelectionManager mgrSelector;
         public StdSelect_ViewerSelector3d MainSelector()

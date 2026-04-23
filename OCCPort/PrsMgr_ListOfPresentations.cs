@@ -1,6 +1,12 @@
-﻿namespace OCCPort
+﻿using System.Collections.Generic;
+
+namespace OCCPort
 {
-	internal class PrsMgr_ListOfPresentations
+	public class PrsMgr_ListOfPresentations:List<Graphic3d_Structure>
 	{
+		public bool IsEmpty()
+		{
+			return Count == 0;
+		}
 	}
 }

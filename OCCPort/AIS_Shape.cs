@@ -98,6 +98,67 @@ namespace OCCPort.Tester
         //! Returns this shape object.
         public TopoDS_Shape Shape() { return myshape; }
 
+        //! Return shape type for specified selection mode.
+        public static TopAbs_ShapeEnum SelectionType(int theSelMode)
+        {
+            switch (theSelMode)
+            {
+                case 1: return TopAbs_ShapeEnum. TopAbs_VERTEX;
+                case 2: return TopAbs_ShapeEnum.TopAbs_EDGE;
+                case 3: return TopAbs_ShapeEnum.TopAbs_WIRE;
+                case 4: return TopAbs_ShapeEnum.TopAbs_FACE;
+                case 5: return TopAbs_ShapeEnum.TopAbs_SHELL;
+                case 6: return TopAbs_ShapeEnum.TopAbs_SOLID;
+                case 7: return TopAbs_ShapeEnum.TopAbs_COMPSOLID;
+                case 8: return TopAbs_ShapeEnum.TopAbs_COMPOUND;
+                case 0: return TopAbs_ShapeEnum.TopAbs_SHAPE;
+            }
+            return TopAbs_ShapeEnum.TopAbs_SHAPE;
+        }
+
+        public override void ComputeSelection(SelectMgr_Selection theSelection, int aMode)
+        {
+            if (myshape.IsNull()) return;
+            if (myshape.ShapeType() == TopAbs_ShapeEnum.TopAbs_COMPOUND && myshape.NbChildren() == 0)
+            {
+                // empty Shape -> empty Assembly.
+                return;
+            }
+
+            TopAbs_ShapeEnum TypOfSel = SelectionType(aMode);
+            TopoDS_Shape shape = myshape;
+
+            // POP protection against crash in low layers
+
+            double aDeflection = StdPrs_ToolTriangulatedShape.GetDeflection(shape, myDrawer);
+            //try
+            //{
+            //    //OCC_CATCH_SIGNALS
+            //    StdSelect_BRepSelectionTool.Load(aSelection,
+            //                                      this,
+            //                                      shape,
+            //                                      TypOfSel,
+            //                                      aDeflection,
+            //                                      myDrawer->DeviationAngle(),
+            //                                      myDrawer->IsAutoTriangulation());
+            //}
+            //catch (Standard_Failure anException)
+            //{
+            //    Message.SendFail(("Error: AIS_Shape::ComputeSelection(") + aMode + ") has failed ("
+            //                     + anException.Message + ")");
+            //    if (aMode == 0)
+            //    {
+            //        aSelection.Clear();
+            //        Bnd_Box B = BoundingBox();
+            //        Handle(StdSelect_BRepOwner) aOwner = new StdSelect_BRepOwner(shape, this);
+            //        Handle(Select3D_SensitiveBox) aSensitiveBox = new Select3D_SensitiveBox(aOwner, B);
+            //        aSelection->Add(aSensitiveBox);
+            //    }
+            //}
+
+            //// insert the drawer in the BrepOwners for hilight...
+            //StdSelect.SetDrawerForBRepOwner(aSelection, myDrawer);
+        }
 
         protected TopoDS_Shape myshape;    //!< shape to display
 

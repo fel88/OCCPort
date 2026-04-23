@@ -1,6 +1,13 @@
-﻿namespace OCCPort
+﻿using System;
+using System.Collections.Generic;
+
+namespace OCCPort
 {
-	internal class SelectMgr_SequenceOfSelection
-	{
-	}
+    public class SelectMgr_SequenceOfSelection : List<SelectMgr_Selection>
+    {
+        public void Append(SelectMgr_Selection aNewSel)
+        {
+            Add(aNewSel);
+        }
+    }
 }

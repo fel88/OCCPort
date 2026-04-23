@@ -13,17 +13,17 @@ namespace OCCPort
             loc = new gp_XYZ(0.0, 0.0, 0.0);
         }
 
-		public gp_Trsf(gp_Trsf t)
-		{
-			scale = (1.0);
-			shape = gp_TrsfForm.gp_Identity;
-			matrix = new gp_Mat ( t.matrix);
-			loc = t.loc;
-		}
+        public gp_Trsf(gp_Trsf t)
+        {
+            scale = (1.0);
+            shape = gp_TrsfForm.gp_Identity;
+            matrix = new gp_Mat(t.matrix);
+            loc = t.loc;
+        }
 
         private double scale;
         private gp_TrsfForm shape;
-		public gp_Mat matrix;
+        public gp_Mat matrix;
         private gp_XYZ loc;
 
         //! Returns the nature of the transformation. It can be: an
@@ -31,17 +31,17 @@ namespace OCCPort
         //! transformation (relative to a point, an axis or a plane), a
         //! scaling transformation, or a compound transformation.
         public gp_TrsfForm Form() { return shape; }
-		public static gp_Trsf operator *(gp_Trsf v, gp_Trsf theT)
-		{
-			return v.Multiplied(theT);
-		}
+        public static gp_Trsf operator *(gp_Trsf v, gp_Trsf theT)
+        {
+            return v.Multiplied(theT);
+        }
 
-		private gp_Trsf Multiplied(gp_Trsf theT)
-		{
-			gp_Trsf aTresult = (gp_Trsf)this.MemberwiseClone();
-			aTresult.Multiply(theT);
-			return aTresult;
-		}
+        private gp_Trsf Multiplied(gp_Trsf theT)
+        {
+            gp_Trsf aTresult = (gp_Trsf)this.MemberwiseClone();
+            aTresult.Multiply(theT);
+            return aTresult;
+        }
 
         internal void Multiply(gp_Trsf T)
         {
@@ -214,7 +214,15 @@ namespace OCCPort
             matrix.SetIdentity();
             loc = theV.XYZ();
         }
-
+        //=======================================================================
+        public void SetTranslation(gp_Pnt theP1,
+                                      gp_Pnt theP2)
+        {
+            shape =gp_TrsfForm. gp_Translation;
+            scale = 1.0;
+            matrix.SetIdentity();
+            loc = (theP2.XYZ()).Subtracted(theP1.XYZ());
+        }
         //! Returns true if the determinant of the vectorial part of
         //! this transformation is negative.
         public bool IsNegative() { return (scale < 0.0); }
@@ -233,14 +241,24 @@ namespace OCCPort
 
         }
 
-		internal gp_GTrsf Inverted()
-		{
-			throw new NotImplementedException();
-		}
-
-        internal object VectorialPart()
+        internal gp_GTrsf Inverted()
         {
             throw new NotImplementedException();
+        }
+
+        public gp_Mat VectorialPart()
+        {
+            if (scale == 1.0)
+                return matrix;
+
+            gp_Mat M = matrix;
+            if (shape == gp_TrsfForm.gp_Scale || shape == gp_TrsfForm.gp_PntMirror)
+                M.SetDiagonal(scale * M.Value(1, 1),
+                              scale * M.Value(2, 2),
+                              scale * M.Value(3, 3));
+            else
+                M.Multiply(scale);
+            return M;
         }
 
         internal void Invert()

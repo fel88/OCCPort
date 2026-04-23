@@ -6,8 +6,13 @@ using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace OCCPort
-{
-	public class Quantity_Color
+{//! This class allows the definition of an RGB color as triplet of 3 normalized floating point values (red, green, blue).
+ //!
+ //! Although Quantity_Color can be technically used for pass-through storage of RGB triplet in any color space,
+ //! other OCCT interfaces taking/returning Quantity_Color would expect them in linear space.
+ //! Therefore, take a look into methods converting to and from non-linear sRGB color space, if needed;
+ //! for instance, application usually providing color picking within 0..255 range in sRGB color space.
+    public class Quantity_Color
 	{
 		//! Creates the color from enumeration value.
 		public Quantity_Color(Quantity_NameOfColor theName)

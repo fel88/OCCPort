@@ -14,6 +14,36 @@ namespace OCCPort
             aV.coord.Multiply(theScalar);
             return aV;
         }
+        public void Rotate(gp_Ax1 theA1, double theAng)
+        {
+            gp_Trsf aT = new gp_Trsf();
+            aT.SetRotation(theA1, theAng);
+            coord.Multiply(aT.VectorialPart());
+        }
+
+        //! Returns True if Angle(<me>, theOther) <= theAngularTolerance or
+        //! PI - Angle(<me>, theOther) <= theAngularTolerance
+        //! This definition means that two parallel vectors cannot define
+        //! a plane but two vectors with opposite directions are considered
+        //! as parallel. Raises VectorWithNullMagnitude if <me>.Magnitude() <= Resolution or
+        //! Other.Magnitude() <= Resolution from gp
+        public bool IsParallel(gp_Vec theOther, double theAngularTolerance)
+        {
+            double anAng = Angle(theOther);
+            return anAng <= theAngularTolerance || Math.PI - anAng <= theAngularTolerance;
+        }
+        public double Angle(gp_Vec theOther)
+        {
+            gp_VectorWithNullMagnitude_Raise_if(coord.Modulus() <= gp.Resolution() ||
+                                                 theOther.coord.Modulus() <= gp.Resolution(), " ");
+            return (new gp_Dir(coord)).Angle(theOther.To_gp_Dir());
+        }
+
+        private void gp_VectorWithNullMagnitude_Raise_if(bool v1, string v2)
+        {
+            if (v1)
+                throw new Exception(v2);
+        }
 
         //! computes the scalar product
         public double Dot(gp_Vec theOther) { return coord.Dot(theOther.coord); }
@@ -39,9 +69,28 @@ namespace OCCPort
         {
             return v.Multiplied(theScalar);
         }
+        public static gp_Vec operator ^(gp_Vec v, gp_Vec theRight)
+        {
+            return v.Crossed(theRight);
+        }  //! computes the cross product between two vectors
+        public gp_Vec Crossed(gp_Vec theRight)
+        {
+            this.coord.Cross(theRight.coord);
+            return this;
+        }
         public static gp_Vec operator *(double theScalar, gp_Vec v)
         {
             return v.Multiplied(theScalar);
+        }
+        public static gp_Vec operator -(gp_Vec f)
+        {
+            return f.Reversed();
+        }
+        //! Reverses the direction of a vector
+        public gp_Vec Reversed()
+        {
+            this.coord.Reverse();
+            return this;
         }
 
         public static gp_Vec operator +(gp_Vec v, gp_Vec theOther)

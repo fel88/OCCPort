@@ -3,7 +3,9 @@ using System;
 using System.Runtime.InteropServices;
 
 namespace OCCPort
-{
+{//! A graphic attribute manager which governs how
+ //! objects such as color, width, line thickness and deflection are displayed.
+ //! A drawer includes an instance of the Aspect classes with particular default values.
     public class Prs3d_Drawer : Graphic3d_PresentationAttributes
     {
         public Prs3d_Drawer()
@@ -279,8 +281,7 @@ namespace OCCPort
 			 }*/
             return true;
         }
-        //! Sets presentation Zlayer.
-        public virtual void SetZLayer(Graphic3d_ZLayerId theLayer) { myZLayer = theLayer; }
+
         Graphic3d_ZLayerId myZLayer;              //!< Z-layer
                                                   //! Sets theDrawer as a link to which the current object references.
         public void Link(Prs3d_Drawer theDrawer)
@@ -521,24 +522,24 @@ namespace OCCPort
     //! to indicate the continuity of its derivatives up to the order
     //! i in the u parametric direction, and j in the v parametric direction.
     public enum GeomAbs_Shape
-{
-    GeomAbs_C0,
-    GeomAbs_G1,
-    GeomAbs_C1,
-    GeomAbs_G2,
-    GeomAbs_C2,
-    GeomAbs_C3,
-    GeomAbs_CN
-}
-//! Describes supported modes of visualization of the shape's vertices:
-//! VDM_Isolated  - only isolated vertices (not belonging to a face) are displayed.
-//! VDM_All       - all vertices of the shape are displayed.
-//! VDM_Inherited - the global settings are inherited and applied to the shape's presentation.
-public enum Prs3d_VertexDrawMode
-{
-    Prs3d_VDM_Isolated,
-    Prs3d_VDM_All,
-    Prs3d_VDM_Inherited
-}
+    {
+        GeomAbs_C0,
+        GeomAbs_G1,
+        GeomAbs_C1,
+        GeomAbs_G2,
+        GeomAbs_C2,
+        GeomAbs_C3,
+        GeomAbs_CN
+    }
+    //! Describes supported modes of visualization of the shape's vertices:
+    //! VDM_Isolated  - only isolated vertices (not belonging to a face) are displayed.
+    //! VDM_All       - all vertices of the shape are displayed.
+    //! VDM_Inherited - the global settings are inherited and applied to the shape's presentation.
+    public enum Prs3d_VertexDrawMode
+    {
+        Prs3d_VDM_Isolated,
+        Prs3d_VDM_All,
+        Prs3d_VDM_Inherited
+    }
 
 }

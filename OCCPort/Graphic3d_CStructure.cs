@@ -1,5 +1,6 @@
 ﻿using OCCPort.Tester;
 using System;
+using System.Reflection.Metadata;
 
 
 namespace OCCPort
@@ -10,8 +11,12 @@ namespace OCCPort
         internal int highlight;
         public int visible;
         int myId;
+        TopLoc_Datum3D         myTrsf;
+
         //! Return structure visibility flag
         public bool IsVisible() { return visible != 0; }
+        //! Assign transformation.
+       public  virtual void SetTransformation( TopLoc_Datum3D theTrsf) { myTrsf = theTrsf; }
 
         public bool IsInfinite { get; internal set; }
         public bool IsForHighlight;

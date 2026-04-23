@@ -26,6 +26,20 @@ namespace OCCPort
             myMat[2][2] = theA33;
         }
 
+        //! Modifies the main diagonal of the matrix.
+        //! @code
+        //! <me>.Value (1, 1) = theX1
+        //! <me>.Value (2, 2) = theX2
+        //! <me>.Value (3, 3) = theX3
+        //! @endcode
+        //! The other coefficients of the matrix are not modified.
+        public void SetDiagonal(double theX1, double theX2, double theX3)
+        {
+            myMat[0][0] = theX1;
+            myMat[1][1] = theX2;
+            myMat[2][2] = theX3;
+        }
+
         public gp_Mat()
         {
             for (int i = 0; i < 3; i++)
@@ -37,10 +51,10 @@ namespace OCCPort
             myMat[2][0] = myMat[2][1] = myMat[2][2] = 0.0;
         }
 
-		public gp_Mat(gp_Mat matrix)
-		{
-            myMat = (double[][])matrix.myMat.Clone();            
-		}
+        public gp_Mat(gp_Mat matrix)
+        {
+            myMat = (double[][])matrix.myMat.Clone();
+        }
 
         internal void Multiply(gp_Mat theOther)
         {

@@ -2,7 +2,7 @@
 {
     //! Definition of the Trihedron position in the views.
     //! It is defined as a bitmask to simplify handling vertical and horizontal alignment independently.
-    enum Aspect_TypeOfTriedronPosition
+  public  enum Aspect_TypeOfTriedronPosition
     {
         Aspect_TOTP_CENTER = 0x0000,             //!< at the center of the view
         Aspect_TOTP_TOP = 0x0001,             //!< at the middle of the top    side

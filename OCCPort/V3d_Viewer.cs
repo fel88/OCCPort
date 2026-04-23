@@ -55,8 +55,13 @@ namespace OCCPort
 
         V3d_TypeOfView myDefaultTypeOfView;
         Graphic3d_StructureManager myStructureManager;
+        public Graphic3d_ZLayerSettings ZLayerSettings(Graphic3d_ZLayerId theLayerId)
+        {
+            return myDriver.ZLayerSettings(theLayerId);
+        }
+        //! Return an iterator for active views.
+       public V3d_ListOfViewIterator ActiveViewIterator()  { return new V3d_ListOfViewIterator(myActiveViews); }
 
-        
         public void AddView(V3d_View theView)
         {
             if (!myDefinedViews.Contains(theView))
@@ -105,7 +110,7 @@ namespace OCCPort
         }
         V3d_ListOfLight myActiveLights = new V3d_ListOfLight();
 
-        V3d_ListOfView myActiveViews = new V3d_ListOfView();
+        public V3d_ListOfView myActiveViews = new V3d_ListOfView();
 
 
         internal void SetViewOn(V3d_View theView)

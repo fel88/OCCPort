@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Reflection.Metadata;
 using System.Security.AccessControl;
 using System.Security.Cryptography;
@@ -26,6 +27,20 @@ namespace OCCPort
     //! View->Move(15.,-5.,0.,False)    (Next motion)
     public class V3d_View
     {
+        public void SetComputedMode(bool theMode)
+        {
+            if (theMode)
+            {
+                if (myComputedMode)
+                {
+                    myView.SetComputedMode(true);
+                }
+            }
+            else
+            {
+                myView.SetComputedMode(false);
+            }
+        }
 
         public V3d_Viewer MyViewer;
 
@@ -456,7 +471,7 @@ namespace OCCPort
             Invalidate();
         }
 
-        private void Invalidate()
+        public void Invalidate()
         {
             if (!myView.IsDefined())
             {
@@ -1067,5 +1082,51 @@ namespace OCCPort
             AutoZFit();
             myView.Redraw();
         }
+
+        public void FitAll(double theMargin, bool theToUpdate)
+        {
+            FitAll(myView.MinMaxValues(), theMargin, theToUpdate);
+        }
+
+        // =======================================================================
+        // function : FitMinMax
+        // purpose  : Internal
+        // =======================================================================
+        public bool FitMinMax(Graphic3d_Camera theCamera,
+                                      Bnd_Box theBox,
+                                      double theMargin,
+                                      double theResolution,
+                                      bool theToEnlargeIfLine = true)
+        {
+            if (!theCamera.FitMinMax(theBox, theResolution, theToEnlargeIfLine))
+            {
+                return false; // bounding box is out of bounds...
+            }
+
+            double aZoomCoef = myView.ConsiderZoomPersistenceObjects();
+            Scale(theCamera, theCamera.ViewDimensions().X() * (aZoomCoef + theMargin), theCamera.ViewDimensions().Y() * (aZoomCoef + theMargin));
+            return true;
+        }
+
+        public void FitAll(Bnd_Box theBox, double theMargin, bool theToUpdate)
+        {
+            new Standard_ASSERT_RAISE(theMargin >= 0.0 && theMargin < 1.0, "Invalid margin coefficient");
+
+            if (myView.NumberOfDisplayedStructures() == 0)
+            {
+                return;
+            }
+
+            if (!FitMinMax(Camera(), theBox, theMargin, 10.0 * Precision.Confusion()))
+            {
+                return;
+            }
+
+            if (myImmediateUpdate || theToUpdate)
+            {
+                Update();
+            }
+        }
+
     }
 }

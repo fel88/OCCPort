@@ -39,6 +39,9 @@ namespace OCCPort
     public struct gp_Ax3
     {
 
+        //! Returns the main axis of <me>. It is the "Location" point
+        //! and the main "Direction".
+        public  gp_Ax1 Axis()  { return axis; }
 
         //! Creates an object corresponding to the reference
         //! coordinate system (OXYZ).

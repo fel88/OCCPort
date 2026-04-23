@@ -2,12 +2,12 @@
 
 namespace OCCPort
 {
-    public class NCollection_Vec2
+    public class NCollection_Vec2<T>
 	{
 		//! Per-component constructor.
-		public NCollection_Vec2(double theX,
+		public NCollection_Vec2(T theX,
 
-							  double theY)
+							  T theY)
 		{
 
 			v[0] = theX;
@@ -19,11 +19,11 @@ namespace OCCPort
 
 		}
 		//! Alias to 1st component as X coordinate in XY.
-		public double x() { return v[0]; }
+		public T x() { return v[0]; }
 
 		//! Alias to 2nd component as Y coordinate in XY.
-		public double y() { return v[1]; }
+		public T y() { return v[1]; }
 
-		double[] v = new double[2];
+		T[] v = new T[2];
 	}
 }
