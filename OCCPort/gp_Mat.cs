@@ -25,6 +25,40 @@ namespace OCCPort
             myMat[2][1] = theA32;
             myMat[2][2] = theA33;
         }
+        public void Transpose()
+        {
+            double aTemp;
+            aTemp = myMat[0][1];
+            myMat[0][1] = myMat[1][0];
+            myMat[1][0] = aTemp;
+            aTemp = myMat[0][2];
+            myMat[0][2] = myMat[2][0];
+            myMat[2][0] = aTemp;
+            aTemp = myMat[1][2];
+            myMat[1][2] = myMat[2][1];
+            myMat[2][1] = aTemp;
+        }
+        public void PreMultiply(gp_Mat theOther)
+        {
+           double aT00 = theOther.myMat[0][0] * myMat[0][0] + theOther.myMat[0][1] * myMat[1][0] + theOther.myMat[0][2] * myMat[2][0];
+           double aT01 = theOther.myMat[0][0] * myMat[0][1] + theOther.myMat[0][1] * myMat[1][1] + theOther.myMat[0][2] * myMat[2][1];
+           double aT02 = theOther.myMat[0][0] * myMat[0][2] + theOther.myMat[0][1] * myMat[1][2] + theOther.myMat[0][2] * myMat[2][2];
+           double aT10 = theOther.myMat[1][0] * myMat[0][0] + theOther.myMat[1][1] * myMat[1][0] + theOther.myMat[1][2] * myMat[2][0];
+           double aT11 = theOther.myMat[1][0] * myMat[0][1] + theOther.myMat[1][1] * myMat[1][1] + theOther.myMat[1][2] * myMat[2][1];
+           double aT12 = theOther.myMat[1][0] * myMat[0][2] + theOther.myMat[1][1] * myMat[1][2] + theOther.myMat[1][2] * myMat[2][2];
+           double aT20 = theOther.myMat[2][0] * myMat[0][0] + theOther.myMat[2][1] * myMat[1][0] + theOther.myMat[2][2] * myMat[2][0];
+           double aT21 = theOther.myMat[2][0] * myMat[0][1] + theOther.myMat[2][1] * myMat[1][1] + theOther.myMat[2][2] * myMat[2][1];
+           double aT22 = theOther.myMat[2][0] * myMat[0][2] + theOther.myMat[2][1] * myMat[1][2] + theOther.myMat[2][2] * myMat[2][2];
+            myMat[0][0] = aT00;
+            myMat[0][1] = aT01;
+            myMat[0][2] = aT02;
+            myMat[1][0] = aT10;
+            myMat[1][1] = aT11;
+            myMat[1][2] = aT12;
+            myMat[2][0] = aT20;
+            myMat[2][1] = aT21;
+            myMat[2][2] = aT22;
+        }
 
         //! Modifies the main diagonal of the matrix.
         //! @code

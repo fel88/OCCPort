@@ -29,7 +29,7 @@ namespace OCCPort
 		public static int NbUSamples(Adaptor3d_Surface S)
 		{
 			int N;
-			GeomAbs_SurfaceType Type = S.GetType();
+			GeomAbs_SurfaceType Type = S._GetType();
 			switch (Type)
 			{
 				case GeomAbs_SurfaceType.GeomAbs_BezierSurface:
@@ -59,7 +59,7 @@ namespace OCCPort
 		public static int NbVSamples(Adaptor3d_Surface S)
 		{
 			int N;
-			GeomAbs_SurfaceType Type = S.GetType();
+			GeomAbs_SurfaceType Type = S._GetType();
 			switch (Type)
 			{
 				case GeomAbs_SurfaceType.GeomAbs_BezierSurface:
@@ -93,7 +93,7 @@ namespace OCCPort
 				double Tol,
 				Bnd_Box B)
 		{
-			GeomAbs_SurfaceType Type = S.GetType(); // skv OCC6503
+			GeomAbs_SurfaceType Type = S._GetType(); // skv OCC6503
 
 			if (Precision.IsInfinite(VMin) ||
 				Precision.IsInfinite(VMax) ||

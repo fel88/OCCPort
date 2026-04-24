@@ -1,4 +1,6 @@
-﻿namespace OCCPort
+﻿using System.Reflection.Metadata;
+
+namespace OCCPort
 {
     //! The abstract class Geometry for 3D space is the root
     //! class of all geometric objects from the Geom
@@ -25,6 +27,15 @@
             G.Transform(T);
             return G;
         }
+
+        Geom_Surface basisSurf;
+        Geom_Surface equivSurf;
+        double offsetValue;
+
+        //! Returns the basis surface of this offset surface.
+        //! Note: The basis surface can be an offset surface.
+        public virtual Geom_Surface BasisSurface()
+        { return basisSurf; }
 
         public abstract void Transform(gp_Trsf t);
 

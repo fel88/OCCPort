@@ -13,17 +13,14 @@ namespace OCCPort
     //! Polynomial coefficients of BSpline curves used for their evaluation are
     //! cached for better performance. Therefore these evaluations are not
     //! thread-safe and parallel evaluations need to be prevented.
-    public class Adaptor2d_Curve2d
+    public abstract class Adaptor2d_Curve2d
     {
-        public virtual GeomAbs_CurveType _GetType()
-        {
-            throw new Standard_NotImplemented("Adaptor2d_Curve2d::GetType");
-        }
+        public abstract GeomAbs_CurveType _GetType();
+        public abstract gp_Lin2d Line();
 
-        public virtual gp_Lin2d Line()
+        internal Adaptor2d_Curve2d Trim(double myFirst, double myLast, double v)
         {
-            throw new Standard_NotImplemented("Adaptor2d_Curve2d::Line");
+            throw new NotImplementedException();
         }
-
     }
 }

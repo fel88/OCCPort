@@ -2,14 +2,15 @@
 
 namespace OCCPort
 {
+    //! Root class for the curve representations. Contains
     //! a location.
-
     public abstract class BRep_CurveRepresentation
     {
         public virtual Geom_Curve Curve3D()
         {
             throw new Standard_DomainError("BRep_CurveRepresentation");
         }
+
         public virtual bool IsRegularity()
         {
             return false;
@@ -76,8 +77,11 @@ namespace OCCPort
             myLocation = L;
         }
 
-        TopLoc_Location myLocation;
+        TopLoc_Location myLocation = new TopLoc_Location();
 
-
+        protected BRep_CurveRepresentation(TopLoc_Location L)
+        {
+            myLocation = (L);
+        }
     }
 }

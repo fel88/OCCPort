@@ -32,8 +32,8 @@ namespace OCCPort
         //! Returns the parametric bounds U1, U2, V1 and V2 of this surface.
         //! If the surface is infinite, this function can return a value
         //! equal to Precision::Infinite: instead of Standard_Real::LastReal.
-        public abstract void Bounds(ref double U1, ref double U2, 
-            ref double V1, ref double V2);
+        public abstract void Bounds(out double U1, out double U2,
+            out double V1, out double V2);
 
     }
 

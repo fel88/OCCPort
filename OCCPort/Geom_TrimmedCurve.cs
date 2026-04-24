@@ -38,7 +38,7 @@ namespace OCCPort
             uTrim1 = (U1);
             uTrim2 = (U2);
             // kill trimmed basis curves
-            Geom_TrimmedCurve T = (Geom_TrimmedCurve)(C);
+            Geom_TrimmedCurve T = C as Geom_TrimmedCurve;
             if (T != null)
                 basisCurve = (Geom_Curve)(T.BasisCurve().Copy());
             else
@@ -57,7 +57,7 @@ namespace OCCPort
                 throw new Standard_ConstructionError("Geom_TrimmedCurve::U1 == U2");
 
             double Udeb = basisCurve.FirstParameter();
-            double  Ufin = basisCurve.LastParameter();
+            double Ufin = basisCurve.LastParameter();
 
             if (basisCurve.IsPeriodic())
             {
@@ -69,8 +69,8 @@ namespace OCCPort
                 uTrim2 = U2;
                 if (theAdjustPeriodic)
                     ElCLib.AdjustPeriodic(Udeb, Ufin,
-                                          Math. Min(Math.Abs(uTrim2 - uTrim1) / 2, Precision.PConfusion()),
-                                          ref uTrim1,ref uTrim2);
+                                          Math.Min(Math.Abs(uTrim2 - uTrim1) / 2, Precision.PConfusion()),
+                                          ref uTrim1, ref uTrim2);
             }
 
             else
@@ -137,7 +137,7 @@ namespace OCCPort
             throw new NotImplementedException();
         }
 
-        
+
 
         public override double ReversedParameter(double U)
         {

@@ -5,6 +5,11 @@ namespace OCCPort
     internal class Geom_Plane : Geom_ElementarySurface
     {
 
+        public gp_Pln Pln()
+        {
+
+            return new gp_Pln(Position());
+        }
 
         public Geom_Plane(gp_Pln Pl)
         {
@@ -29,7 +34,7 @@ namespace OCCPort
             pos = A3;
         }
 
-        public override void Bounds(ref double U1, ref double U2, ref double V1, ref double V2)
+        public override void Bounds(out double U1, out double U2, out double V1, out double V2)
         {
             U1 = -Precision.Infinite();
             U2 = Precision.Infinite();

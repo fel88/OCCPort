@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection.Metadata;
 
 namespace OCCPort
 {
@@ -37,9 +38,44 @@ namespace OCCPort
             Load(S);
             Perform(C);
         }
+
+        public override gp_Lin2d Line()
+        {
+            throw new NotImplementedException();
+        }
+
         public void Load(Adaptor3d_Surface S)
         {
             mySurface = S;
+        }
+        public static void Project(ProjLib_Projector P, Adaptor3d_Curve C)
+        {
+            GeomAbs_CurveType CType = C._GetType();
+            switch (CType)
+            {
+                case GeomAbs_CurveType.GeomAbs_Line:
+                    P.Project(C.Line());
+                    break;
+                //case GeomAbs_Circle:
+                //    P.Project(C->Circle());
+                //    break;
+                //case GeomAbs_Ellipse:
+                //    P.Project(C->Ellipse());
+                //    break;
+                //case GeomAbs_Hyperbola:
+                //    P.Project(C->Hyperbola());
+                //    break;
+                //case GeomAbs_Parabola:
+                //    P.Project(C->Parabola());
+                //    break;
+                //case GeomAbs_BSplineCurve:
+                //case GeomAbs_BezierCurve:
+                //case GeomAbs_OffsetCurve:
+                //case GeomAbs_OtherCurve:    // try the approximation
+                //    break;
+                default:
+                    throw new Standard_NoSuchObject(" ");
+            }
         }
 
         public void Perform(Adaptor3d_Curve C)
@@ -48,8 +84,8 @@ namespace OCCPort
             myCurve = C;
             double FirstPar = C.FirstParameter();
             double LastPar = C.LastParameter();
-            GeomAbs_SurfaceType SType = mySurface.GetType();
-            GeomAbs_CurveType CType = myCurve.GetType();
+            GeomAbs_SurfaceType SType = mySurface._GetType();
+            GeomAbs_CurveType CType = myCurve._GetType();
             bool isAnalyticalSurf = true;
             bool[] IsTrimmed = { false, false };
             int[] SingularCase = new int[2];
@@ -66,324 +102,323 @@ namespace OCCPort
             {
                 case GeomAbs_SurfaceType.GeomAbs_Plane:
                     {
-                        //ProjLib_Plane P = new ProjLib_Plane(mySurface.Plane());
-                        //Project(P, myCurve);
-                        //myResult = P;
+                        ProjLib_Plane P = new ProjLib_Plane(mySurface.Plane());
+                        Project(P, myCurve);
+                        myResult = P;
                     }
                     break;
 
-                    //case GeomAbs_Cylinder:
-                    //	{
-                    //		ProjLib_Cylinder P(mySurface->Cylinder());
-                    //		Project(P, myCurve);
-                    //		myResult = P;
-                    //	}
-                    //	break;
+                //case GeomAbs_Cylinder:
+                //	{
+                //		ProjLib_Cylinder P(mySurface->Cylinder());
+                //		Project(P, myCurve);
+                //		myResult = P;
+                //	}
+                //	break;
 
 
-                    //case GeomAbs_Cone:
-                    //	{
-                    //		ProjLib_Cone P(mySurface->Cone());
-                    //		Project(P, myCurve);
-                    //		myResult = P;
-                    //	}
-                    //	break;
+                //case GeomAbs_Cone:
+                //	{
+                //		ProjLib_Cone P(mySurface->Cone());
+                //		Project(P, myCurve);
+                //		myResult = P;
+                //	}
+                //	break;
 
-                    //case GeomAbs_Sphere:
-                    //	{
-                    //		ProjLib_Sphere P(mySurface->Sphere());
-                    //		Project(P, myCurve);
-                    //		if (P.IsDone())
-                    //		{
-                    //			// on met dans la pseudo-periode ( car Sphere n'est pas
-                    //			// periodique en V !)
-                    //			P.SetInBounds(myCurve->FirstParameter());
-                    //		}
-                    //		else
-                    //		{
-                    //			const Standard_Real Vmax = M_PI / 2.;
-                    //			const Standard_Real Vmin = -Vmax;
-                    //			const Standard_Real minang = 1.e - 5 * M_PI;
-                    //			gp_Sphere aSph = mySurface->Sphere();
-                    //			Standard_Real anR = aSph.Radius();
-                    //			Standard_Real f = myCurve->FirstParameter();
-                    //			Standard_Real l = myCurve->LastParameter();
+                //case GeomAbs_Sphere:
+                //	{
+                //		ProjLib_Sphere P(mySurface->Sphere());
+                //		Project(P, myCurve);
+                //		if (P.IsDone())
+                //		{
+                //			// on met dans la pseudo-periode ( car Sphere n'est pas
+                //			// periodique en V !)
+                //			P.SetInBounds(myCurve->FirstParameter());
+                //		}
+                //		else
+                //		{
+                //			const Standard_Real Vmax = M_PI / 2.;
+                //			const Standard_Real Vmin = -Vmax;
+                //			const Standard_Real minang = 1.e - 5 * M_PI;
+                //			gp_Sphere aSph = mySurface->Sphere();
+                //			Standard_Real anR = aSph.Radius();
+                //			Standard_Real f = myCurve->FirstParameter();
+                //			Standard_Real l = myCurve->LastParameter();
 
-                    //			gp_Pnt Pf = myCurve->Value(f);
-                    //			gp_Pnt Pl = myCurve->Value(l);
-                    //			gp_Pnt aLoc = aSph.Position().Location();
-                    //			Standard_Real maxdist = Max(Pf.Distance(aLoc), Pl.Distance(aLoc));
-                    //			TolConf = Max(anR * minang, Abs(anR - maxdist));
+                //			gp_Pnt Pf = myCurve->Value(f);
+                //			gp_Pnt Pl = myCurve->Value(l);
+                //			gp_Pnt aLoc = aSph.Position().Location();
+                //			Standard_Real maxdist = Max(Pf.Distance(aLoc), Pl.Distance(aLoc));
+                //			TolConf = Max(anR * minang, Abs(anR - maxdist));
 
-                    //			//Surface has pole at V = Vmin and Vmax
-                    //			gp_Pnt Pole = mySurface->Value(U1, Vmin);
-                    //			TrimC3d(myCurve, IsTrimmed, dt, Pole, SingularCase, 3, TolConf);
-                    //			Pole = mySurface->Value(U1, Vmax);
-                    //			TrimC3d(myCurve, IsTrimmed, dt, Pole, SingularCase, 4, TolConf);
-                    //		}
-                    //		myResult = P;
-                    //	}
-                    //	break;
+                //			//Surface has pole at V = Vmin and Vmax
+                //			gp_Pnt Pole = mySurface->Value(U1, Vmin);
+                //			TrimC3d(myCurve, IsTrimmed, dt, Pole, SingularCase, 3, TolConf);
+                //			Pole = mySurface->Value(U1, Vmax);
+                //			TrimC3d(myCurve, IsTrimmed, dt, Pole, SingularCase, 4, TolConf);
+                //		}
+                //		myResult = P;
+                //	}
+                //	break;
 
-                    //case GeomAbs_Torus:
-                    //	{
-                    //		ProjLib_Torus P(mySurface->Torus());
-                    //		Project(P, myCurve);
-                    //		myResult = P;
-                    //	}
-                    //	break;
+                //case GeomAbs_Torus:
+                //	{
+                //		ProjLib_Torus P(mySurface->Torus());
+                //		Project(P, myCurve);
+                //		myResult = P;
+                //	}
+                //	break;
 
-                    //case GeomAbs_BezierSurface:
-                    //case GeomAbs_BSplineSurface:
-                    //	{
-                    //		isAnalyticalSurf = Standard_False;
-                    //		Standard_Real f, l;
-                    //		f = myCurve->FirstParameter();
-                    //		l = myCurve->LastParameter();
-                    //		dt = (l - f) * eps;
+                //case GeomAbs_BezierSurface:
+                //case GeomAbs_BSplineSurface:
+                //	{
+                //		isAnalyticalSurf = Standard_False;
+                //		Standard_Real f, l;
+                //		f = myCurve->FirstParameter();
+                //		l = myCurve->LastParameter();
+                //		dt = (l - f) * eps;
 
-                    //		const Adaptor3d_Surface&S = *mySurface;
-                    //		U1 = S.FirstUParameter();
-                    //		U2 = S.LastUParameter();
-                    //		V1 = S.FirstVParameter();
-                    //		V2 = S.LastVParameter();
+                //		const Adaptor3d_Surface&S = *mySurface;
+                //		U1 = S.FirstUParameter();
+                //		U2 = S.LastUParameter();
+                //		V1 = S.FirstVParameter();
+                //		V2 = S.LastVParameter();
 
-                    //		if (IsoIsDeg(S, U1, GeomAbs_IsoU, 0., myTolerance))
-                    //		{
-                    //			//Surface has pole at U = Umin
-                    //			gp_Pnt Pole = mySurface->Value(U1, V1);
-                    //			TrimC3d(myCurve, IsTrimmed, dt, Pole, SingularCase, 1, TolConf);
-                    //		}
+                //		if (IsoIsDeg(S, U1, GeomAbs_IsoU, 0., myTolerance))
+                //		{
+                //			//Surface has pole at U = Umin
+                //			gp_Pnt Pole = mySurface->Value(U1, V1);
+                //			TrimC3d(myCurve, IsTrimmed, dt, Pole, SingularCase, 1, TolConf);
+                //		}
 
-                    //		if (IsoIsDeg(S, U2, GeomAbs_IsoU, 0., myTolerance))
-                    //		{
-                    //			//Surface has pole at U = Umax
-                    //			gp_Pnt Pole = mySurface->Value(U2, V1);
-                    //			TrimC3d(myCurve, IsTrimmed, dt, Pole, SingularCase, 2, TolConf);
-                    //		}
+                //		if (IsoIsDeg(S, U2, GeomAbs_IsoU, 0., myTolerance))
+                //		{
+                //			//Surface has pole at U = Umax
+                //			gp_Pnt Pole = mySurface->Value(U2, V1);
+                //			TrimC3d(myCurve, IsTrimmed, dt, Pole, SingularCase, 2, TolConf);
+                //		}
 
-                    //		if (IsoIsDeg(S, V1, GeomAbs_IsoV, 0., myTolerance))
-                    //		{
-                    //			//Surface has pole at V = Vmin
-                    //			gp_Pnt Pole = mySurface->Value(U1, V1);
-                    //			TrimC3d(myCurve, IsTrimmed, dt, Pole, SingularCase, 3, TolConf);
-                    //		}
+                //		if (IsoIsDeg(S, V1, GeomAbs_IsoV, 0., myTolerance))
+                //		{
+                //			//Surface has pole at V = Vmin
+                //			gp_Pnt Pole = mySurface->Value(U1, V1);
+                //			TrimC3d(myCurve, IsTrimmed, dt, Pole, SingularCase, 3, TolConf);
+                //		}
 
-                    //		if (IsoIsDeg(S, V2, GeomAbs_IsoV, 0., myTolerance))
-                    //		{
-                    //			//Surface has pole at V = Vmax
-                    //			gp_Pnt Pole = mySurface->Value(U1, V2);
-                    //			TrimC3d(myCurve, IsTrimmed, dt, Pole, SingularCase, 4, TolConf);
-                    //		}
+                //		if (IsoIsDeg(S, V2, GeomAbs_IsoV, 0., myTolerance))
+                //		{
+                //			//Surface has pole at V = Vmax
+                //			gp_Pnt Pole = mySurface->Value(U1, V2);
+                //			TrimC3d(myCurve, IsTrimmed, dt, Pole, SingularCase, 4, TolConf);
+                //		}
 
-                    //		ProjLib_ComputeApproxOnPolarSurface polar;
-                    //		polar.SetTolerance(myTolerance);
-                    //		polar.SetDegree(myDegMin, myDegMax);
-                    //		polar.SetMaxSegments(myMaxSegments);
-                    //		polar.SetBndPnt(myBndPnt);
-                    //		polar.SetMaxDist(myMaxDist);
-                    //		polar.Perform(myCurve, mySurface);
+                //		ProjLib_ComputeApproxOnPolarSurface polar;
+                //		polar.SetTolerance(myTolerance);
+                //		polar.SetDegree(myDegMin, myDegMax);
+                //		polar.SetMaxSegments(myMaxSegments);
+                //		polar.SetBndPnt(myBndPnt);
+                //		polar.SetMaxDist(myMaxDist);
+                //		polar.Perform(myCurve, mySurface);
 
-                    //		Handle(Geom2d_BSplineCurve) aRes = polar.BSpline();
+                //		Handle(Geom2d_BSplineCurve) aRes = polar.BSpline();
 
-                    //		if (!aRes.IsNull())
-                    //		{
-                    //			myTolerance = polar.Tolerance();
-                    //			if ((IsTrimmed[0] || IsTrimmed[1]))
-                    //			{
-                    //				if (IsTrimmed[0])
-                    //				{
-                    //					//Add segment before start of curve
-                    //					f = myCurve->FirstParameter();
-                    //					ExtendC2d(aRes, f, -dt, U1, U2, V1, V2, 0, SingularCase[0]);
-                    //				}
-                    //				if (IsTrimmed[1])
-                    //				{
-                    //					//Add segment after end of curve
-                    //					l = myCurve->LastParameter();
-                    //					ExtendC2d(aRes, l, dt, U1, U2, V1, V2, 1, SingularCase[1]);
-                    //				}
-                    //				Handle(Geom2d_Curve) NewCurve2d;
-                    //				GeomLib::SameRange(Precision::PConfusion(), aRes,
-                    //				  aRes->FirstParameter(), aRes->LastParameter(),
-                    //				  FirstPar, LastPar, NewCurve2d);
-                    //				aRes = Handle(Geom2d_BSplineCurve)::DownCast(NewCurve2d);
-                    //			}
-                    //			myResult.SetBSpline(aRes);
-                    //			myResult.Done();
-                    //			myResult.SetType(GeomAbs_BSplineCurve);
-                    //		}
-                    //	}
-                    //	break;
+                //		if (!aRes.IsNull())
+                //		{
+                //			myTolerance = polar.Tolerance();
+                //			if ((IsTrimmed[0] || IsTrimmed[1]))
+                //			{
+                //				if (IsTrimmed[0])
+                //				{
+                //					//Add segment before start of curve
+                //					f = myCurve->FirstParameter();
+                //					ExtendC2d(aRes, f, -dt, U1, U2, V1, V2, 0, SingularCase[0]);
+                //				}
+                //				if (IsTrimmed[1])
+                //				{
+                //					//Add segment after end of curve
+                //					l = myCurve->LastParameter();
+                //					ExtendC2d(aRes, l, dt, U1, U2, V1, V2, 1, SingularCase[1]);
+                //				}
+                //				Handle(Geom2d_Curve) NewCurve2d;
+                //				GeomLib::SameRange(Precision::PConfusion(), aRes,
+                //				  aRes->FirstParameter(), aRes->LastParameter(),
+                //				  FirstPar, LastPar, NewCurve2d);
+                //				aRes = Handle(Geom2d_BSplineCurve)::DownCast(NewCurve2d);
+                //			}
+                //			myResult.SetBSpline(aRes);
+                //			myResult.Done();
+                //			myResult.SetType(GeomAbs_BSplineCurve);
+                //		}
+                //	}
+                //	break;
 
-                    //default:
-                    //	{
-                    //		isAnalyticalSurf = Standard_False;
-                    //		Standard_Real Vsingular[2] = { 0.0, 0.0 }; //for surfaces of revolution
-                    //		Standard_Real f = 0.0, l = 0.0;
-                    //		dt = 0.0;
+                default:
+                    {
+                        isAnalyticalSurf = false;
+                        double[] Vsingular = new double[2] { 0.0, 0.0 }; //for surfaces of revolution
+                        double f = 0.0, l = 0.0;
+                        dt = 0.0;
 
-                    //		if (mySurface->GetType() == GeomAbs_SurfaceOfRevolution)
-                    //		{
-                    //			//Check possible singularity
+                        if (mySurface._GetType() == GeomAbs_SurfaceType.GeomAbs_SurfaceOfRevolution)
+                        {
+                            //			//Check possible singularity
 
-                    //			gp_Pnt P = mySurface->AxeOfRevolution().Location();
-                    //			gp_Dir N = mySurface->AxeOfRevolution().Direction();
-                    //			gp_Lin L(P, N);
+                            //			gp_Pnt P = mySurface->AxeOfRevolution().Location();
+                            //			gp_Dir N = mySurface->AxeOfRevolution().Direction();
+                            //			gp_Lin L(P, N);
 
-                    //			f = myCurve->FirstParameter();
-                    //			l = myCurve->LastParameter();
-                    //			dt = (l - f) * eps;
+                            //			f = myCurve->FirstParameter();
+                            //			l = myCurve->LastParameter();
+                            //			dt = (l - f) * eps;
 
-                    //			P = myCurve->Value(f);
-                    //			if (L.Distance(P) < Precision::Confusion())
-                    //			{
-                    //				IsTrimmed[0] = Standard_True;
-                    //				f = f + dt;
-                    //				myCurve = myCurve->Trim(f, l, Precision::Confusion());
-                    //				// Searching the parameter on the basis curve for surface of revolution
-                    //				Extrema_ExtPC anExtr(P, * mySurface->BasisCurve(), myTolerance);
-                    //				if (anExtr.IsDone())
-                    //				{
-                    //					Standard_Real aMinDist = RealLast();
-                    //					for (Standard_Integer anIdx = 1; anIdx <= anExtr.NbExt(); anIdx++)
-                    //					{
-                    //						if (anExtr.IsMin(anIdx) &&
-                    //							anExtr.SquareDistance(anIdx) < aMinDist)
-                    //						{
-                    //							aMinDist = anExtr.SquareDistance(anIdx);
-                    //							Vsingular[0] = anExtr.Point(anIdx).Parameter();
-                    //						}
-                    //					}
-                    //				}
-                    //				else
-                    //					Vsingular[0] = ElCLib::Parameter(L, P);
-                    //				//SingularCase[0] = 3;
-                    //			}
+                            //			P = myCurve->Value(f);
+                            //			if (L.Distance(P) < Precision::Confusion())
+                            //			{
+                            //				IsTrimmed[0] = Standard_True;
+                            //				f = f + dt;
+                            //				myCurve = myCurve->Trim(f, l, Precision::Confusion());
+                            //				// Searching the parameter on the basis curve for surface of revolution
+                            //				Extrema_ExtPC anExtr(P, * mySurface->BasisCurve(), myTolerance);
+                            //				if (anExtr.IsDone())
+                            //				{
+                            //					Standard_Real aMinDist = RealLast();
+                            //					for (Standard_Integer anIdx = 1; anIdx <= anExtr.NbExt(); anIdx++)
+                            //					{
+                            //						if (anExtr.IsMin(anIdx) &&
+                            //							anExtr.SquareDistance(anIdx) < aMinDist)
+                            //						{
+                            //							aMinDist = anExtr.SquareDistance(anIdx);
+                            //							Vsingular[0] = anExtr.Point(anIdx).Parameter();
+                            //						}
+                            //					}
+                            //				}
+                            //				else
+                            //					Vsingular[0] = ElCLib::Parameter(L, P);
+                            //				//SingularCase[0] = 3;
+                            //			}
 
-                    //			P = myCurve->Value(l);
-                    //			if (L.Distance(P) < Precision::Confusion())
-                    //			{
-                    //				IsTrimmed[1] = Standard_True;
-                    //				l = l - dt;
-                    //				myCurve = myCurve->Trim(f, l, Precision::Confusion());
-                    //				// Searching the parameter on the basis curve for surface of revolution
-                    //				Extrema_ExtPC anExtr(P, * mySurface->BasisCurve(), myTolerance);
-                    //				if (anExtr.IsDone())
-                    //				{
-                    //					Standard_Real aMinDist = RealLast();
-                    //					for (Standard_Integer anIdx = 1; anIdx <= anExtr.NbExt(); anIdx++)
-                    //					{
-                    //						if (anExtr.IsMin(anIdx) &&
-                    //							anExtr.SquareDistance(anIdx) < aMinDist)
-                    //						{
-                    //							aMinDist = anExtr.SquareDistance(anIdx);
-                    //							Vsingular[1] = anExtr.Point(anIdx).Parameter();
-                    //						}
-                    //					}
-                    //				}
-                    //				else
-                    //					Vsingular[1] = ElCLib::Parameter(L, P);
-                    //				//SingularCase[1] = 4;
-                    //			}
-                    //		}
+                            //			P = myCurve->Value(l);
+                            //			if (L.Distance(P) < Precision::Confusion())
+                            //			{
+                            //				IsTrimmed[1] = Standard_True;
+                            //				l = l - dt;
+                            //				myCurve = myCurve->Trim(f, l, Precision::Confusion());
+                            //				// Searching the parameter on the basis curve for surface of revolution
+                            //				Extrema_ExtPC anExtr(P, * mySurface->BasisCurve(), myTolerance);
+                            //				if (anExtr.IsDone())
+                            //				{
+                            //					Standard_Real aMinDist = RealLast();
+                            //					for (Standard_Integer anIdx = 1; anIdx <= anExtr.NbExt(); anIdx++)
+                            //					{
+                            //						if (anExtr.IsMin(anIdx) &&
+                            //							anExtr.SquareDistance(anIdx) < aMinDist)
+                            //						{
+                            //							aMinDist = anExtr.SquareDistance(anIdx);
+                            //							Vsingular[1] = anExtr.Point(anIdx).Parameter();
+                            //						}
+                            //					}
+                            //				}
+                            //				else
+                            //					Vsingular[1] = ElCLib::Parameter(L, P);
+                            //				//SingularCase[1] = 4;
+                            //			}
+                        }
 
-                    //		Standard_Real aTolU = Max(ComputeTolU(mySurface, myTolerance), Precision::Confusion());
-                    //		Standard_Real aTolV = Max(ComputeTolV(mySurface, myTolerance), Precision::Confusion());
-                    //		Standard_Real aTol2d = Sqrt(aTolU * aTolU + aTolV * aTolV);
+                        double aTolU = Math.Max(ComputeTolU(mySurface, myTolerance), Precision.Confusion());
+                        double aTolV = Math.Max(ComputeTolV(mySurface, myTolerance), Precision.Confusion());
+                        double aTol2d = Math.Sqrt(aTolU * aTolU + aTolV * aTolV);
 
-                    //		Standard_Real aMaxDist = 100. * myTolerance;
-                    //		if (myMaxDist > 0.)
-                    //		{
-                    //			aMaxDist = myMaxDist;
-                    //		}
-                    //		Handle(ProjLib_HCompProjectedCurve) HProjector = new ProjLib_HCompProjectedCurve(mySurface, myCurve, aTolU, aTolV, aMaxDist);
+                        double aMaxDist = 100.0 * myTolerance;
+                        if (myMaxDist > 0.0)
+                        {
+                            aMaxDist = myMaxDist;
+                        }
+                        ProjLib_CompProjectedCurve HProjector = new ProjLib_CompProjectedCurve(mySurface, myCurve, aTolU, aTolV, aMaxDist);
 
-                    //		// Normalement, dans le cadre de ProjLib, le resultat 
-                    //		// doit etre une et une seule courbe !!!
-                    //		// De plus, cette courbe ne doit pas etre Single point
-                    //		Standard_Integer NbCurves = HProjector->NbCurves();
-                    //		Standard_Real Udeb = 0.0, Ufin = 0.0;
-                    //		if (NbCurves > 0)
-                    //		{
-                    //			HProjector->Bounds(1, Udeb, Ufin);
-                    //		}
-                    //		else
-                    //		{
-                    //			return;
-                    //		}
-                    //		// Approximons cette courbe algorithmique.
-                    //		Standard_Boolean Only3d = Standard_False;
-                    //		Standard_Boolean Only2d = Standard_True;
-                    //		GeomAbs_Shape Continuity = GeomAbs_C1;
-                    //		if (myBndPnt == AppParCurves_PassPoint)
-                    //		{
-                    //			Continuity = GeomAbs_C0;
-                    //		}
-                    //		Standard_Integer MaxDegree = 14;
-                    //		if (myDegMax > 0)
-                    //		{
-                    //			MaxDegree = myDegMax;
-                    //		}
-                    //		Standard_Integer MaxSeg = 16;
-                    //		if (myMaxSegments > 0)
-                    //		{
-                    //			MaxSeg = myMaxSegments;
-                    //		}
+                        // Normalement, dans le cadre de ProjLib, le resultat 
+                        // doit etre une et une seule courbe !!!
+                        // De plus, cette courbe ne doit pas etre Single point
+                        int NbCurves = HProjector.NbCurves();
+                        double Udeb, Ufin;
 
-                    //		Approx_CurveOnSurface appr(HProjector, mySurface, Udeb, Ufin, myTolerance);
-                    //		appr.Perform(MaxSeg, MaxDegree, Continuity, Only3d, Only2d);
+                        if (NbCurves > 0)                        
+                            HProjector.Bounds(1, out Udeb, out Ufin);                        
+                        else
+                            return;
 
-                    //		Handle(Geom2d_BSplineCurve) aRes = appr.Curve2d();
+                        // Approximons cette courbe algorithmique.
+                        bool Only3d = false;
+                        bool Only2d = true;
+                        GeomAbs_Shape Continuity = GeomAbs_Shape.GeomAbs_C1;
+                        if (myBndPnt == AppParCurves_Constraint.AppParCurves_PassPoint)
+                        {
+                            Continuity = GeomAbs_Shape.GeomAbs_C0;
+                        }
+                        int MaxDegree = 14;
+                        if (myDegMax > 0)
+                        {
+                            MaxDegree = myDegMax;
+                        }
+                        int MaxSeg = 16;
+                        if (myMaxSegments > 0)
+                        {
+                            MaxSeg = myMaxSegments;
+                        }
 
-                    //		if (!aRes.IsNull())
-                    //		{
-                    //			aTolU = appr.MaxError2dU();
-                    //			aTolV = appr.MaxError2dV();
-                    //			Standard_Real aNewTol2d = Sqrt(aTolU * aTolU + aTolV * aTolV);
-                    //			myTolerance *= (aNewTol2d / aTol2d);
-                    //			if (IsTrimmed[0] || IsTrimmed[1])
-                    //			{
-                    //				// Treatment only for surface of revolution
-                    //				Standard_Real u1, u2, v1, v2;
-                    //				u1 = mySurface->FirstUParameter();
-                    //				u2 = mySurface->LastUParameter();
-                    //				v1 = mySurface->FirstVParameter();
-                    //				v2 = mySurface->LastVParameter();
+                        Approx_CurveOnSurface appr = new Approx_CurveOnSurface(HProjector, mySurface, Udeb, Ufin, myTolerance);
+                        appr.Perform(MaxSeg, MaxDegree, Continuity, Only3d, Only2d);
 
-                    //				if (IsTrimmed[0])
-                    //				{
-                    //					//Add segment before start of curve
-                    //					ExtendC2d(aRes, f, -dt, u1, u2, Vsingular[0], v2, 0, 3);
-                    //				}
-                    //				if (IsTrimmed[1])
-                    //				{
-                    //					//Add segment after end of curve
-                    //					ExtendC2d(aRes, l, dt, u1, u2, v1, Vsingular[1], 1, 4);
-                    //				}
-                    //				Handle(Geom2d_Curve) NewCurve2d;
-                    //				GeomLib::SameRange(Precision::PConfusion(), aRes,
-                    //				  aRes->FirstParameter(), aRes->LastParameter(),
-                    //				  FirstPar, LastPar, NewCurve2d);
-                    //				aRes = Handle(Geom2d_BSplineCurve)::DownCast(NewCurve2d);
-                    //				if (Continuity == GeomAbs_C0)
-                    //				{
-                    //					// try to smoother the Curve GeomAbs_C1.
-                    //					Standard_Integer aDeg = aRes->Degree();
-                    //					Standard_Boolean OK = Standard_True;
-                    //					Standard_Real aSmoothTol = Max(Precision::Confusion(), aNewTol2d);
-                    //					for (Standard_Integer ij = 2; ij < aRes->NbKnots(); ij++)
-                    //					{
-                    //						OK = OK && aRes->RemoveKnot(ij, aDeg - 1, aSmoothTol);
-                    //					}
-                    //				}
-                    //			}
+                        Geom2d_BSplineCurve aRes = appr.Curve2d();
 
-                    //			myResult.SetBSpline(aRes);
-                    //			myResult.Done();
-                    //			myResult.SetType(GeomAbs_BSplineCurve);
-                    //		}
-                    //	}
+                        //		if (!aRes.IsNull())
+                        //		{
+                        //			aTolU = appr.MaxError2dU();
+                        //			aTolV = appr.MaxError2dV();
+                        //			Standard_Real aNewTol2d = Sqrt(aTolU * aTolU + aTolV * aTolV);
+                        //			myTolerance *= (aNewTol2d / aTol2d);
+                        //			if (IsTrimmed[0] || IsTrimmed[1])
+                        //			{
+                        //				// Treatment only for surface of revolution
+                        //				Standard_Real u1, u2, v1, v2;
+                        //				u1 = mySurface->FirstUParameter();
+                        //				u2 = mySurface->LastUParameter();
+                        //				v1 = mySurface->FirstVParameter();
+                        //				v2 = mySurface->LastVParameter();
+
+                        //				if (IsTrimmed[0])
+                        //				{
+                        //					//Add segment before start of curve
+                        //					ExtendC2d(aRes, f, -dt, u1, u2, Vsingular[0], v2, 0, 3);
+                        //				}
+                        //				if (IsTrimmed[1])
+                        //				{
+                        //					//Add segment after end of curve
+                        //					ExtendC2d(aRes, l, dt, u1, u2, v1, Vsingular[1], 1, 4);
+                        //				}
+                        //				Handle(Geom2d_Curve) NewCurve2d;
+                        //				GeomLib::SameRange(Precision::PConfusion(), aRes,
+                        //				  aRes->FirstParameter(), aRes->LastParameter(),
+                        //				  FirstPar, LastPar, NewCurve2d);
+                        //				aRes = Handle(Geom2d_BSplineCurve)::DownCast(NewCurve2d);
+                        //				if (Continuity == GeomAbs_C0)
+                        //				{
+                        //					// try to smoother the Curve GeomAbs_C1.
+                        //					Standard_Integer aDeg = aRes->Degree();
+                        //					Standard_Boolean OK = Standard_True;
+                        //					Standard_Real aSmoothTol = Max(Precision::Confusion(), aNewTol2d);
+                        //					for (Standard_Integer ij = 2; ij < aRes->NbKnots(); ij++)
+                        //					{
+                        //						OK = OK && aRes->RemoveKnot(ij, aDeg - 1, aSmoothTol);
+                        //					}
+                        //				}
+                        //			}
+
+                        //			myResult.SetBSpline(aRes);
+                        //			myResult.Done();
+                        //			myResult.SetType(GeomAbs_BSplineCurve);
+                        //		}
+                    }
+                    break;
             }
 
             //if (!myResult.IsDone() && isAnalyticalSurf)
@@ -542,6 +577,34 @@ namespace OCCPort
                 //}
             }
         }
-    }
+        public static double ComputeTolV(Adaptor3d_Surface theSurf,
+                                  double theTolerance)
+        {
+            double aTolV = theSurf.VResolution(theTolerance);
+            if (theSurf.IsVPeriodic())
+            {
+                aTolV = Math.Min(aTolV, 0.01 * theSurf.VPeriod());
+            }
 
+            return aTolV;
+        }
+        public static double ComputeTolU(Adaptor3d_Surface theSurf,
+                                           double theTolerance)
+        {
+            double aTolU = theSurf.UResolution(theTolerance);
+            if (theSurf.IsUPeriodic())
+            {
+                aTolU = Math.Min(aTolU, 0.01 * theSurf.UPeriod());
+            }
+
+            return aTolU;
+        }
+
+        ProjLib_Projector myResult;
+
+        public override GeomAbs_CurveType _GetType()
+        {
+            return myResult._GetType();
+        }
+    }
 }

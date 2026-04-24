@@ -1,4 +1,6 @@
-﻿namespace OCCPort
+﻿using System;
+
+namespace OCCPort
 {
     public abstract class Geom_Curve : Geom_Geometry
     {
@@ -64,6 +66,8 @@
         {
             return U;
         }
+
+       
 
 
     }

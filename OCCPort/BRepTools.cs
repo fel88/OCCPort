@@ -123,7 +123,7 @@ namespace OCCPort
                     return;
                 }
 
-                aSurf.Bounds(ref UMin, ref UMax, ref VMin, ref VMax);
+                aSurf.Bounds(out UMin, out UMax, out VMin, out VMax);
                 aBox.Update(UMin, VMin, UMax, VMax);
             }
 

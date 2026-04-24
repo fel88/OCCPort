@@ -1,4 +1,5 @@
 ﻿using OCCPort;
+using System;
 using System.Reflection.Metadata;
 using System.Security.AccessControl;
 using System.Security.Cryptography;
@@ -14,10 +15,44 @@ namespace OCCPort
     //! thread-safe and parallel evaluations need to be prevented.
     public class GeomAdaptor_Curve : Adaptor3d_Curve
     {
+        public GeomAdaptor_Curve()
+        {
+            myTypeCurve = GeomAbs_CurveType.GeomAbs_OtherCurve;
+            myFirst = 0;
+            myLast = 0;
+        }
+
         public GeomAdaptor_Curve(Geom_Curve theCurve)
         {
             Load(theCurve);
         }
+
+        public override double FirstParameter()
+        {
+            return myFirst;
+        }
+
+        public override double LastParameter()
+        {
+            return myLast;
+        }
+
+        public override gp_Lin Line()
+        {
+            Standard_NoSuchObject_Raise_if(myTypeCurve !=GeomAbs_CurveType. GeomAbs_Line,
+                                            "GeomAdaptor_Curve::Line() - curve is not a Line");
+            return ((Geom_Line)myCurve).Lin();
+            }
+
+        
+
+        private void Standard_NoSuchObject_Raise_if(bool v1, string v2)
+        {
+            if (v1)
+                throw new Exception(v2);
+        }
+
+        public override GeomAbs_CurveType _GetType() { return myTypeCurve; }
 
         //! Standard_ConstructionError is raised if theUFirst>theULast
         public GeomAdaptor_Curve(Geom_Curve theCurve,
@@ -74,20 +109,21 @@ namespace OCCPort
                 myNestedEvaluator = null;
                 myBSplineCurve = null;
 
-                //(Standard_Type) & TheType = C->DynamicType();
-                //if (TheType == STANDARD_TYPE(Geom_TrimmedCurve))
-                //{
-                //	Load((C as Geom_TrimmedCurve).BasisCurve(), UFirst, ULast);
-                //}
-                //else if (TheType == STANDARD_TYPE(Geom_Circle))
-                //{
-                //	myTypeCurve = GeomAbs_CurveType.GeomAbs_Circle;
-                //}
-
-                //else if (TheType == STANDARD_TYPE(Geom_Line))
-                //{
-                //	myTypeCurve = GeomAbs_CurveType.GeomAbs_Line;
-                //}
+                var TheType = C.GetType();
+                if (TheType == typeof(Geom_TrimmedCurve))
+                {
+                    Load((C as Geom_TrimmedCurve).BasisCurve(), UFirst, ULast);
+                }
+                else
+                /*if (TheType == typeof(Geom_Circle))
+                {
+                    myTypeCurve = GeomAbs_CurveType.GeomAbs_Circle;
+                }
+                else*/
+                if (TheType == typeof(Geom_Line))
+                {
+                    myTypeCurve = GeomAbs_CurveType.GeomAbs_Line;
+                }
                 //else if (TheType == STANDARD_TYPE(Geom_Ellipse))
                 //{
                 //	myTypeCurve = GeomAbs_CurveType.GeomAbs_Ellipse;
@@ -119,10 +155,10 @@ namespace OCCPort
                 //	myNestedEvaluator = new GeomEvaluator_OffsetCurve(
                 //		aBaseAdaptor, anOffsetCurve.Offset(), anOffsetCurve.Direction());
                 //}
-                //else
-                //{
-                //	myTypeCurve = GeomAbs_CurveType.GeomAbs_OtherCurve;
-                //}
+                else
+                {
+                    myTypeCurve = GeomAbs_CurveType.GeomAbs_OtherCurve;
+                }
             }
         }
     }

@@ -14,6 +14,20 @@ namespace OCCPort
     //! thread-safe and parallel evaluations need to be prevented.
     public class GeomAdaptor_Surface : Adaptor3d_Surface
     {
+        public override Adaptor3d_Surface BasisSurface()
+        {
+            if (mySurfaceType != GeomAbs_SurfaceType.GeomAbs_OffsetSurface)
+                throw new Standard_NoSuchObject("GeomAdaptor_Surface::BasisSurface");
+            return new GeomAdaptor_Surface
+              (((Geom_OffsetSurface)mySurface).BasisSurface(), myUFirst, myULast, myVFirst, myVLast);
+        }
+
+        public override gp_Pln Plane()
+        {
+            if (mySurfaceType != GeomAbs_SurfaceType.GeomAbs_Plane)
+                throw new Standard_NoSuchObject("GeomAdaptor_Surface::Plane");
+            return ((Geom_Plane)mySurface).Pln();
+        }
 
         public void Load(Geom_Surface theSurf)
         {
@@ -23,17 +37,19 @@ namespace OCCPort
             }
 
             double aU1 = 0, aU2 = 0, aV1 = 0, aV2 = 0;
-            theSurf.Bounds(ref aU1, ref aU2, ref aV1, ref aV2);
+            theSurf.Bounds(out aU1, out aU2, out aV1, out aV2);
             load(theSurf, aU1, aU2, aV1, aV2);
         }
 
+        public override double FirstUParameter() { return myUFirst; }
 
+        public override double LastUParameter() { return myULast; }
 
         //! Returns the type of the surface : Plane, Cylinder,
         //! Cone,      Sphere,        Torus,    BezierSurface,
         //! BSplineSurface,               SurfaceOfRevolution,
         //! SurfaceOfExtrusion, OtherSurface
-        public virtual new GeomAbs_SurfaceType GetType() { return mySurfaceType; }
+        public override GeomAbs_SurfaceType _GetType() { return mySurfaceType; }
         //! Standard_ConstructionError is raised if theUFirst>theULast or theVFirst>theVLast
         public void Load(Geom_Surface theSurf,
              double theUFirst, double theULast,
@@ -51,6 +67,11 @@ namespace OCCPort
 
             load(theSurf, theUFirst, theULast, theVFirst, theVLast, theTolU, theTolV);
         }
+
+        public override double FirstVParameter() { return myVFirst; }
+
+        public override double LastVParameter() { return myVLast; }
+
 
         Geom_Surface mySurface;
         double myUFirst;
@@ -151,11 +172,54 @@ namespace OCCPort
                     mySurfaceType = GeomAbs_SurfaceType.GeomAbs_OtherSurface;
             }
         }
+
+
+        public Geom_Surface Surface() { return mySurface; }
+
+        public override bool IsVPeriodic()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override bool IsUPeriodic()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override double UPeriod()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override double VPeriod()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override double VResolution(double v)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override double UResolution(double v)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public GeomAdaptor_Surface(Geom_Surface theSurf)
 
         {
             myTolU = (0.0); myTolV = (0.0);
             Load(theSurf);
+        }
+
+        //! Standard_ConstructionError is raised if UFirst>ULast or VFirst>VLast
+        public GeomAdaptor_Surface(Geom_Surface theSurf,
+                        double theUFirst, double theULast,
+                        double theVFirst, double theVLast,
+                        double theTolU = 0.0, double theTolV = 0.0)
+        {
+            Load(theSurf, theUFirst, theULast, theVFirst, theVLast, theTolU, theTolV);
         }
 
         public GeomAdaptor_Surface()

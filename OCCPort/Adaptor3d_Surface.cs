@@ -1,115 +1,103 @@
 ﻿namespace OCCPort
 {
-	public class Adaptor3d_Surface
-	{
-		public double FirstUParameter()
-		{
-			throw new Standard_NotImplemented("Adaptor3d_Surface::FirstUParameter");
-		}
-		//=======================================================================
-		//function : UDegree
-		//purpose  : 
-		//=======================================================================
+    public abstract class Adaptor3d_Surface
+    {
+        public abstract double FirstUParameter();
+        //=======================================================================
+        //function : UDegree
+        //purpose  : 
+        //=======================================================================
 
-		public virtual int UDegree()
-		{
-			throw new Standard_NotImplemented("Adaptor3d_Surface::UDegree");
-		}
+        public virtual int UDegree()
+        {
+            throw new Standard_NotImplemented("Adaptor3d_Surface::UDegree");
+        }
+        public abstract bool IsVPeriodic();
+        public abstract bool IsUPeriodic();
 
+        public abstract double UPeriod( ) ;
+        public abstract double VPeriod( ) ;
+        public abstract double VResolution( double  v) ;
+        public abstract double UResolution( double  v) ;
 
-		//=======================================================================
-		//function : NbVKnots
-		//purpose  : 
-		//=======================================================================
+        //=======================================================================
+        //function : NbVKnots
+        //purpose  : 
+        //=======================================================================
 
-		public virtual int NbVKnots()
-		{
-			throw new Standard_NotImplemented("Adaptor3d_Surface::NbVKnots");
-		}
-		//=======================================================================
-		//function : D0
-		//purpose  : 
-		//=======================================================================
+        public virtual int NbVKnots()
+        {
+            throw new Standard_NotImplemented("Adaptor3d_Surface::NbVKnots");
+        }
+        //=======================================================================
+        //function : D0
+        //purpose  : 
+        //=======================================================================
 
-		//void Adaptor3d_Surface::D0(const Standard_Real U, const Standard_Real V, gp_Pnt& P) const 
-		public virtual  void D0(double u, double v, ref gp_Pnt pnt)
-		{
-			throw new Standard_NotImplemented("Adaptor3d_Surface::D0");
-		}
-
-
-
-		public virtual  double LastUParameter()
-		{
-			throw new Standard_NotImplemented("Adaptor3d_Surface::LastUParameter");
-		}
-		//=======================================================================
-		//function : NbVPoles
-		//purpose  : 
-		//=======================================================================
-
-		public virtual int NbVPoles()
-		{
-			throw new Standard_NotImplemented("Adaptor3d_Surface::NbVPoles");
-		}
-
-		//=======================================================================
-		//function : OffsetValue
-		//purpose  : 
-		//=======================================================================
-
-		public virtual double OffsetValue()
-		{
-			throw new Standard_NotImplemented("Adaptor3d_Surface::OffsetValue");
-		}
+        //void Adaptor3d_Surface::D0(const Standard_Real U, const Standard_Real V, gp_Pnt& P) const 
+        public virtual void D0(double u, double v, ref gp_Pnt pnt)
+        {
+            throw new Standard_NotImplemented("Adaptor3d_Surface::D0");
+        }
 
 
-		//=======================================================================
-		//function : BasisSurface
-		//purpose  : 
-		//=======================================================================
 
-		public virtual Adaptor3d_Surface BasisSurface()
-		{
-			throw new Standard_NotImplemented("Adaptor3d_Surface::BasisSurface");
-		}
+        public abstract double LastUParameter();
+        //=======================================================================
+        //function : NbVPoles
+        //purpose  : 
+        //=======================================================================
 
-		public virtual double FirstVParameter()
-		{
-			throw new Standard_NotImplemented("Adaptor3d_Surface::FirstVParameter");
-		}
-		public virtual double LastVParameter()
-		{
-			throw new Standard_NotImplemented("Adaptor3d_Surface::LastVParameter");
-		}
+        public virtual int NbVPoles()
+        {
+            throw new Standard_NotImplemented("Adaptor3d_Surface::NbVPoles");
+        }
 
-		//=======================================================================
-		//function : NbUPoles
-		//purpose  : 
-		//=======================================================================
+        //=======================================================================
+        //function : OffsetValue
+        //purpose  : 
+        //=======================================================================
 
-		public virtual int NbUPoles()
-		{
-			throw new Standard_NotImplemented("Adaptor3d_Surface::NbUPoles");
-		}
+        public virtual double OffsetValue()
+        {
+            throw new Standard_NotImplemented("Adaptor3d_Surface::OffsetValue");
+        }
 
-		//=======================================================================
-		//function : BSpline
-		//purpose  : 
-		//=======================================================================
 
-		public virtual Geom_BSplineSurface BSpline()
-		{
-			throw new Standard_NotImplemented("Adaptor3d_Surface::BSpline");
-		}
+        //=======================================================================
+        //function : BasisSurface
+        //purpose  : 
+        //=======================================================================
 
-		//! Returns the type of the surface : Plane, Cylinder,
-		//! Cone,      Sphere,        Torus,    BezierSurface,
-		//! BSplineSurface,               SurfaceOfRevolution,
-		//! SurfaceOfExtrusion, OtherSurface
-		public virtual new GeomAbs_SurfaceType GetType()
-		{
-			throw new Standard_NotImplemented("Adaptor3d_Surface::GetType");
-		}
-	}
+        public abstract Adaptor3d_Surface BasisSurface();
+
+        public abstract double FirstVParameter();
+        public abstract double LastVParameter();
+
+        //=======================================================================
+        //function : NbUPoles
+        //purpose  : 
+        //=======================================================================
+
+        public virtual int NbUPoles()
+        {
+            throw new Standard_NotImplemented("Adaptor3d_Surface::NbUPoles");
+        }
+
+        //=======================================================================
+        //function : BSpline
+        //purpose  : 
+        //=======================================================================
+
+        public virtual Geom_BSplineSurface BSpline()
+        {
+            throw new Standard_NotImplemented("Adaptor3d_Surface::BSpline");
+        }
+        public abstract gp_Pln Plane();
+        //! Returns the type of the surface : Plane, Cylinder,
+        //! Cone,      Sphere,        Torus,    BezierSurface,
+        //! BSplineSurface,               SurfaceOfRevolution,
+        //! SurfaceOfExtrusion, OtherSurface
+        public abstract GeomAbs_SurfaceType _GetType();
+    }
 }

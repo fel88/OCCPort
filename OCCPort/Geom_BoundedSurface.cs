@@ -27,7 +27,7 @@
     //! 2D parametric space.
     public abstract class Geom_BoundedSurface : Geom_Surface
     {
-        public override void Bounds(ref double U1, ref double U2, ref double V1, ref double V2)
+        public override void Bounds(out double U1, out double U2, out double V1, out double V2)
         {
             throw new System.NotImplementedException();
         }

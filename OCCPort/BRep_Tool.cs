@@ -28,7 +28,7 @@ namespace OCCPort
                 {
                     BRep_Curve3D GC = (BRep_Curve3D)(cr);
                     L = E.Location() * GC.Location();
-                    GC.Range(First, Last);
+                    GC.Range(ref First, ref Last);
                     return GC.Curve3D();
                 }                
             }
@@ -58,7 +58,7 @@ namespace OCCPort
                     C = GC.PCurve();
                     S = GC.Surface();//strange code here??
                     L = E.Location() * GC.Location();
-                    GC.Range(First, Last);
+                    GC.Range(ref First, ref Last);
                     return;
                 }
                 itcr.Next();
@@ -91,7 +91,7 @@ namespace OCCPort
                 if (cr.IsCurveOnSurface(S, loc))
                 {
                     BRep_GCurve GC = cr as BRep_GCurve;
-                    GC.Range(First, Last);
+                    GC.Range(ref First, ref Last);
                     if (GC.IsCurveOnClosedSurface() && Eisreversed)
                         return GC.PCurve2();
                     else

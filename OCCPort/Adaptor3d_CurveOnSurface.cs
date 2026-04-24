@@ -1,4 +1,6 @@
-﻿namespace OCCPort
+﻿using OpenTK.Graphics.ES20;
+
+namespace OCCPort
 {
 
 	//! An interface between the services provided by a curve
@@ -8,6 +10,13 @@
 	//! package, in the parametric space of the surface.
 	public class Adaptor3d_CurveOnSurface : Adaptor3d_Curve
 	{
-		
-	}
+        public override GeomAbs_CurveType _GetType()
+        {
+            return myType;
+
+        }
+        GeomAbs_CurveType myType;
+
+
+    }
 }

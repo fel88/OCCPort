@@ -30,14 +30,16 @@ namespace OCCPort
         protected double myFirst;
         protected double myLast;
 
-        public BRep_GCurve(TopLoc_Location l, double v1, double v2)
+        public BRep_GCurve(TopLoc_Location l, double First, double Last) : base(l)
         {
+            myFirst = First;
+            myLast = Last;
         }
 
         //=======================================================================
 
-        public void Range(double First,
-                           double Last)
+        public void Range(ref double First,
+                           ref double Last)
         {
             First = myFirst;
             Last = myLast;

@@ -26,7 +26,7 @@ namespace OCCPort
             return 1e-14;
 
         }
-        public TopLoc_SListOfItemLocation myItems;
+        public TopLoc_SListOfItemLocation myItems = new TopLoc_SListOfItemLocation();
 
         public void Clear()
         {
@@ -49,8 +49,10 @@ namespace OCCPort
             // prepend the chain Other in front of this
             // cancelling null exponents
 
-            if (IsIdentity()) return Other;
-            if (Other.IsIdentity()) return this;
+            if (IsIdentity()) 
+                return Other;
+            if (Other.IsIdentity()) 
+                return this;
 
             // prepend the queue of Other
             TopLoc_Location result = Multiplied(Other.NextLocation());

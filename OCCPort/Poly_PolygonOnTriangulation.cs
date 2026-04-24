@@ -1,4 +1,4 @@
-﻿namespace OCCPort.Tester
+﻿namespace OCCPort
 {
 	public class Poly_PolygonOnTriangulation
 	{

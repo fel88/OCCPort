@@ -8,9 +8,19 @@
 			//2.2250738585072014e-308
 			return double.Epsilon;
 		}
+        public static gp_Dir2d DY2d()
+        {
+            gp_Dir2d gp_DY2d = new gp_Dir2d(0, 1);
+            return gp_DY2d;
+        }
+        public static gp_Dir2d DX2d()
+        {
+            gp_Dir2d gp_DY2d = new gp_Dir2d(1, 0);
+            return gp_DY2d;
+        }
 
 
-		internal static gp_Dir DX()
+        internal static gp_Dir DX()
 		{
 			gp_Dir gp_DX = new gp_Dir(1, 0, 0);
 			return gp_DX;

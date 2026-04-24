@@ -26,7 +26,7 @@ namespace OCCPort.Interfaces
                 if (S != null)
                 {
                     GeomAdaptor_Surface AS = new GeomAdaptor_Surface(S);
-                    switch (AS.GetType())
+                    switch (AS._GetType())
                     {
                         case GeomAbs_SurfaceType.GeomAbs_Plane:
                             {

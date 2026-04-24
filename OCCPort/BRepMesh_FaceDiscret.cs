@@ -57,7 +57,7 @@ namespace OCCPort
             try
             {
                 IMeshTools_MeshAlgo aMeshingAlgo =
-                  myAlgoFactory.GetAlgo(aDFace.GetSurface().GetType(), ref myParameters);
+                  myAlgoFactory.GetAlgo(aDFace.GetSurface()._GetType(), ref myParameters);
 
                 aMeshingAlgo.Perform(aDFace, myParameters, theRange);
             }

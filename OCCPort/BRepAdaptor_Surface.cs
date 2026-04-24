@@ -1,4 +1,6 @@
-﻿namespace OCCPort
+﻿using System.Reflection.Metadata;
+
+namespace OCCPort
 {
     //! The Surface from BRepAdaptor allows to  use a Face
     //! of the BRep topology look like a 3D surface.
@@ -18,7 +20,7 @@
         //! Cone,      Sphere,        Torus,    BezierSurface,
         //! BSplineSurface,               SurfaceOfRevolution,
         //! SurfaceOfExtrusion, OtherSurface
-        public virtual new GeomAbs_SurfaceType GetType() { return mySurf.GetType(); }
+        public override GeomAbs_SurfaceType _GetType() { return mySurf._GetType(); }
 
         //! Creates a surface to  access the geometry  of <F>.
         //! If  <Restriction> is  true  the parameter range is
@@ -29,6 +31,22 @@
             Initialize(F, R);
 
         }
+
+        public override Adaptor3d_Surface BasisSurface()
+        {
+            GeomAdaptor_Surface HS = new GeomAdaptor_Surface();
+            HS.Load((Geom_Surface)(mySurf.Surface().Transformed(myTrsf)));
+            return HS.BasisSurface();
+        }
+
+        public override double FirstVParameter() { return mySurf.FirstVParameter(); }
+
+        public override double LastVParameter() { return mySurf.LastVParameter(); }
+
+
+        public override double FirstUParameter() { return mySurf.FirstUParameter(); }
+        public override double LastUParameter() { return mySurf.LastUParameter(); }
+
         GeomAdaptor_Surface mySurf = new GeomAdaptor_Surface();
         gp_Trsf myTrsf;
         TopoDS_Face myFace;
@@ -52,6 +70,39 @@
             myTrsf = L.Transformation();
         }
 
+        public override gp_Pln Plane()
+        {
+            return mySurf.Plane().Transformed(myTrsf);
+        }
 
+        public override bool IsVPeriodic()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override bool IsUPeriodic()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override double UPeriod()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override double VPeriod()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override double VResolution(double v)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override double UResolution(double v)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

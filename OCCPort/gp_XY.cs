@@ -1,4 +1,6 @@
-﻿namespace OCCPort
+﻿using System;
+
+namespace OCCPort
 {
 
     //! This class describes a cartesian coordinate entity in 2D
@@ -36,6 +38,15 @@
 
         //! Assigns the given value to the Y  coordinate of this number pair.
         public void SetY(double theY) { y = theY; }
+
+        //! Computes the scalar product between <me> and theOther
+        public  double Dot( gp_XY theOther)  { return x* theOther.x + y* theOther.y; }
+
+        //! @code
+        //! double D = <me>.X() * theOther.Y() - <me>.Y() * theOther.X()
+        //! @endcode
+        public  double Crossed( gp_XY theOther)  { return x* theOther.y - y* theOther.x; }
+
 
         double x;
         double y;

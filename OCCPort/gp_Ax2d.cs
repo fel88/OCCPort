@@ -18,7 +18,7 @@
     //! -   to define geometric transformations (axis of
     //! symmetry, axis of rotation, and so on).
     //! Note: to define a left-handed 2D coordinate system, use gp_Ax22d.
-    class gp_Ax2d
+    public class gp_Ax2d
     {
 
         //! Returns the origin of <me>.
@@ -30,5 +30,10 @@
         gp_Pnt2d loc;
         gp_Dir2d vdir;
 
+        public gp_Ax2d(gp_Pnt2d theP, gp_Dir2d theV)
+        {
+            loc = (theP);
+            vdir = theV;
+        }
     }
 }

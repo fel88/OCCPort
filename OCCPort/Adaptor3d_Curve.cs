@@ -22,17 +22,13 @@ namespace OCCPort
 		//purpose  : 
 		//=======================================================================
 
-		public new virtual GeomAbs_CurveType GetType()
-		{
-			throw new Standard_NotImplemented("Adaptor3d_Curve::GetType");
-		}
-
+		public abstract GeomAbs_CurveType _GetType();
 		//=======================================================================
 		//function : Line
 		//purpose  : 
 		//=======================================================================
 
-		public gp_Lin Line()
+		public virtual gp_Lin Line()
 		{
 			throw new Standard_NotImplemented("Adaptor3d_Curve::Line");
 		}
@@ -42,11 +38,11 @@ namespace OCCPort
 		}
 
 
-        public double FirstParameter()
+        public virtual double FirstParameter()
 		{
 			throw new Standard_NotImplemented("Adaptor3d_Curve::FirstParameter");
 		}
-		public double LastParameter()
+		public virtual double LastParameter()
 		{
 			throw new Standard_NotImplemented("Adaptor3d_Curve::LastParameter");
 		}

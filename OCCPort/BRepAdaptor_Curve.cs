@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using OpenTK.Graphics.ES11;
+using System.Security.Cryptography;
 
 namespace OCCPort
 {
@@ -29,6 +30,20 @@ namespace OCCPort
             return myConSurf != null;
         }
 
+
+        public override gp_Lin Line()
+        {
+            gp_Lin L = null;
+            if (myConSurf==null)
+                L = myCurve.Line();
+            else
+                L = myConSurf.Line();
+
+            L.Transform(myTrsf);
+            return L;
+        }
+
+        GeomAdaptor_Curve myCurve;
 
         public void Initialize(TopoDS_Edge E)
         {
@@ -64,6 +79,18 @@ namespace OCCPort
             //	}
             //}
             //myTrsf = L.Transformation();
+        }
+
+        public override GeomAbs_CurveType _GetType()
+        {
+            if (myConSurf==null)
+            {
+                return myCurve._GetType();
+            }
+            else
+            {
+                return myConSurf._GetType();
+            }
         }
     }
 }

@@ -21,7 +21,7 @@
     //! by (n X) the period.
     public class Geom_RectangularTrimmedSurface : Geom_BoundedSurface
     {
-        public Geom_Surface BasisSurface()
+        public override Geom_Surface BasisSurface()
         {
             return basisSurf;
         }

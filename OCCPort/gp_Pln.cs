@@ -1,5 +1,6 @@
 ﻿using OpenTK.Audio.OpenAL;
 using System;
+using System.Threading;
 
 namespace OCCPort
 {
@@ -12,7 +13,30 @@ namespace OCCPort
         private gp_Ax3 pos;
 
         //! Returns the plane's normal Axis.
-        public gp_Ax1 Axis()  { return pos.Axis(); }
+        public gp_Ax1 Axis() { return pos.Axis(); }
+
+        //! Transforms a plane with the transformation theT from class Trsf.
+        //! The transformation is performed on the "Location"
+        //! point, on the "XAxis" and the "YAxis".
+        //! The resulting normal direction is the cross product between
+        //! the "XDirection" and the "YDirection" after transformation.
+        public gp_Pln Transformed(gp_Trsf theT)
+        {
+            gp_Pln aPl = this;
+            aPl.pos.Transform(theT);
+            return aPl;
+        }
+        //! The coordinate system of the plane is defined with the axis
+        //! placement theA3.
+        //! The "Direction" of theA3 defines the normal to the plane.
+        //! The "Location" of theA3 defines the location (origin) of the plane.
+        //! The "XDirection" and "YDirection" of theA3 define the "XAxis" and
+        //! the "YAxis" of the plane used to parametrize the plane.
+        public gp_Pln(gp_Ax3 theA3)
+
+        {
+            pos = (theA3);
+        }
 
         public gp_Pln(gp_Pnt P, gp_Dir V)
         {

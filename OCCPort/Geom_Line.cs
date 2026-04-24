@@ -33,8 +33,11 @@
         public override void Transform(gp_Trsf t)
         {
             pos.Transform(t);
-        }
-
+        }   //! Returns non transient line from gp with the same geometric
+            //! properties as <me>
+        public gp_Lin Lin()  { return new gp_Lin(pos); }
+     
+        
         public override Geom_Geometry Copy()
         {
             Geom_Line L = new Geom_Line(pos);

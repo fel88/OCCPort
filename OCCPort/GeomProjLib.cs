@@ -21,7 +21,7 @@ namespace OCCPort
 
             Geom_Curve GC = null;
 
-            switch (Proj.GetType())
+            switch (Proj._GetType())
             {
                 case GeomAbs_CurveType.GeomAbs_Line:
                     GC = new Geom_Line(Proj.Line());

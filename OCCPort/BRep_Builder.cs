@@ -83,7 +83,7 @@ namespace OCCPort
                         // xpu151298 : parameters can be set for null curves
                         //             see lbo & flo, to determine whether range is defined
                         //             compare first and last parameters with default values.
-                        GC.Range(f, l);
+                        GC.Range(ref f, ref l);
                     }
                     if (GC.IsCurveOnSurface(S, L))
                     {
@@ -104,11 +104,11 @@ namespace OCCPort
                 }
             }
 
-            //if (!C.IsNull())
+            if (C != null)
             {
                 BRep_CurveOnSurface COS = new BRep_CurveOnSurface(C, S, L);
                 double aFCur = 0.0, aLCur = 0.0;
-                COS.Range(aFCur, aLCur);
+                COS.Range(ref aFCur, ref aLCur);
                 if (!Precision.IsInfinite(f))
                 {
                     aFCur = f;
@@ -120,7 +120,7 @@ namespace OCCPort
                 }
 
                 COS.SetRange(aFCur, aLCur);
-                //lcr.Append(COS);
+                lcr.Append(COS);
             }
         }
 
@@ -140,7 +140,7 @@ namespace OCCPort
                 //GC = Handle(BRep_GCurve)::DownCast(itcr.Value());
                 if (GC != null)
                 {
-                    GC.Range(f, l);
+                    GC.Range(ref f, ref l);
                     if (GC.IsCurve3D()) break;
 
                 }

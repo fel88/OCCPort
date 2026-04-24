@@ -9,11 +9,13 @@
         {
             this.l = l;
         }
+        public gp_Lin2d Lin2d() { return new gp_Lin2d(pos); }
 
         //! Computes the parameter on the reversed line for the
         //! point of parameter U on this line.
         //! For a line, the returned value is -U.
-        public override double ReversedParameter(double U) {
+        public override double ReversedParameter(double U)
+        {
             return (-U);
         }
 

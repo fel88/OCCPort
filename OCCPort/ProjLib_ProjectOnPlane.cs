@@ -35,6 +35,13 @@ namespace OCCPort
         //purpose  : Returns the projection of a point <Point> on a plane 
         //           <ThePlane>  along a direction <TheDir>.
         //=======================================================================
+        public override gp_Lin Line()
+        {
+            if (myType != GeomAbs_CurveType.GeomAbs_Line)
+                throw new Standard_NoSuchObject("ProjLib_ProjectOnPlane:Line");
+
+            return myResult.Line();
+        }
 
         public static gp_Pnt ProjectPnt(gp_Ax3 ThePlane,
   gp_Dir TheDir,
@@ -75,7 +82,7 @@ namespace OCCPort
             //  gp_Hypr  Hypr ;
 
             int num_knots;
-            GeomAbs_CurveType Type = C.GetType();
+            GeomAbs_CurveType Type = C._GetType();
 
             gp_Ax2 Axis;
             double R1 = 0.0, R2 = 0.0;
@@ -97,7 +104,7 @@ namespace OCCPort
                         { // line orthog au plan
                             myType = GeomAbs_CurveType.GeomAbs_BSplineCurve;
                             gp_Pnt P = ProjectPnt(myPlane, myDirection, L.Location());
-                            TColStd_Array1OfInteger Mults=new TColStd_Array1OfInteger (1, 2); 
+                            TColStd_Array1OfInteger Mults = new TColStd_Array1OfInteger(1, 2);
                             Mults.Init(2);
                             TColgp_Array1OfPnt Poles = new TColgp_Array1OfPnt(1, 2);
                             Poles.Init(P);
@@ -149,7 +156,7 @@ namespace OCCPort
                             if (!myKeepParam)
                             {
                                 //  Modified by Sergey KHROMOV - Tue Jan 29 16:57:29 2002 Begin
-                                GeomAdaptor_Curve aGACurve=new GeomAdaptor_Curve (GeomLinePtr,
+                                GeomAdaptor_Curve aGACurve = new GeomAdaptor_Curve(GeomLinePtr,
                                   myFirstPar,
                                   myLastPar);
                                 //myResult = new GeomAdaptor_Curve(aGACurve);
@@ -220,6 +227,12 @@ namespace OCCPort
             D -= ((Vec * Z) / (TheDir * Z.To_gp_Dir())) * TheDir;
 
             return D;
+        }
+
+        public override GeomAbs_CurveType _GetType()
+        {
+            return myType;
+
         }
 
         Adaptor3d_Curve myCurve;

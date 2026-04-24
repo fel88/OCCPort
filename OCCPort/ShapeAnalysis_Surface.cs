@@ -17,8 +17,7 @@ namespace OCCPort
             myUCloseVal = (-1);
             myVCloseVal = (-1);
 
-
-            mySurf.Bounds(ref myUF, ref myUL, ref myVF, ref myVL);
+            mySurf.Bounds(out myUF, out myUL, out myVF, out myVL);
             myAdSur = new GeomAdaptor_Surface(mySurf);
         }
         bool myExtOK;

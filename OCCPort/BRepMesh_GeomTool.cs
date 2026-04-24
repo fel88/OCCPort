@@ -27,7 +27,7 @@ namespace OCCPort
             if (theRangeSplitter == null)
                 return (-1, -1);
 
-            GeomAbs_SurfaceType aType = theSurface.GetType();
+            GeomAbs_SurfaceType aType = theSurface._GetType();
 
             double anErrFactorU = 0, anErrFactorV = 0;
             ComputeErrFactors(theDeflection, theSurface, ref anErrFactorU, ref anErrFactorV);
@@ -74,7 +74,7 @@ namespace OCCPort
                           ref int theCellsCountU,
                             ref int theCellsCountV)
         {
-            GeomAbs_SurfaceType aType = theFace.GetType();
+            GeomAbs_SurfaceType aType = theFace._GetType();
             if (aType == GeomAbs_SurfaceType.GeomAbs_OtherSurface)
             {
                 // fallback to the default behavior

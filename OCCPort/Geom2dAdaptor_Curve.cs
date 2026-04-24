@@ -151,7 +151,23 @@ namespace OCCPort
 
         }
 
+        public override GeomAbs_CurveType _GetType()
+        {
+            throw new NotImplementedException();
+        }
 
+        public override gp_Lin2d Line()
+        {
+            Standard_NoSuchObject_Raise_if(myTypeCurve !=GeomAbs_CurveType. GeomAbs_Line,
+                                  "Geom2dAdaptor_Curve::Line() - curve is not a Line");
+            return ((Geom2d_Line)myCurve).Lin2d();
+        }
+
+        private void Standard_NoSuchObject_Raise_if(bool v1, string v2)
+        {
+            if (v1)
+                throw new Exception(v2);
+        }
     }
 
 }
