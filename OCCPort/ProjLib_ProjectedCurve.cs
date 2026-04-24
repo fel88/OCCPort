@@ -341,8 +341,8 @@ namespace OCCPort
                         int NbCurves = HProjector.NbCurves();
                         double Udeb, Ufin;
 
-                        if (NbCurves > 0)                        
-                            HProjector.Bounds(1, out Udeb, out Ufin);                        
+                        if (NbCurves > 0)
+                            HProjector.Bounds(1, out Udeb, out Ufin);
                         else
                             return;
 
@@ -415,166 +415,167 @@ namespace OCCPort
 
                         //			myResult.SetBSpline(aRes);
                         //			myResult.Done();
-                        //			myResult.SetType(GeomAbs_BSplineCurve);
+                        //myResult.SetType(GeomAbs_BSplineCurve);
                         //		}
                     }
                     break;
             }
 
-            //if (!myResult.IsDone() && isAnalyticalSurf)
-            //{
-            //	// Use advanced analytical projector if base analytical projection failed.
-            //	ProjLib_ComputeApprox Comp;
-            //	Comp.SetTolerance(myTolerance);
-            //	Comp.SetDegree(myDegMin, myDegMax);
-            //	Comp.SetMaxSegments(myMaxSegments);
-            //	Comp.SetBndPnt(myBndPnt);
-            //	Comp.Perform(myCurve, mySurface);
-            //	if (Comp.Bezier().IsNull() && Comp.BSpline().IsNull())
-            //		return; // advanced projector has been failed too
-            //	myResult.Done();
-            //	Handle(Geom2d_BSplineCurve) aRes;
-            //	if (Comp.BSpline().IsNull())
-            //	{
-            //		aRes = Geom2dConvert::CurveToBSplineCurve(Comp.Bezier());
-            //	}
-            //	else
-            //	{
-            //		aRes = Comp.BSpline();
-            //	}
-            //	if ((IsTrimmed[0] || IsTrimmed[1]))
-            //	{
-            //		if (IsTrimmed[0])
-            //		{
-            //			//Add segment before start of curve
-            //			Standard_Real f = myCurve->FirstParameter();
-            //			ExtendC2d(aRes, f, -dt, U1, U2, V1, V2, 0, SingularCase[0]);
-            //		}
-            //		if (IsTrimmed[1])
-            //		{
-            //			//Add segment after end of curve
-            //			Standard_Real l = myCurve->LastParameter();
-            //			ExtendC2d(aRes, l, dt, U1, U2, V1, V2, 1, SingularCase[1]);
-            //		}
-            //		Handle(Geom2d_Curve) NewCurve2d;
-            //		GeomLib::SameRange(Precision::PConfusion(), aRes,
-            //		  aRes->FirstParameter(), aRes->LastParameter(),
-            //		  FirstPar, LastPar, NewCurve2d);
-            //		aRes = Handle(Geom2d_BSplineCurve)::DownCast(NewCurve2d);
-            //		myResult.SetBSpline(aRes);
-            //		myResult.SetType(GeomAbs_BSplineCurve);
-            //	}
-            //	else
-            //	{
-            //		// set the type
-            //		if (SType == GeomAbs_Plane && CType == GeomAbs_BezierCurve)
-            //		{
-            //			myResult.SetType(GeomAbs_BezierCurve);
-            //			myResult.SetBezier(Comp.Bezier());
-            //		}
-            //		else
-            //		{
-            //			myResult.SetType(GeomAbs_BSplineCurve);
-            //			myResult.SetBSpline(Comp.BSpline());
-            //		}
-            //	}
-            //	// set the periodicity flag
-            //	if (SType == GeomAbs_Plane &&
-            //	  CType == GeomAbs_BSplineCurve &&
-            //	  myCurve->IsPeriodic())
-            //	{
-            //		myResult.SetPeriodic();
-            //	}
-            //	myTolerance = Comp.Tolerance();
-            //}
-
-            //bool[] isPeriodic = {mySurface.IsUPeriodic(),
-            //				   mySurface.IsVPeriodic()};
-            //if (myResult.IsDone() && (isPeriodic[0] || isPeriodic[1]))
+            if (!myResult.IsDone() && isAnalyticalSurf)
             {
-                // Check result curve to be in params space.
+                //	// Use advanced analytical projector if base analytical projection failed.
+                ProjLib_ComputeApprox Comp = new ProjLib_ComputeApprox();
+                Comp.SetTolerance(myTolerance);
+                Comp.SetDegree(myDegMin, myDegMax);
+                Comp.SetMaxSegments(myMaxSegments);
+                Comp.SetBndPnt(myBndPnt);
+                Comp.Perform(myCurve, mySurface);
+                if (Comp.Bezier() == null && Comp.BSpline() == null)
+                    return; // advanced projector has been failed too
 
-                // U and V parameters space correspondingly.
-                //double[] aSurfFirstPar = {mySurface->FirstUParameter(),
-                //							mySurface->FirstVParameter()};
-                //double[] aSurfPeriod = { 0.0, 0.0 };
-                //if (isPeriodic[0])
-                //	aSurfPeriod[0] = mySurface.UPeriod();
-                //if (isPeriodic[1])
-                //	aSurfPeriod[1] = mySurface.VPeriod();
-
-                //for (int anIdx = 1; anIdx <= 2; anIdx++)
-                //{
-                //	if (!isPeriodic[anIdx - 1])
-                //		continue;
-
-                //	if (myResult.GetType() == GeomAbs_BSplineCurve)
+                myResult.Done();
+                Geom2d_BSplineCurve aRes;
+                if (Comp.BSpline()==null)
+                {
+                    aRes = Geom2dConvert.CurveToBSplineCurve(Comp.Bezier());
+                }
+                else
+                {
+                    aRes = Comp.BSpline();
+                }
+                //	if ((IsTrimmed[0] || IsTrimmed[1]))
                 //	{
-                //		NCollection_DataMap<Standard_Integer, Standard_Integer> aMap;
-                //		Handle(Geom2d_BSplineCurve) aRes = myResult.BSpline();
-                //		const Standard_Integer aDeg = aRes->Degree();
-
-                //		for (Standard_Integer aKnotIdx = aRes->FirstUKnotIndex();
-                //							 aKnotIdx < aRes->LastUKnotIndex();
-                //							 aKnotIdx++)
+                //		if (IsTrimmed[0])
                 //		{
-                //			const Standard_Real aFirstParam = aRes->Knot(aKnotIdx);
-                //			const Standard_Real aLastParam = aRes->Knot(aKnotIdx + 1);
-
-                //			for (Standard_Integer anIntIdx = 0; anIntIdx <= aDeg; anIntIdx++)
-                //			{
-                //				const Standard_Real aCurrParam = aFirstParam + (aLastParam - aFirstParam) * anIntIdx / (aDeg + 1.0);
-                //				gp_Pnt2d aPnt2d;
-                //				aRes->D0(aCurrParam, aPnt2d);
-
-                //				Standard_Integer aMapKey = Standard_Integer((aPnt2d.Coord(anIdx) - aSurfFirstPar[anIdx - 1]) / aSurfPeriod[anIdx - 1]);
-
-                //				if (aPnt2d.Coord(anIdx) - aSurfFirstPar[anIdx - 1] < 0.0)
-                //					aMapKey--;
-
-                //				if (aMap.IsBound(aMapKey))
-                //					aMap.ChangeFind(aMapKey)++;
-                //				else
-                //					aMap.Bind(aMapKey, 1);
-                //			}
+                //			//Add segment before start of curve
+                //			Standard_Real f = myCurve->FirstParameter();
+                //			ExtendC2d(aRes, f, -dt, U1, U2, V1, V2, 0, SingularCase[0]);
                 //		}
-
-                //		Standard_Integer aMaxPoints = 0, aMaxIdx = 0;
-                //		NCollection_DataMap<Standard_Integer, Standard_Integer>::Iterator aMapIter(aMap);
-                //		for (; aMapIter.More(); aMapIter.Next())
+                //		if (IsTrimmed[1])
                 //		{
-                //			if (aMapIter.Value() > aMaxPoints)
-                //			{
-                //				aMaxPoints = aMapIter.Value();
-                //				aMaxIdx = aMapIter.Key();
-                //			}
+                //			//Add segment after end of curve
+                //			Standard_Real l = myCurve->LastParameter();
+                //			ExtendC2d(aRes, l, dt, U1, U2, V1, V2, 1, SingularCase[1]);
                 //		}
-                //		if (aMaxIdx != 0)
-                //		{
-                //			gp_Pnt2d aFirstPnt = aRes->Value(aRes->FirstParameter());
-                //			gp_Pnt2d aSecondPnt = aFirstPnt;
-                //			aSecondPnt.SetCoord(anIdx, aFirstPnt.Coord(anIdx) - aSurfPeriod[anIdx - 1] * aMaxIdx);
-                //			aRes->Translate(gp_Vec2d(aFirstPnt, aSecondPnt));
-                //		}
+                //		Handle(Geom2d_Curve) NewCurve2d;
+                //		GeomLib::SameRange(Precision::PConfusion(), aRes,
+                //		  aRes->FirstParameter(), aRes->LastParameter(),
+                //		  FirstPar, LastPar, NewCurve2d);
+                //		aRes = Handle(Geom2d_BSplineCurve)::DownCast(NewCurve2d);
+                //		myResult.SetBSpline(aRes);
+                //		myResult.SetType(GeomAbs_BSplineCurve);
                 //	}
-
-                //	if (myResult.GetType() == GeomAbs_Line)
+                //	else
                 //	{
-                //		Standard_Real aT1 = myCurve->FirstParameter();
-                //		Standard_Real aT2 = myCurve->LastParameter();
-
-                //		if (anIdx == 1)
+                //		// set the type
+                //		if (SType == GeomAbs_Plane && CType == GeomAbs_BezierCurve)
                 //		{
-                //			// U param space.
-                //			myResult.UFrame(aT1, aT2, aSurfFirstPar[anIdx - 1], aSurfPeriod[anIdx - 1]);
+                //			myResult.SetType(GeomAbs_BezierCurve);
+                //			myResult.SetBezier(Comp.Bezier());
                 //		}
                 //		else
                 //		{
-                //			// V param space.
-                //			myResult.VFrame(aT1, aT2, aSurfFirstPar[anIdx - 1], aSurfPeriod[anIdx - 1]);
+                //			myResult.SetType(GeomAbs_BSplineCurve);
+                //			myResult.SetBSpline(Comp.BSpline());
                 //		}
                 //	}
+                //	// set the periodicity flag
+                //	if (SType == GeomAbs_Plane &&
+                //	  CType == GeomAbs_BSplineCurve &&
+                //	  myCurve->IsPeriodic())
+                //	{
+                //		myResult.SetPeriodic();
+                //	}
+                //	myTolerance = Comp.Tolerance();
                 //}
+
+                //bool[] isPeriodic = {mySurface.IsUPeriodic(),
+                //				   mySurface.IsVPeriodic()};
+                //if (myResult.IsDone() && (isPeriodic[0] || isPeriodic[1]))
+                {
+                    // Check result curve to be in params space.
+
+                    // U and V parameters space correspondingly.
+                    //double[] aSurfFirstPar = {mySurface->FirstUParameter(),
+                    //							mySurface->FirstVParameter()};
+                    //double[] aSurfPeriod = { 0.0, 0.0 };
+                    //if (isPeriodic[0])
+                    //	aSurfPeriod[0] = mySurface.UPeriod();
+                    //if (isPeriodic[1])
+                    //	aSurfPeriod[1] = mySurface.VPeriod();
+
+                    //for (int anIdx = 1; anIdx <= 2; anIdx++)
+                    //{
+                    //	if (!isPeriodic[anIdx - 1])
+                    //		continue;
+
+                    //	if (myResult.GetType() == GeomAbs_BSplineCurve)
+                    //	{
+                    //		NCollection_DataMap<Standard_Integer, Standard_Integer> aMap;
+                    //		Handle(Geom2d_BSplineCurve) aRes = myResult.BSpline();
+                    //		const Standard_Integer aDeg = aRes->Degree();
+
+                    //		for (Standard_Integer aKnotIdx = aRes->FirstUKnotIndex();
+                    //							 aKnotIdx < aRes->LastUKnotIndex();
+                    //							 aKnotIdx++)
+                    //		{
+                    //			const Standard_Real aFirstParam = aRes->Knot(aKnotIdx);
+                    //			const Standard_Real aLastParam = aRes->Knot(aKnotIdx + 1);
+
+                    //			for (Standard_Integer anIntIdx = 0; anIntIdx <= aDeg; anIntIdx++)
+                    //			{
+                    //				const Standard_Real aCurrParam = aFirstParam + (aLastParam - aFirstParam) * anIntIdx / (aDeg + 1.0);
+                    //				gp_Pnt2d aPnt2d;
+                    //				aRes->D0(aCurrParam, aPnt2d);
+
+                    //				Standard_Integer aMapKey = Standard_Integer((aPnt2d.Coord(anIdx) - aSurfFirstPar[anIdx - 1]) / aSurfPeriod[anIdx - 1]);
+
+                    //				if (aPnt2d.Coord(anIdx) - aSurfFirstPar[anIdx - 1] < 0.0)
+                    //					aMapKey--;
+
+                    //				if (aMap.IsBound(aMapKey))
+                    //					aMap.ChangeFind(aMapKey)++;
+                    //				else
+                    //					aMap.Bind(aMapKey, 1);
+                    //			}
+                    //		}
+
+                    //		Standard_Integer aMaxPoints = 0, aMaxIdx = 0;
+                    //		NCollection_DataMap<Standard_Integer, Standard_Integer>::Iterator aMapIter(aMap);
+                    //		for (; aMapIter.More(); aMapIter.Next())
+                    //		{
+                    //			if (aMapIter.Value() > aMaxPoints)
+                    //			{
+                    //				aMaxPoints = aMapIter.Value();
+                    //				aMaxIdx = aMapIter.Key();
+                    //			}
+                    //		}
+                    //		if (aMaxIdx != 0)
+                    //		{
+                    //			gp_Pnt2d aFirstPnt = aRes->Value(aRes->FirstParameter());
+                    //			gp_Pnt2d aSecondPnt = aFirstPnt;
+                    //			aSecondPnt.SetCoord(anIdx, aFirstPnt.Coord(anIdx) - aSurfPeriod[anIdx - 1] * aMaxIdx);
+                    //			aRes->Translate(gp_Vec2d(aFirstPnt, aSecondPnt));
+                    //		}
+                    //	}
+
+                    //	if (myResult.GetType() == GeomAbs_Line)
+                    //	{
+                    //		Standard_Real aT1 = myCurve->FirstParameter();
+                    //		Standard_Real aT2 = myCurve->LastParameter();
+
+                    //		if (anIdx == 1)
+                    //		{
+                    //			// U param space.
+                    //			myResult.UFrame(aT1, aT2, aSurfFirstPar[anIdx - 1], aSurfPeriod[anIdx - 1]);
+                    //		}
+                    //		else
+                    //		{
+                    //			// V param space.
+                    //			myResult.VFrame(aT1, aT2, aSurfFirstPar[anIdx - 1], aSurfPeriod[anIdx - 1]);
+                    //		}
+                    //	}
+                }
             }
         }
         public static double ComputeTolV(Adaptor3d_Surface theSurf,
@@ -606,5 +607,16 @@ namespace OCCPort
         {
             return myResult._GetType();
         }
+
+        public override int Degree()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override int NbKnots()
+        {
+            throw new NotImplementedException();
+        }
     }
+
 }

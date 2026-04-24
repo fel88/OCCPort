@@ -30,6 +30,11 @@ namespace OCCPort
             throw new NotImplementedException();
         }
 
+        public override bool IsPeriodic()
+        {
+            throw new NotImplementedException();
+        }
+
         public override double LastParameter()
         {
             throw new NotImplementedException();

@@ -9,6 +9,10 @@ namespace OCCPort
         public static double RealLast()
         { return double.MaxValue; }
 
+        //-------------------------------------------------------------------
+        public static double IntegerPart(double Value)
+        { return ((Value > 0) ? Math.Floor(Value) : Math.Ceiling(Value)); }
+
         public static float RealToShortReal(double theVal)
         {
             var FLT_MAX = float.MaxValue;
@@ -26,7 +30,7 @@ namespace OCCPort
         {
             return double.MinValue;
         }
-     static    double DBL_MAX = 1.7976931348623158e+308;// max value
+        static double DBL_MAX = 1.7976931348623158e+308;// max value
 
         internal static double RealFirst()
         {

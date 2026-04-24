@@ -193,11 +193,11 @@ namespace OCCPort
             ProjLib_ProjectedCurve Proj = new ProjLib_ProjectedCurve(HS, HC);
             Geom2d_Curve pc = Geom2dAdaptor.MakeCurve(Proj);
 
-            //if (pc.DynamicType() == STANDARD_TYPE(Geom2d_TrimmedCurve))
-            //{
-            //    Geom2d_TrimmedCurve TC = pc as Geom2d_TrimmedCurve;
-            //    pc = TC.BasisCurve();
-            //}
+            if (pc is Geom2d_TrimmedCurve)
+            {
+                Geom2d_TrimmedCurve TC = pc as Geom2d_TrimmedCurve;
+                pc = TC.BasisCurve();
+            }
 
             return pc;
         }

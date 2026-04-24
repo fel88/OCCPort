@@ -5,6 +5,22 @@ namespace OCCPort
     public abstract class Geom2d_Curve : Geom2d_Geometry
     {
 
+        //! Returns true if the parameter of the curve is periodic.
+        //! It is possible only if the curve is closed and if the
+        //! following relation is satisfied :
+        //! for each parametric value U the distance between the point
+        //! P(u) and the point P (u + T) is lower or equal to Resolution
+        //! from package gp, T is the period and must be a constant.
+        //! There are three possibilities :
+        //! . the curve is never periodic by definition (SegmentLine)
+        //! . the curve is always periodic by definition (Circle)
+        //! . the curve can be defined as periodic (BSpline). In this case
+        //! a function SetPeriodic allows you to give the shape of the
+        //! curve.  The general rule for this case is : if a curve can be
+        //! periodic or not the default periodicity set is non periodic
+        //! and you have to turn (explicitly) the curve into a periodic
+        //! curve  if you want the curve to be periodic.
+        public abstract bool IsPeriodic();
         public gp_Pnt2d Value(double U)
         {
             gp_Pnt2d P = new gp_Pnt2d();

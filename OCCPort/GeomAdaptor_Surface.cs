@@ -183,7 +183,7 @@ namespace OCCPort
 
         public override bool IsUPeriodic()
         {
-            throw new System.NotImplementedException();
+            return (mySurface.IsUPeriodic());
         }
 
         public override double UPeriod()

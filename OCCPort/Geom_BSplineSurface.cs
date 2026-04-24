@@ -166,6 +166,16 @@ namespace OCCPort
             throw new System.NotImplementedException();
         }
 
+        public override bool IsUPeriodic()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool IsVPeriodic()
+        {
+            throw new NotImplementedException();
+        }
+
         //function : UDegree
         //purpose  : 
         //=======================================================================
@@ -225,6 +235,16 @@ namespace OCCPort
         {
             radius = radius * Math.Abs(T.ScaleFactor());
             pos.Transform(T);
+        }
+
+        public override bool IsUPeriodic()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool IsVPeriodic()
+        {
+            throw new NotImplementedException();
         }
     }
 }

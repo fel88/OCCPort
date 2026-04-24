@@ -20,6 +20,8 @@
     //! Note: to define a left-handed 2D coordinate system, use gp_Ax22d.
     public class gp_Ax2d
     {
+        //! Reverses the direction of <me> and assigns the result to this axis.
+        public void Reverse() { vdir.Reverse(); }
 
         //! Returns the origin of <me>.
         public gp_Pnt2d Location() { return loc; }

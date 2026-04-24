@@ -15,6 +15,10 @@ namespace OCCPort
     //! thread-safe and parallel evaluations need to be prevented.
     public abstract class Adaptor2d_Curve2d
     {
+        public abstract int Degree();
+
+        public abstract int NbKnots();
+
         public abstract GeomAbs_CurveType _GetType();
         public abstract gp_Lin2d Line();
 

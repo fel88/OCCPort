@@ -12,6 +12,15 @@ namespace OCCPort
     public struct gp_XY
 
     {
+        //! @code
+        //! <me>.X() = -<me>.X()
+        //! <me>.Y() = -<me>.Y()
+        public void Reverse()
+        {
+            x = -x;
+            y = -y;
+        }
+
         //! Returns the X coordinate of this number pair.
         public double X() { return x; }
 
@@ -40,12 +49,12 @@ namespace OCCPort
         public void SetY(double theY) { y = theY; }
 
         //! Computes the scalar product between <me> and theOther
-        public  double Dot( gp_XY theOther)  { return x* theOther.x + y* theOther.y; }
+        public double Dot(gp_XY theOther) { return x * theOther.x + y * theOther.y; }
 
         //! @code
         //! double D = <me>.X() * theOther.Y() - <me>.Y() * theOther.X()
         //! @endcode
-        public  double Crossed( gp_XY theOther)  { return x* theOther.y - y* theOther.x; }
+        public double Crossed(gp_XY theOther) { return x * theOther.y - y * theOther.x; }
 
 
         double x;

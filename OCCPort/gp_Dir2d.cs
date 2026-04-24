@@ -9,6 +9,7 @@ namespace OCCPort
         private double dV;
         //! Computes the scalar product
         public double Dot( gp_Dir2d theOther)  { return coord.Dot(theOther.coord); }
+        public void  Reverse() { coord.Reverse(); }
 
         gp_XY coord;
         //! For this unit vector, returns its two coordinates as a number pair.

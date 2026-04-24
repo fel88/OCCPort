@@ -36,6 +36,16 @@
             throw new System.NotImplementedException();
         }
 
+        public override bool IsUPeriodic()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override bool IsVPeriodic()
+        {
+            throw new System.NotImplementedException();
+        }
+
         Geom_Surface basisSurf;
         double utrim1;
         double vtrim1;

@@ -36,6 +36,19 @@ namespace OCCPort
             throw new NotImplementedException();
         }
 
+        public override bool IsUPeriodic()
+        {
+            return basisSurf.IsUPeriodic();
+
+        }
+
+        Geom_Surface basisSurf;
+
+        public override bool IsVPeriodic()
+        {
+            return basisSurf.IsVPeriodic();
+        }
+
         public override void Transform(gp_Trsf t)
         {
             throw new NotImplementedException();

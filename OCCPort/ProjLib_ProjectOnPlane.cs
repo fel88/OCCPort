@@ -235,6 +235,31 @@ namespace OCCPort
 
         }
 
+        public override int Degree()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override int NbKnots()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Geom_BSplineCurve BSpline()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override gp_Pnt Value(double d)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void D0(double d, ref gp_Pnt p)
+        {
+            throw new NotImplementedException();
+        }
+
         Adaptor3d_Curve myCurve;
         gp_Ax3 myPlane;
         gp_Dir myDirection;

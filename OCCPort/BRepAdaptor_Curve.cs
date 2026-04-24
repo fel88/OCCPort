@@ -92,5 +92,30 @@ namespace OCCPort
                 return myConSurf._GetType();
             }
         }
+
+        public override int Degree()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override int NbKnots()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override Geom_BSplineCurve BSpline()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override gp_Pnt Value(double d)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override void D0(double d, ref gp_Pnt p)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

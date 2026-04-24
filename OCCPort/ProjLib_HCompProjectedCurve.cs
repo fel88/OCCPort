@@ -80,5 +80,15 @@ namespace OCCPort
             Ufin = mySequence.Value(Index).Value(mySequence.Value(Index).Length()).X();
 
         }
+
+        public override int Degree()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override int NbKnots()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

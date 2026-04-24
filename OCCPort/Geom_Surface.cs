@@ -35,6 +35,26 @@ namespace OCCPort
         public abstract void Bounds(out double U1, out double U2,
             out double V1, out double V2);
 
+
+        //! Checks if this surface is periodic in the u parametric direction.
+        //! Returns true if:
+        //! - this surface is closed in the u parametric direction, and
+        //! - there is a constant T such that the distance
+        //!   between the points P (u, v) and P (u + T, v)
+        //!   (or the points P (u, v) and P (u, v + T)) is less than or equal to gp::Resolution().
+        //!
+        //! Note: T is the parametric period in the u parametric direction.
+        public abstract bool IsUPeriodic();
+        //! Checks if this surface is periodic in the v parametric direction.
+        //! Returns true if:
+        //! - this surface is closed in the v parametric direction, and
+        //! - there is a constant T such that the distance
+        //!   between the points P (u, v) and P (u + T, v)
+        //!   (or the points P (u, v) and P (u, v + T)) is less than or equal to gp::Resolution().
+        //!
+        //! Note: T is the parametric period in the v parametric direction.
+        public abstract bool IsVPeriodic();
+
     }
 
 }

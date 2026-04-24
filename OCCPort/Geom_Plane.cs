@@ -41,5 +41,15 @@ namespace OCCPort
             V1 = -Precision.Infinite();
             V2 = Precision.Infinite();
         }
+
+        public override bool IsUPeriodic()
+        {
+            return true;
+        }
+
+        public override bool IsVPeriodic()
+        {
+            return false;
+        }
     }
 }

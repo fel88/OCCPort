@@ -38,7 +38,12 @@
 
         public override void Reverse()
         {
-            throw new System.NotImplementedException();
+            pos.Reverse();
+        }
+
+        public override bool IsPeriodic()
+        {
+            return false;
         }
     }
 }

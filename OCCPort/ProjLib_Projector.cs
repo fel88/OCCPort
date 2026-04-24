@@ -15,7 +15,10 @@ namespace OCCPort
         {
             myType = Type;
         }
-
+        public bool IsDone()
+        {
+            return isDone;
+        }
         protected GeomAbs_CurveType myType;
         protected gp_Lin2d myLin;
         protected bool myIsPeriodic;
@@ -29,6 +32,11 @@ namespace OCCPort
         public void Project(gp_Lin l)
         {
             myType = GeomAbs_CurveType.GeomAbs_OtherCurve;
+        }
+
+        internal void Done()
+        {
+            isDone = true;
         }
     }
 

@@ -168,6 +168,16 @@ namespace OCCPort
             if (v1)
                 throw new Exception(v2);
         }
+
+        public override int Degree()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override int NbKnots()
+        {
+            throw new NotImplementedException();
+        }
     }
 
 }

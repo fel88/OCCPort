@@ -21,8 +21,12 @@ namespace OCCPort
 		//function : GetType
 		//purpose  : 
 		//=======================================================================
+		public abstract int Degree();
+		public abstract int NbKnots();
 
-		public abstract GeomAbs_CurveType _GetType();
+		public abstract Geom_BSplineCurve BSpline();
+
+        public abstract GeomAbs_CurveType _GetType();
 		//=======================================================================
 		//function : Line
 		//purpose  : 
@@ -32,11 +36,8 @@ namespace OCCPort
 		{
 			throw new Standard_NotImplemented("Adaptor3d_Curve::Line");
 		}
-		public virtual gp_Pnt Value(double d)
-		{
-			throw new NotImplementedException();
-		}
 
+		public abstract gp_Pnt Value(double d);
 
         public virtual double FirstParameter()
 		{
@@ -48,23 +49,6 @@ namespace OCCPort
 		}
 
 		//void Adaptor3d_Curve::D0(const Standard_Real U, gp_Pnt& P) const 
-		public virtual void D0(double d, ref gp_Pnt p)
-		{
-			throw new Standard_NotImplemented("Adaptor3d_Curve::D0");
-		}
+		public abstract void D0(double d, ref gp_Pnt p);
 	}
-
-	//! Identifies the type of a curve.
-	public enum GeomAbs_CurveType
-	{
-		GeomAbs_Line,
-		GeomAbs_Circle,
-		GeomAbs_Ellipse,
-		GeomAbs_Hyperbola,
-		GeomAbs_Parabola,
-		GeomAbs_BezierCurve,
-		GeomAbs_BSplineCurve,
-		GeomAbs_OffsetCurve,
-		GeomAbs_OtherCurve
-	};
 }
