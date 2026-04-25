@@ -3,12 +3,13 @@
     internal class Geom2d_Line : Geom2d_Curve
 
     {
-        private gp_Lin2d l;
 
-        public Geom2d_Line(gp_Lin2d l)
+
+        public Geom2d_Line(gp_Lin2d L)
         {
-            this.l = l;
+            pos = (L.Position());
         }
+
         public override Geom2d_Geometry Copy()
         {
             Geom2d_Line L;

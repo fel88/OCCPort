@@ -8,7 +8,7 @@ namespace OCCPort
 {
     public class NCollection_Array1<T>
     {
-        public List<T> list = new List<T>();
+        public T[] list = null;
         //! Empty constructor; should be used with caution.
         //! @sa methods Resize() and Move().
         public NCollection_Array1()
@@ -30,6 +30,7 @@ namespace OCCPort
             myUpperBound = (theUpper);
             myDeletable = true;
 
+            list = new T[theUpper - theLower + 1];
             //new Standard_RangeError_Raise_if(theUpper < theLower, "NCollection_Array1::Create");
             //TheItemType* pBegin = new TheItemType[Length()];
             //Standard_OutOfMemory_Raise_if(!pBegin, "NCollection_Array1 : Allocation failed");
@@ -41,7 +42,7 @@ namespace OCCPort
         {
             myLowerBound = lower;
             myUpperBound = upper;
-            list = theOther.ToList();
+            list = theOther.ToArray();
 
         }
         public T this[int key]
@@ -67,7 +68,7 @@ namespace OCCPort
 
         public void SetValue(int v, T aDrawBuffer)
         {
-            list[v] = aDrawBuffer;
+            this[v] = aDrawBuffer;
         }
 
         public int Upper()
@@ -81,7 +82,7 @@ namespace OCCPort
 
         public int Length()
         {
-            return list.Count;
+            return list.Length;
         }
         public void Resize(int v1, int v2, bool v3)
         {

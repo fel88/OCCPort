@@ -21,12 +21,23 @@ namespace OCCPort
     //! secondly perform then get the result
     internal class ShapeAnalysis_WireOrder
     {
+        public ShapeAnalysis_WireOrder()
+
+        {
+            myGap = (0.0);
+            myStat = (0);
+            myKeepLoops = (false);
+            myMode = ModeType.Mode3D;
+            myTol = Precision.Confusion();
+            Clear();
+        }
+
         ModeType myMode;
-        int[] myOrd;
+        TColStd_Array1OfInteger myOrd;
         int[] myChains;
         int[] myCouples;
-        List<gp_XYZ> myXYZ;
-        List<gp_XY> myXY;
+        NCollection_Sequence<gp_XYZ> myXYZ;
+        NCollection_Sequence<gp_XY> myXY;
         double myTol;
         double myGap;
         int myStat;
@@ -79,7 +90,7 @@ namespace OCCPort
 
         public int Ordered(int theIdx)
         {
-            if (myOrd==null || myOrd.GetUpperBound(0) < theIdx)
+            if (myOrd == null || myOrd.Upper() < theIdx)
                 return theIdx;
 
             int anOldIdx = myOrd[theIdx];
@@ -95,31 +106,31 @@ namespace OCCPort
             {
                 return;
             }
-            myOrd = new int[aNbEdges];
+            myOrd = new TColStd_Array1OfInteger(1, aNbEdges);
             //myOrd.Init(0);??
 
             // sequence of the edge nums in the right order
-            List<int> anEdgeSeq = new List<int>();
-            List<List<int>> aLoops = new List<List<int>>();
+            TColStd_HSequenceOfInteger anEdgeSeq = new TColStd_HSequenceOfInteger();
+            NCollection_Sequence<List<int>> aLoops = new NCollection_Sequence<List<int>>();
 
             // the beginnings and ends of the edges
-            gp_XYZ[] aBegins3D = new gp_XYZ[aNbEdges];
-            gp_XYZ[] anEnds3D = new gp_XYZ[aNbEdges];
-            gp_XY[] aBegins2D = new gp_XY[aNbEdges];
-            gp_XY[] anEnds2D = new gp_XY[aNbEdges];
+            TColgp_Array1OfXYZ aBegins3D = new TColgp_Array1OfXYZ(1, aNbEdges);
+            TColgp_Array1OfXYZ anEnds3D = new TColgp_Array1OfXYZ(1, aNbEdges);
+            TColgp_Array1OfXY aBegins2D = new TColgp_Array1OfXY(1, aNbEdges);
+            TColgp_Array1OfXY anEnds2D = new TColgp_Array1OfXY(1, aNbEdges);
             for (int i = 1; i <= aNbEdges; i++)
             {
-                aBegins3D[i] = myXYZ[2 * i - 1];
-                anEnds3D[i] = myXYZ[2 * i];
+                aBegins3D[i] = myXYZ.Value(2 * i - 1);
+                anEnds3D[i] = myXYZ.Value(2 * i);
                 if (myMode == ModeType.ModeBoth)
                 {
-                    aBegins2D[i] = myXY[2 * i - 1];
-                    anEnds2D[i] = myXY[2 * i];
+                    aBegins2D[i] = myXY.Value(2 * i - 1);
+                    anEnds2D[i] = myXY.Value(2 * i);
                 }
             }
 
             // the flags that the edges was considered
-            bool[] isEdgeUsed = new bool[aNbEdges];
+            TColStd_Array1OfBoolean isEdgeUsed = new TColStd_Array1OfBoolean(1, aNbEdges);
             //isEdgeUsed.Init(false);
 
             double aTol2 = Precision.SquareConfusion();
@@ -371,7 +382,7 @@ namespace OCCPort
                     else
                     {
                         aLoops.Append(anEdgeSeq);
-                        anEdgeSeq = new List<int>();
+                        anEdgeSeq = new TColStd_HSequenceOfInteger();
                         aFirstPnt3D = aBegins3D[aBestEdgeNum].To_gp_Pnt();
                         aLastPnt3D = anEnds3D[aBestEdgeNum].To_gp_Pnt();
                         if (myMode == ModeType.ModeBoth)
@@ -401,7 +412,7 @@ namespace OCCPort
                 aMainLoop = new List<int>();
                 for (int i = 1; i <= aLoops.Count; i++)
                 {
-                    List<int> aCurLoop = aLoops[i];
+                    List<int> aCurLoop = aLoops.Value(i);
                     aMainLoop.AddRange(aCurLoop);
                 }
             }
@@ -409,7 +420,7 @@ namespace OCCPort
             {
                 // connecting loops
                 aMainLoop = aLoops.First();
-                aLoops.RemoveAt(1);
+                aLoops.Remove(1);
                 while (aLoops.Count != 0)
                 {
                     // iterate over all loops to find the closest one
@@ -492,15 +503,15 @@ namespace OCCPort
                         }
                     }
                     // insert the found loop into main loop
-                    var aLoop = aLoops[aLoopNum1];
+                    var aLoop = aLoops.Value(aLoopNum1);
                     int aFactor = (aDirect1 ? 1 : -1);
                     for (int i = 0; i < aLoop.Count; i++)
                     {
                         int anIdx = (aCurLoopIt1 + i > aLoop.Count ? aCurLoopIt1 + i - aLoop.Count :
                                                   aCurLoopIt1 + i);
-                        aMainLoop.InsertAfter(aMainLoopIt1 + i, aLoop[anIdx] * aFactor);
+                        aMainLoop.InsertAfter(aMainLoopIt1 + i, aLoop.Value(anIdx) * aFactor);
                     }
-                    aLoops.RemoveAt(aLoopNum1);
+                    aLoops.Remove(aLoopNum1);
                 }
             }
 
@@ -511,11 +522,11 @@ namespace OCCPort
             int aTempStatus = 0;
             for (int i = 1; i <= aMainLoop.Count(); i++)
             {
-                if (i != aMainLoop[i] && aTempStatus >= 0)
+                if (i != aMainLoop.Value(i) && aTempStatus >= 0)
                 {
-                    aTempStatus = (aMainLoop[i] > 0 ? 1 : -1);
+                    aTempStatus = (aMainLoop.Value(i) > 0 ? 1 : -1);
                 }
-                myOrd.SetValue(i, aMainLoop[i]);
+                myOrd.SetValue(i, aMainLoop.Value(i));
             }
             if (aTempStatus == 0)
             {
@@ -569,8 +580,8 @@ namespace OCCPort
 
         void Clear()
         {
-            myXYZ = new List<gp_XYZ>();
-            myXY = new List<gp_XY>();
+            myXYZ = new NCollection_Sequence<gp_XYZ>();
+            myXY = new NCollection_Sequence<gp_XY>();
             myStat = 0;
             myGap = 0.0;
         }

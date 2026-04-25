@@ -5,10 +5,7 @@ namespace OCCPort
 	internal class TColStd_HArray1OfReal: NCollection_Array1<double>
 	{
 		
-		public int Length()
-		{
-			return list.Count;
-		}
+	
 		
 		
 	}

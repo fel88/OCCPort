@@ -22,7 +22,13 @@ namespace OCCPort
         public abstract GeomAbs_CurveType _GetType();
         public abstract gp_Lin2d Line();
         public abstract double FirstParameter();
+        public virtual int NbSamples()
+        {
+            return 20;
+        }
         public abstract double LastParameter();
+        public abstract Geom2d_BSplineCurve BSpline();
+        public abstract Geom2d_BezierCurve Bezier();
 
         internal Adaptor2d_Curve2d Trim(double myFirst, double myLast, double v)
         {

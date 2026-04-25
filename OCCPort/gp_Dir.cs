@@ -11,6 +11,9 @@ namespace OCCPort
         {
             return coord.X();
         }
+        //! Computes the scalar product
+        public double Dot(gp_Dir theOther) { return coord.Dot(theOther.coord); }
+
         public void Reverse() { coord.Reverse(); }
         internal double Y()
         {
@@ -40,8 +43,7 @@ namespace OCCPort
         }
 
 
-        //! Computes the scalar product
-        double Dot(gp_Dir theOther) { return coord.Dot(theOther.coord); }
+        
 
         public static double operator *(gp_Dir v, gp_Dir theOther)
         {
@@ -160,7 +162,7 @@ namespace OCCPort
             aV.coord.Divide(aD);
             return aV;
         }
-        
+
 
         //! Reverses the orientation of a direction
         //! geometric transformations

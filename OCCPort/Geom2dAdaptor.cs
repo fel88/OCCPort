@@ -54,17 +54,17 @@ namespace OCCPort
                 //    }
                 //    break;
 
-                //case GeomAbs_BezierCurve:
-                //    {
-                //        C2D = HC.Bezier();
-                //    }
-                //    break;
+                case GeomAbs_CurveType.GeomAbs_BezierCurve:
+                    {
+                        C2D = HC.Bezier();
+                    }
+                    break;
 
-                //case GeomAbs_BSplineCurve:
-                //    {
-                //        C2D = HC.BSpline();
-                //    }
-                //    break;
+                case GeomAbs_CurveType.GeomAbs_BSplineCurve:
+                    {
+                        C2D = HC.BSpline();
+                    }
+                    break;
 
                 //case GeomAbs_OffsetCurve:
                 //    {
@@ -86,25 +86,25 @@ namespace OCCPort
             }
 
             //trim the curve if necassary.
-            //if (!C2D.IsNull() &&
-            //    ((HC.FirstParameter() != C2D.FirstParameter()) ||
-            //    (HC.LastParameter() != C2D.LastParameter())))
-            //{
+            if (C2D != null &&
+                ((HC.FirstParameter() != C2D.FirstParameter()) ||
+                (HC.LastParameter() != C2D.LastParameter())))
+            {
 
-            //    if (C2D.IsPeriodic() ||
-            //      (HC.FirstParameter() >= C2D.FirstParameter() &&
-            //      HC.LastParameter() <= C2D.LastParameter()))
-            //    {
-            //        C2D = new Geom2d_TrimmedCurve
-            //          (C2D, HC.FirstParameter(), HC.LastParameter());
-            //    }
-            //    else
-            //    {
-            //        double tf = Math.Max(HC.FirstParameter(), C2D.FirstParameter());
-            //        double tl = Math.Min(HC.LastParameter(), C2D.LastParameter());
-            //        C2D = new Geom2d_TrimmedCurve(C2D, tf, tl);
-            //    }
-            //}
+                if (C2D.IsPeriodic() ||
+                  (HC.FirstParameter() >= C2D.FirstParameter() &&
+                  HC.LastParameter() <= C2D.LastParameter()))
+                {
+                    //C2D = new Geom2d_TrimmedCurve
+                    //  (C2D, HC.FirstParameter(), HC.LastParameter());
+                }
+                else
+                {
+                    double tf = Math.Max(HC.FirstParameter(), C2D.FirstParameter());
+                    double tl = Math.Min(HC.LastParameter(), C2D.LastParameter());
+                    //C2D = new Geom2d_TrimmedCurve(C2D, tf, tl);
+                }
+            }
 
             return C2D;
         }

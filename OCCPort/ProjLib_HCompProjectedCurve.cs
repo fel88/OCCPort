@@ -106,5 +106,15 @@ namespace OCCPort
         {
             throw new NotImplementedException();
         }
+
+        public override Geom2d_BSplineCurve BSpline()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Geom2d_BezierCurve Bezier()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

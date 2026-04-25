@@ -58,7 +58,7 @@ namespace OCCPort
 
         public override gp_Lin2d Line()
         {
-            throw new NotImplementedException();
+            return myResult.Line();            
         }
 
         public void Load(Adaptor3d_Surface S)
@@ -631,6 +631,16 @@ namespace OCCPort
         }
 
         public override int NbKnots()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Geom2d_BSplineCurve BSpline()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Geom2d_BezierCurve Bezier()
         {
             throw new NotImplementedException();
         }

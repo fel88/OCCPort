@@ -8,9 +8,6 @@ namespace OCCPort
         {
         }
 
-        public int Length()
-		{
-			return list.Count;
-		}
+  
 	}
 }

@@ -14,7 +14,7 @@ namespace OCCPort
         }
         public TopoDS_Shape Value(int i)
         {
-            return this[i];
+            return this[i - 1];
         }
         public int Length()
         {

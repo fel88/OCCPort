@@ -30,7 +30,7 @@ namespace OCCPort
         }
         public bool PCurve(TopoDS_Edge edge,
                          TopoDS_Face face,
-                         Geom2d_Curve C2d,
+                       ref  Geom2d_Curve C2d,
                          ref double cf, ref double cl,
                          bool orient = true)
         {
@@ -43,7 +43,7 @@ namespace OCCPort
             //   return !C2d.IsNull();
             TopLoc_Location L = new TopLoc_Location();
             Geom_Surface S = BRep_Tool.Surface(face, ref L);
-            return PCurve(edge, S, L, C2d, ref cf, ref cl, orient);
+            return PCurve(edge, S, L,ref  C2d, ref cf, ref cl, orient);
         }
         //! Returns the pcurve and bounding parameteres for the edge
         //! lying on the surface.
@@ -53,7 +53,7 @@ namespace OCCPort
         public bool PCurve(TopoDS_Edge edge,
                          Geom_Surface surface,
                          TopLoc_Location location,
-                         Geom2d_Curve C2d,
+                       ref  Geom2d_Curve C2d,
                          ref double cf, ref double cl,
                          bool orient = true)
         {

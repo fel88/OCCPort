@@ -11,6 +11,8 @@ namespace OCCPort
         public gp_Ax3 Position() { return pos; }
 
         private gp_Ax3 pos;
+        //! Returns the plane's location (origin).
+        public gp_Pnt Location() { return pos.Location(); }
 
         //! Returns the plane's normal Axis.
         public gp_Ax1 Axis() { return pos.Axis(); }

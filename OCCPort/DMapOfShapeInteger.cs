@@ -27,7 +27,7 @@ namespace OCCPort
 
             internal int Find(TopoDS_Edge aEdge)
             {
-                throw new NotImplementedException();
+                return Items.First(z => z.Shape == aEdge).Int;
             }
 
             internal bool IsBound(TopoDS_Edge theEdge)

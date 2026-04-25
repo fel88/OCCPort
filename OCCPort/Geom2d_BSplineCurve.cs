@@ -98,6 +98,9 @@ namespace OCCPort
         public int Degree()
         { return deg; }
         public int deg;
+        public int NbKnots()
+        { return knots.Length(); }
+
 
         TColgp_HArray1OfPnt2d poles;
         TColStd_HArray1OfReal weights;

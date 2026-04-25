@@ -8,6 +8,12 @@ namespace OCCPort
     internal class DMapOfIFacePtrsListOfInteger
     {
         public List<KeyValuePair<IMeshData_Face, ListOfInteger>> map = new List<KeyValuePair<IMeshData_Face, ListOfInteger>>();
+
+        public DMapOfIFacePtrsListOfInteger(int v)
+        {
+
+        }
+
         internal void Bind(IMeshData_Face theDFace, ListOfInteger listOfInteger)
         {
             map.Add(new KeyValuePair<IMeshData_Face, ListOfInteger>(theDFace, listOfInteger));

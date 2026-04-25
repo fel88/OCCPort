@@ -8,9 +8,9 @@ namespace OCCPort
     {
         internal static int NbSamples(Geom2dAdaptor_Curve C)
         {
-            int  nbs = C.NbSamples();
+            int nbs = C.NbSamples();
             GeomAbs_CurveType typC = C._GetType();
-            if (typC ==GeomAbs_CurveType. GeomAbs_Circle)
+            if (typC == GeomAbs_CurveType.GeomAbs_Circle)
             {
                 ////Try to reach deflection = eps*R, eps = 0.01
                 //double minR = 1.0; //eps = 0.01
@@ -23,7 +23,7 @@ namespace OCCPort
                 //}
             }
 
-            return nbs; 
+            return nbs;
         }
     }
 }

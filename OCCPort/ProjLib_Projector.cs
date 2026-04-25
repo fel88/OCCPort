@@ -11,6 +11,13 @@ namespace OCCPort
             isDone = false;
             myType = GeomAbs_CurveType.GeomAbs_BSplineCurve;
         }
+        public gp_Lin2d Line()
+        {
+            if (myType != GeomAbs_CurveType.GeomAbs_Line)
+                throw new Standard_NoSuchObject("ProjLib_Projector::Line");
+            return myLin;
+        }
+
         public void SetType(GeomAbs_CurveType Type)
         {
             myType = Type;
@@ -29,7 +36,7 @@ namespace OCCPort
         }
 
 
-        public void Project(gp_Lin l)
+        public virtual void Project(gp_Lin l)
         {
             myType = GeomAbs_CurveType.GeomAbs_OtherCurve;
         }

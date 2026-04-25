@@ -67,6 +67,9 @@ namespace OCCPort
 
         public BRepMeshData_Edge(TopoDS_Edge theEdge) : base(theEdge)
         {
+            myPCurves = new VectorOfIPCurveHandles(256);
+            myPCurvesMap = new DMapOfIFacePtrsListOfInteger(1);
+
         }
     }
 }

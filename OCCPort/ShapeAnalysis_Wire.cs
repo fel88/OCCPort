@@ -116,7 +116,7 @@ namespace OCCPort
                     double f = 0, l = 0;
                     Geom2d_Curve c2d = null;
                     TopoDS_Shape tmpF = myFace.Oriented(TopAbs_Orientation.TopAbs_FORWARD);
-                    if (!EA.PCurve(E, TopoDS.Face(tmpF), c2d, ref f, ref l))
+                    if (!EA.PCurve(E, TopoDS.Face(tmpF), ref c2d, ref f, ref l))
                     {
                         // if mode is 2d, then we can nothing to do, else we can switch to 3d mode
                         if (!theMode3D && !theModeBoth)
@@ -167,6 +167,7 @@ namespace OCCPort
             }
             return LastCheckStatus(ShapeExtend_Status.ShapeExtend_DONE);
         }
+
         ShapeExtend_WireData myWire;
         TopoDS_Face myFace = new TopoDS_Face();
         ShapeAnalysis_Surface mySurf;

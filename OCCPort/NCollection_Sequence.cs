@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace OCCPort
 {
@@ -13,6 +14,16 @@ namespace OCCPort
         public void Append(T t)
         {
             Add(t);
+        }
+
+        internal T First()
+        {
+            return this[0];
+        }
+
+        internal void Remove(int v)
+        {
+            RemoveAt(v - 1);
         }
     }
 }

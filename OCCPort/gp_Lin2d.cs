@@ -9,6 +9,11 @@
 
         { pos = theA; }
 
+        //! Returns the axis placement one axis with the same
+        //! location and direction as <me>.
+        public gp_Ax2d Position() { return pos; }
+
+
         //! Returns the direction of the line.
         public gp_Dir2d Direction() { return pos.Direction(); }
 

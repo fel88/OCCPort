@@ -19,6 +19,15 @@ namespace OCCPort
         GeomAbs_CurveType myTypeCurve;
         double myFirst;
         double myLast;
+        public override Geom2d_BezierCurve Bezier()
+        {
+            return (Geom2d_BezierCurve)myCurve;
+        }
+        public override Geom2d_BSplineCurve BSpline()
+        {
+            return myBSplineCurve;
+        }
+        Geom2d_BSplineCurve myBSplineCurve; ///< B-spline representation to prevent castings
 
         public gp_Pnt2d Value(double U)
         {
@@ -127,11 +136,11 @@ namespace OCCPort
                 //{
                 //    myTypeCurve = GeomAbs_BezierCurve;
                 //}
-                //else if (TheType == STANDARD_TYPE(Geom2d_BSplineCurve))
-                //{
-                //    myTypeCurve = GeomAbs_BSplineCurve;
-                //    myBSplineCurve = Handle(Geom2d_BSplineCurve)::DownCast(myCurve);
-                //}
+                else if (C is Geom2d_BSplineCurve)
+                {
+                    myTypeCurve = GeomAbs_CurveType.GeomAbs_BSplineCurve;
+                    myBSplineCurve = (Geom2d_BSplineCurve)myCurve;
+                }
                 //else if (TheType == STANDARD_TYPE(Geom2d_OffsetCurve))
                 //{
                 //    myTypeCurve = GeomAbs_OffsetCurve;
@@ -147,11 +156,42 @@ namespace OCCPort
                 }
             }
         }
-        internal int NbSamples()
+
+        public override int NbSamples()
+        {
+            return nbPoints(myCurve);
+        }
+        public static int nbPoints(Geom2d_Curve theCurve)
         {
 
-            return 20;
+            int nbs = 20;
 
+            if (theCurve is Geom2d_Line)
+                nbs = 2;
+            //else if (theCurve->IsKind(STANDARD_TYPE(Geom2d_BezierCurve)))
+            //{
+            //    nbs = 3 + Handle(Geom2d_BezierCurve)::DownCast(theCurve)->NbPoles();
+            //}
+            else if (theCurve is Geom2d_BSplineCurve)
+            {
+                nbs = ((Geom2d_BSplineCurve)theCurve).NbKnots();
+                nbs *= ((Geom2d_BSplineCurve)theCurve).Degree();
+                if (nbs < 2.0) nbs = 2;
+            }
+            //else if (theCurve->IsKind(STANDARD_TYPE(Geom2d_OffsetCurve)))
+            //{
+            //    Handle(Geom2d_Curve) aCurve = Handle(Geom2d_OffsetCurve)::DownCast(theCurve)->BasisCurve();
+            //    return Max(nbs, nbPoints(aCurve));
+            //}
+
+            //else if (theCurve->IsKind(STANDARD_TYPE(Geom2d_TrimmedCurve)))
+            //{
+            //    Handle(Geom2d_Curve) aCurve = Handle(Geom2d_TrimmedCurve)::DownCast(theCurve)->BasisCurve();
+            //    return Max(nbs, nbPoints(aCurve));
+            //}
+            if (nbs > 300)
+                nbs = 300;
+            return nbs;
 
         }
 
