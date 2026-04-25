@@ -21,6 +21,8 @@ namespace OCCPort
 
         public abstract GeomAbs_CurveType _GetType();
         public abstract gp_Lin2d Line();
+        public abstract double FirstParameter();
+        public abstract double LastParameter();
 
         internal Adaptor2d_Curve2d Trim(double myFirst, double myLast, double v)
         {

@@ -220,6 +220,7 @@ namespace OCCPort
             Geom_CylindricalSurface Cs = new Geom_CylindricalSurface(pos, radius);
             return Cs;
         }
+        public double Radius() { return radius; }
         public Geom_CylindricalSurface(gp_Ax3 A3,
                            double R)
 
@@ -230,7 +231,7 @@ namespace OCCPort
             pos = A3;
         }
 
-
+        
         public override void Transform(gp_Trsf T)
         {
             radius = radius * Math.Abs(T.ScaleFactor());

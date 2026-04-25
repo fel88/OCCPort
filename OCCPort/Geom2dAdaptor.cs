@@ -1,16 +1,24 @@
 ﻿using OCCPort;
+using System;
 
 namespace OCCPort
-{
+{//! this package  contains the geometric definition of
+ //! 2d  curves compatible  with  the  Adaptor  package
+ //! templates.
     internal class Geom2dAdaptor
     {
+
+        //! Inherited  from    GHCurve.   Provides a  curve
+        //! handled by reference.
+        //! Creates  a 2d  curve  from  a  HCurve2d.  This
+        //! cannot process the OtherCurves.
         public static Geom2d_Curve MakeCurve(Adaptor2d_Curve2d HC)
         {
-            Geom2d_Curve C2D = null ;
+            Geom2d_Curve C2D = null;
             switch (HC._GetType())
             {
 
-                case GeomAbs_CurveType. GeomAbs_Line:
+                case GeomAbs_CurveType.GeomAbs_Line:
                     {
                         Geom2d_Line GL = new Geom2d_Line(HC.Line());
                         C2D = GL;
@@ -77,23 +85,23 @@ namespace OCCPort
 
             }
 
-            // trim the curve if necassary.
+            //trim the curve if necassary.
             //if (!C2D.IsNull() &&
-            //    ((HC.FirstParameter() != C2D->FirstParameter()) ||
-            //    (HC.LastParameter() != C2D->LastParameter())))
+            //    ((HC.FirstParameter() != C2D.FirstParameter()) ||
+            //    (HC.LastParameter() != C2D.LastParameter())))
             //{
 
-            //    if (C2D->IsPeriodic() ||
-            //      (HC.FirstParameter() >= C2D->FirstParameter() &&
-            //      HC.LastParameter() <= C2D->LastParameter()))
+            //    if (C2D.IsPeriodic() ||
+            //      (HC.FirstParameter() >= C2D.FirstParameter() &&
+            //      HC.LastParameter() <= C2D.LastParameter()))
             //    {
             //        C2D = new Geom2d_TrimmedCurve
             //          (C2D, HC.FirstParameter(), HC.LastParameter());
             //    }
             //    else
             //    {
-            //        Standard_Real tf = Max(HC.FirstParameter(), C2D->FirstParameter());
-            //        Standard_Real tl = Min(HC.LastParameter(), C2D->LastParameter());
+            //        double tf = Math.Max(HC.FirstParameter(), C2D.FirstParameter());
+            //        double tl = Math.Min(HC.LastParameter(), C2D.LastParameter());
             //        C2D = new Geom2d_TrimmedCurve(C2D, tf, tl);
             //    }
             //}

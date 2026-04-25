@@ -13,6 +13,11 @@ namespace OCCPort
         //! Returns True if R may be considered as  a positive
         //! infinite number. Currently R > 1e100
         public static bool IsPositiveInfinite(double R) { return R >= (0.5 * Precision.Infinite()); }
+        //! Used for  Approximations  in parametric space on a
+        //! default curve.
+        //!
+        //! This is Precision::Parametric(Precision::Approximation())
+        public static double PApproximation() { return Parametric(Approximation()); }
 
         //! Returns True if R may  be considered as a negative
         //! infinite number. Currently R < -1e100

@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.Contracts;
+using System.Runtime.CompilerServices;
 
 namespace OCCPort
 {
@@ -94,10 +95,36 @@ namespace OCCPort
     //! a practical guide Gerald Farin
     public class Geom2d_BSplineCurve : Geom2d_BoundedCurve
     {
-        public int Degree() 
-{ return deg; }
-        public int  deg;
+        public int Degree()
+        { return deg; }
+        public int deg;
 
+        TColgp_HArray1OfPnt2d poles;
+        TColStd_HArray1OfReal weights;
+        TColStd_HArray1OfReal flatknots;
+        TColStd_HArray1OfReal knots;
+        TColStd_Array1OfInteger mults;
+        public bool IsRational()
+        {
+            return weights != null;
+        }
+
+        public override Geom2d_Geometry Copy()
+        {
+            Geom2d_BSplineCurve C = null;
+            //if (IsRational())
+            //    C = new Geom2d_BSplineCurve(poles.Array1(),
+            //                weights.Array1(),
+            //                knots.Array1(),
+            //                mults.Array1(),
+            //                deg, periodic);
+            //else
+            //    C = new Geom2d_BSplineCurve(poles->Array1(),
+            //                knots->Array1(),
+            //                mults->Array1(),
+            //                deg, periodic);
+            return C;
+        }
 
 
     }

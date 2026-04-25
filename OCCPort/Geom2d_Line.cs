@@ -9,6 +9,12 @@
         {
             this.l = l;
         }
+        public override Geom2d_Geometry Copy()
+        {
+            Geom2d_Line L;
+            L = new Geom2d_Line(pos);
+            return L;
+        }
         public gp_Lin2d Lin2d() { return new gp_Lin2d(pos); }
 
         //! Computes the parameter on the reversed line for the
@@ -32,6 +38,7 @@
         //purpose  : 
         //=======================================================================
         gp_Ax2d pos;
+        public Geom2d_Line(gp_Ax2d A) { pos = (A); }
 
         public override double LastParameter()
         { return Precision.Infinite(); }

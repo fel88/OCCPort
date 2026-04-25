@@ -16,7 +16,7 @@
 
         public void Perform(Message_ProgressRange theRange)
         {
-            /*ClearStatus();*/
+            ClearStatus();
 
             IMeshTools_Context aContext = GetContext();
             if (aContext == null)

@@ -102,7 +102,7 @@ namespace OCCPort
             // Curve is not found. Try projection on plane
             if (theIsStored.HasValue)
                 theIsStored = false;
-            return CurveOnPlane(E, S, L, First, Last);
+            return CurveOnPlane(E, S, L, ref First, ref Last);
         }
 
 
@@ -141,9 +141,10 @@ namespace OCCPort
         public static Geom2d_Curve CurveOnPlane(TopoDS_Edge E,
                                              Geom_Surface S,
                                              TopLoc_Location L,
-                                             double First,
-                                             double Last)
+                                           ref double First,
+                                           ref  double Last)
         {
+                        
             First = Last = 0.0;
 
             // Check if the surface is planar

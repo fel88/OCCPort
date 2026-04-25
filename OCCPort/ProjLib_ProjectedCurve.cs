@@ -39,6 +39,23 @@ namespace OCCPort
             Perform(C);
         }
 
+
+        public override double FirstParameter()
+        {
+            return myCurve.FirstParameter();
+        }
+
+
+        //=======================================================================
+        //function : LastParameter
+        //purpose  : 
+        //=======================================================================
+
+        public override double LastParameter()
+        {
+            return myCurve.LastParameter();
+        }
+
         public override gp_Lin2d Line()
         {
             throw new NotImplementedException();
@@ -435,7 +452,7 @@ namespace OCCPort
 
                 myResult.Done();
                 Geom2d_BSplineCurve aRes;
-                if (Comp.BSpline()==null)
+                if (Comp.BSpline() == null)
                 {
                     aRes = Geom2dConvert.CurveToBSplineCurve(Comp.Bezier());
                 }

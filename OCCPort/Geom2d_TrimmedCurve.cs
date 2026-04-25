@@ -1,4 +1,8 @@
-﻿namespace OCCPort
+﻿using System;
+using System.Reflection.Metadata;
+using System.Runtime.Intrinsics.X86;
+
+namespace OCCPort
 {
     //! Defines a portion of a curve limited by two values of
     //! parameters inside the parametric domain of the curve.
@@ -15,6 +19,81 @@
         public Geom2d_Curve BasisCurve()
         {
             return basisCurve;
+        }
+
+        public Geom2d_TrimmedCurve(Geom2d_Curve C,
+                                          double U1,
+                                          double U2,
+                                          bool Sense,
+                                          bool theAdjustPeriodic)
+        {
+            uTrim1 = (U1);
+            uTrim2 = (U2);
+
+            if (C == null) throw new Standard_ConstructionError("Geom2d_TrimmedCurve:: C is null");
+            // kill trimmed basis curves
+            Geom2d_TrimmedCurve T = (Geom2d_TrimmedCurve)C;
+            if (T != null)
+                basisCurve = (Geom2d_Curve)(T.BasisCurve().Copy());
+            else
+                basisCurve = (Geom2d_Curve)(C.Copy());
+
+            SetTrim(U1, U2, Sense, theAdjustPeriodic);
+        }
+        public void SetTrim(double U1,
+                            double U2,
+                                   bool Sense,
+                                   bool theAdjustPeriodic)
+        {
+            bool sameSense = true;
+            if (U1 == U2)
+                throw new Standard_ConstructionError("Geom2d_TrimmedCurve::U1 == U2");
+
+            double Udeb = basisCurve.FirstParameter();
+            double Ufin = basisCurve.LastParameter();
+
+            if (basisCurve.IsPeriodic())   
+            {
+                sameSense = Sense;
+
+                // set uTrim1 in the range Udeb , Ufin
+                // set uTrim2 in the range uTrim1 , uTrim1 + Period()
+                uTrim1 = U1;
+                uTrim2 = U2;
+                if (theAdjustPeriodic)
+                    ElCLib.AdjustPeriodic(Udeb, Ufin,
+                                           Math.Min(Math.Abs(uTrim2 - uTrim1) / 2, Precision.PConfusion()),
+                                         ref  uTrim1, ref uTrim2);
+            }
+            else
+            {
+                if (U1 < U2)
+                {
+                    sameSense = Sense;
+                    uTrim1 = U1;
+                    uTrim2 = U2;
+                }
+                else
+                {
+                    sameSense = !Sense;
+                    uTrim1 = U2;
+                    uTrim2 = U1;
+                }
+
+                if ((Udeb - uTrim1 > Precision.PConfusion()) ||
+                (uTrim2 - Ufin > Precision.PConfusion()))
+                {
+                    throw new Standard_ConstructionError("Geom_TrimmedCurve::parameters out of range");
+                }
+            }
+
+            if (!sameSense)
+                Reverse();
+        }
+
+        public override Geom2d_Geometry Copy()
+        {
+            throw new NotImplementedException();
         }
     }
 

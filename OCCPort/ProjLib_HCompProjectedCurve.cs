@@ -25,6 +25,22 @@ namespace OCCPort
             Init();
 
         }
+
+        public override double FirstParameter()
+        {
+            return myCurve.FirstParameter();
+        }
+
+        //=======================================================================
+        //function : LastParameter
+        //purpose  : 
+        //=======================================================================
+
+        public override double LastParameter()
+        {
+            return myCurve.LastParameter();
+        }
+
         int myNbCurves;
         double myTol3d;
 
@@ -73,7 +89,7 @@ namespace OCCPort
 
         internal void Bounds(int Index, out double Udeb, out double Ufin)
         {
-            if (Index < 1 || Index > myNbCurves) 
+            if (Index < 1 || Index > myNbCurves)
                 throw new Standard_NoSuchObject();
 
             Udeb = mySequence.Value(Index).Value(1).X();

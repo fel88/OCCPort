@@ -41,15 +41,27 @@ namespace OCCPort
 
             }
         }
-        public double FirstParameter()
+        public override double FirstParameter()
         {
             return (myCurve.FirstParameter());
         }
 
-        public double LastParameter()
+        public override double LastParameter()
         {
             return (myCurve.LastParameter());
         }
+
+        public override bool Value(double theU, NCollection_Array1<gp_Pnt2d> thePnt2d, NCollection_Array1<gp_Pnt> thePnt)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override bool D1(double theU, NCollection_Array1<gp_Vec2d> theVec2d, NCollection_Array1<gp_Vec> theVec)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        
 
         public ProjLib_Function(Adaptor3d_Curve C, Adaptor3d_Surface S)
         {

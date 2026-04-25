@@ -1,6 +1,9 @@
 ﻿namespace OCCPort
 {
-    public class Geom2d_Geometry
+    public abstract class Geom2d_Geometry
     {
+
+        public abstract Geom2d_Geometry Copy();
+
     }
 }

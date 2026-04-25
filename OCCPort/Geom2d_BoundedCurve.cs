@@ -18,7 +18,7 @@ namespace OCCPort
     //! - Geom2d_TrimmedCurve to trim a curve, i.e. to
     //! only take part of the curve limited by two values of
     //! the parameter of the basis curve.
-    public class Geom2d_BoundedCurve : Geom2d_Curve
+    public abstract class Geom2d_BoundedCurve : Geom2d_Curve
     {
         public override void D0(double U, ref gp_Pnt2d P)
         {

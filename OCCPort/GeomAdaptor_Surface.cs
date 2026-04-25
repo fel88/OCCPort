@@ -1,6 +1,8 @@
 ﻿using OCCPort;
+using System;
 using System.Reflection.Metadata;
 using System.Security.AccessControl;
+using System.Transactions;
 
 namespace OCCPort
 {
@@ -178,7 +180,7 @@ namespace OCCPort
 
         public override bool IsVPeriodic()
         {
-            throw new System.NotImplementedException();
+            return (mySurface.IsVPeriodic());
         }
 
         public override bool IsUPeriodic()
@@ -188,22 +190,160 @@ namespace OCCPort
 
         public override double UPeriod()
         {
-            throw new System.NotImplementedException();
+            Exceptions.Standard_NoSuchObject_Raise_if(!IsUPeriodic(), " ");
+            return mySurface.UPeriod();
         }
+
 
         public override double VPeriod()
         {
-            throw new System.NotImplementedException();
+            Exceptions.Standard_NoSuchObject_Raise_if(!IsVPeriodic(), " ");
+            return mySurface.VPeriod();
         }
 
-        public override double VResolution(double v)
+        public override double VResolution(double R3d)
         {
-            throw new System.NotImplementedException();
+            double Res = 0.0;
+
+            switch (mySurfaceType)
+            {
+                //case GeomAbs_SurfaceType. GeomAbs_SurfaceOfRevolution:
+                //    {
+                //        GeomAdaptor_Curve myBasisCurve
+                //          (Handle(Geom_SurfaceOfRevolution)::DownCast(mySurface)->BasisCurve(),myUFirst,myULast);
+                //        return myBasisCurve.Resolution(R3d);
+                //    }
+                case GeomAbs_SurfaceType.GeomAbs_Torus:
+                    {
+                        Geom_ToroidalSurface S = (Geom_ToroidalSurface)mySurface;
+                        double R = S.MinorRadius();
+                        if (R > Precision.Confusion())
+                            Res = R3d / (2.0 * R);
+                        break;
+                    }
+                //case GeomAbs_Sphere:
+                //    {
+                //        Handle(Geom_SphericalSurface) S(Handle(Geom_SphericalSurface)::DownCast(mySurface));
+                //        const Standard_Real R = S->Radius();
+                //        if (R > Precision::Confusion())
+                //            Res = R3d / (2.* R);
+                //        break;
+                //    }
+                case GeomAbs_SurfaceType.GeomAbs_SurfaceOfExtrusion:
+                case GeomAbs_SurfaceType.GeomAbs_Cylinder:
+                case GeomAbs_SurfaceType.GeomAbs_Cone:
+                case GeomAbs_SurfaceType.GeomAbs_Plane:
+                    {
+                        return R3d;
+                    }
+                //case GeomAbs_BezierSurface:
+                //    {
+                //        Standard_Real Ures, Vres;
+                //        Handle(Geom_BezierSurface)::DownCast(mySurface)->Resolution(R3d, Ures, Vres);
+                //        return Vres;
+                //    }
+                //case GeomAbs_BSplineSurface:
+                //    {
+                //        Standard_Real Ures, Vres;
+                //        myBSplineSurface->Resolution(R3d, Ures, Vres);
+                //        return Vres;
+                //    }
+                //case GeomAbs_OffsetSurface:
+                //    {
+                //        Handle(Geom_Surface) base = Handle(Geom_OffsetSurface)::DownCast(mySurface)->BasisSurface();
+                //        GeomAdaptor_Surface gabase(base,myUFirst,myULast,myVFirst,myVLast);
+                //        return gabase.VResolution(R3d);
+                //    }
+                default: return Precision.Parametric(R3d);
+            }
+
+            if (Res <= 1.0)
+                return 2.0 * Math.Asin(Res);
+
+            return 2.0 * Math.PI;
         }
 
-        public override double UResolution(double v)
+        public override double UResolution(double R3d)
         {
-            throw new System.NotImplementedException();
+            double Res = 0.0;
+
+            switch (mySurfaceType)
+            {
+                //case GeomAbs_SurfaceType.GeomAbs_SurfaceOfExtrusion:
+                //    {
+                //        GeomAdaptor_Curve myBasisCurve=new GeomAdaptor_Curve (
+                //          ((Geom_SurfaceOfLinearExtrusion)mySurface.BasisCurve()),myUFirst,myULast);
+                //        return myBasisCurve.Resolution(R3d);
+                //    }
+                //case GeomAbs_SurfaceType.GeomAbs_Torus:
+                //    {
+                //        Handle(Geom_ToroidalSurface) S(Handle(Geom_ToroidalSurface)::DownCast(mySurface));
+                //        const Standard_Real R = S->MajorRadius() + S->MinorRadius();
+                //        if (R > Precision::Confusion())
+                //            Res = R3d / (2.* R);
+                //        break;
+                //    }
+                //case GeomAbs_SurfaceType.GeomAbs_Sphere:
+                //    {
+                //        Handle(Geom_SphericalSurface) S(Handle(Geom_SphericalSurface)::DownCast(mySurface));
+                //        const Standard_Real R = S->Radius();
+                //        if (R > Precision::Confusion())
+                //            Res = R3d / (2.* R);
+                //        break;
+                //    }
+                case GeomAbs_SurfaceType.GeomAbs_Cylinder:
+                    {
+                        Geom_CylindricalSurface S = (Geom_CylindricalSurface)mySurface;
+                        double R = S.Radius();
+                        if (R > Precision.Confusion())
+                            Res = R3d / (2.0 * R);
+                        break;
+                    }
+                //case GeomAbs_Cone:
+                //    {
+                //        if (myVLast - myVFirst > 1.e10)
+                //        {
+                //            // Pas vraiment borne => resolution inconnue
+                //            return Precision::Parametric(R3d);
+                //        }
+                //        Handle(Geom_ConicalSurface) S(Handle(Geom_ConicalSurface)::DownCast(mySurface));
+                //        Handle(Geom_Curve) C = S->VIso(myVLast);
+                //        const Standard_Real Rayon1 = Handle(Geom_Circle)::DownCast(C)->Radius();
+                //        C = S->VIso(myVFirst);
+                //        const Standard_Real Rayon2 = Handle(Geom_Circle)::DownCast(C)->Radius();
+                //        const Standard_Real R = (Rayon1 > Rayon2) ? Rayon1 : Rayon2;
+                //        return (R > Precision::Confusion() ? (R3d / R) : 0.);
+                //    }
+                case GeomAbs_SurfaceType.GeomAbs_Plane:
+                    {
+                        return R3d;
+                    }
+
+                //case GeomAbs_BezierSurface:
+                //    {
+                //        Standard_Real Ures, Vres;
+                //        Handle(Geom_BezierSurface)::DownCast(mySurface)->Resolution(R3d, Ures, Vres);
+                //        return Ures;
+                //    }
+                //case GeomAbs_BSplineSurface:
+                //    {
+                //        Standard_Real Ures, Vres;
+                //        myBSplineSurface->Resolution(R3d, Ures, Vres);
+                //        return Ures;
+                //    }
+                //case GeomAbs_OffsetSurface:
+                //    {
+                //        Handle(Geom_Surface) base = Handle(Geom_OffsetSurface)::DownCast(mySurface)->BasisSurface();
+                //        GeomAdaptor_Surface gabase(base,myUFirst,myULast,myVFirst,myVLast);
+                //        return gabase.UResolution(R3d);
+                //    }
+                default: return Precision.Parametric(R3d);
+            }
+
+            if (Res <= 1.0)
+                return 2.0 * Math.Asin(Res);
+
+            return 2.0 * Math.PI;
         }
 
         public GeomAdaptor_Surface(Geom_Surface theSurf)

@@ -34,7 +34,24 @@ namespace OCCPort
         //! equal to Precision::Infinite: instead of Standard_Real::LastReal.
         public abstract void Bounds(out double U1, out double U2,
             out double V1, out double V2);
+        public double VPeriod()
+        {
+            Exceptions.Standard_NoSuchObject_Raise_if
+              (!IsVPeriodic(), "Geom_Surface::VPeriod");
 
+            double U1, U2, V1, V2;
+            Bounds(out U1, out U2, out V1, out V2);
+            return (V2 - V1);
+        }
+
+        public double UPeriod()
+        {
+            Exceptions.Standard_NoSuchObject_Raise_if(!IsUPeriodic(), "Geom_Surface::UPeriod");
+
+            double U1, U2, V1, V2;
+            Bounds(out U1, out U2, out V1, out V2);
+            return (U2 - U1);
+        }
 
         //! Checks if this surface is periodic in the u parametric direction.
         //! Returns true if:

@@ -27,34 +27,38 @@ namespace OCCPort
             return aRes;
         }
 
+        public override double FirstParameter() { return myFirst; }
+
+        public override double LastParameter() { return myLast; }
+
         public void D0(double U, ref gp_Pnt2d P)
         {
             //switch (myTypeCurve)
             //{
-                //case GeomAbs_BezierCurve:
-                //case GeomAbs_BSplineCurve:
-                //    {
-                //        Standard_Integer aStart = 0, aFinish = 0;
-                //        if (IsBoundary(U, aStart, aFinish))
-                //        {
-                //            myBSplineCurve->LocalD0(U, aStart, aFinish, P);
-                //        }
-                //        else
-                //        {
-                //            // use cached data
-                //            if (myCurveCache.IsNull() || !myCurveCache->IsCacheValid(U))
-                //                RebuildCache(U);
-                //            myCurveCache->D0(U, P);
-                //        }
-                //        break;
-                //    }
+            //case GeomAbs_BezierCurve:
+            //case GeomAbs_BSplineCurve:
+            //    {
+            //        Standard_Integer aStart = 0, aFinish = 0;
+            //        if (IsBoundary(U, aStart, aFinish))
+            //        {
+            //            myBSplineCurve->LocalD0(U, aStart, aFinish, P);
+            //        }
+            //        else
+            //        {
+            //            // use cached data
+            //            if (myCurveCache.IsNull() || !myCurveCache->IsCacheValid(U))
+            //                RebuildCache(U);
+            //            myCurveCache->D0(U, P);
+            //        }
+            //        break;
+            //    }
 
-                //case GeomAbs_OffsetCurve:
-                //    myNestedEvaluator->D0(U, P);
-                //    break;
+            //case GeomAbs_OffsetCurve:
+            //    myNestedEvaluator->D0(U, P);
+            //    break;
 
-                //default:
-                    myCurve.D0(U, ref P);
+            //default:
+            myCurve.D0(U, ref P);
             //}
         }
         public Geom2dAdaptor_Curve(Geom2d_Curve theCrv, double theUFirst, double theULast)
@@ -158,16 +162,12 @@ namespace OCCPort
 
         public override gp_Lin2d Line()
         {
-            Standard_NoSuchObject_Raise_if(myTypeCurve !=GeomAbs_CurveType. GeomAbs_Line,
+            Exceptions.Standard_NoSuchObject_Raise_if(myTypeCurve != GeomAbs_CurveType.GeomAbs_Line,
                                   "Geom2dAdaptor_Curve::Line() - curve is not a Line");
             return ((Geom2d_Line)myCurve).Lin2d();
         }
 
-        private void Standard_NoSuchObject_Raise_if(bool v1, string v2)
-        {
-            if (v1)
-                throw new Exception(v2);
-        }
+
 
         public override int Degree()
         {
