@@ -170,7 +170,7 @@ namespace OCCPort
                 {
                     IMeshData_Edge aDEdge = aDWire.GetEdge(aEdgeIt);
                     ICurveHandle  aCurve = aDEdge.GetCurve();
-                    IPCurveHandle aPCurve = aDEdge.GetPCurve(
+                    IMeshData_PCurve aPCurve = aDEdge.GetPCurve(
                       myDFace, aDWire.GetEdgeOrientation(aEdgeIt));
 
                     int aPrevNodeIndex = -1;

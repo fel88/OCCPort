@@ -1,5 +1,4 @@
 ﻿using OCCPort.Interfaces;
-using System.Linq;
 
 namespace OCCPort
 {
@@ -8,12 +7,12 @@ namespace OCCPort
         DMapOfIFacePtrsListOfInteger myPCurvesMap;
         VectorOfIPCurveHandles myPCurves;
 
-        public IPCurveHandle GetPCurve(
+        public IMeshData_PCurve GetPCurve(
   IFacePtr theDFace,
   TopAbs_Orientation theOrientation)
         {
             ListOfInteger aListOfPCurves = myPCurvesMap.Find(theDFace);
-            IPCurveHandle aPCurve1 = myPCurves.get(aListOfPCurves.First());
+            IMeshData_PCurve aPCurve1 = myPCurves.get(aListOfPCurves.First());
             return (aPCurve1.GetOrientation() == theOrientation) ?
               aPCurve1 :
               myPCurves.get(aListOfPCurves.Last());
@@ -25,20 +24,20 @@ namespace OCCPort
         }
 
         //! Returns pcurve for the specified discrete face.
-        public IPCurveHandle GetPCurve(IMeshData_Face theDFace, TopAbs_Orientation theOrientation)
+        public IMeshData_PCurve GetPCurve(IMeshData_Face theDFace, TopAbs_Orientation theOrientation)
         {
             ListOfInteger aListOfPCurves = myPCurvesMap.Find(theDFace);
-            IPCurveHandle aPCurve1 = myPCurves.get(aListOfPCurves.First());
+            var aPCurve1 = myPCurves.get(aListOfPCurves.First());
             return (aPCurve1.GetOrientation() == theOrientation) ?
     aPCurve1 : myPCurves.get(aListOfPCurves.Last());
         }
 
         public int PCurvesNb()
         {
-            return myPCurves.Count;
+            return myPCurves.Size();
         }
 
-        public IPCurveHandle AddPCurve(IMeshData_Face theDFace, TopAbs_Orientation theOrientation)
+        public IMeshData_PCurve AddPCurve(IMeshData_Face theDFace, TopAbs_Orientation theOrientation)
         {
 
             int aPCurveIndex = PCurvesNb();
@@ -60,7 +59,7 @@ namespace OCCPort
 
         }
 
-        public IPCurveHandle GetPCurve(int theIndex)
+        public IMeshData_PCurve GetPCurve(int theIndex)
         {
             return myPCurves[theIndex];
         }

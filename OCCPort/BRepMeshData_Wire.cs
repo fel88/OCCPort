@@ -35,10 +35,13 @@ namespace OCCPort
 
         public BRepMeshData_Wire(TopoDS_Shape theShape) : base(theShape)
         {
+           
         }
 
-        public BRepMeshData_Wire(TopoDS_Shape theShape, int theEdgeNb, NCollection_IncAllocator myAllocator) : this(theShape)
+        public BRepMeshData_Wire(TopoDS_Shape theShape, int theEdgeNb, NCollection_IncAllocator theAllocator) : this(theShape)
         {
+            myDEdges = new VectorOfIEdgePtrs(theEdgeNb > 0 ? theEdgeNb : 256, theAllocator);
+            myDEdgesOri = new VectorOfOrientation(theEdgeNb > 0 ? theEdgeNb : 256, theAllocator);
         }
     }
 }

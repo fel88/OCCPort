@@ -1,17 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace OCCPort
 {
-    internal class VectorOfIPCurveHandles : List<IPCurveHandle>
+    internal class VectorOfIPCurveHandles
     {
-        public VectorOfIPCurveHandles(int capacity) : base(capacity)
+        List<IMeshData_PCurve> list = new List<IMeshData_PCurve>();
+        public VectorOfIPCurveHandles(int capacity) 
         {
+
         }
 
-        internal IPCurveHandle get(int v)
+        public IMeshData_PCurve this[int key]
+        {
+            get => list[key ];
+            set => list[key ] = value;
+        }
+
+        public void Append(IMeshData_PCurve d)
+        {
+            list.Add(d);
+        }
+        internal IMeshData_PCurve get(int v)
         {
             return this[v];
+        }
+
+        internal int Size()
+        {
+            return list.Count;
         }
     }
 }

@@ -10,6 +10,10 @@ namespace OCCPort
         {
         }
 
+        public void Append(int c)
+        {
+            Add(c);
+        }
         internal int First()
         {
             return this[0];

@@ -20,16 +20,16 @@ namespace OCCPort.Interfaces
         {
             ClearStatus();
 
-           // try
+            try
             {
                 //OCC_CATCH_SIGNALS
                 return performInternal(theShape, theParameters);
             }
-           /* catch (Exception ex)
+            catch (Exception ex)
             {
                 SetStatus(Message_Status.Message_Fail2);
                 return null;
-            }*/
+            }
         }
     }
 }
