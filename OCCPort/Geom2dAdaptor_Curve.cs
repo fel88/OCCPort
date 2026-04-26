@@ -40,7 +40,7 @@ namespace OCCPort
 
         public override double LastParameter() { return myLast; }
 
-        public void D0(double U, ref gp_Pnt2d P)
+        public override void D0(double U, ref gp_Pnt2d P)
         {
             //switch (myTypeCurve)
             //{
@@ -205,7 +205,7 @@ namespace OCCPort
 
         public override GeomAbs_CurveType _GetType()
         {
-            throw new NotImplementedException();
+            return myTypeCurve;
         }
 
         public override gp_Lin2d Line()
@@ -219,18 +219,54 @@ namespace OCCPort
 
         public override int Degree()
         {
-            throw new NotImplementedException();
+            if (myTypeCurve ==GeomAbs_CurveType. GeomAbs_BezierCurve)
+                return  ((Geom2d_BezierCurve)myCurve).Degree();
+            else if (myTypeCurve ==GeomAbs_CurveType. GeomAbs_BSplineCurve)
+                return myBSplineCurve.Degree();
+            else
+                throw new Standard_NoSuchObject();
         }
 
         public override int NbKnots()
         {
-            throw new NotImplementedException();
+            if (myTypeCurve !=GeomAbs_CurveType. GeomAbs_BSplineCurve)
+                throw new Standard_NoSuchObject("Geom2dAdaptor_Curve::NbKnots");
+            return myBSplineCurve.NbKnots();
         }
 
         public override void D1(double U, out gp_Pnt2d P, out gp_Vec2d V)
         {
-            throw new NotImplementedException();
+            switch (myTypeCurve)
+            {
+                case GeomAbs_CurveType.GeomAbs_BezierCurve:
+                //case GeomAbs_CurveType.GeomAbs_BSplineCurve:
+                //    {
+                //        int aStart = 0, aFinish = 0;
+                //        if (IsBoundary(U, aStart, aFinish))
+                //        {
+                //            myBSplineCurve.LocalD1(U, aStart, aFinish, P, V);
+                //        }
+                //        else
+                //        {
+                //            // use cached data
+                //            if (myCurveCache.IsNull() || !myCurveCache->IsCacheValid(U))
+                //                RebuildCache(U);
+                //            myCurveCache->D1(U, P, V);
+                //        }
+                //        break;
+                //    }
+
+                //case GeomAbs_CurveType.GeomAbs_OffsetCurve:
+                //    myNestedEvaluator.D1(U, P, V);
+                //    break;
+
+                default:
+                    myCurve.D1(U, out P, out V);
+                    break;
+            }
         }
+
+ 
     }
 
 }

@@ -104,7 +104,7 @@ namespace OCCPort
         public void TShape(TopoDS_TShape theTShape) { myTShape = theTShape; }
 
         TopoDS_TShape myTShape;
-        TopLoc_Location myLocation;
+        TopLoc_Location myLocation = new TopLoc_Location();
         TopAbs_Orientation myOrient;
 
 

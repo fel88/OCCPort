@@ -9,6 +9,7 @@ namespace OCCPort.Interfaces
     //! its processing.
     public interface IMeshTools_Context : IMeshData_Shape
     {
+        void SetParameters(IMeshTools_Parameters p);
 
         //! Performs discretization of model edges using assigned edge discret algorithm.
         //! @return True on success, False elsewhere.
@@ -25,5 +26,6 @@ namespace OCCPort.Interfaces
         //! Builds model using assigned model builder.
         //! @return True on success, False elsewhere.
         bool BuildModel();
+        IMeshTools_Parameters ChangeParameters();
     }
 }

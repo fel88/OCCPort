@@ -17,6 +17,9 @@ namespace OCCPort
             double aY = coord.Y() - aXY.Y();
             return (aX * aX + aY * aY);
         }
+        //! For this point returns its two coordinates as a number pair.
+        public void Coord(ref double theXp, ref double theYp) { coord.Coord(ref theXp,ref  theYp); }
+
 
         public double X()
            => coord.X();
@@ -32,6 +35,8 @@ namespace OCCPort
             coord = new gp_XY(theXp, theYp);
 
         }
+        //! Assigns the two coordinates of Coord to this point.
+        public void SetXY(gp_XY theCoord) { coord = theCoord; }
 
         public gp_Pnt2d(gp_XY gp_XY) : this()
         {

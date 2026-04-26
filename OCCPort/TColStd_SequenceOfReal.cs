@@ -9,5 +9,15 @@ namespace OCCPort
         {
             Add(keptT3d);
         }
+
+        internal void ChangeValue(int i, double theParam)
+        {
+            this[i] = theParam;
+        }
+
+        internal void InsertBefore(int i, double theParam)
+        {
+            Insert(i, theParam);
+        }
     }
 }

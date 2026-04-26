@@ -12,6 +12,14 @@ namespace OCCPort
     public struct gp_XY
 
     {
+
+        public void SetLinearForm(double theA1, gp_XY theXY1,
+                              gp_XY theXY2)
+        {
+            x = theA1 * theXY1.x + theXY2.x;
+            y = theA1 * theXY1.y + theXY2.y;
+        }
+
         //! @code
         //! <me>.X() = -<me>.X()
         //! <me>.Y() = -<me>.Y()
@@ -40,7 +48,17 @@ namespace OCCPort
         public static gp_XY operator -(gp_XY vv, gp_XY v2)
         {
             return new gp_XY(vv.x - v2.x,
-                    vv.y / v2.y);
+                    vv.y - v2.y);
+        }
+        public static gp_XY operator +(gp_XY vv, gp_XY v2)
+        {
+            return new gp_XY(vv.x + v2.x,
+                    vv.y + v2.y);
+        }
+        public static gp_XY operator *(gp_XY vv, double v2)
+        {
+            return new gp_XY(vv.x * v2,
+                    vv.y * v2);
         }
         //! Assigns the given value to the X coordinate of this number pair.
         public void SetX(double theX) { x = theX; }
@@ -56,6 +74,12 @@ namespace OCCPort
         //! @endcode
         public double Crossed(gp_XY theOther) { return x * theOther.y - y * theOther.x; }
 
+        //! For this number pair, returns its coordinates X and Y.
+        internal void Coord(ref double theX, ref double theY)
+        {
+            theX = x;
+            theY = y;
+        }
 
         double x;
         double y;

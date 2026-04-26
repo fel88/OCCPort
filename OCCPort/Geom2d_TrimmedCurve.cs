@@ -95,6 +95,11 @@ namespace OCCPort
         {
             throw new NotImplementedException();
         }
+
+        public override void D1(double U, out gp_Pnt2d P, out gp_Vec2d V1)
+        {
+            throw new NotImplementedException();
+        }
     }
 
 }

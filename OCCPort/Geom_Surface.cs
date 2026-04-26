@@ -34,6 +34,28 @@ namespace OCCPort
         //! equal to Precision::Infinite: instead of Standard_Real::LastReal.
         public abstract void Bounds(out double U1, out double U2,
             out double V1, out double V2);
+
+        //! Computes the point P and the first derivatives in the directions U and V at this point.
+        //! Raised if the continuity of the surface is not C1.
+        //!
+        //! Tip: use GeomLib::NormEstim() to calculate surface normal at specified (U, V) point.
+        public abstract void D1(double U, double V, out gp_Pnt P, out gp_Vec D1U, out gp_Vec D1V);
+
+        public gp_Pnt Value(double U,
+
+                double V)
+        {
+            gp_Pnt P = new gp_Pnt();
+            D0(U, V, ref P);
+            return P;
+        }
+
+        //! Computes the point of parameter U,V on the surface.
+        //!
+        //! Raised only for an "OffsetSurface" if it is not possible to
+        //! compute the current point.
+        public abstract void D0(double U, double V, ref gp_Pnt P);
+
         public double VPeriod()
         {
             Exceptions.Standard_NoSuchObject_Raise_if

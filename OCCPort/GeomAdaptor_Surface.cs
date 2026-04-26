@@ -16,6 +16,17 @@ namespace OCCPort
     //! thread-safe and parallel evaluations need to be prevented.
     public class GeomAdaptor_Surface : Adaptor3d_Surface
     {
+        public GeomAdaptor_Surface()
+        {
+            myUFirst = (0.0);
+            myULast = (0.0);
+            myVFirst = (0.0);
+            myVLast = (0.0);
+            myTolU = (0.0);
+            myTolV = (0.0);
+            mySurfaceType = GeomAbs_SurfaceType.GeomAbs_OtherSurface;
+        }
+
         public override Adaptor3d_Surface BasisSurface()
         {
             if (mySurfaceType != GeomAbs_SurfaceType.GeomAbs_OffsetSurface)
@@ -348,7 +359,43 @@ namespace OCCPort
 
         public override void D1(double U, double V, out gp_Pnt P, out gp_Vec D1U, out gp_Vec D1V)
         {
-            throw new NotImplementedException();
+            int Ideb, Ifin, IVdeb, IVfin, USide = 0, VSide = 0;
+            double u = U, v = V;
+            if (Math.Abs(U - myUFirst) <= myTolU) { USide = 1; u = myUFirst; }
+            else if (Math.Abs(U - myULast) <= myTolU) { USide = -1; u = myULast; }
+            if (Math.Abs(V - myVFirst) <= myTolV) { VSide = 1; v = myVFirst; }
+            else if (Math.Abs(V - myVLast) <= myTolV) { VSide = -1; v = myVLast; }
+
+            switch (mySurfaceType)
+            {
+                //case GeomAbs_BezierSurface:
+                //case GeomAbs_BSplineSurface:
+                //    {
+                //        if (!myBSplineSurface.IsNull() &&
+                //            (USide != 0 || VSide != 0) &&
+                //            IfUVBound(u, v, Ideb, Ifin, IVdeb, IVfin, USide, VSide))
+                //            myBSplineSurface->LocalD1(u, v, Ideb, Ifin, IVdeb, IVfin, P, D1U, D1V);
+                //        else
+                //        {
+                //            if (mySurfaceCache.IsNull() || !mySurfaceCache->IsCacheValid(U, V))
+                //                RebuildCache(U, V);
+                //            mySurfaceCache->D1(U, V, P, D1U, D1V);
+                //        }
+                //        break;
+                //    }
+
+                //case GeomAbs_SurfaceOfExtrusion:
+                //case GeomAbs_SurfaceOfRevolution:
+                //case GeomAbs_OffsetSurface:
+                //    Standard_NoSuchObject_Raise_if(myNestedEvaluator.IsNull(),
+                //        "GeomAdaptor_Surface::D1: evaluator is not initialized");
+                //    myNestedEvaluator->D1(u, v, P, D1U, D1V);
+                //    break;
+
+                default:
+                    mySurface.D1(u, v, out P, out D1U, out D1V);
+                    break;
+            }
         }
 
         public override int NbVKnots()
@@ -377,14 +424,7 @@ namespace OCCPort
             Load(theSurf, theUFirst, theULast, theVFirst, theVLast, theTolU, theTolV);
         }
 
-        public GeomAdaptor_Surface()
-        {
-            /*myUFirst=(0.), myULast(0.),
-	   myVFirst(0.), myVLast(0.),
-	   myTolU(0.),   myTolV(0.),*/
-            mySurfaceType = GeomAbs_SurfaceType.GeomAbs_OtherSurface;
 
-        }
         GeomAbs_SurfaceType mySurfaceType;
 
     }

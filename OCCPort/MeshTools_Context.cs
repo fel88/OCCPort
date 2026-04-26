@@ -7,10 +7,11 @@ namespace OCCPort
     {
         protected IMeshTools_ModelBuilder myModelBuilder;
         IMeshData_Model myModel;
-        IMeshTools_Parameters myParameters = new IMeshTools_Parameters();
+        public IMeshTools_Parameters myParameters = new IMeshTools_Parameters();
         IMeshTools_ModelAlgo myEdgeDiscret;
         IMeshTools_ModelAlgo myPreProcessor;
         IMeshTools_ModelAlgo myPostProcessor;
+        
 
         IMeshTools_ModelAlgo myModelHealer;
         //! Sets instance of post-processing algorithm.
@@ -161,6 +162,15 @@ namespace OCCPort
         public IMeshData_Model GetModel()
         {
             return myModel;
+        }
+
+        public IMeshTools_Parameters ChangeParameters()
+        {
+            return myParameters;
+        }
+        public void SetParameters(IMeshTools_Parameters p)
+        {
+            myParameters = p;
         }
     }
 }

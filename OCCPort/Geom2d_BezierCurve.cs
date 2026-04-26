@@ -54,7 +54,19 @@
     //! - The length of a Bezier curve can be null.
     public class Geom2d_BezierCurve : Geom2d_BoundedCurve
     {
+        TColgp_HArray1OfPnt2d poles;
+
+        public int Degree()
+        {
+            return poles.Length() - 1;
+        }
+
         public override Geom2d_Geometry Copy()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override void D1(double U, out gp_Pnt2d P, out gp_Vec2d V1)
         {
             throw new System.NotImplementedException();
         }

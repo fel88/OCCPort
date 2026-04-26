@@ -163,11 +163,11 @@ namespace OCCPort
   bool theUpdateEnds)
         {
             // Create 3d polygon.
-            ICurveHandle aCurve = theDEdge.GetCurve();
+            var aCurve = theDEdge.GetCurve();
 
             TopoDS_Edge aEdge = theDEdge.GetEdge();
-            TopoDS_Vertex aFirstVertex, aLastVertex;
-            TopExp.Vertices(aEdge, out aFirstVertex, out aLastVertex);
+            TopoDS_Vertex aFirstVertex=new TopoDS_Vertex (), aLastVertex=new TopoDS_Vertex ();
+            TopExp.Vertices(aEdge, ref aFirstVertex, ref aLastVertex);
 
             if (aFirstVertex.IsNull() || aLastVertex.IsNull())
                 return;

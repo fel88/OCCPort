@@ -18,6 +18,31 @@ namespace OCCPort
     //! an Edge and a Face.
     public class BRepAdaptor_Curve : Adaptor3d_Curve
     {
+
+        public override double FirstParameter()
+        {
+            if (myConSurf == null)
+            {
+                return myCurve.FirstParameter();
+            }
+            else
+            {
+                return myConSurf.FirstParameter();
+            }
+        }
+
+        public override double LastParameter()
+        {
+            if (myConSurf == null)
+            {
+                return myCurve.LastParameter();
+            }
+            else
+            {
+                return myConSurf.LastParameter();
+            }
+        }
+
         gp_Trsf myTrsf;
         //GeomAdaptor_Curve myCurve;
         Adaptor3d_CurveOnSurface myConSurf;
@@ -142,9 +167,13 @@ namespace OCCPort
             throw new System.NotImplementedException();
         }
 
-        public override void D0(double d, ref gp_Pnt p)
+        public override void D0(double U, ref gp_Pnt P)
         {
-            throw new System.NotImplementedException();
+            if (myConSurf==null)
+                myCurve.D0(U, ref P);
+            else
+                myConSurf.D0(U, ref P);
+            P.Transform(myTrsf);
         }
     }
 }

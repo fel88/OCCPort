@@ -4,7 +4,7 @@
     public interface IMeshData_Edge : IMeshData_TessellatedShape, IMeshData_StatusOwner
     {
         //! Returns 3d curve associated with current edge.
-        ICurveHandle GetCurve();
+        IMeshData_Curve GetCurve();
         //! Gets value of angular deflection for the discrete model.
         double GetAngularDeflection();
 
@@ -15,6 +15,10 @@
         }
         //! By default equals to flag stored in topological shape.
         public bool GetSameParam();
+
+        //! Returns same range flag.
+        //! By default equals to flag stored in topological shape.
+        public bool GetSameRange();
         //! Returns number of pcurves assigned to current edge.
         public int PCurvesNb();
         IMeshData_PCurve GetPCurve(IMeshData_Face myDFace, TopAbs_Orientation topAbs_Orientation);

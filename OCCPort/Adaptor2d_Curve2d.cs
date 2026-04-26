@@ -15,6 +15,9 @@ namespace OCCPort
     //! thread-safe and parallel evaluations need to be prevented.
     public abstract class Adaptor2d_Curve2d
     {
+        //! Computes the point of parameter U on the curve.
+        public abstract void D0(double U, ref gp_Pnt2d P);
+
         public abstract int Degree();
         //! Computes the point of parameter U on the curve with its
         //! first derivative.

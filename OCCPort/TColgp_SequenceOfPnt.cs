@@ -5,6 +5,10 @@ namespace OCCPort
 {
 	public class TColgp_SequenceOfPnt
 	{
+		public void Clear()
+		{
+			list.Clear();
+		}
 		internal int Size()
 		{
 			return list.Count;
@@ -16,5 +20,19 @@ namespace OCCPort
 			return list[index];
 		}
 
-	}
+        internal void Append(gp_Pnt thePnt)
+        {
+			list.Add(thePnt);
+        }
+
+        internal void InsertBefore(int i, gp_Pnt thePnt)
+        {
+			list.Insert(i, thePnt);
+        }
+
+        internal void ChangeValue(int i, gp_Pnt thePnt)
+        {
+			list[i] = thePnt;
+        }
+    }
 }

@@ -7,12 +7,15 @@ namespace OCCPort
         DMapOfIFacePtrsListOfInteger myPCurvesMap;
         VectorOfIPCurveHandles myPCurves;
         bool mySameParam;
+        bool mySameRange;
+
         //! Gets value of angular deflection for the discrete model.
         public double GetAngularDeflection()
         {
             return myAngDeflection;
         }
         double myAngDeflection;
+        IMeshData_Curve myCurve;
 
         //! Returns true in case if the edge is free one, i.e. it does not have pcurves.
         public bool IsFree()
@@ -23,7 +26,14 @@ namespace OCCPort
         public bool GetSameParam()
         {
             return mySameParam;
+        } 
+        //! Returns same range flag.
+           //! By default equals to flag stored in topological shape.
+        public bool GetSameRange()
+        {
+            return mySameRange;
         }
+
         public IMeshData_PCurve GetPCurve(
   IFacePtr theDFace,
   TopAbs_Orientation theOrientation)
@@ -35,9 +45,9 @@ namespace OCCPort
               myPCurves.get(aListOfPCurves.Last());
         }
 
-        public ICurveHandle GetCurve()
+        public IMeshData_Curve GetCurve()
         {
-            throw new System.NotImplementedException();
+            return myCurve;
         }
         public IMeshData_PCurve GetPCurve(
   int theIndex)

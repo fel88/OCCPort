@@ -649,6 +649,11 @@ namespace OCCPort
         {
             throw new NotImplementedException();
         }
+
+        public override void D0(double U, ref gp_Pnt2d P)
+        {
+            throw new NotImplementedException();
+        }
     }
 
 }

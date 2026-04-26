@@ -53,5 +53,13 @@
         {
             return false;
         }
+
+        public override void D1(double U, out gp_Pnt2d P, out gp_Vec2d V1)
+        {
+            P = new gp_Pnt2d();
+            V1 = new gp_Vec2d ();
+            ElCLib.LineD1(U, pos, ref P, ref V1);
+
+        }
     }
 }

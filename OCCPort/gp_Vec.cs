@@ -17,7 +17,7 @@ namespace OCCPort
         //! <me> is set to the following linear form : theV1 + theV2
         public void SetLinearForm(gp_Vec theV1, gp_Vec theV2)
         {
-           // coord.SetLinearForm(theV1.coord, theV2.coord);
+            // coord.SetLinearForm(theV1.coord, theV2.coord);
         } //! <me> is set to the following linear form : theA1 * theV1 + theV2
         public void SetLinearForm(double theA1, gp_Vec theV1, gp_Vec theV2)
         {
@@ -29,6 +29,14 @@ namespace OCCPort
         {
             coord.SetLinearForm(theA1, theV1.coord, theA2, theV2.coord);
         }
+        //! Assigns the given value to the X coordinate of this vector.
+        public void SetX(double theX) { coord.SetX(theX); }
+
+        //! Assigns the given value to the X coordinate of this vector.
+        public void SetY(double theY) { coord.SetY(theY); }
+
+        //! Assigns the given value to the X coordinate of this vector.
+        public void SetZ(double theZ) { coord.SetZ(theZ); }
 
         public void Rotate(gp_Ax1 theA1, double theAng)
         {

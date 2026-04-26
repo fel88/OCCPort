@@ -51,5 +51,20 @@ namespace OCCPort
         {
             return false;
         }
+
+        public override void D1(double U, double V, out gp_Pnt P, out gp_Vec D1U, out gp_Vec D1V)
+        {
+            P = new gp_Pnt();
+            D1U = new gp_Vec();
+            D1V = new gp_Vec();
+            ElSLib.PlaneD1(U, V, pos, ref P, ref D1U, ref D1V);
+
+        }
+
+        public override void D0(double U, double V, ref gp_Pnt P)
+        {
+            P = ElSLib.PlaneValue(U, V, pos);
+
+        }
     }
 }

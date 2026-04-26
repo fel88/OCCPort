@@ -59,21 +59,49 @@ namespace OCCPort
             BRepMesh_Context aContext = new BRepMesh_Context(myParameters.MeshAlgo);
             Perform(aContext, theRange);
         }
+        //! Initializes specific parameters
+        void initParameters()
+        {
+            if (myParameters.Deflection < Precision.Confusion())
+            {
+                throw new Standard_NumericError("BRepMesh_IncrementalMesh::initParameters : invalid parameter value");
+            }
+            if (myParameters.DeflectionInterior < Precision.Confusion())
+            {
+                myParameters.DeflectionInterior = myParameters.Deflection;
+            }
 
+            if (myParameters.MinSize < Precision.Confusion())
+            {
+                myParameters.MinSize =
+                Math.Max(IMeshTools_Parameters.RelMinSize() * Math.Min(myParameters.Deflection,
+                                                                myParameters.DeflectionInterior),
+                      Precision.Confusion());
+            }
+
+            if (myParameters.Angle < Precision.Angular())
+            {
+                throw new Standard_NumericError("BRepMesh_IncrementalMesh::initParameters : invalid parameter value");
+            }
+            if (myParameters.AngleInterior < Precision.Angular())
+            {
+                myParameters.AngleInterior = 2.0 * myParameters.Angle;
+            }
+        }
         public void Perform(IMeshTools_Context theContext, Message_ProgressRange theRange = null)
         {
-            //initParameters();
+            initParameters();
 
             theContext.SetShape(Shape());
-            //theContext->ChangeParameters() = myParameters;
-            //theContext->ChangeParameters().CleanModel = Standard_False;
+            theContext.SetParameters(myParameters);
+            theContext.ChangeParameters().CleanModel = false;
 
             Message_ProgressScope aPS = new Message_ProgressScope(theRange, "Perform incmesh", 10);
             IMeshTools_MeshBuilder aIncMesh = new MeshTools_MeshBuilder(theContext);
             aIncMesh.Perform(aPS.Next(9));
             if (!aPS.More())
             {
-                myStatus = IMeshData_Status. IMeshData_UserBreak;
+                myStatus = IMeshData_Status.IMeshData_UserBreak;
                 return;
             }
             myStatus = IMeshData_Status.IMeshData_NoError;

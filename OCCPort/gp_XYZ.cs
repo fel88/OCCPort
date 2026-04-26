@@ -9,7 +9,17 @@ namespace OCCPort
         private double x;
         private double y;
         private double z;
+        //! Computes X*X + Y*Y + Z*Z where X, Y and Z are the three coordinates of this XYZ object.
+        public double SquareModulus() { return (x * x + y * y + z * z); }
 
+        public void Normalize()
+        {
+            double aD = Modulus();
+            Exceptions.Standard_ConstructionError_Raise_if(aD <= gp.Resolution(), "gp_XYZ::Normalize() - vector has zero norm");
+            x = x / aD;
+            y = y / aD;
+            z = z / aD;
+        }
         //! <me> is set to the following linear form :
         //! @code
         //! theA1 * theXYZ1 + theA2 * theXYZ2

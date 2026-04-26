@@ -13,11 +13,20 @@ namespace OCCPort
     //! package, in the parametric space of the surface.
     public class Adaptor3d_CurveOnSurface : Adaptor3d_Curve
     {
+        public override double FirstParameter()
+        {
+            return myCurve.FirstParameter();
+        }
+        public override double LastParameter()
+        {
+            return myCurve.LastParameter();
+        }
+
 
         Adaptor3d_Surface mySurface;
         Adaptor2d_Curve2d myCurve;
         GeomAbs_CurveType myType;
-        //gp_Circ myCirc;
+        gp_Circ myCirc;
         gp_Lin myLin;
         Adaptor3d_Surface myFirstSurf;
         Adaptor3d_Surface myLastSurf;
@@ -57,9 +66,17 @@ namespace OCCPort
             throw new System.NotImplementedException();
         }
 
-        public override void D0(double d, ref gp_Pnt p)
+        public override void D0(double U, ref gp_Pnt P)
         {
-            throw new System.NotImplementedException();
+            gp_Pnt2d Puv = new gp_Pnt2d();
+
+            if (myType == GeomAbs_CurveType.GeomAbs_Line) P = ElCLib.Value(U, myLin);
+            else if (myType == GeomAbs_CurveType.GeomAbs_Circle) P = ElCLib.Value(U, myCirc);
+            else
+            {
+                myCurve.D0(U, ref Puv);
+                mySurface.D0(Puv.X(), Puv.Y(), ref P);
+            }
         }
         public void Load(Adaptor2d_Curve2d C)
         {
@@ -96,12 +113,13 @@ namespace OCCPort
 
             GeomAbs_SurfaceType STy = mySurface._GetType();
             GeomAbs_CurveType CTy = myCurve._GetType();
-            if (STy ==GeomAbs_SurfaceType.GeomAbs_Plane)
+            if (STy == GeomAbs_SurfaceType.GeomAbs_Plane)
             {
                 myType = CTy;
                 /*if (myType ==GeomAbs_CurveType. GeomAbs_Circle)
                     myCirc = to3d(mySurface.Plane(), myCurve.Circle());
-                else */if (myType == GeomAbs_CurveType.GeomAbs_Line)
+                else */
+                if (myType == GeomAbs_CurveType.GeomAbs_Line)
                 {
                     gp_Pnt P;
                     gp_Vec V = new gp_Vec();
@@ -296,4 +314,4 @@ namespace OCCPort
 
         }
     }
-}
+    }

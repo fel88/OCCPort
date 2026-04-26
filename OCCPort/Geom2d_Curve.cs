@@ -27,6 +27,12 @@ namespace OCCPort
             D0(U, ref P);
             return P;
         }
+        //! Returns the point P of parameter U and the first derivative V1.
+        //! Raised if the continuity of the curve is not C1.
+        public  abstract void D1( double U, out gp_Pnt2d P, out gp_Vec2d V1) ;
+
+
+
         //! curve becomes the StartPoint of the reversed curve.
         public abstract void Reverse();
         //! Computes the parameter on the reversed curve for

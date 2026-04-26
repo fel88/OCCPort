@@ -68,10 +68,40 @@ namespace OCCPort
                 ex.Next();
             }
         }
+        //! Returns in Vfirst, Vlast the  FORWARD and REVERSED
+        //! vertices of the edge <E>. May be null shapes.
+        //! CumOri = True : taking account the edge orientation
+        internal static void Vertices(TopoDS_Edge E, ref TopoDS_Vertex Vfirst,
+            ref TopoDS_Vertex Vlast, bool CumOri = false)
+        {            
+            // minor optimization for case when Vfirst and Vlast are non-null:
+            // at least for VC++ 10, it is faster if we use boolean flags than 
+            // if we nullify vertices at that point (see #27021)
+            bool isFirstDefined = false;
+            bool isLastDefined = false;
 
-        internal static void Vertices(object v, out TopoDS_Vertex aVFirst, out TopoDS_Vertex aVLast)
-        {
-            throw new NotImplementedException();
+            TopoDS_Iterator ite = new TopoDS_Iterator(E, CumOri);
+            while (ite.More())
+            {
+                TopoDS_Shape aV = ite.Value();
+                if (aV.Orientation() == TopAbs_Orientation.TopAbs_FORWARD)
+                {
+                    Vfirst = TopoDS.Vertex(aV);
+                    isFirstDefined = true;
+                }
+                else if (aV.Orientation() == TopAbs_Orientation.TopAbs_REVERSED)
+                {
+                    Vlast = TopoDS.Vertex(aV);
+                    isLastDefined = true;
+                }
+                ite.Next();
+            }
+
+            if (!isFirstDefined)
+                Vfirst.Nullify();
+
+            if (!isLastDefined)
+                Vlast.Nullify();
         }
     }
 }

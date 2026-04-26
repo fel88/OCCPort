@@ -8,6 +8,8 @@
 
         //! For this vector, returns its Y  coordinate.
         public double Y() { return coord.Y(); }
+        //! Assigns the two coordinates of theCoord to this vector.
+      public  void SetXY( gp_XY theCoord) { coord = theCoord; }
 
         gp_XY coord;
 

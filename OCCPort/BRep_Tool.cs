@@ -12,14 +12,202 @@ using System.Threading;
 
 namespace OCCPort
 {
-    public class BRep_Tool
+    public static class BRep_Tool
     {
+        public static double Parameter(TopoDS_Vertex V,
+                                    TopoDS_Edge E)
+        {
+            double p;
+            if (Parameter(V, E, out p))
+                return p;
+            throw new Standard_NoSuchObject("BRep_Tool:: no parameter on edge");
+        }
+        public static void Range(TopoDS_Edge E,
+                       out double First,
+                       out double Last)
+        {
+            //  set the range to all the representations
+            BRep_TEdge TE = (BRep_TEdge)(E.TShape());
+            foreach (var cr in TE.Curves())
+            {
+
+
+                if (cr.IsCurve3D())
+                {
+                    BRep_Curve3D CR = (BRep_Curve3D)(cr);
+                    if (CR.Curve3D() != null)
+                    {
+                        First = CR.First();
+                        Last = CR.Last();
+                        return;
+                    }
+                }
+                else if (cr.IsCurveOnSurface())
+                {
+                    BRep_GCurve CR = (BRep_GCurve)cr;
+                    First = CR.First();
+                    Last = CR.Last();
+                    return;
+                }
+            }
+            First = Last = 0.0;
+        }
+
+        public static bool Parameter(TopoDS_Vertex theV,
+                                         TopoDS_Edge theE,
+                                      out double theParam)
+        {
+            // Search the vertex in the edge
+            theParam = 0;
+            bool rev = false;
+            TopoDS_Shape VF = null;
+            TopAbs_Orientation orient = TopAbs_Orientation.TopAbs_INTERNAL;
+
+            TopoDS_Iterator itv = new TopoDS_Iterator(theE.Oriented(TopAbs_Orientation.TopAbs_FORWARD));
+
+            // if the edge has no vertices
+            // and is degenerated use the vertex orientation
+            // RLE, june 94
+
+            if (!itv.More() && BRep_Tool.Degenerated(theE))
+            {
+                orient = theV.Orientation();
+            }
+
+            while (itv.More())
+            {
+                TopoDS_Shape Vcur = itv.Value();
+                if (theV.IsSame(Vcur))
+                {
+                    if (VF == null)
+                    {
+                        VF = Vcur;
+                    }
+                    else
+                    {
+                        rev = theE.Orientation() == TopAbs_Orientation.TopAbs_REVERSED;
+                        if (Vcur.Orientation() == theV.Orientation())
+                        {
+                            VF = Vcur;
+                        }
+                    }
+                }
+                itv.Next();
+            }
+
+            if (!VF.IsNull()) orient = VF.Orientation();
+
+            double f, l;
+
+            if (orient == TopAbs_Orientation.TopAbs_FORWARD)
+            {
+                BRep_Tool.Range(theE, out f, out l);
+                theParam = (rev) ? l : f;
+                return true;
+            }
+
+            else if (orient == TopAbs_Orientation.TopAbs_REVERSED)
+            {
+                BRep_Tool.Range(theE, out f, out l);
+                theParam = (rev) ? f : l;
+                return true;
+            }
+
+            else
+            {
+                TopLoc_Location L;
+                Geom_Curve C = BRep_Tool.Curve(theE, out L, out f, out l);
+                L = L.Predivided(theV.Location());
+                if (C != null || BRep_Tool.Degenerated(theE))
+                {
+                    //const BRep_TVertex* TV = static_cast <const BRep_TVertex*> (theV.TShape().get());
+                    //BRep_ListIteratorOfListOfPointRepresentation itpr(TV->Points());
+
+                    //while (itpr.More())
+                    //{
+                    //    const Handle(BRep_PointRepresentation)&pr = itpr.Value();
+                    //    if (pr->IsPointOnCurve(C, L))
+                    //    {
+                    //        Standard_Real p = pr->Parameter();
+                    //        Standard_Real res = p;// SVV 4 nov 99 - to avoid warnings on Linux
+                    //        if (!C.IsNull())
+                    //        {
+                    //            // Closed curves RLE 16 june 94
+                    //            if (Precision::IsNegativeInfinite(f))
+                    //            {
+                    //                theParam = pr->Parameter();//p;
+                    //                return Standard_True;
+                    //            }
+                    //            ;
+                    //            if (Precision::IsPositiveInfinite(l))
+                    //            {
+                    //                theParam = pr->Parameter();//p;
+                    //                return Standard_True;
+                    //            }
+                    //            gp_Pnt Pf = C->Value(f).Transformed(L.Transformation());
+                    //            gp_Pnt Pl = C->Value(l).Transformed(L.Transformation());
+                    //            Standard_Real tol = BRep_Tool::Tolerance(theV);
+                    //            if (Pf.Distance(Pl) < tol)
+                    //            {
+                    //                if (Pf.Distance(BRep_Tool::Pnt(theV)) < tol)
+                    //                {
+                    //                    if (theV.Orientation() == TopAbs_FORWARD) res = f;//p = f;
+                    //                    else res = l;//p = l;
+                    //                }
+                    //            }
+                    //        }
+                    //        theParam = res;//p;
+                    //        return Standard_True;
+                    //    }
+                    //    itpr.Next();
+                    //}
+                }
+                else
+                {
+                    // no 3d curve !!
+                    // let us try with the first pcurve
+                    //Handle(Geom2d_Curve) PC;
+                    //Handle(Geom_Surface) S;
+                    //BRep_Tool::CurveOnSurface(theE, PC, S, L, f, l);
+                    //L = L.Predivided(theV.Location());
+                    //const BRep_TVertex* TV = static_cast <const BRep_TVertex*> (theV.TShape().get());
+                    //BRep_ListIteratorOfListOfPointRepresentation itpr(TV->Points());
+
+                    //while (itpr.More())
+                    //{
+                    //    const Handle(BRep_PointRepresentation)&pr = itpr.Value();
+                    //    if (pr->IsPointOnCurveOnSurface(PC, S, L))
+                    //    {
+                    //        Standard_Real p = pr->Parameter();
+                    //        // Closed curves RLE 16 june 94
+                    //        if (PC->IsClosed())
+                    //        {
+                    //            if ((p == PC->FirstParameter()) ||
+                    //              (p == PC->LastParameter()))
+                    //            {
+                    //                if (theV.Orientation() == TopAbs_FORWARD) p = PC->FirstParameter();
+                    //                else p = PC->LastParameter();
+                    //            }
+                    //        }
+                    //        theParam = p;
+                    //        return tru;
+                    //    }
+                    //    itpr.Next();
+                    //}
+                }
+            }
+
+            return false;
+        }
 
         public static Geom_Curve Curve(TopoDS_Edge E,
-                                            ref TopLoc_Location L,
-                                            ref double First,
-                                            ref double Last)
+                                            out TopLoc_Location L,
+                                            out double First,
+                                            out double Last)
         {
+            L = new TopLoc_Location();
+            First = 0;
+            Last = 0;
             // find the representation
             BRep_TEdge TE = (BRep_TEdge)(E.TShape());
 
@@ -226,7 +414,7 @@ namespace OCCPort
             // Check existence of 3d curve in edge
             double f = 0, l = 0;
             TopLoc_Location aCurveLocation = new TopLoc_Location();
-            Geom_Curve C3D = BRep_Tool.Curve(E, ref aCurveLocation, ref f, ref l);
+            Geom_Curve C3D = BRep_Tool.Curve(E, out aCurveLocation, out f, out l);
 
             if (C3D == null)
                 // no 3d curve
@@ -427,8 +615,8 @@ namespace OCCPort
             }
             else if (theShape.ShapeType() == TopAbs_ShapeEnum.TopAbs_EDGE)
             {
-                TopoDS_Vertex aVFirst, aVLast;
-                TopExp.Vertices(TopoDS.Edge(theShape), out aVFirst, out aVLast);
+                TopoDS_Vertex aVFirst=new TopoDS_Vertex (), aVLast = new TopoDS_Vertex();
+                TopExp.Vertices(TopoDS.Edge(theShape), ref aVFirst, ref aVLast);
                 return !aVFirst.IsNull() && aVFirst.IsSame(aVLast);
             }
             return theShape.Closed();
@@ -471,7 +659,7 @@ namespace OCCPort
         //function : Triangulations
         //purpose  :
         //=======================================================================
-        public Poly_ListOfTriangulation Triangulations(TopoDS_Face theFace,
+        public static Poly_ListOfTriangulation Triangulations(TopoDS_Face theFace,
                                                            ref TopLoc_Location theLocation)
         {
             theLocation = theFace.Location();

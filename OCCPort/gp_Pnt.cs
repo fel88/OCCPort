@@ -111,20 +111,16 @@ namespace OCCPort
             }
             else { T.Transforms(ref coord); }
         }
-        public void SetX(double v)
-        {
-            throw new NotImplementedException();
-        }
 
-        public void SetY(double v)
-        {
-            throw new NotImplementedException();
-        }
+        //! Assigns the given value to the X coordinate of this point.
+        public void SetX(double theX) { coord.SetX(theX); }
 
-        public void SetZ(double v)
-        {
-            throw new NotImplementedException();
-        }
+        //! Assigns the given value to the Y coordinate of this point.
+        public void SetY(double theY) { coord.SetY(theY); }
+
+        //! Assigns the given value to the Z coordinate of this point.
+        public void SetZ(double theZ) { coord.SetZ(theZ); }
+
 
         public void Translate(gp_Vec theV)
         {

@@ -116,5 +116,24 @@ namespace OCCPort
                     U * ZDir.Y() + PLoc.Y());
 
         }
+
+        internal static void LineD1(double U, gp_Ax2d Pos, ref gp_Pnt2d P, ref gp_Vec2d V1)
+        {
+            gp_XY Coord = Pos.Direction().XY();
+            V1.SetXY(Coord);
+            Coord.SetLinearForm(U, Coord, Pos.Location().XY());
+            P.SetXY(Coord);
+        }
+
+        internal static gp_Pnt Value(double U, gp_Lin L)
+        {
+            return ElCLib.LineValue(U, L.Position());
+        }
+
+        internal static gp_Pnt Value(double u, gp_Circ myCirc)
+        {
+            throw new NotImplementedException();
+            //return ElCLib.CircleValue(U, C.Position(), C.Radius());
+        }
     }
 }

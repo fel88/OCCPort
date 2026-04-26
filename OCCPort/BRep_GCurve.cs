@@ -9,8 +9,16 @@ namespace OCCPort
 
     internal class BRep_GCurve : BRep_CurveRepresentation
     {
-     
 
+
+        public double First()
+        {
+            return myFirst;
+        }
+        public double Last()
+        {
+            return myLast;
+        }
         public void Update()
         {
 

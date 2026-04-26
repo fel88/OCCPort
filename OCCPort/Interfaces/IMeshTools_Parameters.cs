@@ -1,7 +1,13 @@
 ﻿namespace OCCPort.Interfaces
 {
-	public class IMeshTools_Parameters
-	{
+    public class IMeshTools_Parameters
+    {
+        //! Returns factor used to compute default value of MinSize 
+        //! (minimum mesh edge length) from deflection
+        public static double RelMinSize()
+        {
+            return 0.1;
+        }
 
         //! Default constructor
         public IMeshTools_Parameters()
@@ -41,7 +47,7 @@
         public double MinSize;
 
         //! Switches on/off multi-thread computation
-        public  bool InParallel;
+        public bool InParallel;
 
         //! Switches on/off relative computation of edge tolerance<br>
         //! If true, deflection used for the polygonalisation of each edge will be 
@@ -61,7 +67,7 @@
         // for all types of surfaces including analytical.
         public bool EnableControlSurfaceDeflectionAllSurfaces;
 
-        
+
 
         //! Cleans temporary data model when algorithm is finished.
         public bool CleanModel;
@@ -79,5 +85,5 @@
         public bool AllowQualityDecrease;
         //! 2D Delaunay triangulation algorithm factory to use
         public IMeshTools_MeshAlgoType MeshAlgo { get; set; }
-	}
+    }
 }
