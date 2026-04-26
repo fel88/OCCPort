@@ -54,8 +54,8 @@ namespace OCCPort
                       bool Restriction)
         {
             myFace = F;
-            TopLoc_Location L = new TopLoc_Location();
-            Geom_Surface aSurface = BRep_Tool.Surface(F, ref L);
+            TopLoc_Location L;
+            Geom_Surface aSurface = BRep_Tool.Surface(F, out L);
             if (aSurface == null)
                 return;
 
@@ -101,6 +101,21 @@ namespace OCCPort
         }
 
         public override double UResolution(double v)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override void D1(double U, double V, out gp_Pnt P, out gp_Vec D1U, out gp_Vec D1V)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override int NbVKnots()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override void D0(double u, double v, ref gp_Pnt pnt)
         {
             throw new System.NotImplementedException();
         }

@@ -40,7 +40,11 @@ namespace OCCPort
         {
             return false;
         }
-
+        //! A 3D polygon representation.
+        public  virtual bool IsPolygon3D()
+        {
+            return false;
+        }
         public virtual bool IsCurveOnSurface(Geom_Surface a, TopLoc_Location f)
         {
             return false;

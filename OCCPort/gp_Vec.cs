@@ -14,6 +14,22 @@ namespace OCCPort
             aV.coord.Multiply(theScalar);
             return aV;
         }
+        //! <me> is set to the following linear form : theV1 + theV2
+        public void SetLinearForm(gp_Vec theV1, gp_Vec theV2)
+        {
+           // coord.SetLinearForm(theV1.coord, theV2.coord);
+        } //! <me> is set to the following linear form : theA1 * theV1 + theV2
+        public void SetLinearForm(double theA1, gp_Vec theV1, gp_Vec theV2)
+        {
+            //coord.SetLinearForm(theA1, theV1.coord, theV2.coord);
+        }  //! <me> is set to the following linear form :
+           //! theA1 * theV1 + theA2 * theV2
+        public void SetLinearForm(double theA1, gp_Vec theV1,
+                       double theA2, gp_Vec theV2)
+        {
+            coord.SetLinearForm(theA1, theV1.coord, theA2, theV2.coord);
+        }
+
         public void Rotate(gp_Ax1 theA1, double theAng)
         {
             gp_Trsf aT = new gp_Trsf();

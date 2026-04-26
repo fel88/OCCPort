@@ -30,11 +30,40 @@ namespace OCCPort
             return myConSurf != null;
         }
 
+        public BRepAdaptor_Curve(TopoDS_Edge E)
+        {
+            Initialize(E);
+        }
 
+        public BRepAdaptor_Curve(TopoDS_Edge E,
+                     TopoDS_Face F)
+        {
+            Initialize(E, F);
+        }
+        public void Initialize(TopoDS_Edge E,
+                   TopoDS_Face F)
+        {
+            myConSurf = null;
+
+            myEdge = E;
+            TopLoc_Location L;
+            double pf = 0, pl = 0;
+            Geom_Surface S = BRep_Tool.Surface(F, out L);
+            Geom2d_Curve PC = BRep_Tool.CurveOnSurface(E, F, ref pf, ref pl);
+
+            GeomAdaptor_Surface HS = new GeomAdaptor_Surface();
+            HS.Load(S);
+            Geom2dAdaptor_Curve HC = new Geom2dAdaptor_Curve();
+            HC.Load(PC, pf, pl);
+            myConSurf = new Adaptor3d_CurveOnSurface();
+            myConSurf.Load(HC, HS);
+
+            myTrsf = L.Transformation();
+        }
         public override gp_Lin Line()
         {
             gp_Lin L = null;
-            if (myConSurf==null)
+            if (myConSurf == null)
                 L = myCurve.Line();
             else
                 L = myConSurf.Line();
@@ -83,7 +112,7 @@ namespace OCCPort
 
         public override GeomAbs_CurveType _GetType()
         {
-            if (myConSurf==null)
+            if (myConSurf == null)
             {
                 return myCurve._GetType();
             }

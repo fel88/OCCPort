@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Threading;
 
 namespace OCCPort
 {
@@ -9,6 +10,17 @@ namespace OCCPort
         private double y;
         private double z;
 
+        //! <me> is set to the following linear form :
+        //! @code
+        //! theA1 * theXYZ1 + theA2 * theXYZ2
+        //! @endcode
+        public void SetLinearForm(double theA1, gp_XYZ theXYZ1,
+                           double theA2, gp_XYZ theXYZ2)
+        {
+            x = theA1 * theXYZ1.x + theA2 * theXYZ2.x;
+            y = theA1 * theXYZ1.y + theA2 * theXYZ2.y;
+            z = theA1 * theXYZ1.z + theA2 * theXYZ2.z;
+        }
         //! @code
         //! <me>.X() = <me>.X() + theOther.X()
         //! <me>.Y() = <me>.Y() + theOther.Y()

@@ -21,5 +21,10 @@ namespace OCCPort
 		protected Standard_Failure(SerializationInfo info, StreamingContext context) : base(info, context)
 		{
 		}
-	}
+
+        internal static void Raise(string v)
+        {
+			throw new Exception(v);
+        }
+    }
 }

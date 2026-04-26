@@ -41,8 +41,8 @@ namespace OCCPort
             //     Standard_Real tmp = cf; cf = cl; cl = tmp;
             //   }
             //   return !C2d.IsNull();
-            TopLoc_Location L = new TopLoc_Location();
-            Geom_Surface S = BRep_Tool.Surface(face, ref L);
+            TopLoc_Location L;
+            Geom_Surface S = BRep_Tool.Surface(face, out L);
             return PCurve(edge, S, L,ref  C2d, ref cf, ref cl, orient);
         }
         //! Returns the pcurve and bounding parameteres for the edge

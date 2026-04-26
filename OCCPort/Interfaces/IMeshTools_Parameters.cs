@@ -61,8 +61,10 @@
         // for all types of surfaces including analytical.
         public bool EnableControlSurfaceDeflectionAllSurfaces;
 
+        
+
         //! Cleans temporary data model when algorithm is finished.
-        public double CleanModel;
+        public bool CleanModel;
 
         //! Enables/disables local adjustment of min size depending on edge size.
         //! Disabled by default.
@@ -74,7 +76,7 @@
 
         //! Allows/forbids the decrease of the quality of the generated mesh
         //! over the existing one.
-        public double AllowQualityDecrease;
+        public bool AllowQualityDecrease;
         //! 2D Delaunay triangulation algorithm factory to use
         public IMeshTools_MeshAlgoType MeshAlgo { get; set; }
 	}

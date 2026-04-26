@@ -9,10 +9,7 @@ namespace OCCPort
 
     internal class BRep_GCurve : BRep_CurveRepresentation
     {
-        public override bool IsCurve3D()
-        {
-            throw new NotImplementedException();
-        }
+     
 
         public void Update()
         {

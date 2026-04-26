@@ -29,6 +29,18 @@
             Message_ALARM = 0x00000400,
             Message_FAIL = 0x00000800
         }
+        //! Check status for being set
+        public bool IsSet(Message_Status theStatus)
+        {
+            switch (TypeOfStatus(theStatus))
+            {
+                case Message_StatusType.Message_DONE: return (myDone & getBitFlag(theStatus)) != 0;
+                case Message_StatusType.Message_WARN: return (myWarn & getBitFlag(theStatus)) != 0;
+                case Message_StatusType.Message_ALARM: return (myAlarm & getBitFlag(theStatus)) != 0;
+                case Message_StatusType.Message_FAIL: return (myFail & getBitFlag(theStatus)) != 0;
+            }
+            return false;
+        }
 
         //! Clear all statuses
         public void Clear()

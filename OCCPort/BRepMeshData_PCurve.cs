@@ -8,9 +8,17 @@ namespace OCCPort
     //! Default implementation of curve data model entity.
     internal class BRepMeshData_PCurve : AbstractMeshData_PCurve, IMeshData_PCurve
     {
+        //! Returns orientation of the edge associated with current pcurve.
+
         public TopAbs_Orientation GetOrientation()
         {
-            throw new System.NotImplementedException();
+            return myOrientation;
+        }
+
+        //! Returns discrete face pcurve is associated to.
+        public IMeshData_Face GetFace()
+        {
+            return myDFace;
         }
 
         public gp_Pnt2d GetPoint(int theIndex)
@@ -30,13 +38,15 @@ namespace OCCPort
 
         List<double> myParameters = new List<double>();
 
-        public BRepMeshData_PCurve(IMeshData_Face theDFace, TopAbs_Orientation theOrientation):base(theDFace,theOrientation)
-        { 
+        public BRepMeshData_PCurve(IMeshData_Face theDFace, TopAbs_Orientation theOrientation) : base(theDFace, theOrientation)
+        {
         }
-
+     
         public int ParametersNb()
         {
             return myParameters.Count;
         }
+
+        
     }
 }

@@ -18,7 +18,7 @@ namespace OCCPort
 
         IMeshTools_Parameters myParameters = new IMeshTools_Parameters();
         bool myModified;
-        int myStatus;
+        IMeshData_Status myStatus;
         //! Constructor.
         //! Automatically calls method Perform.
         //! @param theShape shape to be meshed.
@@ -71,28 +71,28 @@ namespace OCCPort
             Message_ProgressScope aPS = new Message_ProgressScope(theRange, "Perform incmesh", 10);
             IMeshTools_MeshBuilder aIncMesh = new MeshTools_MeshBuilder(theContext);
             aIncMesh.Perform(aPS.Next(9));
-            //if (!aPS.More())
-            //{
-            //	myStatus = IMeshData_UserBreak;
-            //	return;
-            //}
-            //myStatus = IMeshData_NoError;
+            if (!aPS.More())
+            {
+                myStatus = IMeshData_Status. IMeshData_UserBreak;
+                return;
+            }
+            myStatus = IMeshData_Status.IMeshData_NoError;
             IMeshData_Model aModel = theContext.GetModel();
             if (aModel != null)
             {
                 for (int aFaceIt = 0; aFaceIt < aModel.FacesNb(); ++aFaceIt)
                 {
-                    //IMeshData.IFaceHandle aDFace = aModel.GetFace(aFaceIt);
-                    //		myStatus |= aDFace->GetStatusMask();
+                    IMeshData_Face aDFace = aModel.GetFace(aFaceIt);
+                    myStatus |= aDFace.GetStatusMask();
 
-                    //		for (Standard_Integer aWireIt = 0; aWireIt < aDFace->WiresNb(); ++aWireIt)
-                    //		{
-                    //			const IMeshData::IWireHandle&aDWire = aDFace->GetWire(aWireIt);
-                    //			myStatus |= aDWire->GetStatusMask();
-                    //		}
+                    for (int aWireIt = 0; aWireIt < aDFace.WiresNb(); ++aWireIt)
+                    {
+                        IWireHandle aDWire = aDFace.GetWire(aWireIt);
+                        myStatus |= aDWire.GetStatusMask();
+                    }
                 }
             }
-            //aPS.Next(1);
+            aPS.Next(1);
             setDone();
         }
     }

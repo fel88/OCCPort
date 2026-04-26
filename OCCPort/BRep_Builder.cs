@@ -304,8 +304,8 @@ namespace OCCPort
         internal void UpdateEdge(TopoDS_Edge E,
                     Geom2d_Curve C, TopoDS_Face F, double Tol)
         {
-            TopLoc_Location l = new TopLoc_Location();
-            UpdateEdge(E, C, BRep_Tool.Surface(F, ref l), l, Tol);
+            TopLoc_Location l;
+            UpdateEdge(E, C, BRep_Tool.Surface(F, out l), l, Tol);
         }
 
         internal void MakeCompound(TopoDS_Compound C)

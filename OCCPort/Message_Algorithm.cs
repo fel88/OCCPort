@@ -8,6 +8,12 @@ namespace OCCPort
         {
             myStatus.Set(theStat);
 
+        }  //! Returns copy of exec status of algorithm
+        public  Message_ExecStatus GetStatus()
+        {
+            return myStatus;
+
+
         }
         public void ClearStatus()
         {

@@ -12,7 +12,7 @@
 
         //! Adds wire to discrete model of face.
         IWireHandle AddWire(TopoDS_Wire theWire, int theEdgeNb = 0);
-        void SetStatus(IMeshData_Status meshData_Failure);
+        
         IWireHandle GetWire(int aWireIt);
     }
 

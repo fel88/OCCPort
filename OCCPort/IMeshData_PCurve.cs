@@ -1,4 +1,6 @@
-﻿namespace OCCPort
+﻿using OCCPort.Interfaces;
+
+namespace OCCPort
 {
 
     //! Interface class representing pcurve of edge associated with discrete face.
@@ -7,7 +9,8 @@
     {
         //! Returns orientation of the edge associated with current pcurve.
         TopAbs_Orientation GetOrientation();
-
+        //! Returns discrete face pcurve is associated to.
+        IMeshData_Face GetFace();
         //! Returns discretization point with the given index.
         gp_Pnt2d GetPoint(int theIndex);
         int ParametersNb();

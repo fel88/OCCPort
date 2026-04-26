@@ -42,10 +42,7 @@ namespace OCCPort
             return TopoDS.Face(GetShape());
         }
 
-        public void SetStatus(IMeshData_Status meshData_Failure)
-        {
-
-        }
+        
 
         public IWireHandle GetWire(int theIndex)
         {

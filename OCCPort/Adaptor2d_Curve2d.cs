@@ -16,7 +16,11 @@ namespace OCCPort
     public abstract class Adaptor2d_Curve2d
     {
         public abstract int Degree();
-
+        //! Computes the point of parameter U on the curve with its
+        //! first derivative.
+        //! Raised if the continuity of the current interval
+        //! is not C1.
+        public abstract void D1(double U,out gp_Pnt2d P, out gp_Vec2d V);
         public abstract int NbKnots();
 
         public abstract GeomAbs_CurveType _GetType();

@@ -1,4 +1,7 @@
-﻿namespace OCCPort
+﻿using System;
+using System.Security.Cryptography;
+
+namespace OCCPort
 {
 	public class Poly_PolygonOnTriangulation
 	{
@@ -12,10 +15,18 @@
 		public double Deflection() { return myDeflection; }
 
 		double myDeflection;
+        TColStd_HArray1OfReal myParameters;
 
 		//! Returns the table of nodes for this polygon.
 		//! A node value is an index in the table of nodes specific to an existing triangulation of a shape.
 		public TColStd_Array1OfInteger Nodes() { return myNodes; }
 
-	}
+        //! Returns true if parameters are associated with the nodes in this polygon.
+        internal bool HasParameters()
+        {
+
+			return myParameters != null;
+
+        }
+    }
 }

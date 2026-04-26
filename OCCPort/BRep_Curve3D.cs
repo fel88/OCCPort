@@ -30,12 +30,7 @@ C == null ? Standard_Real.RealLast() : C.LastParameter())
             return true;
         }
 
-        public void SetRange(double First, double Last)
-        {
-            myFirst = First;
-            myLast = Last;
-            Update();
-        }
+        
 
     }
 }

@@ -29,73 +29,73 @@
 
             if (aContext.BuildModel())
             {
-                /*if (aContext.kDiscretizeEdges())
-				{
-					if (aContext->HealModel())
-					{
-						if (aContext->PreProcessModel())
-						{*/
-
-                if (aContext.DiscretizeFaces(aPS.Next(9)))
+                if (aContext.DiscretizeEdges())
                 {
-                    /*if (aContext->PostProcessModel())
+                    if (aContext.HealModel())
                     {
-                        SetStatus(Message_Done1);
+                        if (aContext.PreProcessModel())
+                        {
+
+                            if (aContext.DiscretizeFaces(aPS.Next(9)))
+                            {
+                                if (aContext.PostProcessModel())
+                                {
+                                    SetStatus(Message_Status.Message_Done1);
+                                }
+
+                                else
+                                {
+                                    SetStatus(Message_Status.Message_Fail7);
+                                }
+                            }
+
+                            else
+                            {
+                                if (!aPS.More())
+                                {
+                                    SetStatus(Message_Status.Message_Fail8);
+                                    aContext.Clean();
+                                    return;
+                                }
+                                SetStatus(Message_Status.Message_Fail6);
+                            }
+                        }
+
+                        else
+                        {
+                            SetStatus(Message_Status.Message_Fail5);
+                        }
                     }
 
                     else
                     {
-                        SetStatus(Message_Fail7);
-                    }*/
+                        SetStatus(Message_Status.Message_Fail4);
+                    }
                 }
-                /*
+
                 else
                 {
-                    if (!aPS.More())
-                    {
-                        SetStatus(Message_Fail8);
-                        aContext->Clean();
-                        return;
-                    }
-                    SetStatus(Message_Fail6);
+                    SetStatus(Message_Status.Message_Fail3);
                 }
             }
-
             else
             {
-                SetStatus(Message_Fail5);
+                 IMeshTools_ModelBuilder aModelBuilder =
+                  aContext.GetModelBuilder();
+
+                 if (aModelBuilder == null)
+                 {
+                     SetStatus(Message_Status.Message_Fail1);
+                 }
+                 else
+                 {
+                     // Is null shape or another problem?
+                     SetStatus(aModelBuilder.GetStatus().IsSet(Message_Status.Message_Fail1) ?
+                       Message_Status.Message_Warn1 : Message_Status.Message_Fail2);
+                 }
             }
-        }
-
-        else
-        {
-            SetStatus(Message_Fail4);
-        }
-    }
-
-    else
-    {
-        SetStatus(Message_Fail3);
-    }
-}
-else
-{
-    IMeshTools_ModelBuilder aModelBuilder =
-     aContext.GetModelBuilder();
-
-    if (aModelBuilder = null)
-    {
-        SetStatus(Message_Fail1);
-    }
-    else
-    {
-        // Is null shape or another problem?
-        SetStatus(aModelBuilder->GetStatus().IsSet(Message_Fail1) ?
-          Message_Warn1 : Message_Fail2);
-    }*/
-            }
-            //aPS.Next(1);
-            //	aContext->Clean();
+            aPS.Next(1);
+            	aContext.Clean();
         }
 
     }

@@ -78,6 +78,14 @@ namespace OCCPort
 
             Load(theCrv, theUFirst, theULast);
         }
+
+        public Geom2dAdaptor_Curve()
+        {
+            myTypeCurve = GeomAbs_CurveType.GeomAbs_OtherCurve;
+            myFirst = (0.0);
+            myLast = 0.0;
+        }
+
         //! Standard_ConstructionError is raised if theUFirst>theULast
         public void Load(Geom2d_Curve theCurve, double theUFirst, double theULast)
         {
@@ -215,6 +223,11 @@ namespace OCCPort
         }
 
         public override int NbKnots()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void D1(double U, out gp_Pnt2d P, out gp_Vec2d V)
         {
             throw new NotImplementedException();
         }

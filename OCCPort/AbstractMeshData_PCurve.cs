@@ -10,8 +10,9 @@ namespace OCCPort
             myOrientation = theOrientation;
             myDFace = theDFace;
         }
-        private IMeshData_Face myDFace;
-        private TopAbs_Orientation myOrientation;
+
+        protected IMeshData_Face myDFace;
+        protected TopAbs_Orientation myOrientation;
 
         
     }

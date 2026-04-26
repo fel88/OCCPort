@@ -15,30 +15,29 @@
         public abstract bool IsVPeriodic();
         public abstract bool IsUPeriodic();
 
-        public abstract double UPeriod( ) ;
-        public abstract double VPeriod( ) ;
-        public abstract double VResolution( double  v) ;
-        public abstract double UResolution( double  v) ;
+        public abstract double UPeriod();
+        public abstract double VPeriod();
+        public abstract double VResolution(double v);
+        public abstract double UResolution(double v);
 
         //=======================================================================
         //function : NbVKnots
         //purpose  : 
         //=======================================================================
+        //! Computes the point  and the first derivatives on the surface.
+        //! Raised if the continuity of the current intervals is not C1.
+        //!
+        //! Tip: use GeomLib::NormEstim() to calculate surface normal at specified (U, V) point.
+        public abstract void D1(double U, double V, out gp_Pnt P, out gp_Vec D1U, out gp_Vec D1V);
 
-        public virtual int NbVKnots()
-        {
-            throw new Standard_NotImplemented("Adaptor3d_Surface::NbVKnots");
-        }
+        public abstract int NbVKnots();
         //=======================================================================
         //function : D0
         //purpose  : 
         //=======================================================================
 
         //void Adaptor3d_Surface::D0(const Standard_Real U, const Standard_Real V, gp_Pnt& P) const 
-        public virtual void D0(double u, double v, ref gp_Pnt pnt)
-        {
-            throw new Standard_NotImplemented("Adaptor3d_Surface::D0");
-        }
+        public abstract void D0(double u, double v, ref gp_Pnt pnt);
 
 
 

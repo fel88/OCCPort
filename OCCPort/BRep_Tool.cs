@@ -8,6 +8,7 @@ using System.Reflection.Metadata;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Security.Policy;
+using System.Threading;
 
 namespace OCCPort
 {
@@ -21,7 +22,7 @@ namespace OCCPort
         {
             // find the representation
             BRep_TEdge TE = (BRep_TEdge)(E.TShape());
-            
+
             foreach (var cr in TE.Curves())
             {
                 if (cr.IsCurve3D())
@@ -30,28 +31,91 @@ namespace OCCPort
                     L = E.Location() * GC.Location();
                     GC.Range(ref First, ref Last);
                     return GC.Curve3D();
-                }                
+                }
             }
 
             L.Identity();
             First = Last = 0.0;
             return null;
         }
+        //=======================================================================
+        //function : CurveOnSurface
+        //purpose  : Returns the curve  associated to the  edge in  the
+        //           parametric  space of  the  face.  Returns   a NULL
+        //           handle  if this curve  does not exist.  Returns in
+        //           <First> and <Last> the parameter range.
+        //=======================================================================
+        public static Geom2d_Curve CurveOnSurface(TopoDS_Edge E,
+                                               TopoDS_Face F,
+                                               ref double First,
+                                               ref double Last
+                                             )
+        {
+            bool? v = null;
+            return CurveOnSurface(E, F, ref First, ref Last, ref v);
+        }
+        public static Geom2d_Curve CurveOnSurface(TopoDS_Edge E,
+                                               TopoDS_Face F,
+                                               ref double First,
+                                               ref double Last,
+                                               ref bool? theIsStored)
+        {
+            TopLoc_Location l;
+            Geom_Surface S = BRep_Tool.Surface(F, out l);
+            TopoDS_Edge aLocalEdge = E;
+            if (F.Orientation() == TopAbs_Orientation.TopAbs_REVERSED)
+            {
+                aLocalEdge.Reverse();
+            }
+            return CurveOnSurface(aLocalEdge, S, ref l, ref First, ref Last, ref theIsStored);
+        }
+        public static Geom2d_Curve CurveOnSurface(TopoDS_Edge E,
+                                               Geom_Surface S,
+                                               ref TopLoc_Location L,
+                                               ref double First,
+                                               ref double Last,
+                                               ref bool? theIsStored)
+        {
+            TopLoc_Location loc = L.Predivided(E.Location());
+            bool Eisreversed = (E.Orientation() == TopAbs_Orientation.TopAbs_REVERSED);
+            if (theIsStored.HasValue)//??
+                theIsStored = true;//??
 
+            // find the representation
+            BRep_TEdge TE = (BRep_TEdge)(E.TShape());
+
+            foreach (var cr in TE.Curves())
+            {
+
+                if (cr.IsCurveOnSurface(S, loc))
+                {
+                    BRep_GCurve GC = (BRep_GCurve)(cr);
+                    GC.Range(ref First, ref Last);
+                    if (GC.IsCurveOnClosedSurface() && Eisreversed)
+                        return GC.PCurve2();
+                    else
+                        return GC.PCurve();
+                }
+
+            }
+
+            // Curve is not found. Try projection on plane
+            if (theIsStored.HasValue)
+                theIsStored = false;
+            return CurveOnPlane(E, S, L, ref First, ref Last);
+        }
         public static void CurveOnSurface(TopoDS_Edge E,
-                              ref Geom2d_Curve C,
-                             ref Geom_Surface S,
-                                TopLoc_Location L,
-                                double First,
-                                double Last)
+                                      ref Geom2d_Curve C,
+                                     ref Geom_Surface S,
+                                        TopLoc_Location L,
+                                        double First,
+                                        double Last)
         {
             // find the representation
             BRep_TEdge TE = (BRep_TEdge)(E.TShape());
-            BRep_ListIteratorOfListOfCurveRepresentation itcr = new BRep_ListIteratorOfListOfCurveRepresentation(TE.Curves());
-
-            while (itcr.More())
+            foreach (var cr in TE.Curves())
             {
-                BRep_CurveRepresentation cr = itcr.Value();
+
                 if (cr.IsCurveOnSurface())
                 {
                     BRep_GCurve GC = (BRep_GCurve)(cr);
@@ -61,7 +125,6 @@ namespace OCCPort
                     GC.Range(ref First, ref Last);
                     return;
                 }
-                itcr.Next();
             }
 
             C = null;
@@ -85,7 +148,7 @@ namespace OCCPort
 
             // find the representation
             BRep_TEdge TE = E.TShape() as BRep_TEdge;
-            
+
             foreach (var cr in TE.Curves())
             {
                 if (cr.IsCurveOnSurface(S, loc))
@@ -96,7 +159,7 @@ namespace OCCPort
                         return GC.PCurve2();
                     else
                         return GC.PCurve();
-                }            
+                }
             }
 
             // Curve is not found. Try projection on plane
@@ -121,8 +184,8 @@ namespace OCCPort
                                                ref double Last,
                                                ref bool theIsStored)
         {
-            TopLoc_Location l = new TopLoc_Location();
-            Geom_Surface S = BRep_Tool.Surface(F, ref l);
+            TopLoc_Location l;
+            Geom_Surface S = BRep_Tool.Surface(F, out l);
             TopoDS_Edge aLocalEdge = E;
             if (F.Orientation() == TopAbs_Orientation.TopAbs_REVERSED)
             {
@@ -142,9 +205,9 @@ namespace OCCPort
                                              Geom_Surface S,
                                              TopLoc_Location L,
                                            ref double First,
-                                           ref  double Last)
+                                           ref double Last)
         {
-                        
+
             First = Last = 0.0;
 
             // Check if the surface is planar
@@ -225,17 +288,17 @@ namespace OCCPort
         {
             // find the representation
             BRep_TEdge TE = (BRep_TEdge)(E.TShape());
-            
+
             foreach (var cr in TE.Curves())
-            {                        
+            {
                 if (cr.IsCurve3D())
                 {
                     BRep_Curve3D GC = cr as BRep_Curve3D;
                     if (GC != null && GC.Curve3D() != null)
                         return true;
                 }
-                else if (cr.IsCurveOnSurface()) 
-                    return true;                
+                else if (cr.IsCurveOnSurface())
+                    return true;
             }
             return false;
         }
@@ -259,24 +322,23 @@ namespace OCCPort
         }
 
         public static Poly_Polygon3D Polygon3D(TopoDS_Edge E,
-                                                          TopLoc_Location L)
+                                                         ref TopLoc_Location L)
         {
             // find the representation
             BRep_TEdge TE = (BRep_TEdge)E.TShape();
             //BRep_ListIteratorOfListOfCurveRepresentation itcr(TE->Curves());
 
-            //while (itcr.More())
-            //{
-            //    const Handle(BRep_CurveRepresentation)&cr = itcr.Value();
-            //    if (cr->IsPolygon3D())
-            //    {
-            //        const BRep_Polygon3D* GC = static_cast <const BRep_Polygon3D*> (cr.get());
-            //        L = E.Location() * GC->Location();
-            //        return GC->Polygon3D();
-            //    }
-            //    itcr.Next();
-            //}
-            //L.Identity();
+            foreach (var cr in TE.Curves())
+            {
+                if (cr.IsPolygon3D())
+                {
+                    BRep_Polygon3D GC = (BRep_Polygon3D)cr;
+                    L = E.Location() * GC.Location();
+                    return GC.Polygon3D();
+                }
+            }
+
+            L.Identity();
             return nullPolygon3D;
         }
         //=======================================================================
@@ -380,9 +442,11 @@ namespace OCCPort
             return TE.Degenerated();
         }
 
-        internal static double Surface(double f, TopLoc_Location l)
+        internal static Geom_Surface Surface(TopoDS_Face F, out TopLoc_Location L)
         {
-            throw new NotImplementedException();
+            BRep_TFace TF = (BRep_TFace)(F.TShape());
+            L = F.Location() * TF.Location();
+            return TF.Surface();
         }
         public static Geom_Surface Surface(TopoDS_Face F)
         {
@@ -402,14 +466,7 @@ namespace OCCPort
             return S;
         }
 
-        internal static Geom_Surface Surface(TopoDS_Face F,
-                   ref TopLoc_Location L)
-        {
-            BRep_TFace TF = (BRep_TFace)(F.TShape());
-            L = F.Location() * TF.Location();
-            return TF.Surface();
 
-        }
         //=======================================================================
         //function : Triangulations
         //purpose  :

@@ -116,8 +116,8 @@ namespace OCCPort
             if (aBox.IsVoid())
             {
                 double UMin = 0, UMax = 0, VMin = 0, VMax = 0;
-                TopLoc_Location L = new TopLoc_Location();
-                Geom_Surface aSurf = BRep_Tool.Surface(F, ref L);
+                TopLoc_Location L;
+                Geom_Surface aSurf = BRep_Tool.Surface(F, out L);
                 if (aSurf == null)
                 {
                     return;
@@ -238,8 +238,8 @@ namespace OCCPort
             // points of the parametric curve of the edge on the face.
 
             // Get surface of the face
-            TopLoc_Location aLoc = new TopLoc_Location();
-            Geom_Surface aSurf = BRep_Tool.Surface(theF, ref aLoc);
+            TopLoc_Location aLoc;
+            Geom_Surface aSurf = BRep_Tool.Surface(theF, out aLoc);
             // Iterate on edges and reset UV points
             TopExp_Explorer anExpE = new TopExp_Explorer(theF, TopAbs_ShapeEnum.TopAbs_EDGE);
             for (; anExpE.More(); anExpE.Next())

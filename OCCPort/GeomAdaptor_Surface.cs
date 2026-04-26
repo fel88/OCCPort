@@ -346,6 +346,21 @@ namespace OCCPort
             return 2.0 * Math.PI;
         }
 
+        public override void D1(double U, double V, out gp_Pnt P, out gp_Vec D1U, out gp_Vec D1V)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override int NbVKnots()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void D0(double u, double v, ref gp_Pnt pnt)
+        {
+            throw new NotImplementedException();
+        }
+
         public GeomAdaptor_Surface(Geom_Surface theSurf)
 
         {

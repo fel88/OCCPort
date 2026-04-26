@@ -6,7 +6,24 @@ namespace OCCPort
     {
         DMapOfIFacePtrsListOfInteger myPCurvesMap;
         VectorOfIPCurveHandles myPCurves;
+        bool mySameParam;
+        //! Gets value of angular deflection for the discrete model.
+        public double GetAngularDeflection()
+        {
+            return myAngDeflection;
+        }
+        double myAngDeflection;
 
+        //! Returns true in case if the edge is free one, i.e. it does not have pcurves.
+        public bool IsFree()
+        {
+            return (PCurvesNb() == 0);
+        }
+        //! By default equals to flag stored in topological shape.
+        public bool GetSameParam()
+        {
+            return mySameParam;
+        }
         public IMeshData_PCurve GetPCurve(
   IFacePtr theDFace,
   TopAbs_Orientation theOrientation)
@@ -22,6 +39,12 @@ namespace OCCPort
         {
             throw new System.NotImplementedException();
         }
+        public IMeshData_PCurve GetPCurve(
+  int theIndex)
+        {
+            return myPCurves[theIndex];
+        }
+
 
         //! Returns pcurve for the specified discrete face.
         public IMeshData_PCurve GetPCurve(IMeshData_Face theDFace, TopAbs_Orientation theOrientation)
@@ -59,10 +82,6 @@ namespace OCCPort
 
         }
 
-        public IMeshData_PCurve GetPCurve(int theIndex)
-        {
-            return myPCurves[theIndex];
-        }
 
         public BRepMeshData_Edge(TopoDS_Edge theEdge) : base(theEdge)
         {
