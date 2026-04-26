@@ -20,6 +20,20 @@ namespace OCCPort
         {
             return myDFace;
         }
+        public void InsertPoint(int thePosition, gp_Pnt2d thePoint, double theParamOnPCurve)
+        {
+            myPoints2d.Insert(thePosition, thePoint);
+            myParameters.Insert(thePosition, theParamOnPCurve);
+            myIndices.Insert(thePosition, 0);
+        }
+
+        //! Adds new discretization point to pcurve.
+        public void AddPoint(gp_Pnt2d thePoint, double theParamOnPCurve)
+        {
+            myPoints2d.Add(thePoint);
+            myParameters.Add(theParamOnPCurve);
+            myIndices.Add(0);
+        }
 
         public gp_Pnt2d GetPoint(int theIndex)
         {
@@ -37,16 +51,17 @@ namespace OCCPort
         }
 
         List<double> myParameters = new List<double>();
+        List<int> myIndices = new List<int>();
 
         public BRepMeshData_PCurve(IMeshData_Face theDFace, TopAbs_Orientation theOrientation) : base(theDFace, theOrientation)
         {
         }
-     
+
         public int ParametersNb()
         {
             return myParameters.Count;
         }
 
-        
+
     }
 }

@@ -135,5 +135,10 @@ namespace OCCPort
             throw new NotImplementedException();
             //return ElCLib.CircleValue(U, C.Position(), C.Radius());
         }
+
+        internal static double InPeriod(double u, double myuinf, double v)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

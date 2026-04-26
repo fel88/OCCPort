@@ -4,11 +4,11 @@
     {
         //! Returns factor used to compute default value of MinSize 
         //! (minimum mesh edge length) from deflection
-        public static double RelMinSize()
+        public static  double RelMinSize()
         {
             return 0.1;
         }
-
+        
         //! Default constructor
         public IMeshTools_Parameters()
 
@@ -21,11 +21,11 @@
             MinSize = -1.0;
             /*InParallel(Standard_False),
             Relative(Standard_False),*/
-            InternalVerticesMode = true;/*
-    ControlSurfaceDeflection(Standard_True),*/
+            InternalVerticesMode = true;
+            ControlSurfaceDeflection = true;
             EnableControlSurfaceDeflectionAllSurfaces = false;/*
-    CleanModel(Standard_True),
-    AdjustMinSize(Standard_False),
+    CleanModel(Standard_True),*/
+            AdjustMinSize = false;/*
     ForceFaceDeflection(Standard_False),
     AllowQualityDecrease(Standard_False)*/
         }
@@ -61,7 +61,7 @@
 
         //! Parameter to check the deviation of triangulation and interior of
         //! the face
-        public double ControlSurfaceDeflection;
+        public bool ControlSurfaceDeflection;
 
         // Enables/disables check triggered by ControlSurfaceDeflection flag 
         // for all types of surfaces including analytical.
@@ -74,7 +74,7 @@
 
         //! Enables/disables local adjustment of min size depending on edge size.
         //! Disabled by default.
-        public double AdjustMinSize;
+        public bool AdjustMinSize;
 
         //! Enables/disables usage of shape tolerances for computing face deflection.
         //! Disabled by default.

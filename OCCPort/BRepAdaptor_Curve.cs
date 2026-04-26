@@ -30,6 +30,22 @@ namespace OCCPort
                 return myConSurf.FirstParameter();
             }
         }
+        public override double Resolution(double R)
+        {
+            if (myConSurf == null)
+            {
+                return myCurve.Resolution(R);
+            }
+            else
+            {
+                return myConSurf.Resolution(R);
+            }
+        }
+        public Adaptor3d_CurveOnSurface CurveOnSurface()
+        {
+            return myConSurf;
+        }
+
 
         public override double LastParameter()
         {
@@ -54,6 +70,9 @@ namespace OCCPort
         {
             return myConSurf != null;
         }
+        //! Creates an undefined Curve with no Edge loaded.
+
+        public BRepAdaptor_Curve() { }
 
         public BRepAdaptor_Curve(TopoDS_Edge E)
         {
@@ -169,11 +188,28 @@ namespace OCCPort
 
         public override void D0(double U, ref gp_Pnt P)
         {
-            if (myConSurf==null)
+            if (myConSurf == null)
                 myCurve.D0(U, ref P);
             else
                 myConSurf.D0(U, ref P);
             P.Transform(myTrsf);
+        }
+
+        public override bool IsPeriodic()
+        {
+            if (myConSurf == null)
+            {
+                return myCurve.IsPeriodic();
+            }
+            else
+            {
+                return myConSurf.IsPeriodic();
+            }
+        }
+
+        public override int NbIntervals(GeomAbs_Shape S)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

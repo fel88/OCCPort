@@ -266,7 +266,46 @@ namespace OCCPort
             }
         }
 
- 
+        public override double Resolution(double Ruv)
+        {
+            switch (myTypeCurve)
+            {
+                case GeomAbs_CurveType. GeomAbs_Line:
+                    return Ruv;
+                //case GeomAbs_Circle:
+                //    {
+                //        Standard_Real R = Handle(Geom2d_Circle)::DownCast(myCurve)->Circ2d().Radius();
+                //        if (R > Ruv / 2.)
+                //            return 2 * ASin(Ruv / (2 * R));
+                //        else
+                //            return 2 * M_PI;
+                //    }
+                //case GeomAbs_Ellipse:
+                //    {
+                //        return Ruv / Handle(Geom2d_Ellipse)::DownCast(myCurve)->MajorRadius();
+                //    }
+                //case GeomAbs_BezierCurve:
+                //    {
+                //        Standard_Real res;
+                //        Handle(Geom2d_BezierCurve)::DownCast(myCurve)->Resolution(Ruv, res);
+                //        return res;
+                //    }
+                //case GeomAbs_BSplineCurve:
+                //    {
+                //        Standard_Real res;
+                //        Handle(Geom2d_BSplineCurve)::DownCast(myCurve)->Resolution(Ruv, res);
+                //        return res;
+                //    }
+                default:
+                    return Precision.Parametric(Ruv);
+            }
+        }
+
+        public override bool IsPeriodic()
+        {
+            return myCurve.IsPeriodic();
+
+        }
     }
 
 }

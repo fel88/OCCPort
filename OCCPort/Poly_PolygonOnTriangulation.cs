@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection.Metadata;
 using System.Security.Cryptography;
 
 namespace OCCPort
@@ -13,6 +14,10 @@ namespace OCCPort
 		TColStd_Array1OfInteger myNodes;
 		//! Returns the deflection of this polygon
 		public double Deflection() { return myDeflection; }
+
+        //! Returns the table of the parameters associated with each node in this polygon.
+        //! Warning! Use the function HasParameters to check if parameters are associated with the nodes in this polygon.
+      public   TColStd_HArray1OfReal Parameters()  { return myParameters; }
 
 		double myDeflection;
         TColStd_HArray1OfReal myParameters;

@@ -15,6 +15,10 @@ namespace OCCPort
         gp_Pnt2d GetPoint(int theIndex);
         int ParametersNb();
 
+        //! Adds new discretization point to pcurve.
+        void AddPoint(gp_Pnt2d thePoint, double theParamOnPCurve);
+        //! Inserts new discretization point at the given position.
+        void InsertPoint(int thePosition, gp_Pnt2d thePoint, double theParamOnPCurve);
 
     }
 }

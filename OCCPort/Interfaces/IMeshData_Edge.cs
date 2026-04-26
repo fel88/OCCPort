@@ -2,12 +2,16 @@
 {
     //! Interface class representing discrete model of an edge.
     public interface IMeshData_Edge : IMeshData_TessellatedShape, IMeshData_StatusOwner
-    {
+    {  //! Sets 3d curve associated with current edge.
+        void SetCurve(IMeshData_Curve theCurve);
         //! Returns 3d curve associated with current edge.
         IMeshData_Curve GetCurve();
         //! Gets value of angular deflection for the discrete model.
         double GetAngularDeflection();
 
+        //! Returns degenerative flag.
+        //! By default equals to flag stored in topological shape.
+        bool GetDegenerated();
         //! Returns TopoDS_Edge attached to model.
         public TopoDS_Edge GetEdge()
         {

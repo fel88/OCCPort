@@ -1,6 +1,5 @@
 ﻿using OCCPort;
 using OCCPort.Interfaces;
-using System;
 using System.Reflection.Metadata;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
@@ -97,7 +96,7 @@ namespace OCCPort
   TopAbs_Orientation theOrientation,
   IMeshData_Face theDFace,
   IMeshTools_Parameters theParameters,
-  int theMinPointsNb=2)
+  int theMinPointsNb = 2)
         {
             return theDEdge.GetSameParam() ?
               new BRepMesh_CurveTessellator(theDEdge, theParameters, theMinPointsNb) :
@@ -108,44 +107,44 @@ namespace OCCPort
         {
 
             var aCurve = theDEdge.GetCurve();
-            //for (int aPCurveIt = 0; aPCurveIt < theDEdge.PCurvesNb(); ++aPCurveIt)
-            //{
-            //    IPCurveHandle aPCurve = theDEdge.GetPCurve(aPCurveIt);
-            //    IFaceHandle aDFace = aPCurve.GetFace();
-            //    ICurveArrayAdaptorHandle aCurveArray = new ICurveArrayAdaptorHandle(new IMeshData::ICurveArrayAdaptor(aCurve));
-            //    BRepMesh_EdgeParameterProvider<IMeshData::ICurveArrayAdaptorHandle> aProvider(
-            //      theDEdge, aPCurve->GetOrientation(), aDFace, aCurveArray);
+            for (int aPCurveIt = 0; aPCurveIt < theDEdge.PCurvesNb(); ++aPCurveIt)
+            {
+                var aPCurve = theDEdge.GetPCurve(aPCurveIt);
+                var aDFace = aPCurve.GetFace();
+                ICurveArrayAdaptor aCurveArray = new ICurveArrayAdaptor(new ICurveArrayAdaptor(aCurve));
+                BRepMesh_EdgeParameterProvider aProvider = new BRepMesh_EdgeParameterProvider(
+                  theDEdge, aPCurve.GetOrientation(), aDFace, aCurveArray);
 
-            //    Adaptor2d_Curve2d aGeomPCurve = aProvider.GetPCurve();
+                Adaptor2d_Curve2d aGeomPCurve = aProvider.GetPCurve();
 
-            //    int aParamIdx, aParamNb;
-            //    if (theUpdateEnds)
-            //    {
-            //        aParamIdx = 0;
-            //        aParamNb = aCurve.ParametersNb();
-            //    }
-            //    else
-            //    {
-            //        aParamIdx = 1;
-            //        aParamNb = aCurve.ParametersNb() - 1;
-            //    }
+                int aParamIdx, aParamNb;
+                if (theUpdateEnds)
+                {
+                    aParamIdx = 0;
+                    aParamNb = aCurve.ParametersNb();
+                }
+                else
+                {
+                    aParamIdx = 1;
+                    aParamNb = aCurve.ParametersNb() - 1;
+                }
 
-            //    for (; aParamIdx < aParamNb; ++aParamIdx)
-            //    {
-            //        double aParam = aProvider.Parameter(aParamIdx, aCurve.GetPoint(aParamIdx));
+                for (; aParamIdx < aParamNb; ++aParamIdx)
+                {
+                    double aParam = aProvider.Parameter(aParamIdx, aCurve.GetPoint(aParamIdx));
 
-            //        gp_Pnt2d aPoint2d;
-            //        aGeomPCurve.D0(aParam, out aPoint2d);
-            //        if (theUpdateEnds)
-            //        {
-            //            aPCurve.AddPoint(aPoint2d, aParam);
-            //        }
-            //        else
-            //        {
-            //            aPCurve.InsertPoint(aPCurve.ParametersNb() - 1, aPoint2d, aParam);
-            //        }
-            //    }
-            //}
+                    gp_Pnt2d aPoint2d = new gp_Pnt2d();
+                    aGeomPCurve.D0(aParam, ref aPoint2d);
+                    if (theUpdateEnds)
+                    {
+                        aPCurve.AddPoint(aPoint2d, aParam);
+                    }
+                    else
+                    {
+                        aPCurve.InsertPoint(aPCurve.ParametersNb() - 1, aPoint2d, aParam);
+                    }
+                }
+            }
         }
 
 
@@ -166,7 +165,7 @@ namespace OCCPort
             var aCurve = theDEdge.GetCurve();
 
             TopoDS_Edge aEdge = theDEdge.GetEdge();
-            TopoDS_Vertex aFirstVertex=new TopoDS_Vertex (), aLastVertex=new TopoDS_Vertex ();
+            TopoDS_Vertex aFirstVertex = new TopoDS_Vertex(), aLastVertex = new TopoDS_Vertex();
             TopExp.Vertices(aEdge, ref aFirstVertex, ref aLastVertex);
 
             if (aFirstVertex.IsNull() || aLastVertex.IsNull())
@@ -176,37 +175,37 @@ namespace OCCPort
             {
                 gp_Pnt aPoint;
                 double aParam;
-                //  theTessellator.Value(1, out aPoint, out aParam);
-                //aCurve.AddPoint(BRep_Tool.Pnt(aFirstVertex), aParam);
+                  theTessellator.Value(1, out aPoint, out aParam);
+                aCurve.AddPoint(BRep_Tool.Pnt(aFirstVertex), aParam);
             }
 
-            //if (!theDEdge.GetDegenerated())
-            //{
-            //    for (int i = 2; i < theTessellator.PointsNb(); ++i)
-            //    {
-            //        gp_Pnt aPoint;
-            //        double aParam;
-            //        if (!theTessellator.Value(i, aPoint, aParam))
-            //            continue;
+            if (!theDEdge.GetDegenerated())
+            {
+                for (int i = 2; i < theTessellator.PointsNb(); ++i)
+                {
+                    gp_Pnt aPoint;
+                    double aParam;
+                    if (!theTessellator.Value(i, out aPoint, out aParam))
+                        continue;
 
-            //        if (theUpdateEnds)
-            //        {
-            //            aCurve->AddPoint(aPoint, aParam);
-            //        }
-            //        else
-            //        {
-            //            aCurve->InsertPoint(aCurve->ParametersNb() - 1, aPoint, aParam);
-            //        }
-            //    }
-            //}
+                    if (theUpdateEnds)
+                    {
+                        aCurve.AddPoint(aPoint, aParam);
+                    }
+                    else
+                    {
+                        aCurve.InsertPoint(aCurve.ParametersNb() - 1, aPoint, aParam);
+                    }
+                }
+            }
 
-            //if (theUpdateEnds)
-            //{
-            //    gp_Pnt aPoint;
-            //    double aParam;
-            //    theTessellator.Value(theTessellator.PointsNb(), out aPoint, out aParam);
-            //    aCurve.AddPoint(BRep_Tool::Pnt(aLastVertex), aParam);
-            //}
+            if (theUpdateEnds)
+            {
+                gp_Pnt aPoint;
+                double aParam;
+                theTessellator.Value(theTessellator.PointsNb(), out aPoint, out aParam);
+                aCurve.AddPoint(BRep_Tool.Pnt(aLastVertex), aParam);
+            }
         }
 
         public override bool performInternal(IMeshData_Model theModel, IMeshTools_Parameters theParameters, Message_ProgressRange theRange)
@@ -279,5 +278,4 @@ namespace OCCPort
         }
 
     }
-
 }

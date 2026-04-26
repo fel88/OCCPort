@@ -2,7 +2,7 @@
 
 namespace OCCPort
 {
-	internal class TColStd_HArray1OfReal: NCollection_Array1<double>
+	public class TColStd_HArray1OfReal: NCollection_Array1<double>, IParametersCollection
 	{
 		
 	

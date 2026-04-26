@@ -15,8 +15,11 @@ namespace OCCPort
     //! thread-safe and parallel evaluations need to be prevented.
     public abstract class Adaptor2d_Curve2d
     {
+        public abstract bool IsPeriodic();
+
         //! Computes the point of parameter U on the curve.
         public abstract void D0(double U, ref gp_Pnt2d P);
+        public abstract double Resolution(double u);
 
         public abstract int Degree();
         //! Computes the point of parameter U on the curve with its

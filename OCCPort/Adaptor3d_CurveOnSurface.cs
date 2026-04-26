@@ -17,6 +17,15 @@ namespace OCCPort
         {
             return myCurve.FirstParameter();
         }
+        public Adaptor3d_Surface GetSurface()
+        {
+            return mySurface;
+        }
+        public Adaptor2d_Curve2d GetCurve()
+        {
+            return myCurve;
+        }
+
         public override double LastParameter()
         {
             return myCurve.LastParameter();
@@ -313,5 +322,33 @@ namespace OCCPort
             Load(S);
 
         }
+
+        public override double Resolution(double R3d)
+        {
+            double ru, rv;
+            ru = mySurface.UResolution(R3d);
+            rv = mySurface.VResolution(R3d);
+            return myCurve.Resolution(Math.Min(ru, rv));
+        }
+
+        public override gp_Lin Line()
+        {
+            Exceptions.Standard_NoSuchObject_Raise_if(myType != GeomAbs_CurveType.GeomAbs_Line, "Adaptor3d_CurveOnSurface::Line(): curve is not a line");
+            return myLin;
+        }
+
+        public override bool IsPeriodic()
+        {
+            if (myType == GeomAbs_CurveType.GeomAbs_Circle ||
+     myType == GeomAbs_CurveType.GeomAbs_Ellipse)
+                return true;
+
+            return myCurve.IsPeriodic();
+        }
+
+        public override int NbIntervals(GeomAbs_Shape S)
+        {
+            throw new NotImplementedException();
+        }
     }
-    }
+}

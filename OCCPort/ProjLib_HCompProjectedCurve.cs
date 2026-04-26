@@ -126,5 +126,15 @@ namespace OCCPort
         {
             throw new NotImplementedException();
         }
+
+        public override double Resolution(double u)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool IsPeriodic()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

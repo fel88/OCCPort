@@ -260,6 +260,21 @@ namespace OCCPort
             throw new NotImplementedException();
         }
 
+        public override double Resolution(double R3d)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool IsPeriodic()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override int NbIntervals(GeomAbs_Shape S)
+        {
+            throw new NotImplementedException();
+        }
+
         Adaptor3d_Curve myCurve;
         gp_Ax3 myPlane;
         gp_Dir myDirection;

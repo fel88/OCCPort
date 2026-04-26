@@ -17,7 +17,7 @@ namespace OCCPort
 		public List<gp_Pnt> list = new List<gp_Pnt>();
 		public gp_Pnt Value(int index)
 		{
-			return list[index];
+			return list[index-1];
 		}
 
         internal void Append(gp_Pnt thePnt)
@@ -27,12 +27,12 @@ namespace OCCPort
 
         internal void InsertBefore(int i, gp_Pnt thePnt)
         {
-			list.Insert(i, thePnt);
+			list.Insert(i-1, thePnt);
         }
 
         internal void ChangeValue(int i, gp_Pnt thePnt)
         {
-			list[i] = thePnt;
+			list[i-1] = thePnt;
         }
     }
 }

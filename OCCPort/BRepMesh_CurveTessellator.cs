@@ -58,11 +58,11 @@ namespace OCCPort
             aPreciseAngDef = Math.Max(aPreciseAngDef, Precision.Angular());
 
             double aMinSize = myParameters.MinSize;
-            //if (myParameters.AdjustMinSize)
-            //{
-            //    aMinSize = Math.Min(aMinSize, myParameters.RelMinSize() * GCPnts_AbscissaPoint::Length(
-            //      myCurve, myCurve.FirstParameter(), myCurve.LastParameter(), aPreciseLinDef));
-            //}
+            if (myParameters.AdjustMinSize) 
+            {
+                aMinSize = Math.Min(aMinSize, IMeshTools_Parameters.RelMinSize() * GCPnts_AbscissaPoint.Length(
+                  myCurve, myCurve.FirstParameter(), myCurve.LastParameter(), aPreciseLinDef));
+            }
 
             mySquareEdgeDef = aPreciseLinDef * aPreciseLinDef;
             mySquareMinSize = Math.Max(mySquareEdgeDef, aMinSize * aMinSize);
@@ -215,6 +215,57 @@ namespace OCCPort
                 myDiscretTool.AddPoint(BRep_Tool.Pnt(aVertex),
                   BRep_Tool.Parameter(aVertex, myEdge), true);
             }
+        }
+
+        public int PointsNb()
+        {
+            return myDiscretTool.NbPoints();
+
+        }
+
+        public bool Value(int theIndex, out gp_Pnt thePoint, out double theParameter)
+        {
+            thePoint = myDiscretTool.Value(theIndex);
+            theParameter = myDiscretTool.Parameter(theIndex);
+
+            /*if (!isInToleranceOfVertex(thePoint, myFirstVertex) &&
+                !isInToleranceOfVertex(thePoint, myLastVertex))
+            {*/
+            if (!myCurve.IsCurveOnSurface())
+            {
+                return true;
+            }
+
+            // If point coordinates are out of surface range, 
+            // it is necessary to re-project point.
+             Adaptor3d_CurveOnSurface aCurve = myCurve.CurveOnSurface();
+             Adaptor3d_Surface aSurface = aCurve.GetSurface();
+            if (aSurface._GetType() != GeomAbs_SurfaceType.GeomAbs_BSplineSurface &&
+                aSurface._GetType() != GeomAbs_SurfaceType.GeomAbs_BezierSurface &&
+                aSurface._GetType() != GeomAbs_SurfaceType.GeomAbs_OtherSurface)
+            {
+                return true;
+            }
+
+            // Let skip periodic case.
+            if (aSurface.IsUPeriodic() || aSurface.IsVPeriodic())
+            {
+                return true;
+            }
+
+            gp_Pnt2d aUV = new gp_Pnt2d();
+            aCurve.GetCurve().D0(theParameter, ref aUV);
+            // Point lies within the surface range - nothing to do.
+            if (aUV.X() > myFaceRangeU[0] && aUV.X() < myFaceRangeU[1] &&
+                aUV.Y() > myFaceRangeV[0] && aUV.Y() < myFaceRangeV[1])
+            {
+                return true;
+            }
+
+            gp_Pnt aPntOnSurf = new gp_Pnt();
+            aSurface.D0(aUV.X(), aUV.Y(), ref aPntOnSurf);
+
+            return (thePoint.SquareDistance(aPntOnSurf) < myEdgeSqTol);
         }
 
         IMeshData_Edge myDEdge;

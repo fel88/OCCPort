@@ -8,6 +8,20 @@ namespace OCCPort
         VectorOfIPCurveHandles myPCurves;
         bool mySameParam;
         bool mySameRange;
+        //! Sets 3d curve associated with current edge.
+        public void SetCurve(IMeshData_Curve theCurve)
+        {
+            myCurve = theCurve;
+        }
+        bool myDegenerated;
+
+
+        //! Returns degenerative flag.
+        //! By default equals to flag stored in topological shape.
+        public bool GetDegenerated()
+        {
+            return myDegenerated;
+        }
 
         //! Gets value of angular deflection for the discrete model.
         public double GetAngularDeflection()
@@ -26,9 +40,9 @@ namespace OCCPort
         public bool GetSameParam()
         {
             return mySameParam;
-        } 
+        }
         //! Returns same range flag.
-           //! By default equals to flag stored in topological shape.
+        //! By default equals to flag stored in topological shape.
         public bool GetSameRange()
         {
             return mySameRange;
@@ -97,6 +111,7 @@ namespace OCCPort
         {
             myPCurves = new VectorOfIPCurveHandles(256);
             myPCurvesMap = new DMapOfIFacePtrsListOfInteger(1);
+            SetCurve(new BRepMeshData_Curve());
 
         }
     }

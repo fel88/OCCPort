@@ -54,6 +54,11 @@ namespace OCCPort
             myFirstu = 0.0;
 
         }
+        public gp_Pnt Value(int I)
+        {
+            return myPoints.Value(I);
+        }
+
         public GCPnts_TangentialDeflection(Adaptor3d_Curve theC,
                                                           double theFirstParameter,
                                                           double theLastParameter,

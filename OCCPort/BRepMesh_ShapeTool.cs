@@ -22,6 +22,17 @@ namespace OCCPort
             theMaxDimension = Math.Max(aMaxX - aMinX, Math.Max(aMaxY - aMinY, aMaxZ - aMinZ));
         }
 
+        public static gp_Pnt UseLocation(
+   gp_Pnt thePnt,
+   TopLoc_Location theLoc)
+        {
+            if (theLoc.IsIdentity())
+            {
+                return thePnt;
+            }
+
+            return thePnt.Transformed(theLoc.Transformation());
+        }
 
         //! Stores the given triangulation into the given face.
         //! @param theFace face to be updated by triangulation.
