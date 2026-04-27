@@ -80,6 +80,13 @@ namespace OCCPort
             theX = x;
             theY = y;
         }
+        
+        
+        //! Computes Sqrt (X*X + Y*Y) where X and Y are the two coordinates of this number pair.
+        internal double Modulus()
+        {
+            return Math.Sqrt(x * x + y * y); 
+        }
 
         double x;
         double y;

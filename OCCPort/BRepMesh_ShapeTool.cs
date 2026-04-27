@@ -1,6 +1,7 @@
 ﻿using OCCPort.Interfaces;
 using System;
 using System.Diagnostics;
+using System.Reflection.Metadata;
 using System.Security.Cryptography;
 
 namespace OCCPort
@@ -141,7 +142,7 @@ ref double theLastParam,
                         // Calculation of the length of the edge in 3D
                         // in order to check degenerativity
                         gp_Pnt aPnt = new gp_Pnt();
-                        aCurve.D0(aParameter,ref aPnt);
+                        aCurve.D0(aParameter, ref aPnt);
                         aLength += aPrevPnt.Distance(aPnt);
 
                         //if (theEdge->GetSameParam ())
@@ -164,6 +165,38 @@ ref double theLastParam,
                     theEdge.SetDegenerated(aLength < aVertexTolerance);
                 }
             }
+        }
+        public static void NullifyEdge(
+   TopoDS_Edge theEdge,
+   ref TopLoc_Location theLocation)
+        {
+            BRep_Builder aBuilder = new BRep_Builder();
+//aBuilder.UpdateEdge(theEdge, null, ref theLocation);
+        }
+
+        internal static void NullifyEdge(TopoDS_Edge theEdge, Poly_Triangulation theTriangulation, ref TopLoc_Location theLocation)
+        {
+
+          /*  UpdateEdge(theEdge, null,
+              theTriangulation, ref theLocation);*/
+
+        }
+        public void UpdateEdge(
+      TopoDS_Edge theEdge,
+      Poly_PolygonOnTriangulation thePolygon,
+      Poly_Triangulation theTriangulation,
+    ref TopLoc_Location theLocation)
+        {
+            BRep_Builder aBuilder = new BRep_Builder();
+         //   aBuilder.UpdateEdge(theEdge, thePolygon, theTriangulation, theLocation);
+        }
+
+        internal static void NullifyFace(TopoDS_Face theFace)
+        {
+
+            BRep_Builder aBuilder = new BRep_Builder();
+            aBuilder.UpdateFace(theFace, null);
+
         }
     }
 

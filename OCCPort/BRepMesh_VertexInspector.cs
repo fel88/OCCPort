@@ -7,12 +7,21 @@ namespace OCCPort
     //! Class intended for fast searching of the coincidence points.
     internal class BRepMesh_VertexInspector : NCollection_CellFilter_InspectorXY, IInspector
     {
+        //  typedef Standard_Integer Target;
+
         VectorOfVertex myVertices;
         //! Returns index of point coinciding with regerence one.
         public int GetCoincidentPoint()
         {
             return myIndex;
+        } 
+        
+        //! Returns vertex with the given index.
+        public BRepMesh_Vertex GetVertex(int theIndex)
+        {
+            return myVertices[(theIndex - 1)];
         }
+
         public BRepMesh_VertexInspector(NCollection_IncAllocator myAllocator)
         {
             myIndex = (0);

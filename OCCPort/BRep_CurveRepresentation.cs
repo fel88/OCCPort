@@ -24,7 +24,17 @@ namespace OCCPort
         {
             return false;
         }
-
+        //! A representation by an array of nodes on a
+        //! triangulation.
+        public virtual bool IsPolygonOnTriangulation()
+        {
+            return false;
+        }
+        public virtual bool IsPolygonOnTriangulation
+  (Poly_Triangulation t, TopLoc_Location l)
+        {
+            return false;
+        }
         public virtual Geom2d_Curve PCurve2()
         {
             throw new Standard_DomainError("BRep_CurveRepresentation");
@@ -41,7 +51,7 @@ namespace OCCPort
             return false;
         }
         //! A 3D polygon representation.
-        public  virtual bool IsPolygon3D()
+        public virtual bool IsPolygon3D()
         {
             return false;
         }

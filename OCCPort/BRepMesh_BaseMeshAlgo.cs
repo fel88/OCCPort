@@ -129,7 +129,7 @@ namespace OCCPort
                 myParameters = theParameters;
                 myAllocator = new NCollection_IncAllocator(IMeshData.MEMORY_BLOCK_SIZE_HUGE);
                 myStructure = new BRepMesh_DataStructureOfDelaun(myAllocator);
-                //myNodesMap = new VectorOfPnt(256, myAllocator);
+                myNodesMap = new VectorOfPnt(256);
                 //myUsedNodes = new DMapOfIntegerInteger(1, myAllocator);
 
                 if (initDataStructure())

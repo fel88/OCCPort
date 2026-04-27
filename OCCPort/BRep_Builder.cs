@@ -27,6 +27,12 @@ namespace OCCPort
 
     {
 
+        public void UpdateEdge(TopoDS_Edge E,
+                                      Poly_PolygonOnTriangulation P,
+                                     ref Poly_Triangulation T)
+        {
+            //UpdateEdge(E, P, T, new TopLoc_Location());
+        }
 
 
         internal void MakeEdge(TopoDS_Edge E,
@@ -242,12 +248,65 @@ namespace OCCPort
             BRep_TFace TF = new BRep_TFace();
             MakeShape(F, TF);
         }
+        public void UpdateEdge(TopoDS_Edge E,
+                                      Poly_PolygonOnTriangulation P1,
+                                      Poly_PolygonOnTriangulation P2,
+                                      Poly_Triangulation T)
+        {
+            UpdateEdge(E, P1, P2, T, new TopLoc_Location());
+        }
 
         public void UpdateEdge(TopoDS_Edge E,
                                       Geom_Curve C,
                                       double Tol)
         {
             UpdateEdge(E, C, new TopLoc_Location(), Tol);
+        }
+
+        public void UpdateEdge(TopoDS_Edge E,
+                                  Poly_PolygonOnTriangulation P1,
+                                 Poly_PolygonOnTriangulation P2,
+                                  Poly_Triangulation T,
+                                  TopLoc_Location L)
+        {
+            BRep_TEdge TE = (BRep_TEdge)E.TShape();
+            if (TE.Locked())
+            {
+                throw new TopoDS_LockedShape("BRep_Builder::UpdateEdge");
+            }
+            var l = L.Predivided(E.Location());
+
+            bool isModified = false;
+
+            BRep_ListOfCurveRepresentation lcr = TE.ChangeCurves();
+            BRep_ListIteratorOfListOfCurveRepresentation itcr = new BRep_ListIteratorOfListOfCurveRepresentation(lcr);
+            BRep_CurveRepresentation cr;
+
+            while (itcr.More())
+            {
+                if (itcr.Value().IsPolygonOnTriangulation(T, l)) //szv:was L
+                {
+                    // cr is used to keep a reference on the curve representation
+                    // this avoid deleting it as its content may be referenced by T
+                    cr = itcr.Value();
+                    //lcr.Remove(itcr);
+                    lcr.Remove(cr);
+                    isModified = true;
+                    break;
+                }
+                itcr.Next();
+            }
+
+            if (P1 != null && P2 != null)
+            {
+                BRep_PolygonOnClosedTriangulation PT =
+                  new BRep_PolygonOnClosedTriangulation(P1, P2, T, l);
+                lcr.Append(PT);
+                isModified = true;
+            }
+
+            if (isModified)
+                TE.Modified(true);
         }
 
 
@@ -376,9 +435,9 @@ namespace OCCPort
             }
             else
             {
-             /*   BRep_PointOnCurveOnSurface POCS =
-                  new BRep_PointOnCurveOnSurface(p, PC, S, L);
-                lpr.Append(POCS);*/
+                /*   BRep_PointOnCurveOnSurface POCS =
+                     new BRep_PointOnCurveOnSurface(p, PC, S, L);
+                   lpr.Append(POCS);*/
             }
         }
         public void UpdateVertex(TopoDS_Vertex V,

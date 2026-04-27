@@ -61,11 +61,23 @@ namespace OCCPort
             throw new NotImplementedException();
         }
 
-        VectorOfElements myElements;
+        public BRepMesh_Vertex GetNode(int theIndex)
+        {
+            return myNodes.FindKey(theIndex);
+        }
 
-        public BRepMesh_DataStructureOfDelaun(NCollection_IncAllocator myAllocator)
+        VectorOfElements myElements;
+        IDMapOfLink myLinks;
+        ListOfInteger myDelLinks;
+
+        public BRepMesh_DataStructureOfDelaun(NCollection_IncAllocator myAllocator, int theReservedNodeSize = 100)
         {
             myNodes = (new BRepMesh_VertexTool(myAllocator));
+            myNodeLinks = new DMapOfIntegerListOfInteger(theReservedNodeSize * 3, myAllocator);
+            myLinks = new IDMapOfLink(theReservedNodeSize * 3, myAllocator);
+            myDelLinks = new ListOfInteger(myAllocator);
+            myElements = new VectorOfElements(theReservedNodeSize * 2, myAllocator);
+
         }
     }
 }

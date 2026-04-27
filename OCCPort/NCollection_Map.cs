@@ -34,6 +34,12 @@ namespace OCCPort
 
         }
         List<T> shapes = new List<T>();
+
+        public NCollection_Map() { }
+        public NCollection_Map(int v)
+        {
+        }
+
         internal void Remove(T e)
         {
             shapes.Remove(e);

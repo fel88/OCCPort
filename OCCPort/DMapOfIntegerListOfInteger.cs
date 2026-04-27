@@ -7,6 +7,11 @@ namespace OCCPort
     //typedef NCollection_Shared<NCollection_DataMap<Standard_Integer, ListOfInteger> >                             DMapOfIntegerListOfInteger;
     {
         public Dictionary<int, ListOfInteger> map = new Dictionary<int, ListOfInteger>();
+
+        public DMapOfIntegerListOfInteger(int v, NCollection_IncAllocator myAllocator)
+        {
+        }
+
         internal void Bind(int aNodeId, ListOfInteger value)
         {
             map.Add(aNodeId, value);

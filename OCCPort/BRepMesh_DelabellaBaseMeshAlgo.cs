@@ -11,56 +11,56 @@ namespace OCCPort
         {
             BRepMesh_DataStructureOfDelaun aStructure = this.getStructure();
 
-            //Bnd_B2d aBox = new Bnd_B2d();
+            Bnd_B2d aBox = new Bnd_B2d();
             int aNodesNb = aStructure.NbNodes();
             //List<Standard_Real> aPoints(2 * (aNodesNb + 4));
             double[] aPoints = new double[(2 * (aNodesNb + 4))];
-            //          for (Standard_Integer aNodeIt = 0; aNodeIt < aNodesNb; ++aNodeIt)
-            //          {
-            //              const BRepMesh_Vertex&aVertex = aStructure->GetNode(aNodeIt + 1);
+            for (int aNodeIt = 0; aNodeIt < aNodesNb; ++aNodeIt)
+            {
+                BRepMesh_Vertex aVertex = aStructure.GetNode(aNodeIt + 1);
 
-            //              const size_t aBaseIdx = 2 * static_cast<size_t>(aNodeIt);
-            //              aPoints[aBaseIdx + 0] = aVertex.Coord().X();
-            //              aPoints[aBaseIdx + 1] = aVertex.Coord().Y();
+                int aBaseIdx = 2 * (aNodeIt);
+                aPoints[aBaseIdx + 0] = aVertex.Coord().X();
+                aPoints[aBaseIdx + 1] = aVertex.Coord().Y();
 
-            //              aBox.Add(gp_Pnt2d(aVertex.Coord()));
-            //          }
+                aBox.Add(new gp_Pnt2d(aVertex.Coord()));
+            }
 
-            //          aBox.Enlarge(0.1 * (aBox.CornerMax() - aBox.CornerMin()).Modulus());
-            //          const gp_XY aMin = aBox.CornerMin();
-            //          const gp_XY aMax = aBox.CornerMax();
+            aBox.Enlarge(0.1 * (aBox.CornerMax() - aBox.CornerMin()).Modulus());
+            gp_XY aMin = aBox.CornerMin();
+            gp_XY aMax = aBox.CornerMax();
 
-            //          aPoints[2 * aNodesNb + 0] = aMin.X();
-            //          aPoints[2 * aNodesNb + 1] = aMin.Y();
-            //          aStructure->AddNode(BRepMesh_Vertex(
-            //            aPoints[2 * aNodesNb + 0],
-            //            aPoints[2 * aNodesNb + 1], BRepMesh_Free));
+            aPoints[2 * aNodesNb + 0] = aMin.X();
+            aPoints[2 * aNodesNb + 1] = aMin.Y();
+            aStructure.AddNode(new BRepMesh_Vertex(
+              aPoints[2 * aNodesNb + 0],
+              aPoints[2 * aNodesNb + 1], BRepMesh_DegreeOfFreedom.BRepMesh_Free));
 
-            //          aPoints[2 * aNodesNb + 2] = aMax.X();
-            //          aPoints[2 * aNodesNb + 3] = aMin.Y();
-            //          aStructure->AddNode(BRepMesh_Vertex(
-            //            aPoints[2 * aNodesNb + 2],
-            //            aPoints[2 * aNodesNb + 3], BRepMesh_Free));
+            aPoints[2 * aNodesNb + 2] = aMax.X();
+            aPoints[2 * aNodesNb + 3] = aMin.Y();
+            aStructure.AddNode(new BRepMesh_Vertex(
+              aPoints[2 * aNodesNb + 2],
+              aPoints[2 * aNodesNb + 3], BRepMesh_DegreeOfFreedom.BRepMesh_Free));
 
-            //          aPoints[2 * aNodesNb + 4] = aMax.X();
-            //          aPoints[2 * aNodesNb + 5] = aMax.Y();
-            //          aStructure->AddNode(BRepMesh_Vertex(
-            //            aPoints[2 * aNodesNb + 4],
-            //            aPoints[2 * aNodesNb + 5], BRepMesh_Free));
+            aPoints[2 * aNodesNb + 4] = aMax.X();
+            aPoints[2 * aNodesNb + 5] = aMax.Y();
+            aStructure.AddNode(new BRepMesh_Vertex(
+              aPoints[2 * aNodesNb + 4],
+              aPoints[2 * aNodesNb + 5], BRepMesh_DegreeOfFreedom.BRepMesh_Free));
 
-            //          aPoints[2 * aNodesNb + 6] = aMin.X();
-            //          aPoints[2 * aNodesNb + 7] = aMax.Y();
-            //          aStructure->AddNode(BRepMesh_Vertex(
-            //            aPoints[2 * aNodesNb + 6],
-            //            aPoints[2 * aNodesNb + 7], BRepMesh_Free));
+            aPoints[2 * aNodesNb + 6] = aMin.X();
+            aPoints[2 * aNodesNb + 7] = aMax.Y();
+            aStructure.AddNode(new BRepMesh_Vertex(
+              aPoints[2 * aNodesNb + 6],
+              aPoints[2 * aNodesNb + 7], BRepMesh_DegreeOfFreedom.BRepMesh_Free));
 
-            //          const Standard_Real aDiffX = (aMax.X() - aMin.X());
-            //          const Standard_Real aDiffY = (aMax.Y() - aMin.Y());
-            //          for (size_t i = 0; i < aPoints.size(); i += 2)
-            //          {
-            //              aPoints[i + 0] = (aPoints[i + 0] - aMin.X()) / aDiffX - 0.5;
-            //              aPoints[i + 1] = (aPoints[i + 1] - aMin.Y()) / aDiffY - 0.5;
-            //          }
+            double aDiffX = (aMax.X() - aMin.X());
+            double aDiffY = (aMax.Y() - aMin.Y());
+            for (int i = 0; i < aPoints.Length; i += 2)
+            {
+                aPoints[i + 0] = (aPoints[i + 0] - aMin.X()) / aDiffX - 0.5;
+                aPoints[i + 1] = (aPoints[i + 1] - aMin.Y()) / aDiffY - 0.5;
+            }
 
             IDelaBella aTriangulator = IDelaBella.Create();
             if (aTriangulator == null) // should never happen

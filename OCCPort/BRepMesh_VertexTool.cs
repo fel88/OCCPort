@@ -12,6 +12,11 @@ namespace OCCPort
         public BRepMesh_VertexTool(NCollection_IncAllocator myAllocator)
         {
             mySelector = new BRepMesh_VertexInspector(myAllocator);
+            myCellFilter = new VertexCellFilter(0.0);
+        }//! Returns vertex by the given index.
+        public BRepMesh_Vertex FindKey(int theIndex)
+        {
+            return mySelector.GetVertex(theIndex);
         }
 
         //! Returns a number of vertices.
@@ -35,7 +40,7 @@ namespace OCCPort
                 aIndex = mySelector.Add(theVertex);
 
                 gp_XY aMinPnt = new gp_XY(), aMaxPnt = new gp_XY();
-                expandPoint(theVertex.Coord(), ref aMinPnt,ref aMaxPnt);
+                expandPoint(theVertex.Coord(), ref aMinPnt, ref aMaxPnt);
                 myCellFilter.Add(aIndex, aMinPnt, aMaxPnt);
             }
             return aIndex;

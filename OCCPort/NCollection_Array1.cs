@@ -88,5 +88,10 @@ namespace OCCPort
         {
             //throw new NotImplementedException();
         }
+
+        internal int Size()
+        {
+            return list.Length ;
+        }
     }
 }
