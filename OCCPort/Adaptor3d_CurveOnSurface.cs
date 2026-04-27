@@ -70,9 +70,20 @@ namespace OCCPort
             throw new System.NotImplementedException();
         }
 
-        public override gp_Pnt Value(double d)
+        public override gp_Pnt Value(double U)
         {
-            throw new System.NotImplementedException();
+            gp_Pnt P = new gp_Pnt();
+            gp_Pnt2d Puv = new gp_Pnt2d();
+
+            if (myType == GeomAbs_CurveType.GeomAbs_Line) P = ElCLib.Value(U, myLin);
+            else if (myType == GeomAbs_CurveType.GeomAbs_Circle) P = ElCLib.Value(U, myCirc);
+            else
+            {
+                myCurve.D0(U,ref Puv);
+                mySurface.D0(Puv.X(), Puv.Y(), ref P);
+            }
+
+            return P;
         }
 
         public override void D0(double U, ref gp_Pnt P)

@@ -20,10 +20,12 @@
         public gp_Trsf myTrsf;
         
 
-        public TopLoc_ItemLocation(TopLoc_Datum3D myDatum, int v)
+        public TopLoc_ItemLocation(TopLoc_Datum3D D, int P)
         {
-            this.myDatum = myDatum;
-            this.myPower = v;
+            myDatum = D;
+            myPower = P;
+            myTrsf = (D.Transformation().Powered(P));
+
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using OpenTK.Compute.OpenCL;
+﻿using OCCPort;
+using OpenTK.Compute.OpenCL;
 using System.Reflection.Metadata;
 
 namespace OCCPort
@@ -28,9 +29,31 @@ namespace OCCPort
             }
             return V;
         }
+
+        public bool Curve3d(TopoDS_Edge edge,
+                        out  Geom_Curve C3d,
+                          ref double cf, ref double cl,
+                           bool orient)
+        {
+            TopLoc_Location L;
+            C3d = BRep_Tool.Curve(edge, out L, out cf, out cl);
+            if (C3d != null && !L.IsIdentity())
+            {
+                C3d = (Geom_Curve)C3d.Transformed(L.Transformation());
+                cf = C3d.TransformedParameter(cf, L.Transformation());
+                cl = C3d.TransformedParameter(cl, L.Transformation());
+            }
+            if (orient)
+            {
+                if (edge.Orientation() == TopAbs_Orientation.TopAbs_REVERSED)
+                { double tmp = cf; cf = cl; cl = tmp; }
+            }
+            return C3d != null;
+        }
+
         public bool PCurve(TopoDS_Edge edge,
                          TopoDS_Face face,
-                       ref  Geom2d_Curve C2d,
+                       ref Geom2d_Curve C2d,
                          ref double cf, ref double cl,
                          bool orient = true)
         {
@@ -43,7 +66,7 @@ namespace OCCPort
             //   return !C2d.IsNull();
             TopLoc_Location L;
             Geom_Surface S = BRep_Tool.Surface(face, out L);
-            return PCurve(edge, S, L,ref  C2d, ref cf, ref cl, orient);
+            return PCurve(edge, S, L, ref C2d, ref cf, ref cl, orient);
         }
         //! Returns the pcurve and bounding parameteres for the edge
         //! lying on the surface.
@@ -53,7 +76,7 @@ namespace OCCPort
         public bool PCurve(TopoDS_Edge edge,
                          Geom_Surface surface,
                          TopLoc_Location location,
-                       ref  Geom2d_Curve C2d,
+                       ref Geom2d_Curve C2d,
                          ref double cf, ref double cl,
                          bool orient = true)
         {

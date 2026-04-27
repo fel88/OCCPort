@@ -13,6 +13,17 @@ namespace OCCPort
     //! relation to other shapes).
     public class TopoDS_Vertex : TopoDS_Shape
     {
-   
+        public TopoDS_Vertex() : base() { }
+        public TopoDS_Vertex(TopoDS_Shape theOther) : base(theOther)
+        {
+        }
+
+        public override void Orientation(TopAbs_Orientation theOrient) { base.Orientation(theOrient); }
+        public override TopoDS_Shape Oriented(TopAbs_Orientation theOrient) {  return base.Oriented(theOrient);}
+        public override void Reverse()
+        {
+            base.Reverse();
+        }
+
     }
 }

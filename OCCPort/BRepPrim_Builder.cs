@@ -64,7 +64,7 @@ namespace OCCPort
 
         internal void AddWireEdge(TopoDS_Wire W, TopoDS_Edge E, bool direct)
         {
-            TopoDS_Edge EE = E;
+            TopoDS_Edge EE = new TopoDS_Edge( E);
             if (!direct)
                 EE.Reverse();
             myBuilder.Add(W, EE);
@@ -79,12 +79,12 @@ namespace OCCPort
                         double P,
                         bool direct)
         {
-            TopoDS_Vertex VV = V;
+            TopoDS_Vertex VV = new  TopoDS_Vertex (V);
             if (!direct)
                 VV.Reverse();
 
             myBuilder.Add(E, VV);
-            //myBuilder.UpdateVertex(VV, P, E, Precision.Confusion());
+            myBuilder.UpdateVertex(VV, P, E, Precision.Confusion());
         }
 
 

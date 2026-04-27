@@ -615,7 +615,7 @@ namespace OCCPort
             }
             else if (theShape.ShapeType() == TopAbs_ShapeEnum.TopAbs_EDGE)
             {
-                TopoDS_Vertex aVFirst=new TopoDS_Vertex (), aVLast = new TopoDS_Vertex();
+                TopoDS_Vertex aVFirst = new TopoDS_Vertex(), aVLast = new TopoDS_Vertex();
                 TopExp.Vertices(TopoDS.Edge(theShape), ref aVFirst, ref aVLast);
                 return !aVFirst.IsNull() && aVFirst.IsSame(aVLast);
             }

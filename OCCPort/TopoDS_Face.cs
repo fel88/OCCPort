@@ -13,6 +13,10 @@ namespace OCCPort
     public class TopoDS_Face : TopoDS_Shape
 
     {
-        
+        public TopoDS_Face() : base()
+        {
+
+        }
+
     }
 }

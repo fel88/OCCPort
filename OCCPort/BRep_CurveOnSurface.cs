@@ -14,6 +14,21 @@ namespace OCCPort
             mySurface = S;
 
         }
+        public override void Update()
+        {
+            double f = First();
+            double l = Last();
+            bool isneg = Precision.IsNegativeInfinite(f);
+            bool ispos = Precision.IsPositiveInfinite(l);
+            if (!isneg)
+            {
+                myPCurve.D0(f, ref myUV1);
+            }
+            if (!ispos)
+            {
+                myPCurve.D0(l,ref myUV2);
+            }
+        }
 
         Geom2d_Curve myPCurve;
         Geom_Surface mySurface;

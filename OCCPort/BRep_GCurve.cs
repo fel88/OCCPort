@@ -9,7 +9,16 @@ namespace OCCPort
 
     internal class BRep_GCurve : BRep_CurveRepresentation
     {
-
+        public void First(double F)
+        {
+            myFirst = F;
+            Update();
+        }
+        public void Last(double F)
+        {
+            myLast = F;
+            Update();
+        }
 
         public double First()
         {
@@ -19,7 +28,7 @@ namespace OCCPort
         {
             return myLast;
         }
-        public void Update()
+        public virtual void Update()
         {
 
         }

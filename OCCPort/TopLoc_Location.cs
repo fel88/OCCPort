@@ -11,6 +11,8 @@ namespace OCCPort
 
     public class TopLoc_Location
     {
+        public TopLoc_SListOfItemLocation myItems = new TopLoc_SListOfItemLocation();
+
         public TopLoc_Location()
         {
             myItems = new TopLoc_SListOfItemLocation();
@@ -26,7 +28,6 @@ namespace OCCPort
             return 1e-14;
 
         }
-        public TopLoc_SListOfItemLocation myItems = new TopLoc_SListOfItemLocation();
 
         public void Clear()
         {
@@ -88,11 +89,7 @@ namespace OCCPort
             throw new NotImplementedException();
         }
 
-        internal TopLoc_Location Clone()
-        {
-            return (TopLoc_Location)this.MemberwiseClone();
-
-        }
+        
 
         internal TopLoc_Location Inverted()
         {

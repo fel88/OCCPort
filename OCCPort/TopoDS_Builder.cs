@@ -102,7 +102,7 @@ namespace OCCPort
         }
 
         //=======================================================================
-        public void MakeShape(TopoDS_Shape S,
+        public void MakeShape( TopoDS_Shape S,
                                    TopoDS_TShape T)
         {
             S.TShape(T);

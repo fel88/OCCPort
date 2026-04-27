@@ -15,16 +15,19 @@ namespace OCCPort
 
         //! Returns the number of direct sub-shapes (children).
         //! @sa TopoDS_Iterator for accessing sub-shapes
-        public int NbChildren()  { return myShapes.Size(); }
+        public int NbChildren() { return myShapes.Size(); }
 
 
 
-    //! Returns the checked flag.
-    public bool Checked()  { return ((myFlags & (int)TopoDS_TShape_Flags.TopoDS_TShape_Flags_Checked) != 0); }
+        //! Returns a copy  of the  TShape  with no sub-shapes.
+        public abstract TopoDS_TShape EmptyCopy();
+
+        //! Returns the checked flag.
+        public bool Checked() { return ((myFlags & (int)TopoDS_TShape_Flags.TopoDS_TShape_Flags_Checked) != 0); }
 
 
-    //! Sets the checked flag.
-    public void Checked(bool theIsChecked) { setFlag(TopoDS_TShape_Flags.TopoDS_TShape_Flags_Checked, theIsChecked); }
+        //! Sets the checked flag.
+        public void Checked(bool theIsChecked) { setFlag(TopoDS_TShape_Flags.TopoDS_TShape_Flags_Checked, theIsChecked); }
 
 
         //! Sets the closedness flag.
@@ -59,16 +62,16 @@ namespace OCCPort
         int myFlags;
 
         //! Returns the free flag.
-        public bool Free()  { return ((myFlags & (int)TopoDS_TShape_Flags.TopoDS_TShape_Flags_Free) != 0); }
+        public bool Free() { return ((myFlags & (int)TopoDS_TShape_Flags.TopoDS_TShape_Flags_Free) != 0); }
 
-    //! Sets the free flag.
-    public void Free(bool theIsFree) { setFlag(TopoDS_TShape_Flags.TopoDS_TShape_Flags_Free, theIsFree); }
-
-
+        //! Sets the free flag.
+        public void Free(bool theIsFree) { setFlag(TopoDS_TShape_Flags.TopoDS_TShape_Flags_Free, theIsFree); }
 
 
-    //! Sets the modification flag.
-    public void Modified(bool theIsModified)
+
+
+        //! Sets the modification flag.
+        public void Modified(bool theIsModified)
         {
             setFlag(TopoDS_TShape_Flags.TopoDS_TShape_Flags_Modified, theIsModified);
             if (theIsModified)
@@ -79,7 +82,7 @@ namespace OCCPort
 
 
         //! Returns the modification flag.
-        public bool Modified() { return ((myFlags &(int) TopoDS_TShape_Flags.TopoDS_TShape_Flags_Modified) != 0); }
+        public bool Modified() { return ((myFlags & (int)TopoDS_TShape_Flags.TopoDS_TShape_Flags_Modified) != 0); }
 
         //! Returns the locked flag.
         public bool Locked() { return ((myFlags & (int)TopoDS_TShape_Flags.TopoDS_TShape_Flags_Locked) != 0); }

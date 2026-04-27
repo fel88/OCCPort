@@ -19,8 +19,9 @@ namespace OCCPort
         }
         public gp_Pnt Translated(gp_Vec theV)
         {
-            this.coord.Add(theV.XYZ());
-            return this;
+            gp_Pnt aP = new gp_Pnt(this.coord);
+            aP.coord.Add(theV.XYZ());
+            return aP;
         }
 
         //! Assigns the three coordinates of theCoord to this point.
@@ -129,8 +130,7 @@ namespace OCCPort
 
         public gp_Pnt Transformed(gp_Trsf theT)
         {
-
-            gp_Pnt aP = this;
+            gp_Pnt aP = new gp_Pnt(this.coord);
             aP.Transform(theT);
             return aP;
 

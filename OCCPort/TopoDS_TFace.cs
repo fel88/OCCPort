@@ -7,6 +7,11 @@
 	public class TopoDS_TFace : TopoDS_TShape
 
     {
+        public override TopoDS_TShape EmptyCopy()
+        {
+            throw new System.NotImplementedException();
+        }
+
         public override TopAbs_ShapeEnum ShapeType()
         {
             return TopAbs_ShapeEnum.TopAbs_FACE;

@@ -181,9 +181,15 @@ namespace OCCPort
             throw new System.NotImplementedException();
         }
 
-        public override gp_Pnt Value(double d)
+        public override gp_Pnt Value(double U)
         {
-            throw new System.NotImplementedException();
+            gp_Pnt P;
+            if (myConSurf == null)
+                P = myCurve.Value(U);
+            else
+                P = myConSurf.Value(U);
+            P.Transform(myTrsf);
+            return P;
         }
 
         public override void D0(double U, ref gp_Pnt P)

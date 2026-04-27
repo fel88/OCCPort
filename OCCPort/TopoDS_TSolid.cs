@@ -5,6 +5,11 @@
     //! edges and vertices.
     public class TopoDS_TSolid : TopoDS_TShape
     {
+        public override TopoDS_TShape EmptyCopy()
+        {
+            throw new System.NotImplementedException();
+        }
+
         public override TopAbs_ShapeEnum ShapeType()
         {
             return TopAbs_ShapeEnum.TopAbs_SOLID;

@@ -1,6 +1,7 @@
 ﻿using OCCPort;
 using System;
 using System.Data;
+using System.Linq;
 using System.Security.Cryptography;
 
 namespace OCCPort
@@ -386,7 +387,8 @@ new[]                      { 8,10, 4, 6,-1,-1},
                 myBuilder.CompleteEdge(myEdges[i]);
                 EdgesBuilt[i] = true;
             }
-
+                        
+            
             return myEdges[i];
 
         }
@@ -887,16 +889,6 @@ new[]                      { 8,10, 4, 6,-1,-1},
 
 
 
-    }
-
-    public enum BRepPrim_Direction
-    {
-        BRepPrim_XMin,
-        BRepPrim_XMax,
-        BRepPrim_YMin,
-        BRepPrim_YMax,
-        BRepPrim_ZMin,
-        BRepPrim_ZMax
     }
 
 

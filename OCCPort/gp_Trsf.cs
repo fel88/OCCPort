@@ -1,4 +1,6 @@
-﻿using System;
+﻿using OCCPort;
+using System;
+using System.Threading;
 
 namespace OCCPort
 {
@@ -12,6 +14,156 @@ namespace OCCPort
             matrix = new gp_Mat(1, 0, 0, 0, 1, 0, 0, 0, 1);
             loc = new gp_XYZ(0.0, 0.0, 0.0);
         }
+
+        //! Computes the following composition of transformations
+        //! <me> * <me> * .......* <me>, theN time.
+        //! if theN = 0 <me> = Identity
+        //! if theN < 0 <me> = <me>.Inverse() *...........* <me>.Inverse().
+        //!
+        //! Raises if theN < 0 and if the matrix of the transformation not
+        //! inversible.
+        public gp_Trsf Powered(int theN)
+        {
+            gp_Trsf aT = new gp_Trsf(this);
+            aT.Power(theN);
+            return aT;
+        }
+        public void Power(int N)
+        {
+            if (shape == gp_TrsfForm.gp_Identity) { }
+            else
+            {
+                if (N == 0)
+                {
+                    scale = 1.0;
+                    shape = gp_TrsfForm.gp_Identity;
+                    matrix.SetIdentity();
+                    loc = new gp_XYZ(0.0, 0.0, 0.0);
+                }
+                else if (N == 1) { }
+                else if (N == -1) { Invert(); }
+                else
+                {
+                    if (N < 0) { Invert(); }
+                    if (shape == gp_TrsfForm.gp_Translation)
+                    {
+                        int Npower = N;
+                        if (Npower < 0) Npower = -Npower;
+                        Npower--;
+                        gp_XYZ Temploc = loc;
+                        for (; ; )
+                        {
+                            if (IsOdd(Npower)) loc.Add(Temploc);
+                            if (Npower == 1) break;
+                            Temploc.Add(Temploc);
+                            Npower = Npower / 2;
+                        }
+                    }
+                    else if (shape == gp_TrsfForm.gp_Scale)
+                    {
+                        int Npower = N;
+                        if (Npower < 0) Npower = -Npower;
+                        Npower--;
+                        gp_XYZ Temploc = loc;
+                        double Tempscale = scale;
+                        for (; ; )
+                        {
+                            if (IsOdd(Npower))
+                            {
+                                loc.Add(Temploc.Multiplied(scale));
+                                scale = scale * Tempscale;
+                            }
+                            if (Npower == 1) break;
+                            Temploc.Add(Temploc.Multiplied(Tempscale));
+                            Tempscale = Tempscale * Tempscale;
+                            Npower = Npower / 2;
+                        }
+                    }
+                    else if (shape == gp_TrsfForm.gp_Rotation)
+                    {
+                        int Npower = N;
+                        if (Npower < 0) Npower = -Npower;
+                        Npower--;
+                        gp_Mat Tempmatrix = new gp_Mat(matrix);
+                        if (loc.X() == 0.0 && loc.Y() == 0.0 && loc.Z() == 0.0)
+                        {
+                            for (; ; )
+                            {
+                                if (IsOdd(Npower)) matrix.Multiply(Tempmatrix);
+                                if (Npower == 1) break;
+                                Tempmatrix.Multiply(Tempmatrix);
+                                Npower = Npower / 2;
+                            }
+                        }
+                        else
+                        {
+                            gp_XYZ Temploc = loc;
+                            for (; ; )
+                            {
+                                if (IsOdd(Npower))
+                                {
+                                    loc.Add(Temploc.Multiplied(matrix));
+                                    matrix.Multiply(Tempmatrix);
+                                }
+                                if (Npower == 1) break;
+                                Temploc.Add(Temploc.Multiplied(Tempmatrix));
+                                Tempmatrix.Multiply(Tempmatrix);
+                                Npower = Npower / 2;
+                            }
+                        }
+                    }
+                    else if (shape == gp_TrsfForm.gp_PntMirror || shape == gp_TrsfForm.gp_Ax1Mirror ||
+                             shape == gp_TrsfForm.gp_Ax2Mirror)
+                    {
+                        if (IsEven(N))
+                        {
+                            shape = gp_TrsfForm.gp_Identity;
+                            scale = 1.0;
+                            matrix.SetIdentity();
+                            loc.SetX(0);
+                            loc.SetY(0);
+                            loc.SetZ(0);
+                        }
+                    }
+                    else
+                    {
+                        shape = gp_TrsfForm.gp_CompoundTrsf;
+                        int Npower = N;
+                        if (Npower < 0) Npower = -Npower;
+                        Npower--;
+                        gp_XYZ Temploc = loc;
+                        double Tempscale = scale;
+                        gp_Mat Tempmatrix = new gp_Mat(matrix);
+                        for (; ; )
+                        {
+                            if (IsOdd(Npower))
+                            {
+                                loc.Add((Temploc.Multiplied(matrix)).Multiplied(scale));
+                                scale = scale * Tempscale;
+                                matrix.Multiply(Tempmatrix);
+                            }
+                            if (Npower == 1) break;
+                            Tempscale = Tempscale * Tempscale;
+                            Temploc.Add((Temploc.Multiplied(Tempmatrix)).Multiplied
+                                          (Tempscale)
+                                          );
+                            Tempmatrix.Multiply(Tempmatrix);
+                            Npower = Npower / 2;
+                        }
+                    }
+                }
+            }
+        }// ------------------------------------------------------------------
+         // IsOdd : Returns Standard_True if an integer is odd
+         // ------------------------------------------------------------------
+        public bool IsOdd(int Value)
+        { return Value % 2 == 1; }
+        // ------------------------------------------------------------------
+        // IsEven : Returns Standard_True if an integer is even
+        // ------------------------------------------------------------------
+        public  bool IsEven( int Value)
+{ return Value % 2 == 0; }
+
 
         public gp_Trsf(gp_Trsf t)
         {
@@ -38,7 +190,7 @@ namespace OCCPort
 
         private gp_Trsf Multiplied(gp_Trsf theT)
         {
-            gp_Trsf aTresult = (gp_Trsf)this.MemberwiseClone();
+            gp_Trsf aTresult = new gp_Trsf(this);
             aTresult.Multiply(theT);
             return aTresult;
         }
@@ -218,7 +370,7 @@ namespace OCCPort
         public void SetTranslation(gp_Pnt theP1,
                                       gp_Pnt theP2)
         {
-            shape =gp_TrsfForm. gp_Translation;
+            shape = gp_TrsfForm.gp_Translation;
             scale = 1.0;
             matrix.SetIdentity();
             loc = (theP2.XYZ()).Subtracted(theP1.XYZ());
@@ -268,7 +420,7 @@ namespace OCCPort
             //
             // Pour les gp_Trsf puisque le scale est extrait de la gp_Matrice R
             // on a toujours determinant (R) = 1 et R-1 = R transposee.
-            if (shape ==gp_TrsfForm. gp_Identity) { }
+            if (shape == gp_TrsfForm.gp_Identity) { }
             else if (shape == gp_TrsfForm.gp_Translation || shape == gp_TrsfForm.gp_PntMirror) loc.Reverse();
             else if (shape == gp_TrsfForm.gp_Scale)
             {
@@ -295,9 +447,9 @@ namespace OCCPort
         internal void PreMultiply(gp_Trsf T)
         {
 
-            
-{
-                if (T.shape ==gp_TrsfForm. gp_Identity) { }
+
+            {
+                if (T.shape == gp_TrsfForm.gp_Identity) { }
                 else if (shape == gp_TrsfForm.gp_Identity)
                 {
                     shape = T.shape;

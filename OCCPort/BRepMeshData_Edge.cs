@@ -14,6 +14,23 @@ namespace OCCPort
             myCurve = theCurve;
         }
         bool myDegenerated;
+        //! Updates same range flag.
+        public void SetSameRange(bool theValue)
+        {
+            mySameRange = theValue;
+        }
+
+
+        //! Updates degenerative flag.
+        public void SetDegenerated(bool theValue)
+        {
+            myDegenerated = theValue;
+        }
+        //! Updates same param flag.
+        public void SetSameParam(bool theValue)
+        {
+            mySameParam = theValue;
+        }
 
 
         //! Returns degenerative flag.

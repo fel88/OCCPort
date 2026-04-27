@@ -8,6 +8,8 @@
         IMeshData_Curve GetCurve();
         //! Gets value of angular deflection for the discrete model.
         double GetAngularDeflection();
+        //! Updates same param flag.
+        void SetSameParam(bool theValue);
 
         //! Returns degenerative flag.
         //! By default equals to flag stored in topological shape.
@@ -34,5 +36,7 @@
             TopAbs_Orientation theOrientation);
         //! Returns pcurve with the given index.
         IMeshData_PCurve GetPCurve(int aPCurveIt);
+        void SetDegenerated(bool v);
+        void SetSameRange(bool v);
     }
 }

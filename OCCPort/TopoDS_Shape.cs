@@ -10,12 +10,14 @@ namespace OCCPort
         {
             myOrient = TopAbs_Orientation.TopAbs_EXTERNAL;
         }
+
         public TopoDS_Shape(TopoDS_Shape theOther)
         {
             myOrient = theOther.myOrient;
             myTShape = theOther.myTShape;
-            myLocation = theOther.myLocation.Clone();
+            myLocation = theOther.myLocation;
         }
+
         //! Returns True if two shapes are same, i.e.  if they
         //! share  the  same TShape  with the same  Locations.
         //! Orientations may differ.
@@ -132,7 +134,7 @@ namespace OCCPort
 
 
         //! Sets the shape orientation.
-        public void Orientation(TopAbs_Orientation theOrient) { myOrient = theOrient; }
+        public virtual void Orientation(TopAbs_Orientation theOrient) { myOrient = theOrient; }
 
         public TopAbs_Orientation Orientation()
         {
@@ -140,7 +142,7 @@ namespace OCCPort
         }
         //! Reverses the orientation, using the Reverse method
         //! from the TopAbs package.
-        public void Reverse() { myOrient = TopAbs.Reverse(myOrient); }
+        public virtual void Reverse() { myOrient = TopAbs.Reverse(myOrient); }
 
 
         internal void Move(object v1, bool v2)
@@ -151,12 +153,19 @@ namespace OCCPort
 
         //! Returns  a    shape  similar  to  <me>   with  the
         //! orientation set to <Or>.
-        public TopoDS_Shape Oriented(TopAbs_Orientation theOrient)
+        public virtual TopoDS_Shape Oriented(TopAbs_Orientation theOrient)
         {
-            TopoDS_Shape aShape = (TopoDS_Shape)MemberwiseClone();
+            var aShape = Activator.CreateInstance(this.GetType()) as TopoDS_Shape;
+            //TopoDS_Shape aShape = (TopoDS_Shape)MemberwiseClone();
+            aShape.myOrient = this.myOrient;
+            aShape.myTShape = this.myTShape;
+            aShape.myLocation =  this.myLocation;//clone ?
+
             aShape.Orientation(theOrient);
             return aShape;
         }
+
+        
 
         //! Returns the number of direct sub-shapes (children).
         //! @sa TopoDS_Iterator for accessing sub-shapes

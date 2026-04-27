@@ -39,7 +39,7 @@ namespace OCCPort
                             aMinPCurveIndex = aPCurveIt;
                         }
 
-                        //BRepMesh_ShapeTool.CheckAndUpdateFlags(aDEdge, aPCurve);
+                        BRepMesh_ShapeTool.CheckAndUpdateFlags(aDEdge, aPCurve);
                     }
 
                     if (aMinPCurveIndex != -1)

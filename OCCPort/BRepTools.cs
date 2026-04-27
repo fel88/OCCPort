@@ -250,7 +250,7 @@ namespace OCCPort
                 if (TE.Locked())
                     return;
 
-                TopLoc_Location aELoc = aLoc.Predivided(aE.Location()).Clone();
+                TopLoc_Location aELoc = aLoc.Predivided(aE.Location());
                 // Edge representations
                 BRep_ListOfCurveRepresentation aLCR = TE.ChangeCurves();
                 BRep_ListIteratorOfListOfCurveRepresentation itLCR = new BRep_ListIteratorOfListOfCurveRepresentation(aLCR);

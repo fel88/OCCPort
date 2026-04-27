@@ -1,6 +1,8 @@
-﻿namespace OCCPort
+﻿using System.Collections.Generic;
+
+namespace OCCPort
 {
-    internal class BRep_ListOfPointRepresentation
+    public class BRep_ListOfPointRepresentation:List<BRep_PointRepresentation>
     {
     }
 }

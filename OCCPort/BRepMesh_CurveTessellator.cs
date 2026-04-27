@@ -80,18 +80,18 @@ namespace OCCPort
 
             if (myCurve.IsCurveOnSurface())
             {
-                //Adaptor3d_CurveOnSurface aCurve = myCurve.CurveOnSurface();
-                //Adaptor3d_Surface aSurface = aCurve.GetSurface();
+                Adaptor3d_CurveOnSurface aCurve = myCurve.CurveOnSurface();
+                Adaptor3d_Surface aSurface = aCurve.GetSurface();
 
-                //double aTol = Precision.Confusion();
-                //double aDu = aSurface.UResolution(aTol);
-                //double aDv = aSurface.VResolution(aTol);
+                double aTol = Precision.Confusion();
+                double aDu = aSurface.UResolution(aTol);
+                double aDv = aSurface.VResolution(aTol);
 
-                //myFaceRangeU[0] = aSurface.FirstUParameter() - aDu;
-                //myFaceRangeU[1] = aSurface.LastUParameter() + aDu;
+                myFaceRangeU[0] = aSurface.FirstUParameter() - aDu;
+                myFaceRangeU[1] = aSurface.LastUParameter() + aDu;
 
-                //myFaceRangeV[0] = aSurface.FirstVParameter() - aDv;
-                //myFaceRangeV[1] = aSurface.LastVParameter() + aDv;
+                myFaceRangeV[0] = aSurface.FirstVParameter() - aDv;
+                myFaceRangeV[1] = aSurface.LastVParameter() + aDv;
             }
 
             addInternalVertices();

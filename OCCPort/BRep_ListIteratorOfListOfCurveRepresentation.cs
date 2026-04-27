@@ -5,14 +5,15 @@ namespace OCCPort
     internal class BRep_ListIteratorOfListOfCurveRepresentation
     {
 
-        List<BRep_CurveRepresentation> list = new List<BRep_CurveRepresentation>();
+        BRep_ListOfCurveRepresentation list;
         public BRep_ListIteratorOfListOfCurveRepresentation(BRep_ListOfCurveRepresentation lcr)
         {
+            list = lcr;
         }
 
         internal bool More()
         {
-            return index < list.Count - 1;
+            return index < list.Count ;
         }
 
         internal void Next()

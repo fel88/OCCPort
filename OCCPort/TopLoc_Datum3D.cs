@@ -10,6 +10,9 @@ namespace OCCPort
 			myTrsf = new gp_Trsf(aTrsf);
 		}
 
+        //! Returns a gp_Trsf which, when applied to this datum, produces the default datum.
+        public  gp_Trsf Transformation()  { return myTrsf; }
+
 		public TopLoc_Datum3D()
 		{
 		}
