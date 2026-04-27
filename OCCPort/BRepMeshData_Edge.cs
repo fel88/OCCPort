@@ -126,6 +126,11 @@ namespace OCCPort
 
         public BRepMeshData_Edge(TopoDS_Edge theEdge) : base(theEdge)
         {
+            mySameParam = BRep_Tool.SameParameter(theEdge);
+            mySameRange = BRep_Tool.SameRange(theEdge);
+            myDegenerated = BRep_Tool.Degenerated(theEdge);
+            myAngDeflection = Standard_Real.RealLast();
+
             myPCurves = new VectorOfIPCurveHandles(256);
             myPCurvesMap = new DMapOfIFacePtrsListOfInteger(1);
             SetCurve(new BRepMeshData_Curve());

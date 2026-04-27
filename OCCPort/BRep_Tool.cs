@@ -293,11 +293,11 @@ namespace OCCPort
             return CurveOnPlane(E, S, L, ref First, ref Last);
         }
         public static void CurveOnSurface(TopoDS_Edge E,
-                                      ref Geom2d_Curve C,
-                                     ref Geom_Surface S,
-                                        TopLoc_Location L,
-                                        double First,
-                                        double Last)
+                                      out Geom2d_Curve C,
+                                     out Geom_Surface S,
+                                   ref TopLoc_Location L,
+                                    ref double First,
+                                   ref double Last)
         {
             // find the representation
             BRep_TEdge TE = (BRep_TEdge)(E.TShape());
@@ -621,8 +621,13 @@ namespace OCCPort
             }
             return theShape.Closed();
         }
+        public static bool SameRange(TopoDS_Edge E)
+        {
+            BRep_TEdge TE = (BRep_TEdge)(E.TShape());
+            return TE.SameRange();
+        }
 
-        private static bool Degenerated(TopoDS_Edge e)
+        public static bool Degenerated(TopoDS_Edge e)
         {
             BRep_TEdge TE = e.TShape() as BRep_TEdge;
 
@@ -710,6 +715,14 @@ namespace OCCPort
                 }
             }
             return aMaxCont;
+        }
+
+        internal static bool SameParameter(TopoDS_Edge E)
+        {
+
+            BRep_TEdge TE = (BRep_TEdge)(E.TShape());
+            return TE.SameParameter();
+
         }
     }
 

@@ -2,70 +2,79 @@
 
 namespace OCCPort
 {
-	internal class BRep_TEdge : TopoDS_TEdge
-	{//=======================================================================
-		public bool Degenerated()
-		{
-			return (myFlags & DegeneratedMask) != 0;
-		}
-		//=======================================================================
+    internal class BRep_TEdge : TopoDS_TEdge
+    {//=======================================================================
+        public bool Degenerated()
+        {
+            return (myFlags & DegeneratedMask) != 0;
+        }
+        //=======================================================================
+        public bool SameParameter()
+        {
+            return (myFlags & ParameterMask) != 0;
+        }
 
-		public BRep_ListOfCurveRepresentation Curves()
-		{
-			return myCurves;
-		}
+        public bool SameRange()
+        {
+            return (myFlags & RangeMask) != 0;
+        }
 
-		public BRep_TEdge()
+        public BRep_ListOfCurveRepresentation Curves()
+        {
+            return myCurves;
+        }
 
-
-		{
-			myCurves = new BRep_ListOfCurveRepresentation();
-			myTolerance = Standard_Real.RealEpsilon();
-			myFlags = (0);
-			SameParameter(true);
-			SameRange(true);
-		}
-		//=======================================================================
-		//function : Tolerance
-		//purpose  : 
-		//=======================================================================
-
-		public double Tolerance()
-		{
-			return myTolerance;
-		}
-
-		const int ParameterMask = 1;
-		const int RangeMask = 2;
-		const int DegeneratedMask = 4;
-
-		void SameParameter(bool S)
-		{
-			if (S) myFlags |= ParameterMask;
-			else myFlags &= ~ParameterMask;
-		}
+        public BRep_TEdge()
 
 
+        {
+            myCurves = new BRep_ListOfCurveRepresentation();
+            myTolerance = Standard_Real.RealEpsilon();
+            myFlags = (0);
+            SameParameter(true);
+            SameRange(true);
+        }
+        //=======================================================================
+        //function : Tolerance
+        //purpose  : 
+        //=======================================================================
 
-		void SameRange(bool S)
-		{
-			if (S) myFlags |= RangeMask;
-			else myFlags &= ~RangeMask;
-		}
+        public double Tolerance()
+        {
+            return myTolerance;
+        }
 
-		public BRep_ListOfCurveRepresentation ChangeCurves()
-		{
-			return myCurves;
-		}
+        const int ParameterMask = 1;
+        const int RangeMask = 2;
+        const int DegeneratedMask = 4;
+
+        public void SameParameter(bool S)
+        {
+            if (S) myFlags |= ParameterMask;
+            else myFlags &= ~ParameterMask;
+        }
 
 
-		double myTolerance;
-		int myFlags;
-		BRep_ListOfCurveRepresentation myCurves;
 
-		internal void UpdateTolerance(double T)
-		{
-			if (T > myTolerance) myTolerance = T;
-		}
-	}
+        public void SameRange(bool S)
+        {
+            if (S) myFlags |= RangeMask;
+            else myFlags &= ~RangeMask;
+        }
+
+        public BRep_ListOfCurveRepresentation ChangeCurves()
+        {
+            return myCurves;
+        }
+
+
+        double myTolerance;
+        int myFlags;
+        BRep_ListOfCurveRepresentation myCurves;
+
+        internal void UpdateTolerance(double T)
+        {
+            if (T > myTolerance) myTolerance = T;
+        }
+    }
 }

@@ -116,8 +116,9 @@ namespace OCCPort
             return L;
         }
 
-        GeomAdaptor_Curve myCurve;
-
+        GeomAdaptor_Curve myCurve = new GeomAdaptor_Curve();
+        //! Sets  the Curve <me>  to access the  geometry of
+        //! edge <E>.
         public void Initialize(TopoDS_Edge E)
         {
             myConSurf = null;
@@ -125,33 +126,33 @@ namespace OCCPort
             double pf, pl;
 
             TopLoc_Location L;
-            //Geom_Curve C = BRep_Tool.Curve(E, L, pf, pl);
+            Geom_Curve C = BRep_Tool.Curve(E, out L, out pf, out pl);
 
-            //if (C != null)
-            //{
-            //	myCurve.Load(C, pf, pl);
-            //}
-            //else
-            //{
-            //	Geom2d_Curve PC;
-            //	Geom_Surface S;
-            //	BRep_Tool.CurveOnSurface(E, PC, S, L, pf, pl);
-            //	if (PC != null)
-            //	{
-            //		GeomAdaptor_Surface HS = new GeomAdaptor_Surface();
-            //		HS.Load(S);
-            //		Geom2dAdaptor_Curve HC = new Geom2dAdaptor_Curve();
-            //		HC.Load(PC, pf, pl);
-            //		myConSurf = new Adaptor3d_CurveOnSurface();
-            //		myConSurf.Load(HC, HS);
-            //	}
+            if (C != null)
+            {
+                myCurve.Load(C, pf, pl);
+            }
+            else
+            {
+                Geom2d_Curve PC;
+                Geom_Surface S;
+                BRep_Tool.CurveOnSurface(E, out PC, out S, ref L, ref pf, ref pl);
+                if (PC != null)
+                {
+                    GeomAdaptor_Surface HS = new GeomAdaptor_Surface();
+                    HS.Load(S);
+                    Geom2dAdaptor_Curve HC = new Geom2dAdaptor_Curve();
+                    HC.Load(PC, pf, pl);
+                    myConSurf = new Adaptor3d_CurveOnSurface();
+                    myConSurf.Load(HC, HS);
+                }
 
-            //	else
-            //	{
-            //		throw new Standard_NullObject("BRepAdaptor_Curve::No geometry");
-            //	}
-            //}
-            //myTrsf = L.Transformation();
+                else
+                {
+                    throw new Standard_NullObject("BRepAdaptor_Curve::No geometry");
+                }
+            }
+            myTrsf = L.Transformation();
         }
 
         public override GeomAbs_CurveType _GetType()
