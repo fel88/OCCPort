@@ -1,8 +1,11 @@
 ﻿using OCCPort.Enums;
+using System;
 
 namespace OCCPort
 {
-    internal class BRepMesh_Edge : BRepMesh_OrientedEdge
+
+    //! Light weighted structure representing link of the mesh.
+    public class BRepMesh_Edge : BRepMesh_OrientedEdge
     {
         //! Constructs a link between two vertices.
         public BRepMesh_Edge(
@@ -14,6 +17,17 @@ namespace OCCPort
         {
             myMovability = theMovability;
         }
+
+        //! Checks if the given edge and this one have the same orientation.
+        //! @param theOther edge to be checked against this one.
+        //! \return TRUE if edges have the same orientation, FALSE if not.
+        public bool IsSameOrientation(BRepMesh_Edge theOther)
+        {
+            return base.IsEqual(theOther);
+        }
+
+       
+
         BRepMesh_DegreeOfFreedom myMovability;
     }
 }

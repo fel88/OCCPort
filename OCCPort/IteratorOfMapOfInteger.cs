@@ -11,6 +11,11 @@ namespace OCCPort
             
         }
 
+        internal object Key()
+        {
+            throw new NotImplementedException();
+        }
+
         internal bool More()
         {
             throw new NotImplementedException();

@@ -17,6 +17,11 @@ namespace OCCPort
             map.Add(aNodeId, value);
         }
 
+        internal ListOfInteger Find(int theIndex)
+        {
+            return map[theIndex];
+        }
+
         internal bool IsBound(int aNodeId)
         {
             return map.ContainsKey(aNodeId);

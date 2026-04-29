@@ -17,4 +17,7 @@
   <ItemGroup>
     <PackageReference Include="OpenTK" Version="4.9.4" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Triangle\Triangle.csproj" />
+  </ItemGroup>
 </Project>

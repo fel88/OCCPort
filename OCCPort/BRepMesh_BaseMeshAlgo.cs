@@ -53,35 +53,36 @@ namespace OCCPort
         Poly_Triangulation collectTriangles()
         {
             MapOfInteger aTriangles = myStructure.ElementsOfDomain();
-            //if (aTriangles.IsEmpty())
-            //{
-            //    return new Poly_Triangulation();
-            //}
+            if (aTriangles.IsEmpty())
+            {
+                return new Poly_Triangulation();
+            }
 
             Poly_Triangulation aRes = new Poly_Triangulation();
-            //aRes.ResizeTriangles(aTriangles.Extent(), false);
+            aRes.ResizeTriangles(aTriangles.Extent(), false);
             IteratorOfMapOfInteger aTriIt = new IteratorOfMapOfInteger(aTriangles);
-            for (int aTriangeId = 1; aTriIt.More(); aTriIt.Next(), ++aTriangeId)
+            for (int aTriangeId = 0; aTriangeId < aTriangles.Count; aTriangeId++)
             {
-                //     BRepMesh_Triangle aCurElem = myStructure.GetElement(aTriIt.Key());
+                int item = aTriangles[aTriangeId];
+                BRepMesh_Triangle aCurElem = myStructure.GetElement(item);
 
                 int[] aNode = new int[3];
-                //    myStructure.ElementNodes(aCurElem, aNode);
+                myStructure.ElementNodes(aCurElem, aNode);
 
-                //    for (int i = 0; i < 3; ++i)
-                //    {
-                //        if (!myUsedNodes.IsBound(aNode[i]))
-                //        {
-                //            myUsedNodes.Bind(aNode[i], myUsedNodes.Size() + 1);
-                //        }
+                for (int i = 0; i < 3; ++i)
+                {
+                    if (!myUsedNodes.IsBound(aNode[i]))
+                    {
+                        myUsedNodes.Bind(aNode[i], myUsedNodes.Size() + 1);
+                    }
 
-                //        aNode[i] = myUsedNodes.Find(aNode[i]);
-                //    }
+                    aNode[i] = myUsedNodes.Find(aNode[i]);
+                }
 
                 aRes.SetTriangle(aTriangeId, new Poly_Triangle(aNode[0], aNode[1], aNode[2]));
             }
-            //aRes.ResizeNodes(myUsedNodes.Extent(), false);
-            //aRes.AddUVNodes();
+            aRes.ResizeNodes(myUsedNodes.Extent(), false);
+            aRes.AddUVNodes();
             return aRes;
         }
 
@@ -130,7 +131,7 @@ namespace OCCPort
                 myAllocator = new NCollection_IncAllocator(IMeshData.MEMORY_BLOCK_SIZE_HUGE);
                 myStructure = new BRepMesh_DataStructureOfDelaun(myAllocator);
                 myNodesMap = new VectorOfPnt(256);
-                //myUsedNodes = new DMapOfIntegerInteger(1, myAllocator);
+                myUsedNodes = new DMapOfIntegerInteger(1, myAllocator);
 
                 if (initDataStructure())
                 {
@@ -149,7 +150,7 @@ namespace OCCPort
             //myDFace.Nullify(); // Do not hold link to face.
             myStructure = null;
             //myNodesMap.Nullify();
-            //myUsedNodes.Nullify();
+            myUsedNodes = null;
             //myAllocator.Nullify();
         }
 
@@ -169,7 +170,7 @@ namespace OCCPort
                 for (int aEdgeIt = 0; aEdgeIt < aDWire.EdgesNb(); ++aEdgeIt)
                 {
                     IMeshData_Edge aDEdge = aDWire.GetEdge(aEdgeIt);
-                    var  aCurve = aDEdge.GetCurve();
+                    var aCurve = aDEdge.GetCurve();
                     IMeshData_PCurve aPCurve = aDEdge.GetPCurve(
                       myDFace, aDWire.GetEdgeOrientation(aEdgeIt));
 
@@ -197,7 +198,7 @@ namespace OCCPort
         // Handle(NCollection_IncAllocator)       myAllocator;
 
         //Handle(VectorOfPnt)                    myNodesMap;
-        //Handle(DMapOfIntegerInteger)           myUsedNodes;
+        DMapOfIntegerInteger myUsedNodes;
 
         BRepMesh_DataStructureOfDelaun myStructure;
     }

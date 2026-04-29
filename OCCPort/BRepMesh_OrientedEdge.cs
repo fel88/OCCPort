@@ -1,6 +1,8 @@
-﻿namespace OCCPort
+﻿using OpenTK.Graphics.ES20;
+
+namespace OCCPort
 {
-    internal class BRepMesh_OrientedEdge
+    public class BRepMesh_OrientedEdge
     {
         public BRepMesh_OrientedEdge()
         {
@@ -8,11 +10,22 @@
             myLastNode = -1;
         }
 
-  
+        //! Returns index of first node of the Link.
+        public int FirstNode()
+        {
+            return myFirstNode;
+        }
+
+        //! Returns index of last node of the Link.
+        public int LastNode()
+        {
+            return myLastNode;
+        }
+
         //! Constructs a link between two vertices.
         public BRepMesh_OrientedEdge(
-     int theFirstNode,
-     int theLastNode)
+             int theFirstNode,
+             int theLastNode)
         {
             myFirstNode = (theFirstNode);
             myLastNode = (theLastNode);
@@ -39,6 +52,16 @@
         public override int GetHashCode()
         {
             return (myFirstNode + myLastNode);
+
+        }
+
+        //! Checks this and other edge for equality.
+        //! @param theOther edge to be checked against this one.
+        //! @return TRUE if edges have the same orientation, FALSE if not.
+        protected bool IsEqual(BRepMesh_Edge theOther)
+        {
+
+            return (myFirstNode == theOther.myFirstNode && myLastNode == theOther.myLastNode);
 
         }
     }

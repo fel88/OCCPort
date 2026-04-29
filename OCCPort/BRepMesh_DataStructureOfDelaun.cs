@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OCCPort;
+using System;
 
 namespace OCCPort
 {
@@ -7,11 +8,43 @@ namespace OCCPort
     public class BRepMesh_DataStructureOfDelaun
     {
         BRepMesh_VertexTool myNodes;
+        //! Get element by the index.
+        //! @param theIndex index of an element.
+        //! @return element with the given index.
+        public BRepMesh_Triangle GetElement(int theIndex)
+        {
+            return myElements[theIndex - 1];
+        }
 
         //! Returns map of indices of elements registered in mesh.
         public MapOfInteger ElementsOfDomain()
         {
             return myElementsOfDomain;
+        }
+        public void ElementNodes(
+      BRepMesh_Triangle theElement,
+      int[] theNodes)
+        {
+            int[] e = theElement.myEdges;
+            bool[] o = theElement.myOrientations;
+
+            BRepMesh_Edge aLink1 = GetLink(e[0]);
+            if (o[0])
+            {
+                theNodes[0] = aLink1.FirstNode();
+                theNodes[1] = aLink1.LastNode();
+            }
+            else
+            {
+                theNodes[1] = aLink1.FirstNode();
+                theNodes[0] = aLink1.LastNode();
+            }
+
+            BRepMesh_Edge aLink2 = GetLink(e[2]);
+            if (o[2])
+                theNodes[2] = aLink2.FirstNode();
+            else
+                theNodes[2] = aLink2.LastNode();
         }
 
         MapOfInteger myElementsOfDomain = new MapOfInteger();
@@ -39,26 +72,79 @@ namespace OCCPort
         //typedef NCollection_Shared<NCollection_DataMap<Standard_Integer, ListOfInteger> >                             DMapOfIntegerListOfInteger;
         DMapOfIntegerListOfInteger myNodeLinks;
 
-        //=======================================================================
-        //function : AddElement
-        //purpose  : 
-        //=======================================================================
+
+        //! Adds element to the mesh if it is not already in the mesh.
+        //! @param theElement element to be added to the mesh.
+        //! @return index of the element in the structure.
         public int AddElement(BRepMesh_Triangle theElement)
         {
             myElements.Append(theElement);
             int aElementIndex = myElements.Size();
             myElementsOfDomain.Add(aElementIndex);
-            //
-            //  int (&e)[3] = theElement.myEdges;
-            //  for (int i = 0; i < 3; ++i)
-            //     myLinks(e[i]).Append(aElementIndex);
+
+            var e = theElement.myEdges;
+            for (int i = 0; i < 3; ++i)
+                myLinks[e[i]].Append(aElementIndex);
 
             return aElementIndex;
         }
 
-        internal int AddLink(BRepMesh_Edge aLink)
+
+        //! Get link by the index.
+        //! @param theIndex index of a link.
+        //! @return link with the given index.
+        public BRepMesh_Edge GetLink(int theIndex)
         {
-            throw new NotImplementedException();
+            return myLinks.FindKey(theIndex);
+        }
+
+        //! Adds link to the mesh if it is not already in the mesh.
+        //! @param theLink link to be added to the mesh.
+        //! @return index of the link in the structure.
+        internal int AddLink(BRepMesh_Edge theLink)
+        {
+            int aLinkIndex = IndexOf(theLink);
+            if (aLinkIndex > 0)
+            {
+                return theLink.IsSameOrientation(GetLink(aLinkIndex)) ?
+                   aLinkIndex : -aLinkIndex;
+            }
+
+            BRepMesh_PairOfIndex aPair = new BRepMesh_PairOfIndex();
+            if (!myDelLinks.IsEmpty())
+            {
+                aLinkIndex = myDelLinks.First();
+                myLinks.Substitute(aLinkIndex, theLink, aPair);
+                myDelLinks.RemoveFirst();
+            }
+            else
+                aLinkIndex = myLinks.Add(theLink, aPair);
+
+            int aLinkId = Math.Abs(aLinkIndex);
+            linksConnectedTo(theLink.FirstNode()).Append(aLinkId);
+            linksConnectedTo(theLink.LastNode()).Append(aLinkId);
+            myLinksOfDomain.Add(aLinkIndex);
+
+            return aLinkIndex;
+        }
+
+        MapOfInteger myLinksOfDomain = new MapOfInteger();
+
+        //! Get list of links attached to the node with the given index.
+        //! @param theIndex index of node whose links should be retrieved.
+        //! @return list of links attached to the node.
+        ListOfInteger linksConnectedTo(
+    int theIndex)
+        {
+            return (ListOfInteger)myNodeLinks.Find(theIndex);
+        }
+
+        //! Finds the index of the given link.
+        //! @param theLink link to find.
+        //! @return index of the given element of zero if link is not in the mesh.
+        public int IndexOf(BRepMesh_Edge theLink)
+        {
+            return myLinks.FindIndex(theLink);
         }
 
         public BRepMesh_Vertex GetNode(int theIndex)

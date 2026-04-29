@@ -1,12 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace OCCPort
 {
-    public class MapOfInteger
+    public class MapOfInteger:List<int>
     {
-        internal void Add(int aElementIndex)
+        public bool IsEmpty()
         {
-            throw new NotImplementedException();
+            return Count == 0;
+        }
+
+        internal int Extent()
+        {
+            return Count;
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace OCCPort
 {
@@ -8,15 +9,15 @@ namespace OCCPort
 
         public int Length()
         {
-            return pnts.Count;
+            return pnts.Length;
         }
 
-		// =======================================================================
-		// function : Value
-		// purpose  :
-		// =======================================================================
-		List<gp_Pnt> pnts = new List<gp_Pnt>();
-        List<gp_Vec3> vecs = new List<gp_Vec3>();
+        // =======================================================================
+        // function : Value
+        // purpose  :
+        // =======================================================================
+        gp_Pnt[] pnts;
+
         int myStride;    //!< element size
         public gp_Pnt Value(int theIndex)
         {
@@ -30,6 +31,24 @@ namespace OCCPort
                 //	gp_Vec3 aVec3 = vecs[theIndex]; ;
                 //const gp_Vec3f&aVec3 = NCollection_AliasedArray::Value<gp_Vec3f>(theIndex);
                 //return new gp_Pnt(aVec3.x(), aVec3.y(), aVec3.z());
+            }
+        }
+
+        internal int Size()
+        {
+            return pnts.Length;
+        }
+
+        internal void Resize(int theNbNodes, bool theToCopyOld)
+        {
+            var old = pnts;
+            pnts = new gp_Pnt[theNbNodes];
+            if (theToCopyOld)
+            {
+                for (int i = 0; i < Math.Min(old.Length, pnts.Length); i++)
+                {
+                    pnts[i] = old[i];
+                }
             }
         }
     }

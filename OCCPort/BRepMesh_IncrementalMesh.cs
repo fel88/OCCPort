@@ -90,6 +90,7 @@ namespace OCCPort
         }
         public void Perform(IMeshTools_Context theContext, Message_ProgressRange theRange = null)
         {
+            
             initParameters();
 
             theContext.SetShape(Shape());
