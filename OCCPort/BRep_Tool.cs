@@ -691,9 +691,30 @@ namespace OCCPort
             return TF.Surface();
         }
 
-        internal static Poly_PolygonOnTriangulation PolygonOnTriangulation(TopoDS_Edge anEdge, Poly_Triangulation aTriangulation, TopLoc_Location aTrsf)
+        //! Returns the polygon associated to the  edge in  the
+        //! parametric  space of  the  face.  Returns   a NULL
+        //! handle  if this polygon  does not exist.
+        internal static Poly_PolygonOnTriangulation PolygonOnTriangulation(TopoDS_Edge E,
+            Poly_Triangulation T, TopLoc_Location L)
         {
-            throw new NotImplementedException();
+            TopLoc_Location l = L.Predivided(E.Location());
+            bool Eisreversed = (E.Orientation() == TopAbs_Orientation.TopAbs_REVERSED);
+
+            // find the representation
+            BRep_TEdge TE = (BRep_TEdge) (E.TShape());
+            
+            foreach (var cr in TE.Curves())
+            {                            
+                if (cr.IsPolygonOnTriangulation(T, l))
+                {
+                    if (cr.IsPolygonOnClosedTriangulation() && Eisreversed)
+                        return cr.PolygonOnTriangulation2();
+                    else
+                        return cr.PolygonOnTriangulation();
+                }                
+            }
+
+            return null;
         }
 
         internal static GeomAbs_Shape MaxContinuity(TopoDS_Edge theEdge)

@@ -24,10 +24,12 @@ namespace OCCPort
                 }
             }
         }
+
         public bool IsEmpty()
         {
-            return points.Length == 0;
+            return points == null || points.Length == 0;
         }
+
         gp_Pnt2d[] points = null;
         internal int Size()
         {

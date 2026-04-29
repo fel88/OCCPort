@@ -67,5 +67,13 @@ namespace OCCPort
             //}
             //myDeletable = Standard_True;
         }
+        public bool IsEmpty()
+        {
+            return triangles.Length == 0;
+        }
+        public int Length()
+        {
+            return triangles.Length;
+        }
     }
 }

@@ -45,7 +45,7 @@ namespace OCCPort
             {
                 return false;
             }
-
+            return IsEqual(obj as BRepMesh_OrientedEdge);
             throw new System.NotImplementedException();
         }
 
@@ -58,7 +58,7 @@ namespace OCCPort
         //! Checks this and other edge for equality.
         //! @param theOther edge to be checked against this one.
         //! @return TRUE if edges have the same orientation, FALSE if not.
-        protected bool IsEqual(BRepMesh_Edge theOther)
+        protected bool IsEqual(BRepMesh_OrientedEdge theOther)
         {
 
             return (myFirstNode == theOther.myFirstNode && myLastNode == theOther.myLastNode);

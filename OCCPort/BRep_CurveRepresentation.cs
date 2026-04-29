@@ -20,6 +20,21 @@ namespace OCCPort
             throw new Standard_DomainError("BRep_CurveRepresentation");
         }
 
+        //! A representation by two arrays of nodes on a
+        //! triangulation.
+        public virtual bool IsPolygonOnClosedTriangulation()
+        {
+            return false;
+        }
+        public virtual Poly_PolygonOnTriangulation PolygonOnTriangulation2()
+        {
+            throw new Standard_DomainError();
+        }
+        public virtual Poly_PolygonOnTriangulation PolygonOnTriangulation()
+        {
+            throw new Standard_DomainError();
+        }
+
         public bool IsCurveOnClosedSurface()
         {
             return false;
@@ -91,7 +106,7 @@ namespace OCCPort
             myLocation = L;
         }
 
-        TopLoc_Location myLocation = new TopLoc_Location();
+        protected TopLoc_Location myLocation = new TopLoc_Location();
 
         protected BRep_CurveRepresentation(TopLoc_Location L)
         {

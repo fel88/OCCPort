@@ -17,5 +17,20 @@ namespace OCCPort
         }
         Poly_PolygonOnTriangulation myPolygon;
         Poly_Triangulation myTriangulation;
+
+        public override Poly_PolygonOnTriangulation PolygonOnTriangulation()
+        {
+            return myPolygon;
+        }
+        public override bool IsPolygonOnTriangulation()
+        {
+            return true;
+        }
+        public override bool IsPolygonOnTriangulation(Poly_Triangulation T, TopLoc_Location L)
+        {
+            return (T == myTriangulation) && (L == myLocation);
+
+        }
+
     }
 }

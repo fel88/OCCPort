@@ -22,7 +22,7 @@ namespace OCCPort
         }
         public bool IsEmpty()
         {
-            return list.Length == 0;
+            return list==null || list.Length == 0;
         }
 
         bool myDeletable; //!< Flag showing who allocated the array

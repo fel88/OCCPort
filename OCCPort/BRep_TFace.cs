@@ -170,7 +170,7 @@ namespace OCCPort
         public void Surface(Geom_Surface theSurface) { mySurface = theSurface; }
 
 
-        Poly_ListOfTriangulation myTriangulations;
+        Poly_ListOfTriangulation myTriangulations = new Poly_ListOfTriangulation();
         Poly_Triangulation myActiveTriangulation;
         Geom_Surface mySurface;
         TopLoc_Location myLocation;
