@@ -105,11 +105,38 @@ namespace OCCPort.Tester
                         }
                         return;
                     }
+                case TopAbs_ShapeEnum.TopAbs_SOLID:
+                    {
+                        for (TopoDS_Iterator anIter = new TopoDS_Iterator(theShape); anIter.More(); anIter.Next())
+                        {
+                            TopoDS_Shape aSubShape = anIter.Value();
+                            bool isClosed = aSubShape.ShapeType() == TopAbs_ShapeEnum.TopAbs_SHELL &&
+                                                              BRep_Tool.IsClosed(aSubShape) &&
+                                                              StdPrs_ToolTriangulatedShape.IsTriangulated(aSubShape);
+                            theBuilder.Add(isClosed ? theClosed : theOpened, aSubShape);
+                        }
+                        return;
+                    }
+
+                case TopAbs_ShapeEnum.TopAbs_SHELL:
                 case TopAbs_ShapeEnum.TopAbs_FACE:
                     {
                         theBuilder.Add(theOpened, theShape);
                         return;
                     }
+                case TopAbs_ShapeEnum.TopAbs_WIRE:
+                case TopAbs_ShapeEnum.TopAbs_EDGE:
+                case TopAbs_ShapeEnum.TopAbs_VERTEX:
+                    {
+                        if (!theIgnore1DSubShape)
+                        {
+                            theBuilder.Add(theOpened, theShape);
+                        }
+                        return;
+                    }
+                case TopAbs_ShapeEnum.TopAbs_SHAPE:
+                default:
+                    return;
             }
             /*
              * not finished here!

@@ -1,6 +1,7 @@
 ﻿using OCCPort;
+using OpenTK.Audio.OpenAL;
 using OpenTK.Graphics.OpenGL;
-
+using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -48,6 +49,11 @@ namespace OCCPort.OpenGL
         //! Return structure holding frame statistics.
         public OpenGl_FrameStats FrameStats() { return myFrameStats; }
 
+        //! @return active GLSL program
+        public OpenGl_ShaderProgram ActiveProgram()
+        {
+            return myActiveProgram;
+        }
 
         // =======================================================================
         // function : BindProgram
@@ -456,6 +462,46 @@ namespace OCCPort.OpenGL
                 }
             }
         }
+
+        internal void SetColor4fv(Graphic3d_Vec4 theColor)
+        {
+            SetColor4fv(new Vector4(theColor.x(), theColor.y(), theColor.z(), theColor.a()));
+        }
+        internal void SetColor4fv(Vector4 theColor)
+        {
+            if (myActiveProgram != null)
+            {
+                OpenGl_ShaderUniformLocation aLoc = myActiveProgram.GetStateLocation(OpenGl_StateVariable.OpenGl_OCCT_COLOR);
+                if (aLoc != null)
+                {
+                    myActiveProgram.SetUniform(this, aLoc, Vec4FromQuantityColor(theColor));
+                }
+            }
+            else if (core11ffp != null)
+            {
+                core11ffp.glColor4fv(theColor);
+            }
+        }
+        //! Convert Quantity_ColorRGBA into vec4
+        //! with conversion or no conversion into non-linear sRGB
+        //! basing on ToRenderSRGB() flag.
+        Vector4 Vec4FromQuantityColor(Vector4 theColor)
+        {
+            return myIsSRgbActive
+                 ? Vec4LinearFromQuantityColor(theColor)
+                 : Vec4sRGBFromQuantityColor(theColor);
+        }
+        //! Convert Quantity_ColorRGBA into vec4.
+        //! Quantity_Color is expected to be linear RGB, hence conversion is NOT required
+        Vector4 Vec4LinearFromQuantityColor(Vector4 theColor) { return theColor; }
+        //! Convert Quantity_ColorRGBA (linear RGB) into non-linear sRGB vec4.
+        public Vector4 Vec4sRGBFromQuantityColor(Vector4 theColor)
+        {
+            return Quantity_ColorRGBA.Convert_LinearRGB_To_sRGB(theColor);
+        }
+
+
+        bool myIsSRgbActive;    //!< flag indicating GL_FRAMEBUFFER_SRGB state
 
         int myAnisoMax;             //!< maximum level of anisotropy texture filter
         int myTexClamp;             //!< either GL_CLAMP_TO_EDGE (1.2+) or GL_CLAMP (1.1)

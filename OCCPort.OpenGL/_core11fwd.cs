@@ -25,9 +25,23 @@ namespace OCCPort.OpenGL
             GL.Disable((EnableCap)v);
         }
 
+        internal void glDrawArrays(int aDrawMode, int aFirstElem, int aNbElemsInGroup)
+        {
+            glDrawArrays((PrimitiveType)aDrawMode, aFirstElem, aNbElemsInGroup);
+        }
+        internal void glDrawArrays(PrimitiveType aDrawMode, int aFirstElem, int aNbElemsInGroup)
+        {
+            GL.DrawArrays(aDrawMode, aFirstElem, aNbElemsInGroup);
+        }
+
         internal void glDrawBuffer(int aDrawBuffer)
         {
             GL.DrawBuffer((DrawBufferMode)aDrawBuffer);
+        }
+
+        internal void glDrawElements(int aDrawMode, int v, All all, int  anOffset)
+        {
+            GL.DrawElements((PrimitiveType)aDrawMode, v, (DrawElementsType)all, anOffset);
         }
 
         internal void glEnable(All v)

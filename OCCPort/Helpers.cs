@@ -1,7 +1,11 @@
-﻿namespace OCCPort
+﻿
+using OpenTK.Mathematics;
+
+namespace OCCPort
 {
     public static class Helpers
     {
+        public static float[] ToFloatArray(this Vector4 v) => [v.X, v.Y, v.Z, v.W];
         public static string Prepend(this string str, string s)
         {
             return s + str;

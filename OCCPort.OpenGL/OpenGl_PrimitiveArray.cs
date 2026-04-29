@@ -1,5 +1,6 @@
 ﻿using OCCPort.Enums;
 using OpenTK.Graphics.OpenGL;
+using OpenTK.Mathematics;
 using System;
 using System.Reflection.Metadata;
 using System.Security.AccessControl;
@@ -118,7 +119,7 @@ namespace OCCPort.OpenGL
         protected Graphic3d_IndexBuffer myIndices;
         protected Graphic3d_Buffer myAttribs;
         Graphic3d_BoundBuffer myBounds;
-        short myDrawMode;
+        int myDrawMode;
         bool myIsFillType;
         bool myIsVboInit;
 
@@ -163,6 +164,88 @@ namespace OCCPort.OpenGL
         const int DRAW_MODE_NONE = -1;
 
 
+        // =======================================================================
+        // function : drawArray
+        // purpose  :
+        // =======================================================================
+        void drawArray(OpenGl_Workspace theWorkspace,
+                                       Graphic3d_Vec4[] theFaceColors,
+                                       bool theHasVertColor)
+        {
+            OpenGl_Context aGlContext = theWorkspace.GetGlContext();
+            if (myVboAttribs == null)
+            {
+                if (myDrawMode == (int)PrimitiveType.Points
+                 && aGlContext.core11ffp != null)
+                {
+                    // extreme compatibility mode - without sprites but with markers
+                    //drawMarkers(theWorkspace);
+                }
+                return;
+            }
+
+            var toHilight = theWorkspace.ToHighlight();
+            var aDrawMode = aGlContext.ActiveProgram() != null
+                                   && aGlContext.ActiveProgram().HasTessellationStage()
+                                   ? (int)PrimitiveType.Patches
+                                   : myDrawMode;
+            myVboAttribs.BindAllAttributes(aGlContext);
+            if (theHasVertColor && toHilight)
+            {
+                // disable per-vertex color
+                //OpenGl_VertexBuffer.unbindAttribute(aGlContext, Graphic3d_TOA_COLOR);
+            }
+            if (myVboIndices != null)
+            {
+                myVboIndices.Bind(aGlContext);
+                var anOffset = myVboIndices.GetDataOffset();
+                if (myBounds != null)
+                {
+                    // draw primitives by vertex count with the indices
+                    int aStride = myVboIndices.GetDataType() == All.UnsignedShort ? sizeof(ushort) : sizeof(uint);
+                    for (int aGroupIter = 0; aGroupIter < myBounds.NbBounds; ++aGroupIter)
+                    {
+                        int aNbElemsInGroup = myBounds.Bounds[aGroupIter];
+                        if (theFaceColors != null)
+                            aGlContext.SetColor4fv(theFaceColors[aGroupIter]);
+                        aGlContext.core11fwd.glDrawElements(aDrawMode, aNbElemsInGroup, myVboIndices.GetDataType(), anOffset);
+                        anOffset += aStride * aNbElemsInGroup;
+                    }
+                }
+                else
+                {
+                    // draw one (or sequential) primitive by the indices
+                    aGlContext.core11fwd.glDrawElements(aDrawMode, myVboIndices.GetElemsNb(), myVboIndices.GetDataType(), anOffset);
+                }
+                myVboIndices.Unbind(aGlContext);
+            }
+            else if (myBounds != null)
+            {
+                int aFirstElem = 0;
+                for (int aGroupIter = 0; aGroupIter < myBounds.NbBounds; ++aGroupIter)
+                {
+                    int aNbElemsInGroup = myBounds.Bounds[aGroupIter];
+                    if (theFaceColors != null) aGlContext.SetColor4fv(theFaceColors[aGroupIter]);
+                    aGlContext.core11fwd.glDrawArrays(aDrawMode, aFirstElem, aNbElemsInGroup);
+                    aFirstElem += aNbElemsInGroup;
+                }
+            }
+            else
+            {
+                if (myDrawMode == (int)PrimitiveType.Points)
+                {
+                    //drawMarkers(theWorkspace);
+                }
+                else
+                {
+                    aGlContext.core11fwd.glDrawArrays(aDrawMode, 0, myVboAttribs.GetElemsNb());
+                }
+            }
+
+            // bind with 0
+            myVboAttribs.UnbindAllAttributes(aGlContext);
+        }
+
         public override void Render(OpenGl_Workspace theWorkspace)
         {
             if (myDrawMode == DRAW_MODE_NONE)
@@ -203,35 +286,45 @@ namespace OCCPort.OpenGL
             bool toEnableEnvMap = aTextureSet != null
                                       && aTextureSet == theWorkspace.EnvironmentTexture();
 
-
-            bool hasColorAttrib = myVboAttribs != null && myVboAttribs.HasColorAttribute();
-            bool toHilight = theWorkspace.ToHighlight();
-            bool hasVertColor = hasColorAttrib && !toHilight;
-            bool hasVertNorm = myVboAttribs != null && myVboAttribs.HasNormalAttribute();
-            switch (myDrawMode)
+            if (toDrawArray)
             {
-                default:
-                    {
-                        aShadingModel = aCtx.ShaderManager().ChooseFaceShadingModel(anAspectFace.ShadingModel(), hasVertNorm);
-                        aCtx.ShaderManager().BindFaceProgram(aTextureSet,
-                                                                aShadingModel,
-                                                                aCtx.ShaderManager().MaterialState().HasAlphaCutoff() ? Graphic3d_AlphaMode.Graphic3d_AlphaMode_Mask : Graphic3d_AlphaMode.Graphic3d_AlphaMode_Opaque,
-                                                                toDrawInteriorEdges == 1 ? anAspectFace.Aspect().InteriorStyle() : Aspect_InteriorStyle.Aspect_IS_SOLID,
-                                                                hasVertColor,
-                                                                toEnableEnvMap,
-                                                                toDrawInteriorEdges == 1,
-                                                                anAspectFace.ShaderProgramRes(aCtx));
-                        if (toDrawInteriorEdges == 1)
+                bool hasColorAttrib = myVboAttribs != null && myVboAttribs.HasColorAttribute();
+                bool toHilight = theWorkspace.ToHighlight();
+                bool hasVertColor = hasColorAttrib && !toHilight;
+                bool hasVertNorm = myVboAttribs != null && myVboAttribs.HasNormalAttribute();
+                switch (myDrawMode)
+                {
+                    default:
                         {
-                            //aCtx.ShaderManager().PushInteriorState(aCtx.ActiveProgram(), anAspectFace.Aspect());
+                            aShadingModel = aCtx.ShaderManager().ChooseFaceShadingModel(anAspectFace.ShadingModel(), hasVertNorm);
+                            aCtx.ShaderManager().BindFaceProgram(aTextureSet,
+                                                                    aShadingModel,
+                                                                    aCtx.ShaderManager().MaterialState().HasAlphaCutoff() ? Graphic3d_AlphaMode.Graphic3d_AlphaMode_Mask : Graphic3d_AlphaMode.Graphic3d_AlphaMode_Opaque,
+                                                                    toDrawInteriorEdges == 1 ? anAspectFace.Aspect().InteriorStyle() : Aspect_InteriorStyle.Aspect_IS_SOLID,
+                                                                    hasVertColor,
+                                                                    toEnableEnvMap,
+                                                                    toDrawInteriorEdges == 1,
+                                                                    anAspectFace.ShaderProgramRes(aCtx));
+                            if (toDrawInteriorEdges == 1)
+                            {
+                                //aCtx.ShaderManager().PushInteriorState(aCtx.ActiveProgram(), anAspectFace.Aspect());
+                            }
+                            else if (toSetLinePolygMode)
+                            {
+                                aCtx.SetPolygonMode((int)PolygonMode.Line);
+                            }
+                            break;
                         }
-                        else if (toSetLinePolygMode)
-                        {
-                            aCtx.SetPolygonMode((int)PolygonMode.Line);
-                        }
-                        break;
-                    }
+                }
+
+                var aFaceColors = myBounds != null && !toHilight && anAspectFace.Aspect().InteriorStyle() != Aspect_InteriorStyle.Aspect_IS_HIDDENLINE
+                                     ? myBounds.Colors
+                                     : null;
+
+                drawArray(theWorkspace, aFaceColors, hasColorAttrib);
+
             }
+
 
         }
 
@@ -352,10 +445,10 @@ namespace OCCPort.OpenGL
                 case 10: myVboAttribs = new OpenGl_VertexBufferT_OpenGl_VertexBuffer(10, myAttribs); break;
             }
 
-             bool isAttribMutable = myAttribs.IsMutable();
+            bool isAttribMutable = myAttribs.IsMutable();
             bool isAttribInterleaved = myAttribs.IsInterleaved();
             if (myAttribs.NbElements != myAttribs.NbMaxElements()
-             && myIndices==null
+             && myIndices == null
              && (!isAttribInterleaved || isAttribMutable))
             {
                 throw new Standard_ProgramError("OpenGl_PrimitiveArray::buildVBO() - vertex attribute data with reserved size is not supported");
@@ -363,7 +456,7 @@ namespace OCCPort.OpenGL
 
             // specify data type as Byte and NbComponents as Stride, so that OpenGl_VertexBuffer::EstimatedDataSize() will return correct value
             int aNbVertexes = (isAttribMutable || !isAttribInterleaved) ? myAttribs.NbMaxElements() : myAttribs.NbElements;
-            if (!myVboAttribs.init(theCtx, myAttribs.Stride, aNbVertexes, myAttribs.Data(), All.UnsignedByte, myAttribs.Stride))
+            if (!myVboAttribs.init(theCtx, (uint)myAttribs.Stride, aNbVertexes, myAttribs.Data(), All.UnsignedByte, myAttribs.Stride))
             {
                 string aMsg = ("VBO creation for Primitive Array has failed for ") + aNbVertexes + " vertices. Out of memory?";
                 theCtx.PushMessage(All.DebugSourceApplication, All.DebugTypePerformance, 0, All.DebugSeverityLow, aMsg);
@@ -371,7 +464,7 @@ namespace OCCPort.OpenGL
                 clearMemoryGL(theCtx);
                 return false;
             }
-            else if (myIndices==null)
+            else if (myIndices == null)
             {
                 if (isAttribMutable && isAttribInterleaved)
                 {

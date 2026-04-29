@@ -7,7 +7,11 @@ namespace OCCPort
         public TopoDS_TShape()
         {
             myShapes = new TopoDS_ListOfShape();
+            myFlags = (int)(TopoDS_TShape_Flags.TopoDS_TShape_Flags_Free
+          | TopoDS_TShape_Flags.TopoDS_TShape_Flags_Modified
+          | TopoDS_TShape_Flags.TopoDS_TShape_Flags_Orientable);
         }
+
         internal TopoDS_ListOfShape myShapes;
         //! Returns the type as a term of the ShapeEnum enum :
         //! VERTEX, EDGE, WIRE, FACE, ....

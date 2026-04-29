@@ -5,7 +5,7 @@ namespace OCCPort
 {
     public class Graphic3d_BoundBuffer
     {
-        public Graphic3d_Vec4 Colors;      //!< pointer to facet color values
+        public Graphic3d_Vec4 []Colors;      //!< pointer to facet color values
         public int[] Bounds;      //!< pointer to bounds array
         public int NbBounds;    //!< number of bounds
         public int NbMaxBounds; //!< number of allocated bounds

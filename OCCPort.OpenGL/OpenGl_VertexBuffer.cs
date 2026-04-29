@@ -6,7 +6,7 @@ namespace OCCPort.OpenGL
 	//! Vertex Buffer Object - is a general storage object for vertex attributes (position, normal, color).
 	//! Notice that you should use OpenGl_IndexBuffer specialization for array of indices.	
 
-	public class OpenGl_VertexBuffer : OpenGl_Buffer
+	public abstract class OpenGl_VertexBuffer : OpenGl_Buffer
 	{
 		public override BufferTarget GetTarget()
 		{
@@ -23,5 +23,15 @@ namespace OCCPort.OpenGL
 		{
 			return false;
 		}
-	}
+        public virtual void BindAllAttributes(OpenGl_Context theGlCtx)
+        {
+
+        }
+
+        //! Unbind all vertex attributes. Default implementation does nothing.
+        public virtual void UnbindAllAttributes(OpenGl_Context aGlContext)
+        {
+            
+        }
+    }
 }

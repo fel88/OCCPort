@@ -28,7 +28,7 @@
         public float r() { return v[0]; }
 
         //! Alias to 2nd component as Y coordinate in XYZW.
-        public double y() { return v[1]; }
+        public float y() { return v[1]; }
 
         //! Alias to 2nd component as GREEN channel in RGBA.
         public float g() { return v[1]; }
