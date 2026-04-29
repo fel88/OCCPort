@@ -24,6 +24,12 @@ namespace OCCPort
             myMat[2][0] = theA31;
             myMat[2][1] = theA32;
             myMat[2][2] = theA33;
+        } //! Computes the determinant of the matrix.
+        public double Determinant()
+        {
+            return myMat[0][0] * (myMat[1][1] * myMat[2][2] - myMat[2][1] * myMat[1][2]) -
+                   myMat[0][1] * (myMat[1][0] * myMat[2][2] - myMat[2][0] * myMat[1][2]) +
+                   myMat[0][2] * (myMat[1][0] * myMat[2][1] - myMat[2][0] * myMat[1][1]);
         }
         public void Transpose()
         {
@@ -40,15 +46,15 @@ namespace OCCPort
         }
         public void PreMultiply(gp_Mat theOther)
         {
-           double aT00 = theOther.myMat[0][0] * myMat[0][0] + theOther.myMat[0][1] * myMat[1][0] + theOther.myMat[0][2] * myMat[2][0];
-           double aT01 = theOther.myMat[0][0] * myMat[0][1] + theOther.myMat[0][1] * myMat[1][1] + theOther.myMat[0][2] * myMat[2][1];
-           double aT02 = theOther.myMat[0][0] * myMat[0][2] + theOther.myMat[0][1] * myMat[1][2] + theOther.myMat[0][2] * myMat[2][2];
-           double aT10 = theOther.myMat[1][0] * myMat[0][0] + theOther.myMat[1][1] * myMat[1][0] + theOther.myMat[1][2] * myMat[2][0];
-           double aT11 = theOther.myMat[1][0] * myMat[0][1] + theOther.myMat[1][1] * myMat[1][1] + theOther.myMat[1][2] * myMat[2][1];
-           double aT12 = theOther.myMat[1][0] * myMat[0][2] + theOther.myMat[1][1] * myMat[1][2] + theOther.myMat[1][2] * myMat[2][2];
-           double aT20 = theOther.myMat[2][0] * myMat[0][0] + theOther.myMat[2][1] * myMat[1][0] + theOther.myMat[2][2] * myMat[2][0];
-           double aT21 = theOther.myMat[2][0] * myMat[0][1] + theOther.myMat[2][1] * myMat[1][1] + theOther.myMat[2][2] * myMat[2][1];
-           double aT22 = theOther.myMat[2][0] * myMat[0][2] + theOther.myMat[2][1] * myMat[1][2] + theOther.myMat[2][2] * myMat[2][2];
+            double aT00 = theOther.myMat[0][0] * myMat[0][0] + theOther.myMat[0][1] * myMat[1][0] + theOther.myMat[0][2] * myMat[2][0];
+            double aT01 = theOther.myMat[0][0] * myMat[0][1] + theOther.myMat[0][1] * myMat[1][1] + theOther.myMat[0][2] * myMat[2][1];
+            double aT02 = theOther.myMat[0][0] * myMat[0][2] + theOther.myMat[0][1] * myMat[1][2] + theOther.myMat[0][2] * myMat[2][2];
+            double aT10 = theOther.myMat[1][0] * myMat[0][0] + theOther.myMat[1][1] * myMat[1][0] + theOther.myMat[1][2] * myMat[2][0];
+            double aT11 = theOther.myMat[1][0] * myMat[0][1] + theOther.myMat[1][1] * myMat[1][1] + theOther.myMat[1][2] * myMat[2][1];
+            double aT12 = theOther.myMat[1][0] * myMat[0][2] + theOther.myMat[1][1] * myMat[1][2] + theOther.myMat[1][2] * myMat[2][2];
+            double aT20 = theOther.myMat[2][0] * myMat[0][0] + theOther.myMat[2][1] * myMat[1][0] + theOther.myMat[2][2] * myMat[2][0];
+            double aT21 = theOther.myMat[2][0] * myMat[0][1] + theOther.myMat[2][1] * myMat[1][1] + theOther.myMat[2][2] * myMat[2][1];
+            double aT22 = theOther.myMat[2][0] * myMat[0][2] + theOther.myMat[2][1] * myMat[1][2] + theOther.myMat[2][2] * myMat[2][2];
             myMat[0][0] = aT00;
             myMat[0][1] = aT01;
             myMat[0][2] = aT02;

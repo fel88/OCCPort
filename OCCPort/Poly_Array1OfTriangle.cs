@@ -8,6 +8,10 @@ namespace OCCPort
     {
         Poly_Triangle[] triangles;
 
+        public Poly_Triangle Value(int index)
+        {
+            return triangles[index - 1];
+        }
         internal void SetValue(int theIndex, Poly_Triangle theTriangle)
         {
             //todo: ???

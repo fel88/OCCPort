@@ -29,10 +29,20 @@ namespace OCCPort
             //
         }
         Bnd_Box myCachedMinMax;
-
+        //! Returns triangle at the given index.
+        //! @param[in] theIndex triangle index within [1, NbTriangles()] range
+        //! @return triangle node indices, with each node defined within [1, NbNodes()] range
+        public Poly_Triangle Triangle(int theIndex) { return myTriangles.Value(theIndex); }
         //! Returns mesh purpose bits.
         public Poly_MeshPurpose MeshPurpose() { return myPurpose; }
-
+        //! Returns normal at the given index.
+        //! @param[in] theIndex node index within [1, NbNodes()] range
+        //! @return normalized 3D vector defining a surface normal
+        public gp_Dir Normal(int theIndex)
+        {
+            gp_Vec3f aNorm = myNormals.Value(theIndex - 1);
+            return new gp_Dir(aNorm.x(), aNorm.y(), aNorm.z());
+        }
         //! Sets a triangle.
         //! @param[in] theIndex triangle index within [1, NbTriangles()] range
         //! @param[in] theTriangle triangle node indices, with each node defined within [1, NbNodes()] range
@@ -119,5 +129,14 @@ namespace OCCPort
                 myNormals.Resize(0, theNbNodes - 1, theToCopyOld);
             }
         }
+
+        //! Returns Standard_True if 2D nodes are associated with 3D nodes for this triangulation.
+        public bool HasUVNodes() { return !myUVNodes.IsEmpty(); }
+
+        //! Returns UV-node at the given index.
+        //! @param[in] theIndex node index within [1, NbNodes()] range
+        //! @return 2D point defining UV coordinates
+        public gp_Pnt2d UVNode(int theIndex) { return myUVNodes.Value(theIndex - 1); }
+
     }
 }

@@ -25,6 +25,10 @@ namespace OCCPort
             }
         }
 
+        public gp_Pnt2d Value(int index)
+        {
+            return points[index - 1];
+        }
         public bool IsEmpty()
         {
             return points == null || points.Length == 0;

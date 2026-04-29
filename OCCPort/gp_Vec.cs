@@ -29,6 +29,10 @@ namespace OCCPort
         {
             coord.SetLinearForm(theA1, theV1.coord, theA2, theV2.coord);
         }
+
+        //! computes the cross product between two vectors
+        public void Cross(gp_Vec theRight) { coord.Cross(theRight.coord); }
+
         //! Assigns the given value to the X coordinate of this vector.
         public void SetX(double theX) { coord.SetX(theX); }
 
@@ -162,6 +166,8 @@ namespace OCCPort
 
             coord.Divide(aD);
         }
+        //! Computes the square magnitude of this vector.
+        internal double SquareMagnitude() => coord.SquareModulus();
 
         public gp_Vec(gp_Dir theV)
         {

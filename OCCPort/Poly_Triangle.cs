@@ -18,6 +18,13 @@
             myNodes[2] = theN3;
         }
 
+        //! Returns the node indices of this triangle.
+        public void Get(ref int theN1, ref int theN2, ref int theN3)
+        {
+            theN1 = myNodes[0];
+            theN2 = myNodes[1];
+            theN3 = myNodes[2];
+        }
         int[] myNodes = new int[3];
     }
 }

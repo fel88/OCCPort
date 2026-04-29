@@ -158,7 +158,7 @@ namespace OCCPort.Tester
             int aNbVertices = 0;
 
             // Precision for compare square distances
-            //double aPreci = Precision.SquareConfusion();
+            double aPreci = Precision.SquareConfusion();
 
             TopExp_Explorer aFaceIt = new TopExp_Explorer(theShape, TopAbs_ShapeEnum.TopAbs_FACE);
             for (; aFaceIt.More(); aFaceIt.Next())
@@ -191,7 +191,7 @@ namespace OCCPort.Tester
                 gp_Trsf aTrsf = aLoc.Transformation();
 
                 // Determinant of transform matrix less then 0 means that mirror transform applied.
-                //  bool isMirrored = aTrsf.VectorialPart().Determinant() < 0;
+                  bool isMirrored = aTrsf.VectorialPart().Determinant() < 0;
 
                 // Extracts vertices & normals from nodes
                 StdPrs_ToolTriangulatedShape.ComputeNormals(aFace, aT);
@@ -206,74 +206,74 @@ namespace OCCPort.Tester
                 int aDecal = anArray.VertexNumber();
                 for (int aNodeIter = 1; aNodeIter <= aT.NbNodes(); ++aNodeIter)
                 {
-                    //aPoint = aT->Node(aNodeIter);
-                    //gp_Dir aNorm = aT->Normal(aNodeIter);
-                    //if ((aFace.Orientation() == TopAbs_REVERSED) ^ isMirrored)
-                    //{
-                    //    aNorm.Reverse();
-                    //}
-                    //if (!aLoc.IsIdentity())
-                    //{
-                    //    aPoint.Transform(aTrsf);
-                    //    aNorm.Transform(aTrsf);
-                    //}
+                    aPoint = aT.Node(aNodeIter);
+                    gp_Dir aNorm = aT.Normal(aNodeIter);
+                    if ((aFace.Orientation() == TopAbs_Orientation.TopAbs_REVERSED) ^ isMirrored)
+                    {
+                        aNorm.Reverse();
+                    }
+                    if (!aLoc.IsIdentity())
+                    {
+                        aPoint.Transform(aTrsf);
+                        aNorm.Transform(aTrsf);
+                    }
 
-                    //if (theHasTexels && aT->HasUVNodes())
-                    //{
-                    //    const gp_Pnt2d aNode2d = aT->UVNode(aNodeIter);
-                    //    const gp_Pnt2d aTexel = (dUmax == 0.0 || dVmax == 0.0)
-                    //                          ? aNode2d
-                    //                          : gp_Pnt2d((-theUVOrigin.X() + (theUVRepeat.X() * (aNode2d.X() - aUmin)) / dUmax) / theUVScale.X(),
-                    //                                      (-theUVOrigin.Y() + (theUVRepeat.Y() * (aNode2d.Y() - aVmin)) / dVmax) / theUVScale.Y());
-                    //    anArray->AddVertex(aPoint, aNorm, aTexel);
-                    //}
-                    //else
-                    //{
-                    //    anArray->AddVertex(aPoint, aNorm);
-                    //}
+                    if (theHasTexels && aT.HasUVNodes())
+                    {
+                        gp_Pnt2d aNode2d = aT.UVNode(aNodeIter);
+                        gp_Pnt2d aTexel = (dUmax == 0.0 || dVmax == 0.0)
+                                              ? aNode2d
+                                              : new gp_Pnt2d((-theUVOrigin.X() + (theUVRepeat.X() * (aNode2d.X() - aUmin)) / dUmax) / theUVScale.X(),
+                                                          (-theUVOrigin.Y() + (theUVRepeat.Y() * (aNode2d.Y() - aVmin)) / dVmax) / theUVScale.Y());
+                       // anArray.AddVertex(aPoint, aNorm, aTexel);
+                    }
+                    else
+                    {
+                        anArray.AddVertex(aPoint, aNorm);
+                    }
                 }
 
                 // Fill array with vertex and edge visibility info
                 int[] anIndex = new int[3];
                 for (int aTriIter = 1; aTriIter <= aT.NbTriangles(); ++aTriIter)
                 {
-                    //if ((aFace.Orientation() == TopAbs_REVERSED))
-                    //{
-                    //    aT->Triangle(aTriIter).Get(anIndex[0], anIndex[2], anIndex[1]);
-                    //}
-                    //else
-                    //{
-                    //    aT->Triangle(aTriIter).Get(anIndex[0], anIndex[1], anIndex[2]);
-                    //}
+                    if ((aFace.Orientation() == TopAbs_Orientation.TopAbs_REVERSED))
+                    {
+                        aT.Triangle(aTriIter).Get(ref anIndex[0], ref anIndex[2], ref anIndex[1]);
+                    }
+                    else
+                    {
+                        aT.Triangle(aTriIter).Get(ref anIndex[0], ref anIndex[1], ref  anIndex[2]);
+                    }
 
-                    //const gp_Pnt aP1 = aT->Node(anIndex[0]);
-                    //const gp_Pnt aP2 = aT->Node(anIndex[1]);
-                    //const gp_Pnt aP3 = aT->Node(anIndex[2]);
+                    gp_Pnt aP1 = aT.Node(anIndex[0]);
+                    gp_Pnt aP2 = aT.Node(anIndex[1]);
+                    gp_Pnt aP3 = aT.Node(anIndex[2]);
 
-                    //gp_Vec aV1(aP1, aP2);
-                    //if (aV1.SquareMagnitude() <= aPreci)
-                    //{
-                    //    continue;
-                    //}
-                    //gp_Vec aV2(aP2, aP3);
-                    //if (aV2.SquareMagnitude() <= aPreci)
-                    //{
-                    //    continue;
-                    //}
-                    //gp_Vec aV3(aP3, aP1);
-                    //if (aV3.SquareMagnitude() <= aPreci)
-                    //{
-                    //    continue;
-                    //}
-                    //aV1.Normalize();
-                    //aV2.Normalize();
-                    //aV1.Cross(aV2);
-                    //if (aV1.SquareMagnitude() > aPreci)
-                    //{
-                    //    anArray->AddEdges(anIndex[0] + aDecal,
-                    //                       anIndex[1] + aDecal,
-                    //                       anIndex[2] + aDecal);
-                    //}
+                    gp_Vec aV1 = new gp_Vec(aP1, aP2);
+                    if (aV1.SquareMagnitude() <= aPreci)
+                    {
+                        continue;
+                    }
+                    gp_Vec aV2 = new gp_Vec(aP2, aP3);
+                    if (aV2.SquareMagnitude() <= aPreci)
+                    {
+                        continue;
+                    }
+                    gp_Vec aV3 = new gp_Vec(aP3, aP1);
+                    if (aV3.SquareMagnitude() <= aPreci)
+                    {
+                        continue;
+                    }
+                    aV1.Normalize();
+                    aV2.Normalize();
+                    aV1.Cross(aV2);
+                    if (aV1.SquareMagnitude() > aPreci)
+                    {
+                        anArray.AddEdges(anIndex[0] + aDecal,
+                                           anIndex[1] + aDecal,
+                                           anIndex[2] + aDecal);
+                    }
                 }
             }
             return anArray;
