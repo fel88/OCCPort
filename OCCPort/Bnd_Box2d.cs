@@ -43,7 +43,42 @@ namespace OCCPort
 
         //! Returns true if this bounding box is open in the Ymax direction.
         bool IsOpenYmax() { return (Flags.HasFlag(MaskFlags.YmaxMask)); }
+        //! Adds the 2d point.
+        public void Add(gp_Pnt2d thePnt)
+        {
+            Update(thePnt.X(), thePnt.Y());
+        }
+        public void Update(double X, double Y)
+        {
+            if ((Flags & MaskFlags.VoidMask) > 0)
+            {
+                Xmin = X;
+                Ymin = Y;
+                Xmax = X;
+                Ymax = Y;
+                Flags &= ~MaskFlags.VoidMask;
+            }
+            else
+            {
+                if (!(Flags.HasFlag(MaskFlags.XminMask)) && (X < Xmin)) Xmin = X;
+                else if (!(Flags.HasFlag(MaskFlags.XmaxMask)) && (X > Xmax)) Xmax = X;
+                if (!(Flags.HasFlag(MaskFlags.YminMask)) && (Y < Ymin)) Ymin = Y;
+                else if (!(Flags.HasFlag(MaskFlags.YmaxMask)) && (Y > Ymax)) Ymax = Y;
+            }
+        }
 
+        //! Enlarges     the  box  with    a  tolerance  value.
+        //! This means that the minimum values of its X and Y
+        //! intervals of definition, when they are finite, are reduced by
+        //! the absolute value of Tol, while the maximum values are
+        //! increased by the same amount.
+        public void Enlarge(double theTol)
+        {
+            double aTol = theTol < 0.0 ? -theTol : theTol;
+            if (Gap < aTol) 
+                Gap = aTol;
+
+        }
 
         //! Returns true if this bounding box is infinite in all 4
         //! directions (Whole Space flag).

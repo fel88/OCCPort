@@ -14,8 +14,69 @@ namespace OCCPort
         public BRepMesh_Triangle GetElement(int theIndex)
         {
             return myElements[theIndex - 1];
+        }  //! Returns map of indices of links registered in mesh.
+        public MapOfInteger LinksOfDomain()
+        {
+            return myLinksOfDomain;
+        }
+        //! Returns indices of elements connected to the link with the given index.
+        //! @param theLinkIndex index of link whose data should be retrieved.
+        //! @return indices of elements connected to the link.
+        public BRepMesh_PairOfIndex ElementsConnectedTo(int theLinkIndex)
+        {
+            return myLinks.FindFromIndex(theLinkIndex);
+        }
+        //! Returns number of links.
+        public int NbLinks()
+        {
+            return myLinks.Extent();
         }
 
+        //! Removes link from the mesh in case if it has no connected elements 
+        //! and its type is Free.
+        //! @param theIndex index of link to be removed.
+        //! @param isForce if TRUE link will be removed even if movability
+        //! is not Free.
+        public void RemoveLink(int theIndex, bool isForce = false)
+        {
+            BRepMesh_Edge aLink = (BRepMesh_Edge)GetLink(theIndex);
+            if (aLink.Movability() == Enums.BRepMesh_DegreeOfFreedom.BRepMesh_Deleted ||
+                (!isForce && aLink.Movability() != Enums.BRepMesh_DegreeOfFreedom.BRepMesh_Free) ||
+                ElementsConnectedTo(theIndex).Extent() != 0)
+            {
+                return;
+            }
+
+            cleanLink(theIndex, aLink);
+            aLink.SetMovability(Enums.BRepMesh_DegreeOfFreedom.BRepMesh_Deleted);
+
+            myLinksOfDomain.Remove(theIndex);
+            myDelLinks.Append(theIndex);
+        }
+        public void cleanLink(
+     int theIndex,
+     BRepMesh_Edge theLink)
+        {
+            for (int i = 0; i < 2; ++i)
+            {
+                int aNodeId = (i == 0) ?
+                 theLink.FirstNode() : theLink.LastNode();
+
+                ListOfInteger aLinkList = linksConnectedTo(aNodeId);
+                if (aLinkList.Contains(theIndex))
+                {
+                    aLinkList.Remove(theIndex);
+                }
+                /*foreach (var aLinkIt in aLinkList)
+                {                                
+                    if (aLinkIt == theIndex)
+                    {
+                        aLinkList.Remove(aLinkIt);
+                        break;
+                    }
+                }*/
+            }
+        }
         //! Returns map of indices of elements registered in mesh.
         public MapOfInteger ElementsOfDomain()
         {
@@ -150,6 +211,11 @@ namespace OCCPort
         public BRepMesh_Vertex GetNode(int theIndex)
         {
             return myNodes.FindKey(theIndex);
+        }
+
+        internal void RemoveNode(int v)
+        {
+            throw new NotImplementedException();
         }
 
         VectorOfElements myElements;

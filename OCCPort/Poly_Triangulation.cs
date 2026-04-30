@@ -35,6 +35,17 @@ namespace OCCPort
         public Poly_Triangle Triangle(int theIndex) { return myTriangles.Value(theIndex); }
         //! Returns mesh purpose bits.
         public Poly_MeshPurpose MeshPurpose() { return myPurpose; }
+
+
+        //! Sets an UV-node coordinates.
+        //! @param[in] theIndex node index within [1, NbNodes()] range
+        //! @param[in] thePnt   UV coordinates
+        public void SetUVNode(int theIndex,
+                    gp_Pnt2d thePnt)
+        {
+            myUVNodes.SetValue(theIndex - 1, thePnt);
+        }
+
         //! Returns normal at the given index.
         //! @param[in] theIndex node index within [1, NbNodes()] range
         //! @return normalized 3D vector defining a surface normal
@@ -65,7 +76,7 @@ namespace OCCPort
         //! Returns a node at the given index.
         //! @param[in] theIndex node index within [1, NbNodes()] range
         //! @return 3D point coordinates
-        public gp_Pnt Node(int theIndex) { return myNodes.Value(theIndex - 1); }
+        public gp_Pnt Node(int theIndex) { return myNodes.Value<gp_Pnt>(theIndex - 1); }
 
         double myDeflection;
 
@@ -183,9 +194,9 @@ namespace OCCPort
             foreach (var aTriIter in myTriangles.triangles)
             {
                 aTriIter.Get(ref anElem[0], ref anElem[1], ref anElem[2]);
-                gp_Pnt aNode0 = myNodes.Value(anElem[0] - 1);
-                gp_Pnt aNode1 = myNodes.Value(anElem[1] - 1);
-                gp_Pnt aNode2 = myNodes.Value(anElem[2] - 1);
+                gp_Pnt aNode0 = myNodes.Value<gp_Pnt>(anElem[0] - 1);
+                gp_Pnt aNode1 = myNodes.Value<gp_Pnt>(anElem[1] - 1);
+                gp_Pnt aNode2 = myNodes.Value<gp_Pnt>(anElem[2] - 1);
 
                 gp_XYZ aVec01 = aNode1.XYZ() - aNode0.XYZ();
                 gp_XYZ aVec02 = aNode2.XYZ() - aNode0.XYZ();
@@ -201,7 +212,7 @@ namespace OCCPort
             for (int i = 0; i < myNormals.list.Length; i++)
             {
                 gp_Vec3f aNodeIter = myNormals.list[i];
-                gp_Vec3f  aNorm3f = aNodeIter;
+                gp_Vec3f aNorm3f = aNodeIter;
                 float aMod = aNorm3f.Modulus();
                 myNormals.list[i] = aMod == 0.0f ? new gp_Vec3f(0.0f, 0.0f, 1.0f) : (aNorm3f / aMod);
             }

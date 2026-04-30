@@ -16,6 +16,15 @@ namespace OCCPort
             //set => dic[key ]=new KeyValuePair<T1, T2> () = value;
         }
 
+        //! FindFromIndex
+        public T2 FindFromIndex(int theIndex)
+        {
+            Exceptions.Standard_OutOfRange_Raise_if(theIndex < 1 || theIndex > Extent(), "NCollection_IndexedDataMap::FindFromIndex");
+            return dic[theIndex - 1].Value;
+            //IndexedDataMapNode* aNode = (IndexedDataMapNode*)myData2[theIndex - 1];
+            //return aNode->Value();
+        }
+
         public T1 FindKey(int theIndex)
         {
             return dic[theIndex].Key;

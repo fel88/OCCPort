@@ -4,26 +4,26 @@ namespace OCCPort
 {
     internal class IteratorOfMapOfInteger
     {
-        
 
+        MapOfInteger list;
         public IteratorOfMapOfInteger(MapOfInteger aTriangles)
         {
-            
+            list = aTriangles;
         }
 
-        internal object Key()
+        internal int Key()
         {
-            throw new NotImplementedException();
+            return list[index];
         }
-
+        int index = 0;
         internal bool More()
         {
-            throw new NotImplementedException();
+            return index < list.Count - 1;
         }
 
-        internal object Next()
+        internal void Next()
         {
-            throw new NotImplementedException();
+            index++;
         }
     }
 }

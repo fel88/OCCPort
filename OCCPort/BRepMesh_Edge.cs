@@ -17,7 +17,17 @@ namespace OCCPort
         {
             myMovability = theMovability;
         }
-
+        //! Returns movability flag of the Link.
+        public BRepMesh_DegreeOfFreedom Movability()
+        {
+            return myMovability;
+        }
+        //! Sets movability flag of the Link.
+        //! @param theMovability flag to be set.
+        public void SetMovability(BRepMesh_DegreeOfFreedom theMovability)
+        {
+            myMovability = theMovability;
+        }
         //! Checks if the given edge and this one have the same orientation.
         //! @param theOther edge to be checked against this one.
         //! \return TRUE if edges have the same orientation, FALSE if not.
@@ -26,7 +36,7 @@ namespace OCCPort
             return base.IsEqual(theOther);
         }
 
-       
+
 
         BRepMesh_DegreeOfFreedom myMovability;
     }

@@ -70,7 +70,9 @@ namespace OCCPort
 
         public TopLoc_SListOfItemLocation Assign(TopLoc_SListOfItemLocation Other)
         {
-            if (this == Other) return this;
+            if (this == Other) 
+                return this;
+
             Clear();
             myNode = Other.myNode;
 

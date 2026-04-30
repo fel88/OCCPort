@@ -17,6 +17,11 @@ namespace OCCPort
         BRepMesh_DegreeOfFreedom myMovability;
 
 
+        //! Returns index of 3d point associated with the vertex.
+        public int Location3d()
+        {
+            return myLocation3d;
+        }
         //! Returns movability of the vertex.
         public BRepMesh_DegreeOfFreedom Movability()
         {

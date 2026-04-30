@@ -162,12 +162,12 @@ namespace OCCPort
             //myTexData = myAttribs->ChangeAttributeData(Graphic3d_TOA_UV, anAttribDummy, myTexStride);
             //myColData = myAttribs->ChangeAttributeData(Graphic3d_TOA_COLOR, anAttribDummy, myColStride);
 
-            //      memset(myAttribs->ChangeData(), 0, size_t(myAttribs->Stride) * size_t(myAttribs->NbMaxElements()));
-            //      if ((theArrayOptions & Graphic3d_ArrayFlags_AttribsMutable) == 0
-            //       && (theArrayOptions & Graphic3d_ArrayFlags_AttribsDeinterleaved) == 0)
-            //      {
-            //          myAttribs->NbElements = 0;
-            //}
+            //memset(myAttribs->ChangeData(), 0, size_t(myAttribs->Stride) * size_t(myAttribs->NbMaxElements()));
+            if ((theArrayOptions & Graphic3d_ArrayFlags.Graphic3d_ArrayFlags_AttribsMutable) == 0
+             && (theArrayOptions & Graphic3d_ArrayFlags.Graphic3d_ArrayFlags_AttribsDeinterleaved) == 0)
+            {
+                myAttribs.NbElements = 0;
+            }
 
             if (theMaxBounds > 0)
             {

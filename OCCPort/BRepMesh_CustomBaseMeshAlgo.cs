@@ -16,35 +16,35 @@
 
             buildBaseTriangulation();
 
-            (int,int) aCellsCount = getCellsCount(aStructure.NbNodes());
-            BRepMesh_Delaun aMesher=new BRepMesh_Delaun (aStructure, aCellsCount.Item1, aCellsCount.Item2, false);
+            (int, int) aCellsCount = getCellsCount(aStructure.NbNodes());
+            BRepMesh_Delaun aMesher = new BRepMesh_Delaun(aStructure, aCellsCount.Item1, aCellsCount.Item2, false);
 
-            //const Standard_Integer aNewNodesNb = aStructure->NbNodes();
-            //const Standard_Boolean isRemoveAux = aNewNodesNb > aNodesNb;
-            //if (isRemoveAux)
-            //{
-            //    IMeshData::VectorOfInteger aAuxVertices(aNewNodesNb -aNodesNb);
-            //    for (Standard_Integer aExtNodesIt = aNodesNb + 1; aExtNodesIt <= aNewNodesNb; ++aExtNodesIt)
-            //    {
-            //        aAuxVertices.Append(aExtNodesIt);
-            //    }
+            int aNewNodesNb = aStructure.NbNodes();
+            bool isRemoveAux = aNewNodesNb > aNodesNb;
+            if (isRemoveAux)
+            {
+                VectorOfInteger aAuxVertices = new VectorOfInteger(aNewNodesNb - aNodesNb);
+                for (int aExtNodesIt = aNodesNb + 1; aExtNodesIt <= aNewNodesNb; ++aExtNodesIt)
+                {
+                    aAuxVertices.Append(aExtNodesIt);
+                }
 
-            //    // Set aux vertices if there are some to clean up mesh correctly.
-            //    aMesher.SetAuxVertices(aAuxVertices);
-            //}
+                // Set aux vertices if there are some to clean up mesh correctly.
+                aMesher.SetAuxVertices(aAuxVertices);
+            }
 
-            //aMesher.ProcessConstraints();
+            aMesher.ProcessConstraints();
 
-            //// Destruction of triangles containing aux vertices added (possibly) during base mesh computation.
-            //if (isRemoveAux)
-            //{
-            //    aMesher.RemoveAuxElements();
-            //}
+            // Destruction of triangles containing aux vertices added (possibly) during base mesh computation.
+            if (isRemoveAux)
+            {
+                aMesher.RemoveAuxElements();
+            }
 
-            //BRepMesh_MeshTool aCleaner(aStructure);
-            //aCleaner.EraseFreeLinks();
+            BRepMesh_MeshTool aCleaner = new BRepMesh_MeshTool(aStructure);
+            aCleaner.EraseFreeLinks();
 
-            //postProcessMesh(aMesher, theRange);
+            postProcessMesh(aMesher, theRange);
         }
     }
 }

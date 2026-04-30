@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.Intrinsics.X86;
 
 namespace OCCPort
 {
     //! Defines an array of 2D nodes of single/double precision configurable at construction time.
 
-    internal class Poly_ArrayOfUVNodes
+    internal class Poly_ArrayOfUVNodes: NCollection_AliasedArray
     {
         //! Resizes the array to specified bounds.
         //! No re-allocation will be done if length of array does not change,
@@ -38,6 +39,19 @@ namespace OCCPort
         internal int Size()
         {
             return points.Length;
+        }
+
+        internal void SetValue(int v, gp_Pnt2d thePnt)
+        {
+           // if (myStride == (Standard_Integer)sizeof(gp_Pnt2d))
+            {
+              //  NCollection_AliasedArray::ChangeValue<gp_Pnt2d>(theIndex) = theValue;
+            }
+            //else
+            {
+                //gp_Vec2f & aVec2 = NCollection_AliasedArray::ChangeValue<gp_Vec2f>(theIndex);
+                //aVec2.SetValues((float)theValue.X(), (float)theValue.Y());
+            }
         }
     }
 }

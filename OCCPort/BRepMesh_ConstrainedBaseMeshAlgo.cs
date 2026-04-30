@@ -8,5 +8,12 @@
         {
             return (-1, -1);
         }
+        //! Performs processing of generated mesh.
+        //! By default does nothing.
+        //! Expected to be called from method generateMesh() in successor classes.
+        public virtual void postProcessMesh(BRepMesh_Delaun theMesher,
+                                     Message_ProgressRange theRange)
+        {
+        }
     }
 }

@@ -19,6 +19,11 @@ namespace OCCPort
         {
             return myDFace;
         }
+        //! Gets 3d nodes map.
+        public VectorOfPnt getNodesMap()
+        {
+            return myNodesMap;
+        }
 
         //! Registers the given point in vertex map and adds 2d point to mesh data structure.
         //! Returns index of node in the structure.
@@ -60,7 +65,7 @@ namespace OCCPort
 
             Poly_Triangulation aRes = new Poly_Triangulation();
             aRes.ResizeTriangles(aTriangles.Extent(), false);
-            IteratorOfMapOfInteger aTriIt = new IteratorOfMapOfInteger(aTriangles);
+            //IteratorOfMapOfInteger aTriIt = new IteratorOfMapOfInteger(aTriangles);
             for (int aTriangeId = 0; aTriangeId < aTriangles.Count; aTriangeId++)
             {
                 int item = aTriangles[aTriangeId];
@@ -100,21 +105,28 @@ namespace OCCPort
 
             BRepMesh_ShapeTool.AddInFace(myDFace.GetFace(), aTriangulation);
         }
+
+        //=======================================================================
+        public gp_Pnt2d getNodePoint2d(BRepMesh_Vertex theVertex)
+        {
+            return new gp_Pnt2d(theVertex.Coord());
+        }
+
         //=======================================================================
         //function : collectNodes
         //purpose  :
         //=======================================================================
         public void collectNodes(Poly_Triangulation theTriangulation)
         {
-            //for (int i = 1; i <= myNodesMap.Size(); ++i)
+            for (int i = 1; i <= myNodesMap.Size(); ++i)
             {
-                //if (myUsedNodes->IsBound(i))
+                if (myUsedNodes.IsBound(i))
                 {
-                    //BRepMesh_Vertex aVertex = myStructure.GetNode(i);
+                    BRepMesh_Vertex aVertex = myStructure.GetNode(i);
 
-                    //const Standard_Integer aNodeIndex = myUsedNodes->Find(i);
-                    //theTriangulation->SetNode(aNodeIndex, myNodesMap->Value(aVertex.Location3d()));
-                    //theTriangulation->SetUVNode(aNodeIndex, getNodePoint2d(aVertex));
+                    int aNodeIndex = myUsedNodes.Find(i);
+                    theTriangulation.SetNode(aNodeIndex, myNodesMap.Value(aVertex.Location3d()));
+                    theTriangulation.SetUVNode(aNodeIndex, getNodePoint2d(aVertex));
                 }
             }
         }

@@ -1,4 +1,6 @@
-﻿namespace OCCPort
+﻿using OpenTK.Graphics.ES11;
+
+namespace OCCPort
 {
     //! This class represents a pair of integer indices to store 
     //! element indices connected to link. It is restricted to 
@@ -9,6 +11,33 @@
         public BRepMesh_PairOfIndex()
         {
             Clear();
+        }
+
+        //! Returns first index of pair.
+        public int FirstIndex()
+        {
+            return myIndex[0];
+        }
+        //! Returns number of initialized indices.
+        public int Extent()
+        {
+            return (myIndex[0] < 0 ? 0 : (myIndex[1] < 0 ? 1 : 2));
+        }
+        //! Returns is pair is empty.
+        public bool IsEmpty()
+        {
+            // Check only first index. It is impossible to update
+            // second index if the first one is empty.
+            return (myIndex[0] < 0);
+        }
+        //! Returns index corresponding to the given position in the pair.
+        //! @param thePairPos position of index in the pair (1 or 2).
+        public int Index(int thePairPos)
+        {
+            if (thePairPos != 1 && thePairPos != 2)
+                throw new Standard_OutOfRange("BRepMesh_PairOfIndex::Index, requested index is out of range");
+
+            return myIndex[thePairPos - 1];
         }
 
         //! Clears indices.

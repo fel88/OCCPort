@@ -17,9 +17,10 @@ namespace OCCPort
             return list.Contains(d);
         }
         HashSet<int> list = new HashSet<int>();
-        internal void Add(int mytr)
-        {
-            list.Add(mytr);
+
+        internal bool Add(int mytr)
+        {            
+            return list.Add(mytr);
         }
     }
 }
