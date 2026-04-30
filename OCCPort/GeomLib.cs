@@ -17,7 +17,7 @@ namespace OCCPort
         public static int NormEstim(Geom_Surface theSurf,
                                                      gp_Pnt2d theUV,
                                                      double theTol,
-                                                     gp_Dir theNorm)
+                                                    ref gp_Dir theNorm)
         {
             double aTol2 = Math.Pow(theTol, 2);
 

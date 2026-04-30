@@ -44,7 +44,7 @@ namespace OCCPort
             for (int aNodeIter = 1; aNodeIter <= theTris.NbNodes(); ++aNodeIter)
             {
                 // try to retrieve normal from real surface first, when UV coordinates are available
-                if (GeomLib.NormEstim(aSurf, theTris.UVNode(aNodeIter), aTol, aNorm) > 1)
+                if (GeomLib.NormEstim(aSurf, theTris.UVNode(aNodeIter), aTol, ref aNorm) > 1)
                 {
                     if (thePolyConnect.Triangulation() != theTris)
                     {

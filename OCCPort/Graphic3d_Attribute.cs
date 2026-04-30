@@ -1,7 +1,7 @@
 ﻿namespace OCCPort
 {
     //! Vertex attribute definition.
-    public class Graphic3d_Attribute
+    public struct Graphic3d_Attribute
     {
 
         public Graphic3d_TypeOfAttribute Id;       //!< attribute identifier in vertex shader, 0 is reserved for vertex position

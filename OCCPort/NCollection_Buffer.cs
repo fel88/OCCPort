@@ -27,5 +27,16 @@
         {
             return myData;
         }
+        //! De-allocate buffer.
+     protected   void Free()
+        {
+            //if (!myAllocator.IsNull())
+            {
+             //   myAllocator->Free(myData);
+            }
+            myData = null;
+            mySize = 0;
+        }
+
     }
 }

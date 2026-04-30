@@ -22,7 +22,7 @@ namespace OCCPort
 
         public int AddEdge(int theVertexIndex)
         {
-            Exceptions.Standard_OutOfRange_Raise_if(myIndices==null || myIndices.NbElements >= myIndices.NbMaxElements(), "TOO many EDGE");
+            Exceptions.Standard_OutOfRange_Raise_if(myIndices == null || myIndices.NbElements >= myIndices.NbMaxElements(), "TOO many EDGE");
             Exceptions.Standard_OutOfRange_Raise_if(theVertexIndex < 1 || theVertexIndex > myAttribs.NbElements, "BAD VERTEX index");
             int aVertIndex = theVertexIndex - 1;
             myIndices.SetIndex(myIndices.NbElements, aVertIndex);
@@ -43,8 +43,8 @@ namespace OCCPort
         {
             /*myNormData = (null);
             myTexData = (null);
-            myColData = (null);
-            myPosStride = (0);*/
+            myColData = (null);*/
+            myPosStride = (0);
             myNormStride = (0);/*
             myTexStride = (0);/*
             myColStride = (0);*/
@@ -54,6 +54,7 @@ namespace OCCPort
         }
 
         int myNormStride;
+        int myPosStride;
         //! Returns the number of defined vertex
         public int VertexNumber() { return myAttribs.NbElements; }
 
@@ -77,10 +78,10 @@ namespace OCCPort
             if ((theArrayOptions & Graphic3d_ArrayFlags.Graphic3d_ArrayFlags_AttribsMutable) != 0
              || (theArrayOptions & Graphic3d_ArrayFlags.Graphic3d_ArrayFlags_AttribsDeinterleaved) != 0)
             {
-                Graphic3d_AttribBuffer anAttribs = new Graphic3d_AttribBuffer(anAlloc);
-                anAttribs.SetMutable((theArrayOptions & Graphic3d_ArrayFlags.Graphic3d_ArrayFlags_AttribsMutable) != 0);
-                anAttribs.SetInterleaved((theArrayOptions & Graphic3d_ArrayFlags.Graphic3d_ArrayFlags_AttribsDeinterleaved) == 0);
-                myAttribs = anAttribs;
+                Graphic3d_AttribBuffer _anAttribs = new Graphic3d_AttribBuffer(anAlloc);
+                _anAttribs.SetMutable((theArrayOptions & Graphic3d_ArrayFlags.Graphic3d_ArrayFlags_AttribsMutable) != 0);
+                _anAttribs.SetInterleaved((theArrayOptions & Graphic3d_ArrayFlags.Graphic3d_ArrayFlags_AttribsDeinterleaved) == 0);
+                myAttribs = _anAttribs;
             }
             else
             {
@@ -103,66 +104,70 @@ namespace OCCPort
                 }
                 if (theMaxVertexs < (int)(ushort.MaxValue))
                 {
-                    /*if (!myIndices.Init(theMaxEdges))
-					{
-						myIndices = null;
-						return;
-					}*/
+                    if (!myIndices.Init(sizeof(ushort), theMaxEdges))//init ushort
+                    {
+                        myIndices = null;
+                        return;
+                    }
                 }
                 else
                 {
-                    //	if (!myIndices->Init < unsigned int> (theMaxEdges))
-                    //{
-                    //		myIndices.Nullify();
-                    //		return;
-                    //	}
+                    if (!myIndices.Init(sizeof(uint), (theMaxEdges))) //init uint
+                    {
+                        myIndices = null;
+                        return;
+                    }
                 }
-                //          myIndices.NbElements = 0;
-                //      }
-
-                //      Graphic3d_Attribute []anAttribs=new Graphic3d_Attribute[4];
-                //      in aNbAttribs = 0;
-                //      anAttribs[aNbAttribs].Id = Graphic3d_TOA_POS;
-                //      anAttribs[aNbAttribs].DataType = Graphic3d_TOD_VEC3;
-                //      ++aNbAttribs;
-                //      if ((theArrayOptions & Graphic3d_ArrayFlags_VertexNormal) != 0)
-                //      {
-                //          anAttribs[aNbAttribs].Id = Graphic3d_TOA_NORM;
-                //          anAttribs[aNbAttribs].DataType = Graphic3d_TOD_VEC3;
-                //          ++aNbAttribs;
-                //      }
-                //      if ((theArrayOptions & Graphic3d_ArrayFlags_VertexTexel) != 0)
-                //      {
-                //          anAttribs[aNbAttribs].Id = Graphic3d_TOA_UV;
-                //          anAttribs[aNbAttribs].DataType = Graphic3d_TOD_VEC2;
-                //          ++aNbAttribs;
-                //      }
-                //      if ((theArrayOptions & Graphic3d_ArrayFlags_VertexColor) != 0)
-                //      {
-                //          anAttribs[aNbAttribs].Id = Graphic3d_TOA_COLOR;
-                //          anAttribs[aNbAttribs].DataType = Graphic3d_TOD_VEC4UB;
-                //          ++aNbAttribs;
-                //      }
-
-                //      if (!myAttribs->Init(theMaxVertexs, anAttribs, aNbAttribs))
-                //      {
-                //          myAttribs.Nullify();
-                //          myIndices.Nullify();
-                //          return;
-                //      }
-
-                //      int anAttribDummy = 0;
-                //      myAttribs->ChangeAttributeData(Graphic3d_TOA_POS, anAttribDummy, myPosStride);
-                //      myNormData = myAttribs->ChangeAttributeData(Graphic3d_TOA_NORM, anAttribDummy, myNormStride);
-                //      myTexData = myAttribs->ChangeAttributeData(Graphic3d_TOA_UV, anAttribDummy, myTexStride);
-                //      myColData = myAttribs->ChangeAttributeData(Graphic3d_TOA_COLOR, anAttribDummy, myColStride);
-
-                //      memset(myAttribs->ChangeData(), 0, size_t(myAttribs->Stride) * size_t(myAttribs->NbMaxElements()));
-                //      if ((theArrayOptions & Graphic3d_ArrayFlags_AttribsMutable) == 0
-                //       && (theArrayOptions & Graphic3d_ArrayFlags_AttribsDeinterleaved) == 0)
-                //      {
-                //          myAttribs->NbElements = 0;
+                myIndices.NbElements = 0;
             }
+
+            Graphic3d_Attribute[] anAttribs = new Graphic3d_Attribute[4];
+            for (int i = 0; i < 3; i++)
+            {
+                anAttribs[i] = new Graphic3d_Attribute();
+            }
+            int aNbAttribs = 0;
+            anAttribs[aNbAttribs].Id = Graphic3d_TypeOfAttribute.Graphic3d_TOA_POS;
+            anAttribs[aNbAttribs].DataType = Graphic3d_TypeOfData.Graphic3d_TOD_VEC3;
+            ++aNbAttribs;
+            if ((theArrayOptions & Graphic3d_ArrayFlags.Graphic3d_ArrayFlags_VertexNormal) != 0)
+            {
+                anAttribs[aNbAttribs].Id = Graphic3d_TypeOfAttribute.Graphic3d_TOA_NORM;
+                anAttribs[aNbAttribs].DataType = Graphic3d_TypeOfData.Graphic3d_TOD_VEC3;
+                ++aNbAttribs;
+            }
+            if ((theArrayOptions & Graphic3d_ArrayFlags.Graphic3d_ArrayFlags_VertexTexel) != 0)
+            {
+                anAttribs[aNbAttribs].Id = Graphic3d_TypeOfAttribute.Graphic3d_TOA_UV;
+                anAttribs[aNbAttribs].DataType = Graphic3d_TypeOfData.Graphic3d_TOD_VEC2;
+                ++aNbAttribs;
+            }
+            if ((theArrayOptions & Graphic3d_ArrayFlags.Graphic3d_ArrayFlags_VertexColor) != 0)
+            {
+                anAttribs[aNbAttribs].Id = Graphic3d_TypeOfAttribute.Graphic3d_TOA_COLOR;
+                anAttribs[aNbAttribs].DataType = Graphic3d_TypeOfData.Graphic3d_TOD_VEC4UB;
+                ++aNbAttribs;
+            }
+
+            if (!myAttribs.Init(theMaxVertexs, anAttribs, aNbAttribs))
+            {
+                myAttribs = null;
+                myIndices = null;
+                return;
+            }
+
+            int anAttribDummy = 0;
+            myAttribs.AttributeData(Graphic3d_TypeOfAttribute.Graphic3d_TOA_POS, ref anAttribDummy, ref myPosStride);
+            myNormData = myAttribs.AttributeData(Graphic3d_TypeOfAttribute.Graphic3d_TOA_NORM, ref anAttribDummy, ref myNormStride);
+            //myTexData = myAttribs->ChangeAttributeData(Graphic3d_TOA_UV, anAttribDummy, myTexStride);
+            //myColData = myAttribs->ChangeAttributeData(Graphic3d_TOA_COLOR, anAttribDummy, myColStride);
+
+            //      memset(myAttribs->ChangeData(), 0, size_t(myAttribs->Stride) * size_t(myAttribs->NbMaxElements()));
+            //      if ((theArrayOptions & Graphic3d_ArrayFlags_AttribsMutable) == 0
+            //       && (theArrayOptions & Graphic3d_ArrayFlags_AttribsDeinterleaved) == 0)
+            //      {
+            //          myAttribs->NbElements = 0;
+            //}
 
             if (theMaxBounds > 0)
             {
@@ -259,17 +264,16 @@ namespace OCCPort
             return anIndex;
         }
 
-        private void SetVertice(int anIndex, float theX, float theY, float theZ)
+        private void SetVertice(int theIndex, float theX, float theY, float theZ)
         {
-            //Standard_OutOfRange_Raise_if(theIndex < 1 || theIndex > myAttribs->NbMaxElements(), "BAD VERTEX index");
-            /*	Graphic3d_Vec3  aVec = *reinterpret_cast<Graphic3d_Vec3*>(myAttribs->ChangeData() + myPosStride * ((Standard_Size)theIndex - 1));
-                aVec.x() = theX;
-                aVec.y() = theY;
-                aVec.z() = theZ;
-                if (myAttribs->NbElements < theIndex)
-                {
-                    myAttribs->NbElements = theIndex;
-                }*/
+            Exceptions.Standard_OutOfRange_Raise_if(theIndex < 1 || theIndex > myAttribs.NbMaxElements(), "BAD VERTEX index");
+            //Graphic3d_Vec3 aVec = *reinterpret_cast<Graphic3d_Vec3*>(myAttribs->ChangeData() + myPosStride * ((Standard_Size)theIndex - 1));
+            Graphic3d_Vec3 aVec = new Graphic3d_Vec3(myAttribs.Data(), theIndex * myPosStride);
+            aVec.SetValues(theX, theY, theZ);
+            if (myAttribs.NbElements < theIndex)
+            {
+                myAttribs.NbElements = theIndex;
+            }
 
         }
 

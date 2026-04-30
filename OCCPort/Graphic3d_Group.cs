@@ -61,7 +61,7 @@ namespace OCCPort
             int aNbVerts = theAttribs.NbElements;
             int anAttribIndex = 0;
             int anAttribStride = 0;
-            byte[] aDataPtr = theAttribs.AttributeData(Graphic3d_TypeOfAttribute.Graphic3d_TOA_POS, anAttribIndex, anAttribStride);
+            byte[] aDataPtr = theAttribs.AttributeData(Graphic3d_TypeOfAttribute.Graphic3d_TOA_POS,ref  anAttribIndex,ref anAttribStride);
             if (aDataPtr == null)
             {
                 Update();
