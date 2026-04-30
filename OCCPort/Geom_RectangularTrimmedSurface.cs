@@ -56,6 +56,11 @@
             throw new System.NotImplementedException();
         }
 
+        public override void D2(double U, double V, out gp_Pnt P, out gp_Vec D1U, out gp_Vec D1V, out gp_Vec D2U, out gp_Vec D2V, out gp_Vec D2UV)
+        {
+            throw new System.NotImplementedException();
+        }
+
         Geom_Surface basisSurf;
         double utrim1;
         double vtrim1;

@@ -27,7 +27,7 @@ namespace OCCPort
 
         public gp_Pnt2d Value(int index)
         {
-            return points[index - 1];
+            return points[index];
         }
         public bool IsEmpty()
         {

@@ -6,7 +6,7 @@ namespace OCCPort
 {
     internal class Poly_Array1OfTriangle
     {
-        Poly_Triangle[] triangles;
+        public Poly_Triangle[] triangles;
 
         public Poly_Triangle Value(int index)
         {
@@ -73,10 +73,12 @@ namespace OCCPort
         }
         public bool IsEmpty()
         {
-            return triangles.Length == 0;
+            return triangles == null || triangles.Length == 0;//not origin code
         }
         public int Length()
         {
+            if (triangles == null)//not origin code
+                return 0;
             return triangles.Length;
         }
     }

@@ -97,6 +97,11 @@ namespace OCCPort
         {
             return v.Divided(y);
         }
+        public static gp_XYZ operator ^(gp_XYZ v, gp_XYZ  v2)
+        {
+            return v.Crossed(v2);
+        }
+
 
         //! divides <me> by a real.
         public gp_XYZ Divided(double theScalar)

@@ -14,6 +14,19 @@ namespace OCCPort
         //! Computes the scalar product
         public double Dot(gp_Dir theOther) { return coord.Dot(theOther.coord); }
 
+        //! Assigns the three coordinates of theCoord to this unit vector.
+        public void SetXYZ(gp_XYZ theXYZ)
+        {
+            double aX = theXYZ.X();
+            double anY = theXYZ.Y();
+            double aZ = theXYZ.Z();
+            double aD = Math.Sqrt(aX * aX + anY * anY + aZ * aZ);
+            Exceptions.Standard_ConstructionError_Raise_if(aD <= gp.Resolution(), "gp_Dir::SetX() - input vector has zero norm");
+            coord.SetX(aX / aD);
+            coord.SetY(anY / aD);
+            coord.SetZ(aZ / aD);
+        }
+
         public void Reverse() { coord.Reverse(); }
         internal double Y()
         {
@@ -43,7 +56,7 @@ namespace OCCPort
         }
 
 
-        
+
 
         public static double operator *(gp_Dir v, gp_Dir theOther)
         {

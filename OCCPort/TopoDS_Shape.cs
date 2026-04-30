@@ -50,7 +50,13 @@ namespace OCCPort
         //! coordinate system set to <Loc>.
         public TopoDS_Shape Located(TopLoc_Location theLoc, bool theRaiseExc = true)
         {
-            TopoDS_Shape aShape = new TopoDS_Shape(this);
+            var aShape = Activator.CreateInstance(this.GetType()) as TopoDS_Shape;
+            //TopoDS_Shape aShape = (TopoDS_Shape)MemberwiseClone();
+            aShape.myOrient = this.myOrient;
+            aShape.myTShape = this.myTShape;
+            aShape.myLocation = this.myLocation;//clone ?
+
+            
             aShape.Location(theLoc, theRaiseExc);
             return aShape;
         }

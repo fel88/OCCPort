@@ -10,8 +10,12 @@ namespace OCCPort
 
         public int Length()
         {
+            if (pnts == null)//not origin code
+                return 0;
+
             return pnts.Length;
         }
+
         public void SetValue(int theIndex, gp_Pnt theValue)
         {
             if (myStride == 2)

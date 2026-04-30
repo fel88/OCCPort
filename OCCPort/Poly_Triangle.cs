@@ -1,4 +1,7 @@
-﻿namespace OCCPort
+﻿using System.Collections.Generic;
+using System.Linq;
+
+namespace OCCPort
 {
     //! Describes a component triangle of a triangulation (Poly_Triangulation object).
     //! A Triangle is defined by a triplet of nodes within [1, Poly_Triangulation::NbNodes()] range.
@@ -18,6 +21,7 @@
             myNodes[2] = theN3;
         }
 
+
         //! Returns the node indices of this triangle.
         public void Get(ref int theN1, ref int theN2, ref int theN3)
         {
@@ -25,6 +29,11 @@
             theN2 = myNodes[1];
             theN3 = myNodes[2];
         }
+        public int[] Get()
+        {
+            return myNodes.ToArray();
+        }
+
         int[] myNodes = new int[3];
     }
 }

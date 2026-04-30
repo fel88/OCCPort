@@ -85,7 +85,7 @@ namespace OCCPort
 
 
         //! Computes the vector modulus (magnitude, length).
-        float Modulus()
+        public float Modulus()
 		{
 			return (float)Math.Sqrt(x() * x() + y() * y() + z() * z());
 		}

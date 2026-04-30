@@ -1,9 +1,23 @@
-﻿using System;
+﻿using OpenTK.Graphics.ES30;
+using System;
 
 namespace OCCPort
 {
     public class Bnd_B2d
     {
+        public Bnd_B2d()
+        {
+            Clear();
+        }
+        const double Bnd_B2x_RealLast =(double)(1e30);
+        private void Clear()
+        {
+            myCenter[0] = Bnd_B2x_RealLast;
+            myCenter[1] = Bnd_B2x_RealLast;
+            myHSize[0] = -Bnd_B2x_RealLast;
+            myHSize[1] = -Bnd_B2x_RealLast;
+        }
+
         internal void Add(gp_Pnt2d thePnt)
         {
             Add(thePnt.XY());

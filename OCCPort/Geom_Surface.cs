@@ -40,6 +40,11 @@ namespace OCCPort
         //!
         //! Tip: use GeomLib::NormEstim() to calculate surface normal at specified (U, V) point.
         public abstract void D1(double U, double V, out gp_Pnt P, out gp_Vec D1U, out gp_Vec D1V);
+        //! Computes the point P, the first and the second derivatives in
+        //! the directions U and V at this point.
+        //! Raised if the continuity of the surface is not C2.
+        public abstract void D2(double U, double V, out gp_Pnt P, out gp_Vec D1U, out gp_Vec D1V, out gp_Vec D2U, out gp_Vec D2V,
+            out gp_Vec D2UV);
 
         public gp_Pnt Value(double U,
 

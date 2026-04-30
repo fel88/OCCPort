@@ -14,6 +14,18 @@ namespace OCCPort
             aV.coord.Multiply(theScalar);
             return aV;
         }
+        //! For this vector, assigns
+        //! -   the values theXv, theYv and theZv to its three coordinates.
+        public void SetCoord(double theXv, double theYv, double theZv)
+        {
+            coord.SetX(theXv);
+            coord.SetY(theYv);
+            coord.SetZ(theZv);
+        }
+
+        //! Adds two vectors
+        public void Add(gp_Vec theOther) { coord.Add(theOther.coord); }
+
         //! <me> is set to the following linear form : theV1 + theV2
         public void SetLinearForm(gp_Vec theV1, gp_Vec theV2)
         {

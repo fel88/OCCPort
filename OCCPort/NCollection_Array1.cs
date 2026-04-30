@@ -22,7 +22,7 @@ namespace OCCPort
         }
         public bool IsEmpty()
         {
-            return list==null || list.Length == 0;
+            return list == null || list.Length == 0;
         }
 
         bool myDeletable; //!< Flag showing who allocated the array
@@ -89,14 +89,25 @@ namespace OCCPort
         {
             return list.Length;
         }
-        public void Resize(int v1, int v2, bool v3)
+        public void Resize(int theLower, int theUpper, bool theToCopyData)
         {
-            //throw new NotImplementedException();
+            myLowerBound = theLower;
+            myUpperBound = theUpper;
+            var old = list;
+            list = new T[theUpper - theLower + 1];
+
+            if (theToCopyData)
+            {
+                for (int i = 0; i < Math.Min(list.Length, old.Length); i++)
+                {
+                    list[i] = old[i];
+                }
+            }
         }
 
         internal int Size()
         {
-            return list.Length ;
+            return list.Length;
         }
     }
 }
