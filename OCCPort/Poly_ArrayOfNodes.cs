@@ -29,9 +29,10 @@ namespace OCCPort
                 pnts3[theIndex].SetValues((float)theValue.X(), (float)theValue.Y(), (float)theValue.Z());
             }
         }
+
         public bool IsEmpty()
         {
-            return pnts.Length == 0;
+            return Size() == 0;
         }
         // =======================================================================
         // function : Value
@@ -72,18 +73,29 @@ namespace OCCPort
 
         internal int Size()
         {
-            return pnts.Length;
+            if (myStride == (int)sizeof(double) * 3)
+            {
+                return pnts.Length;
+            }
+
+            return pnts3.Length;
         }
 
         internal void Resize(int theNbNodes, bool theToCopyOld)
         {
             var old = pnts;
+            var old2 = pnts3;
             pnts = new gp_Pnt[theNbNodes];
+            pnts3 = new gp_Vec3f[theNbNodes];
             if (theToCopyOld)
             {
                 for (int i = 0; i < Math.Min(old.Length, pnts.Length); i++)
                 {
                     pnts[i] = old[i];
+                }
+                for (int i = 0; i < Math.Min(old.Length, pnts3.Length); i++)
+                {
+                    pnts3[i] = old2[i];
                 }
             }
         }

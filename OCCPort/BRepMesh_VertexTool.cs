@@ -19,6 +19,16 @@ namespace OCCPort
             return mySelector.GetVertex(theIndex);
         }
 
+        //! Gets the tolerance to be used for identification of 
+        //! coincident vertices.
+        //! @param theToleranceX tolerance for X dimension.
+        //! @param theToleranceY tolerance for Y dimension.
+        public void GetTolerance(ref double theToleranceX,
+                             ref double theToleranceY)
+        {
+            theToleranceX = myTolerance[0];
+            theToleranceY = myTolerance[1];
+        }
         public void DeleteVertex(int theIndex)
         {
             BRepMesh_Vertex aV = mySelector.GetVertex(theIndex);

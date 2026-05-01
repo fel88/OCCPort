@@ -1,4 +1,5 @@
 ﻿using OCCPort;
+using OCCPort.Interfaces;
 
 namespace OCCPort
 {
@@ -13,11 +14,16 @@ namespace OCCPort
         bool myIsValid;
 
         //! Returns U range.
-        public  override (double, double) GetRangeU()
+        public override (double, double) GetRangeU()
         {
             return myRangeU;
         }
 
+        public override ListOfPnt2d GenerateSurfaceNodes(
+  IMeshTools_Parameters theParameters)
+        {
+            return null;
+        }
         //! Returns V range.
         public override (double, double) GetRangeV()
         {
@@ -25,7 +31,7 @@ namespace OCCPort
         }
 
         //! Returns delta.
-        public override  (double, double) GetDelta()
+        public override (double, double) GetDelta()
         {
             return myDelta;
         }

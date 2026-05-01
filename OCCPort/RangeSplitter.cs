@@ -1,4 +1,6 @@
-﻿namespace OCCPort
+﻿using OCCPort.Interfaces;
+
+namespace OCCPort
 {
     public abstract class AbstractRangeSplitter// originally was template parameter
     {
@@ -9,5 +11,6 @@
 
         //! Returns delta.
         public abstract (double, double) GetDelta();
+        public abstract ListOfPnt2d GenerateSurfaceNodes(IMeshTools_Parameters theParameters);
     }
 }

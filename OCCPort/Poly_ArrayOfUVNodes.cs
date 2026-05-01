@@ -17,6 +17,7 @@ namespace OCCPort
         {
             var old = points;
             points = new gp_Pnt2d[v1];
+            
             if (v2)
             {
                 for (int i = 0; i < Math.Min(old.Length, v1); i++)

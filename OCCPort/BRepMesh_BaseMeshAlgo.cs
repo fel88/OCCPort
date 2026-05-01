@@ -1,5 +1,7 @@
-﻿using OCCPort.Enums;
+﻿using OCCPort;
+using OCCPort.Enums;
 using OCCPort.Interfaces;
+using System;
 using System.Reflection.Metadata;
 using System.Security.Cryptography;
 
@@ -14,6 +16,14 @@ namespace OCCPort
         {
             return myStructure;
         }
+
+
+        //! Gets meshing parameters.
+        protected IMeshTools_Parameters getParameters()
+        {
+            return myParameters;
+        }
+
         //! Gets discrete face.
         public IMeshData_Face getDFace()
         {
@@ -23,6 +33,22 @@ namespace OCCPort
         public VectorOfPnt getNodesMap()
         {
             return myNodesMap;
+        }
+
+        int addLinkToMesh(
+  int theFirstNodeId,
+  int theLastNodeId,
+  TopAbs_Orientation theOrientation)
+        {
+            int aLinkIndex;
+            if (theOrientation == TopAbs_Orientation.TopAbs_REVERSED)
+                aLinkIndex = myStructure.AddLink(new BRepMesh_Edge(theLastNodeId, theFirstNodeId, BRepMesh_DegreeOfFreedom.BRepMesh_Frontier));
+            else if (theOrientation == TopAbs_Orientation.TopAbs_INTERNAL)
+                aLinkIndex = myStructure.AddLink(new BRepMesh_Edge(theFirstNodeId, theLastNodeId, BRepMesh_DegreeOfFreedom.BRepMesh_Fixed));
+            else
+                aLinkIndex = myStructure.AddLink(new BRepMesh_Edge(theFirstNodeId, theLastNodeId, BRepMesh_DegreeOfFreedom.BRepMesh_Frontier));
+
+            return Math.Abs(aLinkIndex);
         }
 
         //! Registers the given point in vertex map and adds 2d point to mesh data structure.
@@ -60,7 +86,7 @@ namespace OCCPort
             MapOfInteger aTriangles = myStructure.ElementsOfDomain();
             if (aTriangles.IsEmpty())
             {
-                return new Poly_Triangulation();
+                return null;
             }
 
             Poly_Triangulation aRes = new Poly_Triangulation();
@@ -97,7 +123,7 @@ namespace OCCPort
             Poly_Triangulation aTriangulation = collectTriangles();
             if (aTriangulation == null)
             {
-                //myDFace.SetStatus(IMeshData_Failure);
+                myDFace.SetStatus(IMeshData_Status.IMeshData_Failure);
                 return;
             }
 
@@ -155,15 +181,44 @@ namespace OCCPort
                     commitSurfaceTriangulation();
                 }
             }
-            catch (Standard_Failure  /*theException*/)
+            catch (Standard_Failure ex /*theException*/)
             {
             }
 
-            //myDFace.Nullify(); // Do not hold link to face.
+            myDFace = null; // Do not hold link to face.
             myStructure = null;
-            //myNodesMap.Nullify();
+            myNodesMap = null;
             myUsedNodes = null;
             //myAllocator.Nullify();
+        }
+
+        TopAbs_Orientation fixSeamEdgeOrientation(
+  IMeshData_Edge theDEdge,
+  IMeshData_PCurve thePCurve)
+        {
+            for (int aPCurveIt = 0; aPCurveIt < theDEdge.PCurvesNb(); ++aPCurveIt)
+            {
+                var aPCurve = theDEdge.GetPCurve(aPCurveIt);
+                if (aPCurve.GetFace() == myDFace && thePCurve != aPCurve)
+                {
+                    // Simple check that another pcurve of seam edge does not coincide with reference one.
+                    gp_Pnt2d aPnt1_1 = thePCurve.GetPoint(0);
+                    gp_Pnt2d aPnt2_1 = thePCurve.GetPoint(thePCurve.ParametersNb() - 1);
+
+                    gp_Pnt2d aPnt1_2 = aPCurve.GetPoint(0);
+                    gp_Pnt2d aPnt2_2 = aPCurve.GetPoint(aPCurve.ParametersNb() - 1);
+
+                    double aSqDist1 = Math.Min(aPnt1_1.SquareDistance(aPnt1_2), aPnt1_1.SquareDistance(aPnt2_2));
+                    double aSqDist2 = Math.Min(aPnt2_1.SquareDistance(aPnt1_2), aPnt2_1.SquareDistance(aPnt2_2));
+                    if (aSqDist1 < Precision.SquareConfusion() &&
+                        aSqDist2 < Precision.SquareConfusion())
+                    {
+                        return TopAbs_Orientation.TopAbs_INTERNAL;
+                    }
+                }
+            }
+
+            return thePCurve.GetOrientation();
         }
 
         private bool initDataStructure()
@@ -186,6 +241,8 @@ namespace OCCPort
                     IMeshData_PCurve aPCurve = aDEdge.GetPCurve(
                       myDFace, aDWire.GetEdgeOrientation(aEdgeIt));
 
+                    TopAbs_Orientation aOri = fixSeamEdgeOrientation(aDEdge, aPCurve);
+
                     int aPrevNodeIndex = -1;
                     int aLastPoint = aPCurve.ParametersNb() - 1;
                     for (int aPointIt = 0; aPointIt <= aLastPoint; ++aPointIt)
@@ -195,6 +252,22 @@ namespace OCCPort
                           aPCurve.GetPoint(aPointIt),
                           BRepMesh_DegreeOfFreedom.BRepMesh_Frontier, false/*aPointIt > 0 && aPointIt < aLastPoint*/);
 
+                        aPCurve.SetIndex(aPointIt, aNodeIndex);
+                        myUsedNodes.Bind(aNodeIndex, aNodeIndex);
+
+                        if (aPrevNodeIndex != -1 && aPrevNodeIndex != aNodeIndex)
+                        {
+                            int aLinksNb = myStructure.NbLinks();
+                            int aLinkIndex = addLinkToMesh(aPrevNodeIndex, aNodeIndex, aOri);
+                            if (aWireIt != 0 && aLinkIndex <= aLinksNb)
+                            {
+                                // Prevent holes around wire of zero area.
+                                BRepMesh_Edge aLink = (BRepMesh_Edge)myStructure.GetLink(aLinkIndex);
+                                aLink.SetMovability(BRepMesh_DegreeOfFreedom.BRepMesh_Fixed);
+                            }
+                        }
+
+                        aPrevNodeIndex = aNodeIndex;
                     }
                 }
 

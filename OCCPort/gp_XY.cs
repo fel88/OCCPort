@@ -12,6 +12,7 @@ namespace OCCPort
     public struct gp_XY
 
     {
+        public static double operator ^(gp_XY theOther, gp_XY v2) { return theOther.Crossed(v2); }
 
         public void SetLinearForm(double theA1, gp_XY theXY1,
                               gp_XY theXY2)
@@ -40,6 +41,12 @@ namespace OCCPort
         {
             x = theX;
             y = theY;
+        }
+
+        public gp_XY(gp_XY gp_XY) : this()
+        {
+            x = gp_XY.x;
+            y = gp_XY.y;
         }
 
         //! Computes X*X + Y*Y where X and Y are the two coordinates of this number pair.
@@ -80,12 +87,34 @@ namespace OCCPort
             theX = x;
             theY = y;
         }
-        
-        
+
+
         //! Computes Sqrt (X*X + Y*Y) where X and Y are the two coordinates of this number pair.
         public double Modulus()
         {
-            return Math.Sqrt(x * x + y * y); 
+            return Math.Sqrt(x * x + y * y);
+        }
+
+
+        //! modifies the coordinate of range theIndex
+        //! theIndex = 1 => X is modified
+        //! theIndex = 2 => Y is modified
+        //! Raises OutOfRange if theIndex != {1, 2}.
+        public void SetCoord(int theIndex, double theXi)
+        {
+            Exceptions.Standard_OutOfRange_Raise_if(theIndex < 1 || theIndex > 2, null);
+            if (theIndex == 1) x = theXi;
+            else
+                y = theXi;
+            //(&x)[theIndex - 1] = theXi;
+        }
+
+        //! For this number pair, assigns
+        //! the values theX and theY to its coordinates
+        public void SetCoord(double theX, double theY)
+        {
+            x = theX;
+            y = theY;
         }
 
         double x;

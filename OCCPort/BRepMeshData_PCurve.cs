@@ -14,6 +14,13 @@ namespace OCCPort
         {
             return myOrientation;
         }
+        public int GetIndex(int theIndex)
+        {
+            Standard_OutOfRange_Raise_if(
+              theIndex < 0 || theIndex >= myIndices.Count,
+              "BRepMeshData_PCurve::GetIndex");
+            return myIndices[theIndex];
+        }
 
         //! Returns discrete face pcurve is associated to.
         public IMeshData_Face GetFace()
@@ -62,6 +69,9 @@ namespace OCCPort
             return myParameters.Count;
         }
 
-
+        public void SetIndex(int theIndex, int val)
+        {
+            myIndices[theIndex] = val;
+        }
     }
 }

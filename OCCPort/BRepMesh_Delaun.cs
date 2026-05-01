@@ -30,7 +30,260 @@ namespace OCCPort
                 //InitCirclesTool(theCellsCountU, theCellsCountV);
             }
         }
+        //! Adds some vertices into the triangulation.
+        public void AddVertices(VectorOfInteger theVertices,
+                                    Message_ProgressRange theRange = null)
+        {
+            if (theRange == null)
+                theRange = new Message_ProgressRange();
 
+            ComparatorOfIndexedVertexOfDelaun aCmp=new ComparatorOfIndexedVertexOfDelaun (myMeshData);
+            std.make_heap(theVertices, aCmp);
+            std.sort_heap(theVertices, aCmp);
+
+            createTrianglesOnNewVertices(theVertices, theRange);
+        }
+
+        //=======================================================================
+        //function : createTrianglesOnNewVertices
+        //purpose  : Creation of triangles from the new nodes
+        //=======================================================================
+        void createTrianglesOnNewVertices(
+          VectorOfInteger theVertexIndexes,
+  Message_ProgressRange theRange)
+        {
+
+            double aTolU = 0, aTolV = 0;
+            myMeshData.Data().GetTolerance(ref aTolU, ref aTolV);
+            double aSqTol = aTolU * aTolU + aTolV * aTolV;
+
+            // Insertion of nodes :
+            bool isModify = true;
+
+            int anIndex = theVertexIndexes.Lower();
+            int anUpper = theVertexIndexes.Upper();
+            Message_ProgressScope aPS = new Message_ProgressScope(theRange, "Create triangles on new vertices", anUpper);
+            for (; anIndex <= anUpper; ++anIndex, aPS.Next())
+            {
+                if (!aPS.More())
+                {
+                    return;
+                }
+                //aAllocator->Reset(Standard_False);
+                MapOfIntegerInteger aLoopEdges = new MapOfIntegerInteger(10);
+
+                int aVertexIdx = theVertexIndexes[anIndex];
+                BRepMesh_Vertex aVertex = GetVertex(aVertexIdx);
+
+                // Iterator in the list of indexes of circles containing the node
+                //ListOfInteger aCirclesList = myCircles.Select(aVertex.Coord());
+
+                int onEgdeId = 0, aTriangleId = 0;
+                //ListOfInteger::Iterator aCircleIt(aCirclesList );
+                //for (; aCircleIt.More(); aCircleIt.Next())
+                //{
+                //    // To add a node in the mesh it is necessary to check conditions: 
+                //    // - the node should be within the boundaries of the mesh and so in an existing triangle
+                //    // - all adjacent triangles should belong to a component connected with this triangle
+                //    if (Contains(aCircleIt.Value(), aVertex, aSqTol, onEgdeId))
+                //    {
+                //        if (onEgdeId != 0 && GetEdge(onEgdeId).Movability() != BRepMesh_Free)
+                //        {
+                //            // We can skip free vertex too close to the frontier edge.
+                //            if (aVertex.Movability() == BRepMesh_Free)
+                //                continue;
+
+                //            // However, we should add vertex that have neighboring frontier edges.
+                //        }
+
+                //        // Remove triangle even if it contains frontier edge in order 
+                //        // to prevent appearance of incorrect configurations like free 
+                //        // edge glued with frontier #26407
+                //        aTriangleId = aCircleIt.Value();
+                //        aCirclesList.Remove(aCircleIt);
+                //        break;
+                //    }
+                //}
+
+                if (aTriangleId > 0)
+                {
+                    deleteTriangle(aTriangleId, aLoopEdges);
+
+                    isModify = true;
+                    //while (isModify && !aCirclesList.IsEmpty())
+                    //{
+                    //    isModify = Standard_False;
+                    //    IMeshData::ListOfInteger::Iterator aCircleIt1(aCirclesList );
+                    //    for (; aCircleIt1.More(); aCircleIt1.Next())
+                    //    {
+                    //        const BRepMesh_Triangle&aElement = GetTriangle(aCircleIt1.Value());
+                    //        const Standard_Integer(&e)[3] = aElement.myEdges;
+
+                    //    if (aLoopEdges.IsBound(e[0]) ||
+                    //         aLoopEdges.IsBound(e[1]) ||
+                    //         aLoopEdges.IsBound(e[2]))
+                    //    {
+                    //        isModify = Standard_True;
+                    //        deleteTriangle(aCircleIt1.Value(), aLoopEdges);
+                    //        aCirclesList.Remove(aCircleIt1);
+                    //        break;
+                    //    }
+                    //}
+                    //}
+
+                    // Creation of triangles with the current node and free edges
+                    // and removal of these edges from the list of free edges
+                    createTriangles(aVertexIdx, aLoopEdges);
+                }
+            }
+
+            ProcessConstraints();
+        }
+        //=======================================================================
+        //function : createTriangles
+        //purpose  : Creates the triangles between the node and the polyline.
+        //=======================================================================
+        void createTriangles(int theVertexIndex,
+                                              MapOfIntegerInteger thePoly)
+        {
+            ListOfInteger aLoopEdges=new ListOfInteger (), anExternalEdges=new ListOfInteger ();
+            gp_XY aVertexCoord = myMeshData.GetNode(theVertexIndex).Coord();
+
+            foreach (var anEdges in thePoly)
+            {
+                int anEdgeId = anEdges.Key;
+                BRepMesh_Edge anEdge = GetEdge(anEdgeId);
+
+                bool isPositive = thePoly[anEdgeId] != 0;
+
+                int[] aNodes = new int[3];
+                if (isPositive)
+                {
+                    aNodes[0] = anEdge.FirstNode();
+                    aNodes[2] = anEdge.LastNode();
+                }
+                else
+                {
+                    aNodes[0] = anEdge.LastNode();
+                    aNodes[2] = anEdge.FirstNode();
+                }
+                aNodes[1] = theVertexIndex;
+
+                BRepMesh_Vertex aFirstVertex = GetVertex(aNodes[0]);
+                BRepMesh_Vertex aLastVertex = GetVertex(aNodes[2]);
+
+                gp_XY anEdgeDir = new gp_XY(aLastVertex.Coord() - aFirstVertex.Coord());
+                double anEdgeLen = anEdgeDir.Modulus();
+                if (anEdgeLen < Precision)
+                    continue;
+
+                anEdgeDir.SetCoord(anEdgeDir.X() / anEdgeLen,
+                                    anEdgeDir.Y() / anEdgeLen);
+
+                gp_XY aFirstLinkDir = new gp_XY(aFirstVertex.Coord() - aVertexCoord);
+                gp_XY aLastLinkDir = new gp_XY(aVertexCoord - aLastVertex.Coord());
+
+                double aDist12 = aFirstLinkDir ^ anEdgeDir;
+                double aDist23 = anEdgeDir ^ aLastLinkDir;
+                if (Math.Abs(aDist12) < Precision ||
+                    Math.Abs(aDist23) < Precision)
+                {
+                    continue;
+                }
+
+                BRepMesh_Edge aFirstLink = new BRepMesh_Edge(aNodes[1], aNodes[0], BRepMesh_DegreeOfFreedom.BRepMesh_Free);
+                BRepMesh_Edge aLastLink = new BRepMesh_Edge(aNodes[2], aNodes[1], BRepMesh_DegreeOfFreedom.BRepMesh_Free);
+
+                int[] anEdgesInfo = new int[] {
+      myMeshData.AddLink( aFirstLink ),
+      isPositive ? anEdgeId : -anEdgeId,
+      myMeshData.AddLink( aLastLink ) };
+
+                bool isSensOK = (aDist12 > 0.0 && aDist23 > 0.0);
+                if (isSensOK)
+                {
+                    int[] anEdgeIds = new int[3];
+                    bool[] anEdgesOri = new bool[3];
+                    for (int aTriLinkIt = 0; aTriLinkIt < 3; ++aTriLinkIt)
+                    {
+                        int anEdgeInfo = anEdgesInfo[aTriLinkIt];
+                        anEdgeIds[aTriLinkIt] = Math.Abs(anEdgeInfo);
+                        anEdgesOri[aTriLinkIt] = anEdgeInfo > 0;
+                    }
+
+                    addTriangle(anEdgeIds, anEdgesOri, aNodes);
+                }
+                else
+                {
+                    if (isPositive)
+                        aLoopEdges.Append(anEdges.Key);
+                    else
+                        aLoopEdges.Append(-anEdges.Key);
+
+                    if (aFirstLinkDir.SquareModulus() > aLastLinkDir.SquareModulus())
+                        anExternalEdges.Append(Math.Abs(anEdgesInfo[0]));
+                    else
+                        anExternalEdges.Append(Math.Abs(anEdgesInfo[2]));
+                }
+            }
+
+            thePoly.Clear();
+            while (!anExternalEdges.IsEmpty())
+            {
+                BRepMesh_PairOfIndex aPair =
+                 myMeshData.ElementsConnectedTo(Math.Abs(anExternalEdges.First()));
+
+
+                if (!aPair.IsEmpty())
+                    deleteTriangle(aPair.FirstIndex(), thePoly);
+
+                anExternalEdges.RemoveFirst();
+            }
+
+            foreach (var anEdges in thePoly)
+            {                       
+                if (myMeshData.ElementsConnectedTo(anEdges.Key).IsEmpty())
+                    myMeshData.RemoveLink(anEdges.Key);
+            }
+
+            while (!aLoopEdges.IsEmpty())
+            {
+                BRepMesh_Edge anEdge = GetEdge(Math.Abs(aLoopEdges.First()));
+                if (anEdge.Movability() != BRepMesh_DegreeOfFreedom.BRepMesh_Deleted)
+                {
+                    int anEdgeIdx = aLoopEdges.First();
+                    meshLeftPolygonOf(Math.Abs(anEdgeIdx), (anEdgeIdx > 0));
+                }
+
+                aLoopEdges.RemoveFirst();
+            }
+        }
+
+        //=======================================================================
+        //function : addTriangle
+        //purpose  : Add a triangle based on the given oriented edges into mesh
+        //=======================================================================
+        void addTriangle(int[] theEdgesId,
+                                   bool[] theEdgesOri,
+                                   int[] theNodesId)
+        {
+            int aNewTriangleId =
+              myMeshData.AddElement(new BRepMesh_Triangle(theEdgesId,
+                theEdgesOri, BRepMesh_DegreeOfFreedom.BRepMesh_Free));
+
+            bool isAdded = true;
+            //if (myInitCircles)
+            //{
+            //    isAdded = myCircles.Bind(
+            //      aNewTriangleId,
+            //      GetVertex(theNodesId[0]).Coord(),
+            //      GetVertex(theNodesId[1]).Coord(),
+            //      GetVertex(theNodesId[2]).Coord());
+            //}
+
+            if (!isAdded)
+                myMeshData.RemoveElement(aNewTriangleId);
+        }
 
         //! Destruction of auxiliary triangles containing the given vertices.
         //! Removes auxiliary vertices also.
@@ -185,7 +438,7 @@ namespace OCCPort
         //purpose  : Gives the list of edges with type defined by input parameter
         //=======================================================================
         MapOfInteger getEdgesByType(
-  BRepMesh_DegreeOfFreedom theEdgeType)
+        BRepMesh_DegreeOfFreedom theEdgeType)
         {
 
             MapOfInteger aResult = new MapOfInteger();
@@ -202,6 +455,12 @@ namespace OCCPort
 
             return aResult;
         }
+
+        //! Cleanup mesh from the free triangles.
+        //=======================================================================
+        //function : cleanupMesh
+        //purpose  : Cleanup mesh from the free triangles
+        //=======================================================================
         void cleanupMesh()
         {
             for (; ; )
@@ -334,8 +593,8 @@ namespace OCCPort
         }
 
         bool isBoundToFrontier(
-  int theRefNodeId,
-  int theRefLinkId)
+        int theRefNodeId,
+        int theRefLinkId)
         {
             Stack<int> aLinkStack = new Stack<int>();
             TColStd_PackedMapOfInteger aVisitedLinks = new TColStd_PackedMapOfInteger();
@@ -468,9 +727,9 @@ namespace OCCPort
         //purpose  : Collect the polygon at the left of the given edge (material side)
         //=======================================================================
         bool meshLeftPolygonOf(
-  int theStartEdgeId,
-  bool isForward,
-  MapOfInteger theSkipped = null)
+        int theStartEdgeId,
+        bool isForward,
+        MapOfInteger theSkipped = null)
         {
             throw new NotImplementedException();
         }
@@ -573,6 +832,32 @@ namespace OCCPort
             }
 
             mySupTrian = new BRepMesh_Triangle(e, o, Enums.BRepMesh_DegreeOfFreedom.BRepMesh_Free);
+        }
+    }
+
+    //! Sort two points in projection on vector (1,1)
+    class ComparatorOfIndexedVertexOfDelaun
+    {
+        public ComparatorOfIndexedVertexOfDelaun(BRepMesh_DataStructureOfDelaun theDS)
+        {
+
+            myStructure = (theDS);
+        }
+
+        BRepMesh_DataStructureOfDelaun myStructure;
+
+    }
+
+    public static class std
+    {
+        internal static void make_heap(VectorOfInteger theVertices, ComparatorOfIndexedVertexOfDelaun aCmp)
+        {
+            
+        }
+
+        internal static void sort_heap(VectorOfInteger theVertices, ComparatorOfIndexedVertexOfDelaun aCmp)
+        {
+            
         }
     }
 }

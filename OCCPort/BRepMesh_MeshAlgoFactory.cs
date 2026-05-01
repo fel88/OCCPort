@@ -6,9 +6,9 @@ namespace OCCPort
     {
         public IMeshTools_MeshAlgo GetAlgo(GeomAbs_SurfaceType theSurfaceType, ref IMeshTools_Parameters theParameters)
         {
-            var algo1 = new BRepMesh_DelaunayNodeInsertionMeshAlgo();
+            var algo1 = new BRepMesh_DelaunayNodeInsertionMeshAlgo<BRepMesh_DefaultRangeSplitter>();
             var algo2 = new BRepMesh_DelabellaBaseMeshAlgo();
-            var algo3 = new BRepMesh_DelaunayDeflectionControlMeshAlgo();
+            var algo3 = new BRepMesh_DelaunayDeflectionControlMeshAlgo<BRepMesh_DefaultRangeSplitter>();
             switch (theSurfaceType)
             {
                 /**
@@ -30,13 +30,5 @@ namespace OCCPort
             }
             return null;
         }
-    }
-
-
-    //! Extends node insertion Delaunay meshing algo in order to control 
-    //! deflection of generated trianges. Splits triangles failing the check.
-    //template<class RangeSplitter, class BaseAlgo>
-    class BRepMesh_DelaunayDeflectionControlMeshAlgo : BRepMesh_DelaunayNodeInsertionMeshAlgo//<RangeSplitter, BaseAlgo>
-    {
     }
 }

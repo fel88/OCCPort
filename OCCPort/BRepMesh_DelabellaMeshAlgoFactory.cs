@@ -13,7 +13,7 @@ namespace OCCPort
             // Purpose :
             //=======================================================================
             {
-                var algo1 = new BRepMesh_DelaunayNodeInsertionMeshAlgo();
+                var algo1 = new BRepMesh_DelaunayNodeInsertionMeshAlgo<BRepMesh_DefaultRangeSplitter>();
                 var algo2 = new BRepMesh_DelabellaBaseMeshAlgo();
                 switch (theSurfaceType)
                 {

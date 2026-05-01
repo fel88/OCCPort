@@ -9,9 +9,14 @@ namespace OCCPort
         {
             bool ret = false;
             if (!ContainsKey(aFreeEdgeId))
+            {
                 ret = true;
-
-            Add(aFreeEdgeId, v);
+                Add(aFreeEdgeId, v);
+            }
+            else
+            {
+                this[aFreeEdgeId] = v;
+            }
             return ret;
         }
     }

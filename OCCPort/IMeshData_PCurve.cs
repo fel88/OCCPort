@@ -9,6 +9,11 @@ namespace OCCPort
     {
         //! Returns orientation of the edge associated with current pcurve.
         TopAbs_Orientation GetOrientation();
+
+        int GetIndex(int theIndex);
+        void SetIndex(int theIndex,int val);
+
+
         //! Returns discrete face pcurve is associated to.
         IMeshData_Face GetFace();
         //! Returns discretization point with the given index.

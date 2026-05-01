@@ -1,6 +1,7 @@
 ﻿using OCCPort;
 using System;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Xml.Linq;
 
 namespace OCCPort
@@ -122,11 +123,13 @@ namespace OCCPort
                 }*/
             }
         }
+
         //! Returns map of indices of elements registered in mesh.
         public MapOfInteger ElementsOfDomain()
         {
             return myElementsOfDomain;
         }
+
         public void ElementNodes(
       BRepMesh_Triangle theElement,
       int[] theNodes)
@@ -271,6 +274,13 @@ namespace OCCPort
                     myNodes.DeleteVertex(theIndex);
             }
         }
+
+        //! Gives the data structure for initialization of cell size and tolerance.
+       public  BRepMesh_VertexTool Data()
+        {
+            return myNodes;
+        }
+
 
         VectorOfElements myElements;
         IDMapOfLink myLinks;
