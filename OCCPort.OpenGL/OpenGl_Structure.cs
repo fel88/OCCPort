@@ -16,6 +16,24 @@ namespace OCCPort.OpenGL
         {
         }
 
+        //! Connect other structure to this one
+        public override void Connect(Graphic3d_CStructure theStructure)
+        {
+
+            OpenGl_Structure aStruct = (OpenGl_Structure)theStructure;
+
+            new Standard_ASSERT_RAISE(myInstancedStructure == null || myInstancedStructure == aStruct,
+              "Error! Instanced structure is already defined");
+
+            myInstancedStructure = aStruct;
+
+            if (aStruct.IsRaytracable())
+            {
+                UpdateStateIfRaytracable(false);
+            }
+        }
+
+
         // =======================================================================
         public void renderGeometry(OpenGl_Workspace theWorkspace,
                                          ref bool theHasClosed)
@@ -159,5 +177,6 @@ namespace OCCPort.OpenGL
         }
     }
 }
+
 
 

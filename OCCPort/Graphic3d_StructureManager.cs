@@ -1,6 +1,7 @@
 ﻿using OCCPort.Tester;
 using System;
 using System.Collections.Generic;
+using System.Reflection.Metadata;
 
 
 namespace OCCPort
@@ -16,8 +17,37 @@ namespace OCCPort
     {
         Graphic3d_GraphicDriver myGraphicDriver;
         Graphic3d_MapOfStructure myDisplayedStructure = new Graphic3d_MapOfStructure();
+
+        public void ReCompute(Graphic3d_Structure theStructure)
+        {
+            if (!myDisplayedStructure.Contains(theStructure))
+            {
+                return;
+            }
+
+            // Recompute structure for all defined views
+            for (int aViewIt = 1; aViewIt <= myDefinedViews.Extent(); ++aViewIt)
+            {
+                ReCompute(theStructure, myDefinedViews[aViewIt]);
+            }
+        }
+        public void ReCompute(Graphic3d_Structure theStructure,
+                                             Graphic3d_DataStructureManager theProjector)
+        {
+            Graphic3d_CView aView = (Graphic3d_CView)theProjector;
+
+            if (aView == null
+             || !myDefinedViews.Contains(aView)
+             || !myDisplayedStructure.Contains(theStructure))
+            {
+                return;
+            }
+
+            aView.ReCompute(theStructure);
+        }
+
         public void RegisterObject(AIS_InteractiveObject theObject,
-                                                  Graphic3d_ViewAffinity theAffinity)
+                                                          Graphic3d_ViewAffinity theAffinity)
         {
             Graphic3d_ViewAffinity aResult;
             if (myRegisteredObjects.Find(theObject, out aResult)
@@ -28,6 +58,30 @@ namespace OCCPort
 
             myRegisteredObjects.Bind(theObject, theAffinity);
         }
+        Graphic3d_MapOfStructure myHighlightedStructure;
+
+
+        public void Erase(Graphic3d_Structure theStructure)
+        {
+            myDisplayedStructure.Remove(theStructure);
+            myHighlightedStructure.Remove(theStructure);
+
+            // Erase structure in all defined views
+            foreach (var aViewIt in myDefinedViews)
+            {
+                aViewIt.Erase(theStructure);
+            }
+        }
+
+        public void Connect(Graphic3d_Structure theMother,
+                                                    Graphic3d_Structure theDaughter)
+        {
+            foreach (var aViewIt in myDefinedViews)
+            {
+                aViewIt.Connect(theMother, theDaughter);
+            }
+        }
+
         public virtual void Update(Graphic3d_ZLayerId theLayerId = Graphic3d_ZLayerId.Graphic3d_ZLayerId_UNKNOWN)
         {
             foreach (var aViewIt in myDefinedViews)
@@ -66,17 +120,25 @@ namespace OCCPort
         public bool IsDeviceLost() { return myDeviceLostFlag; }
         bool myDeviceLostFlag = true;
 
+        public void RecomputeStructures(NCollection_Map<Graphic3d_Structure> theStructures)
+        {
+            foreach (var anIter in theStructures)
+            {
+                Graphic3d_Structure aStruct = anIter;
+                aStruct.Clear();
+                aStruct.Compute();
+            }
+        }
+
         internal void RecomputeStructures()
         {
             myDeviceLostFlag = false;
 
             // Go through all unique structures including child (connected) ones and ensure that they are computed.
-            List<Graphic3d_Structure> aStructNetwork = new List<Graphic3d_Structure>();
+            NCollection_Map<Graphic3d_Structure> aStructNetwork = new NCollection_Map<Graphic3d_Structure>();
             foreach (var anIter in myDisplayedStructure)
             {
                 Graphic3d_Structure.Network(anIter, Graphic3d_TypeOfConnection.Graphic3d_TOC_DESCENDANT, aStructNetwork);
-                //aStructNetwork.Add(anIter.net);
-                //anIter.Network();
             }
             /*
             for (Graphic3d_MapIteratorOfMapOfStructure anIter(myDisplayedStructure); anIter.More(); anIter.Next())

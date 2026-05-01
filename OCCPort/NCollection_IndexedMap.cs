@@ -4,7 +4,16 @@ namespace OCCPort
 {
     public class NCollection_IndexedMap<T>:List<T>
     {
+        internal new  int Add(T theStruct)
+        {
+            base.Add(theStruct);
+            return Count;
+        }
 
-        
+        internal int Size()
+        {
+            return Count;
+        }
+
     }
 }

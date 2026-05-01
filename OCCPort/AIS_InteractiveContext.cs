@@ -364,39 +364,113 @@ namespace OCCPort
             }
         }
 
+
+        //! Hides the object. The object's presentations are simply flagged as invisible and therefore excluded from redrawing.
+        //! To show hidden objects, use Display().
         private void Erase(AIS_InteractiveObject theIObj, bool theToUpdateViewer)
         {
-            throw new NotImplementedException();
+            if (theIObj == null)
+            {
+                return;
+            }
+
+            if (!theIObj.IsAutoHilight())
+            {
+                theIObj.ClearSelected();
+            }
+
+            EraseGlobal(theIObj, false);
+            if (theToUpdateViewer)
+            {
+                myMainVwr.Update();
+            }
         }
 
-        private void setObjectStatus(AIS_InteractiveObject theIObj, PrsMgr_DisplayStatus prsMgr_DisplayStatus_Displayed, int theDispMode, int theSelectionMode)
+
+        public void EraseGlobal(AIS_InteractiveObject theIObj,
+                                          bool theToUpdateviewer)
         {
-            //theIObj.SetDisplayStatus(theStatus);
-            //if (theStatus != PrsMgr_DisplayStatus_None)
+            //AIS_GlobalStatus aStatus;
+            //if (theIObj == null
+            //|| !myObjects.Find(theIObj, aStatus)
+            //|| theIObj.DisplayStatus() == PrsMgr_DisplayStatus.PrsMgr_DisplayStatus_Erased)
             //{
-            //	AIS_GlobalStatus aStatus = new AIS_GlobalStatus();
-            //	aStatus.SetDisplayMode(theDispMode);
-            //	if (theSelectionMode != -1)
-            //	{
-            //		aStatus.AddSelectionMode(theSelectionMode);
-            //	}
-            //	myObjects.Bind(theIObj, aStatus);
-            //}
-            //else
-            //{
-            //	myObjects.UnBind(theIObj);
+            //    return;
             //}
 
-            //for (PrsMgr_ListOfPresentableObjectsIter aPrsIter (theIObj->Children()); aPrsIter.More(); aPrsIter.Next())
-            //{
-            //	AIS_InteractiveObject aChild=(Handle(AIS_InteractiveObject)::DownCast(aPrsIter.Value()));
-            //	if (aChild.IsNull())
-            //	{
-            //		continue;
-            //	}
+            //int aDispMode = theIObj.HasHilightMode() ? theIObj.HilightMode() : 0;
+            //unselectOwners(theIObj);
+            //myMainPM.SetVisibility(theIObj, aStatus.DisplayMode(), false);
 
-            //	setObjectStatus(aChild, theStatus, theDispMode, theSelectionMode);
+            //if (!myLastPicked.IsNull()
+            //  && myLastPicked->IsSameSelectable(theIObj))
+            //{
+            //    clearDynamicHighlight();
             //}
+
+            //// make sure highlighting presentations are properly erased
+            //theIObj.ErasePresentations(false);
+
+            //if (IsSelected(theIObj)
+            // && aStatus.DisplayMode() != aDispMode)
+            //{
+            //    myMainPM.SetVisibility(theIObj, aDispMode, false);
+            //}
+
+            //foreach (var item in aStatus.SelectionModes())
+            //{
+
+            //}
+            //for (TColStd_ListIteratorOfListOfInteger aSelModeIter (); aSelModeIter.More(); aSelModeIter.Next())
+            //{
+            //    mgrSelector->Deactivate(theIObj, aSelModeIter.Value());
+            //}
+            //aStatus->ClearSelectionModes();
+            //theIObj->SetDisplayStatus(PrsMgr_DisplayStatus_Erased);
+
+            //if (theToUpdateviewer)
+            //{
+            //    myMainVwr->Update();
+            //}
+        }
+
+
+        //! Removes dynamic highlight draw
+        void clearDynamicHighlight()
+        {
+            if (myLastPicked==null)
+                return;
+
+            //myLastPicked.Selectable().ClearDynamicHighlight(myMainPM);
+        }
+
+        private void setObjectStatus(AIS_InteractiveObject theIObj, PrsMgr_DisplayStatus theStatus,
+            int theDispMode, int theSelectionMode)
+        {
+            theIObj.SetDisplayStatus(theStatus);
+            if (theStatus != PrsMgr_DisplayStatus.PrsMgr_DisplayStatus_None)
+            {
+                AIS_GlobalStatus aStatus = new AIS_GlobalStatus();
+                aStatus.SetDisplayMode(theDispMode);
+                if (theSelectionMode != -1)
+                {
+                    aStatus.AddSelectionMode(theSelectionMode);
+                }
+                myObjects.Bind(theIObj, aStatus);
+            }
+            else
+            {
+                myObjects.UnBind(theIObj);
+            }
+
+            foreach (var aPrsIter in theIObj.Children())
+            {
+                AIS_InteractiveObject aChild = aPrsIter as AIS_InteractiveObject;
+                if (aChild == null)
+                    continue;
+
+                setObjectStatus(aChild, theStatus, theDispMode, theSelectionMode);
+            }
         }
 
 

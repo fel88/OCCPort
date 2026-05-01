@@ -161,8 +161,8 @@ namespace OCCPort
         // ------------------------------------------------------------------
         // IsEven : Returns Standard_True if an integer is even
         // ------------------------------------------------------------------
-        public  bool IsEven( int Value)
-{ return Value % 2 == 0; }
+        public bool IsEven(int Value)
+        { return Value % 2 == 0; }
 
 
         public gp_Trsf(gp_Trsf t)
@@ -347,6 +347,22 @@ namespace OCCPort
         internal gp_XYZ TranslationPart()
         {
             return loc;
+        }
+
+        public void Transforms(ref double theX,
+                               ref double theY,
+                                 ref double theZ)
+        {
+            gp_XYZ aTriplet = new gp_XYZ(theX, theY, theZ);
+            aTriplet.Multiply(matrix);
+            if (scale != 1.0)
+            {
+                aTriplet.Multiply(scale);
+            }
+            aTriplet.Add(loc);
+            theX = aTriplet.X();
+            theY = aTriplet.Y();
+            theZ = aTriplet.Z();
         }
 
         internal void Transforms(ref gp_XYZ theCoord)

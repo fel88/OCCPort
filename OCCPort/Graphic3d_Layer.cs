@@ -408,10 +408,13 @@ namespace OCCPort
             //return aResBox;
         }
 
+        //! Marks cached bounding box as obsolete.
         internal void InvalidateBoundingBox()
         {
-            throw new NotImplementedException();
+            myIsBoundingBoxNeedsReset[0] = myIsBoundingBoxNeedsReset[1] = true;
         }
+        //! Defines if the cached bounding box is outdated.
+        bool[] myIsBoundingBoxNeedsReset = new bool[2];
 
         internal int NbOfTransformPersistenceObjects()
         {

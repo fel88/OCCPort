@@ -15,6 +15,9 @@ namespace OCCPort
             }
         }
 
+        //! Returns a selectable object detected in the working context.
+        public SelectMgr_SelectableObject Selectable() { return mySelectable; }
+
 
         //! Returns true if pointer to selectable object of this owner is equal to the given one
         public bool IsSameSelectable(SelectMgr_SelectableObject theOther)

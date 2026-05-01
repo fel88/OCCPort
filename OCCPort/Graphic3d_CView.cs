@@ -1,4 +1,5 @@
-﻿using OpenTK.Mathematics;
+﻿using OCCPort;
+using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using System;
 using System.Collections.Generic;
@@ -17,10 +18,133 @@ namespace OCCPort
             myId = myStructureManager.Identification(this);
 
         }
+        public void ReCompute(Graphic3d_Structure theStruct)
+        {
+            theStruct.CalculateBoundBox();
+            if (!theStruct.IsMutable()
+             && !theStruct.CStructure().IsForHighlight
+             && !theStruct.CStructure().IsInfinite)
+            {
+                Graphic3d_ZLayerId aLayerId = theStruct.GetZLayer();
+                //InvalidateBVHData(aLayerId);
+            }
+
+            if (!ComputedMode()
+             || !IsActive()
+             || !theStruct.IsDisplayed())
+            {
+                return;
+            }
+
+            Graphic3d_TypeOfAnswer anAnswer = acceptDisplay(theStruct.Visual());
+            if (anAnswer != Graphic3d_TypeOfAnswer.Graphic3d_TOA_COMPUTE)
+            {
+                return;
+            }
+
+            int anIndex = IsComputed(theStruct);
+            if (anIndex == 0)
+            {
+                return;
+            }
+
+            // compute + validation
+            Graphic3d_Structure aCompStructOld = myStructsComputed.ChangeValue(anIndex);
+            Graphic3d_Structure aCompStruct = aCompStructOld;
+            //aCompStruct.SetTransformation(null);
+          //  theStruct.computeHLR(myCamera, aCompStruct);
+            if (aCompStruct == null)
+            {
+                return;
+            }
+
+            aCompStruct.SetHLRValidation(true);
+            aCompStruct.CalculateBoundBox();
+
+            // of which type will be the computed?
+            bool toComputeWireframe = myVisualization == Graphic3d_TypeOfVisualization.Graphic3d_TOV_WIREFRAME
+                                                     && theStruct.ComputeVisual() != Graphic3d_TypeOfStructure.Graphic3d_TOS_SHADING;
+            bool toComputeShading = myVisualization == Graphic3d_TypeOfVisualization.Graphic3d_TOV_SHADING
+                                                     && theStruct.ComputeVisual() != Graphic3d_TypeOfStructure.Graphic3d_TOS_WIREFRAME;
+            if (toComputeWireframe)
+            {
+                aCompStruct.SetVisual(Graphic3d_TypeOfStructure.Graphic3d_TOS_WIREFRAME);
+            }
+            else if (toComputeShading)
+            {
+                aCompStruct.SetVisual(Graphic3d_TypeOfStructure.Graphic3d_TOS_SHADING);
+            }
+
+            if (theStruct.IsHighlighted())
+            {
+             //   aCompStruct.Highlight(theStruct.HighlightStyle(), false);
+            }
+
+            // The previous calculation is removed and the new one is displayed
+            eraseStructure(aCompStructOld.CStructure());
+            displayStructure(aCompStruct.CStructure(), theStruct.DisplayPriority());
+
+            // why not just replace existing items?
+            //myStructsToCompute.ChangeValue (anIndex) = theStruct;
+            //myStructsComputed .ChangeValue (anIndex) = aCompStruct;
+
+            // hlhsr and the new associated compute are added
+            myStructsToCompute.Append(theStruct);
+            myStructsComputed.Append(aCompStruct);
+
+            // hlhsr and the new associated compute are removed
+            myStructsToCompute.Remove(anIndex);
+            myStructsComputed.Remove(anIndex);
+        }
+        public void Erase(Graphic3d_Structure theStructure)
+        {
+            if (!IsDisplayed(theStructure))
+            {
+                return;
+            }
+
+            Graphic3d_TypeOfAnswer anAnswer = myIsInComputedMode ? acceptDisplay(theStructure.Visual()) : Graphic3d_TypeOfAnswer.Graphic3d_TOA_YES;
+            if (anAnswer != Graphic3d_TypeOfAnswer.Graphic3d_TOA_COMPUTE)
+            {
+                eraseStructure(theStructure.CStructure());
+            }
+
+            int anIndex = !myStructsToCompute.IsEmpty() ? IsComputed(theStructure) : 0;
+            if (anIndex != 0)
+            {
+                if (anAnswer == Graphic3d_TypeOfAnswer.Graphic3d_TOA_COMPUTE
+                 && myIsInComputedMode)
+                {
+                    Graphic3d_Structure aCompStruct = myStructsComputed.ChangeValue(anIndex);
+                    eraseStructure(aCompStruct.CStructure());
+                }
+                myStructsComputed.Remove(anIndex);
+                myStructsToCompute.Remove(anIndex);
+            }
+
+            myStructsDisplayed.Remove(theStructure);
+            Update(theStructure.GetZLayer());
+        }
+
+
 
         //! Returns anchor camera definition (without tracked head orientation).
         public Graphic3d_Camera BaseXRCamera() { return myBaseXRCamera; }
         Graphic3d_Camera myBaseXRCamera;       //!< neutral camera orientation defining coordinate system in which head tracking is defined
+
+        public void Connect(Graphic3d_Structure theMother,
+                               Graphic3d_Structure theDaughter)
+        {
+            int anIndexM = IsComputed(theMother);
+            int anIndexD = IsComputed(theDaughter);
+            if (anIndexM != 0
+             && anIndexD != 0)
+            {
+                Graphic3d_Structure aStructM = myStructsComputed.Value(anIndexM);
+                Graphic3d_Structure aStructD = myStructsComputed.Value(anIndexD);
+                aStructM.GraphicConnect(aStructD);
+            }
+        }
 
         public double ConsiderZoomPersistenceObjects()
         {
@@ -90,7 +214,7 @@ namespace OCCPort
         protected Graphic3d_StructureManager myStructureManager;
         protected Graphic3d_Camera myCamera;
         protected Graphic3d_SequenceOfStructure myStructsToCompute = new Graphic3d_SequenceOfStructure();
-        protected Graphic3d_SequenceOfStructure myStructsComputed;
+        protected Graphic3d_SequenceOfStructure myStructsComputed = new Graphic3d_SequenceOfStructure();
         protected Graphic3d_MapOfStructure myStructsDisplayed;
         protected bool myIsInComputedMode;
         protected bool myIsActive;

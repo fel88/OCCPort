@@ -15,6 +15,7 @@ namespace OCCPort
         //! is applied within Local Coordinate system defined by this Persistence.
         public void SetLocalTransformation(gp_Trsf theTrsf) { setLocalTransformation(new TopLoc_Datum3D(theTrsf)); }
 
+
         public void setLocalTransformation(TopLoc_Datum3D theTransformation)
         {
             myLocalTransformation = theTransformation;
@@ -114,28 +115,34 @@ namespace OCCPort
             //(void ) theMode;
             return true;
         }
+        //! Return presentation display status; PrsMgr_DisplayStatus_None by default.
+        public PrsMgr_DisplayStatus DisplayStatus() { return myDisplayStatus; }
 
+        //! Returns highlight display mode.
+        //! This is obsolete method for backward compatibility - use ::HilightAttributes() and ::DynamicHilightAttributes() instead.
+        //! @sa HilightAttributes()
+        public int HilightMode() { return myHilightDrawer != null ? myHilightDrawer.DisplayMode() : -1; }
 
-        Prs3d_Drawer myDynHilightDrawer;        //!< (optional) custom presentation attributes for highlighting detected object
-        Graphic3d_TransformPers myTransformPersistence;    //!< transformation persistence
-        TopLoc_Datum3D myLocalTransformation;     //!< local transformation relative to parent object
-        TopLoc_Datum3D myTransformation;          //!< absolute transformation of this object (combined parents + local transformations)
-        TopLoc_Datum3D myCombinedParentTransform; //!< transformation of parent object (combined for all parents)
-        PrsMgr_ListOfPresentableObjects myChildren = new PrsMgr_ListOfPresentableObjects();                //!< list of children
-        gp_GTrsf myInvTransformation;       //!< inversion of absolute transformation (combined parents + local transformations)
-        PrsMgr_TypeOfPresentation3d myTypeOfPresentation3d;    //!< presentation type
-        PrsMgr_DisplayStatus myDisplayStatus;           //!< presentation display status
+        protected Prs3d_Drawer myDynHilightDrawer;        //!< (optional) custom presentation attributes for highlighting detected object
+        protected Graphic3d_TransformPers myTransformPersistence;    //!< transformation persistence
+        protected TopLoc_Datum3D myLocalTransformation;     //!< local transformation relative to parent object
+        protected TopLoc_Datum3D myTransformation;          //!< absolute transformation of this object (combined parents + local transformations)
+        protected TopLoc_Datum3D myCombinedParentTransform; //!< transformation of parent object (combined for all parents)
+        protected PrsMgr_ListOfPresentableObjects myChildren = new PrsMgr_ListOfPresentableObjects();                //!< list of children
+        protected gp_GTrsf myInvTransformation;       //!< inversion of absolute transformation (combined parents + local transformations)
+        protected PrsMgr_TypeOfPresentation3d myTypeOfPresentation3d;    //!< presentation type
+        protected PrsMgr_DisplayStatus myDisplayStatus;           //!< presentation display status
 
-        Aspect_TypeOfFacingModel myCurrentFacingModel;      //!< current facing model
-        float myOwnWidth;                //!< custom width value
-        bool hasOwnColor;               //!< own color flag
-        bool hasOwnMaterial;            //!< own material flag
+        protected Aspect_TypeOfFacingModel myCurrentFacingModel;      //!< current facing model
+        protected float myOwnWidth;                //!< custom width value
+        protected bool hasOwnColor;               //!< own color flag
+        protected bool hasOwnMaterial;            //!< own material flag
 
-        bool myInfiniteState;           //!< infinite flag
-        bool myIsMutable;               //!< mutable flag
-        bool myHasOwnPresentations;     //!< flag indicating if object should have own presentations
+        protected bool myInfiniteState;           //!< infinite flag
+        protected bool myIsMutable;               //!< mutable flag
+        protected bool myHasOwnPresentations;     //!< flag indicating if object should have own presentations
 
-        bool myToPropagateVisualState;  //!< flag indicating if visual state (display/erase/color) should be propagated to all children
+        protected bool myToPropagateVisualState;  //!< flag indicating if visual state (display/erase/color) should be propagated to all children
 
 
         //! Returns true if the Interactive Object has display mode setting overriding global setting (within Interactive Context).

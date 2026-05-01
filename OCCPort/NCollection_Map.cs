@@ -4,15 +4,15 @@ using System.Xml.Linq;
 
 namespace OCCPort
 {
-    internal class NCollection_Map<T>
+    public class NCollection_Map<T>:List<T>
     {
-        internal bool Add(T e)
+        internal new  bool Add(T e)
         {
-            if (shapes.Contains(e))
+            if (Contains(e))
             {
                 return false;
             }
-            shapes.Add(e);
+            base.Add(e);
             return true;
         }
 
@@ -21,33 +21,27 @@ namespace OCCPort
         public T Added(T K)
         {
             //probably should clone here
-            if (!shapes.Contains(K))
+            if (!Contains(K))
             {
-                shapes.Add(K);
+                base.Add(K);
             }
             return K;
         }
 
         public bool IsEmpty()
         {
-            return shapes.Count == 0;
+            return Count == 0;
 
         }
-        List<T> shapes = new List<T>();
+        
 
         public NCollection_Map() { }
         public NCollection_Map(int v)
         {
         }
 
-        internal void Remove(T e)
-        {
-            shapes.Remove(e);
-        }
+        
 
-        internal bool Contains(T theCell)
-        {
-            return shapes.Contains(theCell);
-        }
+        
     }
 }

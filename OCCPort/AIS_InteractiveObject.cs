@@ -13,21 +13,9 @@ namespace OCCPort
         AIS_InteractiveContext myCTXPtr; //!< pointer to Interactive Context, where object is currently displayed; @sa SetContext()
         object myOwner;  //!< application-specific owner object
 
-
-
-        internal int DisplayMode()
+        internal void SetDisplayStatus(PrsMgr_DisplayStatus theStatus)
         {
-            throw new NotImplementedException();
-        }
-
-        internal int HilightMode()
-        {
-            throw new NotImplementedException();
-        }
-
-        internal void SetDisplayStatus(PrsMgr_DisplayStatus prsMgr_DisplayStatus_Displayed)
-        {
-            throw new NotImplementedException();
+            myDisplayStatus = theStatus;
         }
 
         //! Indicates whether the Interactive Object has a pointer to an interactive context.

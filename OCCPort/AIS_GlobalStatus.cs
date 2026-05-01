@@ -1,32 +1,49 @@
 ﻿using System;
+using System.Linq;
 
 namespace OCCPort
 {
     public class AIS_GlobalStatus
     {
-        internal void AddSelectionMode(int theSelectionMode)
+        internal bool AddSelectionMode(int theMode)
         {
-            throw new NotImplementedException();
+            if (!mySelModes.Contains(theMode))
+            {
+                mySelModes.Append(theMode);
+                return true;
+            }
+            return false;
         }
+
+
+        //! Returns active selection modes of the object.
+        public TColStd_ListOfInteger SelectionModes() { return mySelModes; }
+        TColStd_ListOfInteger mySelModes = new TColStd_ListOfInteger();
 
         internal int DisplayMode()
         {
-            throw new NotImplementedException();
+            return myDispMode;
         }
 
-        internal object HilightStyle()
+        internal Prs3d_Drawer HilightStyle()
         {
-            throw new NotImplementedException();
+            return myHiStyle;
         }
 
         internal bool IsHilighted()
         {
-            throw new NotImplementedException();
+            return myIsHilit;
         }
+        Prs3d_Drawer myHiStyle;
 
-        internal void SetDisplayMode(int theDispMode)
+
+        int myDispMode;
+        bool  myIsHilit;
+        bool mySubInt;
+        //! Sets display mode.
+        internal void SetDisplayMode(int theMode)
         {
-            throw new NotImplementedException();
+            myDispMode = theMode;
         }
     }
 }

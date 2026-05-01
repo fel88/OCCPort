@@ -15,7 +15,7 @@ namespace OCCPort
 		int index = 0;
 		internal bool More()
 		{
-			return index < list.list.Count - 1;
+			return index < list.Count - 1;
 		}
 
 		internal void Next()
@@ -25,7 +25,7 @@ namespace OCCPort
 
 		internal PrsMgr_PresentableObject Value()
 		{
-			return list.list[index];
+			return list[index];
 		}
 	}
 }

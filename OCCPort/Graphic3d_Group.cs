@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using System.Reflection.Metadata;
 
 namespace OCCPort
 {
@@ -10,6 +11,8 @@ namespace OCCPort
             myStructure = theStruct;
             myIsClosed = (false);
         }
+        //! Return transformation persistence.
+        public Graphic3d_TransformPers TransformPersistence() { return myTrsfPers; }
 
         /*public Graphic3d_Group(Graphic3d_StructureManager m)
         {
@@ -61,7 +64,7 @@ namespace OCCPort
             int aNbVerts = theAttribs.NbElements;
             int anAttribIndex = 0;
             int anAttribStride = 0;
-            byte[] aDataPtr = theAttribs.AttributeData(Graphic3d_TypeOfAttribute.Graphic3d_TOA_POS,ref  anAttribIndex,ref anAttribStride);
+            byte[] aDataPtr = theAttribs.AttributeData(Graphic3d_TypeOfAttribute.Graphic3d_TOA_POS, ref anAttribIndex, ref anAttribStride);
             if (aDataPtr == null)
             {
                 Update();
@@ -133,6 +136,12 @@ namespace OCCPort
         internal void SetClosed(bool theIsClosed)
         {
             throw new NotImplementedException();
+        }
+
+        //! Returns boundary box of the group <me> without transformation applied,
+        public Graphic3d_BndBox4f BoundingBox()
+        {
+            return myBounds;
         }
     }
 }

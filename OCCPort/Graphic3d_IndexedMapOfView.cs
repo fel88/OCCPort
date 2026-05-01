@@ -5,9 +5,19 @@ namespace OCCPort
 {
 	internal class Graphic3d_IndexedMapOfView : List<Graphic3d_CView>
 	{
-		//public List<Graphic3d_CView> list = new List<Graphic3d_CView>();
+        internal int Extent()
+        {
+			return Count;
+        }
+        public new Graphic3d_CView this[int key]
+        {
+            get => base[key - 1];
+            set => base[key - 1] = value;
+        }
 
-		internal class Iterator
+        //public List<Graphic3d_CView> list = new List<Graphic3d_CView>();
+
+        internal class Iterator
 		{
 			Graphic3d_IndexedMapOfView list;
 			public Iterator(Graphic3d_IndexedMapOfView myDefinedViews)

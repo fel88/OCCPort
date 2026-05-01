@@ -15,6 +15,89 @@ namespace OCCPort.OpenGL
 {
     public class OpenGl_Context
     {
+        public OpenGl_Context(OpenGl_Caps theCaps = null)
+        {
+            //core11ffp = null;
+
+            core11fwd = new _core11fwd();
+            core15fwd = new _core15fwd();
+            /*
+             *  mySupportedFormats (new Image_SupportedFormats()),
+  myAnisoMax   (1),
+  myTexClamp   (GL_CLAMP_TO_EDGE),
+  myMaxTexDim  (1024),
+  myMaxTexCombined (1),
+  myMaxTexUnitsFFP (1),
+  myMaxDumpSizeX (1024),
+  myMaxDumpSizeY (1024),
+  myMaxClipPlanes (6),
+  myMaxMsaaSamples(0),
+  myMaxDrawBuffers (1),
+  myMaxColorAttachments (1),
+  myGlVerMajor (0),
+  myGlVerMinor (0),
+  myIsInitialized (Standard_False),
+  myIsStereoBuffers (Standard_False),
+  myHasMsaaTextures (Standard_False),
+  myIsGlNormalizeEnabled (Standard_False),
+  mySpriteTexUnit (Graphic3d_TextureUnit_PointSprite),
+  myHasRayTracing (Standard_False),
+  myHasRayTracingTextures (Standard_False),
+  myHasRayTracingAdaptiveSampling (Standard_False),
+  myHasRayTracingAdaptiveSamplingAtomic (Standard_False),
+  myHasPBR (Standard_False),
+  myPBREnvLUTTexUnit       (Graphic3d_TextureUnit_PbrEnvironmentLUT),
+  myPBRDiffIBLMapSHTexUnit (Graphic3d_TextureUnit_PbrIblDiffuseSH),
+  myPBRSpecIBLMapTexUnit   (Graphic3d_TextureUnit_PbrIblSpecular),
+  myShadowMapTexUnit       (Graphic3d_TextureUnit_ShadowMap),
+  myDepthPeelingDepthTexUnit (Graphic3d_TextureUnit_DepthPeelingDepth),
+  myDepthPeelingFrontColorTexUnit (Graphic3d_TextureUnit_DepthPeelingFrontColor),*/
+            myFrameStats = new OpenGl_FrameStats();
+            /*
+myActiveMockTextures (0),
+myActiveHatchType (Aspect_HS_SOLID),
+myHatchIsEnabled (false),
+myPointSpriteOrig (GL_UPPER_LEFT),*/
+            myRenderMode = (int)All.Render;
+            myShadeModel = (int)All.Smooth;
+            myPolygonMode = (int)All.Fill;
+            /*
+  myFaceCulling (Graphic3d_TypeOfBackfacingModel_DoubleSided),
+  myReadBuffer (0),*/
+            myDrawBuffers = new NCollection_Array1<int>(0, 7);
+            /*
+myDefaultVao (0),
+myColorMask (true),
+myAlphaToCoverage (false),
+myIsGlDebugCtx (false),
+myIsWindowDeepColor (false),
+myIsSRgbWindow (false),
+myIsSRgbActive (false),
+myResolution (Graphic3d_RenderingParams::THE_DEFAULT_RESOLUTION),
+myResolutionRatio (1.0f),
+myLineWidthScale (1.0f),
+myLineFeather (1.0f),*/
+            myRenderScale = (1.0f);
+            myRenderScaleInv = 1.0f;
+
+            caps = (theCaps != null ? theCaps : new OpenGl_Caps());
+            myViewport[0] = 0;
+            myViewport[1] = 0;
+            myViewport[2] = 0;
+            myViewport[3] = 0;
+            myViewportVirt[0] = 0;
+            myViewportVirt[1] = 0;
+            myViewportVirt[2] = 0;
+            myViewportVirt[3] = 0;
+
+
+            /*myPolygonOffset.Mode = Aspect_POM_Off;
+            myPolygonOffset.Factor = 0.0f;
+            myPolygonOffset.Units = 0.0f;*/
+            myShaderManager = new OpenGl_ShaderManager(this);
+
+
+        }
         public OpenGl_ArbFBO arbFBO;             //!< GL_ARB_framebuffer_object
         public OpenGl_ArbFBOBlit arbFBOBlit;         //!< glBlitFramebuffer function, moved out from OpenGl_ArbFBO structure for compatibility with OpenGL ES 2.0
         bool arbSampleShading;   //!< GL_ARB_sample_shading
@@ -348,7 +431,8 @@ namespace OCCPort.OpenGL
 
         internal bool IsRender()
         {
-            throw new NotImplementedException();
+            return myRenderMode == (int)All.Render;
+            //#define GL_RENDER                         0x1C00
         }
 
         internal void PushMessage(All debugSourceApplication, All debugTypePerformance, int v, All debugSeverityLow, string aMsg)
@@ -532,85 +616,6 @@ namespace OCCPort.OpenGL
 
         //! Empty constructor. You should call Init() to perform initialization with bound GL context.
 
-        public OpenGl_Context(OpenGl_Caps theCaps = null)
-        {
-            //core11ffp = null;
 
-            core11fwd = new _core11fwd();
-            core15fwd = new _core15fwd();
-            /*
-             *  mySupportedFormats (new Image_SupportedFormats()),
-  myAnisoMax   (1),
-  myTexClamp   (GL_CLAMP_TO_EDGE),
-  myMaxTexDim  (1024),
-  myMaxTexCombined (1),
-  myMaxTexUnitsFFP (1),
-  myMaxDumpSizeX (1024),
-  myMaxDumpSizeY (1024),
-  myMaxClipPlanes (6),
-  myMaxMsaaSamples(0),
-  myMaxDrawBuffers (1),
-  myMaxColorAttachments (1),
-  myGlVerMajor (0),
-  myGlVerMinor (0),
-  myIsInitialized (Standard_False),
-  myIsStereoBuffers (Standard_False),
-  myHasMsaaTextures (Standard_False),
-  myIsGlNormalizeEnabled (Standard_False),
-  mySpriteTexUnit (Graphic3d_TextureUnit_PointSprite),
-  myHasRayTracing (Standard_False),
-  myHasRayTracingTextures (Standard_False),
-  myHasRayTracingAdaptiveSampling (Standard_False),
-  myHasRayTracingAdaptiveSamplingAtomic (Standard_False),
-  myHasPBR (Standard_False),
-  myPBREnvLUTTexUnit       (Graphic3d_TextureUnit_PbrEnvironmentLUT),
-  myPBRDiffIBLMapSHTexUnit (Graphic3d_TextureUnit_PbrIblDiffuseSH),
-  myPBRSpecIBLMapTexUnit   (Graphic3d_TextureUnit_PbrIblSpecular),
-  myShadowMapTexUnit       (Graphic3d_TextureUnit_ShadowMap),
-  myDepthPeelingDepthTexUnit (Graphic3d_TextureUnit_DepthPeelingDepth),
-  myDepthPeelingFrontColorTexUnit (Graphic3d_TextureUnit_DepthPeelingFrontColor),
-  myFrameStats (new OpenGl_FrameStats()),
-  myActiveMockTextures (0),
-  myActiveHatchType (Aspect_HS_SOLID),
-  myHatchIsEnabled (false),
-  myPointSpriteOrig (GL_UPPER_LEFT),
-  myRenderMode (GL_RENDER),
-  myShadeModel (GL_SMOOTH),
-  myPolygonMode (GL_FILL),
-  myFaceCulling (Graphic3d_TypeOfBackfacingModel_DoubleSided),
-  myReadBuffer (0),
-  myDrawBuffers (0, 7),
-  myDefaultVao (0),
-  myColorMask (true),
-  myAlphaToCoverage (false),
-  myIsGlDebugCtx (false),
-  myIsWindowDeepColor (false),
-  myIsSRgbWindow (false),
-  myIsSRgbActive (false),
-  myResolution (Graphic3d_RenderingParams::THE_DEFAULT_RESOLUTION),
-  myResolutionRatio (1.0f),
-  myLineWidthScale (1.0f),
-  myLineFeather (1.0f),*/
-            myRenderScale = (1.0f);
-            myRenderScaleInv = 1.0f;
-
-            caps = (theCaps != null ? theCaps : new OpenGl_Caps());
-            myViewport[0] = 0;
-            myViewport[1] = 0;
-            myViewport[2] = 0;
-            myViewport[3] = 0;
-            myViewportVirt[0] = 0;
-            myViewportVirt[1] = 0;
-            myViewportVirt[2] = 0;
-            myViewportVirt[3] = 0;
-
-
-            /*myPolygonOffset.Mode = Aspect_POM_Off;
-            myPolygonOffset.Factor = 0.0f;
-            myPolygonOffset.Units = 0.0f;*/
-            myShaderManager = new OpenGl_ShaderManager(this);
-
-
-        }
     }
 }

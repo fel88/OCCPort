@@ -15,6 +15,41 @@ namespace OCCPort
             myAutoHilight = (true);
         }
 
+        public void ErasePresentations(bool theToRemove)
+        {
+            if (mySelectionPrs!=null)
+            {
+                mySelectionPrs.Erase();
+                if (theToRemove)
+                {
+                    mySelectionPrs.Clear();
+                    mySelectionPrs = null;
+                }
+            }
+            if (myHilightPrs != null)
+            {
+                myHilightPrs.Erase();
+                if (theToRemove)
+                {
+                    myHilightPrs.Clear();
+                    myHilightPrs = null;
+                }
+            }
+        }
+
+        //! If returns True, the old mechanism for highlighting selected objects is used (HilightSelected Method may be empty).
+        //! If returns False, the HilightSelected method will be fully responsible for highlighting selected entity owners belonging to this selectable object.
+        public virtual bool IsAutoHilight() { return myAutoHilight; }
+
+        //! Method which clear all selected owners belonging
+        //! to this selectable object ( for fast presentation draw )
+        public virtual void ClearSelected()
+        {
+            if (mySelectionPrs != null)
+            {
+                mySelectionPrs.Clear();
+            }
+        }
         //! Computes sensitive primitives for the given selection mode - key interface method of Selectable Object.
         //! @param theSelection selection to fill
         //! @param theMode selection mode to create sensitive primitives

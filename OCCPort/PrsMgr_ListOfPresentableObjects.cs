@@ -3,18 +3,18 @@ using System.Collections.Generic;
 
 namespace OCCPort
 {
-	public class PrsMgr_ListOfPresentableObjects
-	{
-		public List<PrsMgr_PresentableObject> list = new List<PrsMgr_PresentableObject>();
+	public class PrsMgr_ListOfPresentableObjects: List<PrsMgr_PresentableObject>
+    {
+		
 
 		internal void Append(PrsMgr_PresentableObject theObject)
 		{
-			list.Add(theObject);
+			base.Add(theObject);
 		}
 
 		internal void Remove(PrsMgr_ListOfPresentableObjectsIter anIter)
 		{
-			list.Remove(anIter.Value());
+			base.Remove(anIter.Value());
 		}
 	}
 }

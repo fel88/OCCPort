@@ -11,12 +11,18 @@ namespace OCCPort
         internal int highlight;
         public int visible;
         int myId;
-        TopLoc_Datum3D         myTrsf;
+
+        //! Return transformation.
+        public TopLoc_Datum3D Transformation() { return myTrsf; }
+
+        TopLoc_Datum3D myTrsf;
+        //! Connect other structure to this one
+        public abstract void Connect(Graphic3d_CStructure theStructure);
 
         //! Return structure visibility flag
         public bool IsVisible() { return visible != 0; }
         //! Assign transformation.
-       public  virtual void SetTransformation( TopLoc_Datum3D theTrsf) { myTrsf = theTrsf; }
+        public virtual void SetTransformation(TopLoc_Datum3D theTrsf) { myTrsf = theTrsf; }
 
         public bool IsInfinite { get; internal set; }
         public bool IsForHighlight;
@@ -60,8 +66,8 @@ namespace OCCPort
             highlight = (0);
             visible = (1);
             /*HLRValidation(0),
-			IsForHighlight(Standard_False),
-			IsMutable(Standard_False),
+			IsForHighlight(Standard_False),*/
+            IsMutable = false;/*
 			Is2dText(Standard_False)*/
 
 
@@ -132,6 +138,11 @@ namespace OCCPort
         internal void updateLayerTransformation()
         {
             throw new NotImplementedException();
+        }
+
+        internal void ChangeBoundingBox(Graphic3d_BndBox3d aBox)
+        {
+            myBndBox = aBox;
         }
 
         Graphic3d_DisplayPriority myPriority;
