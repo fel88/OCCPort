@@ -62,8 +62,8 @@ namespace OCCPort
                 aPoints[i + 1] = (aPoints[i + 1] - aMin.Y()) / aDiffY - 0.5;
             }
 
-            IDelaBella aTriangulator = new ShewchukTriangulator();
-            //IDelaBella aTriangulator = new CDelaBella();
+            //IDelaBella aTriangulator = new ShewchukTriangulator();
+            IDelaBella aTriangulator = new CDelaBella();
             if (aTriangulator == null) // should never happen
             {
                 throw new Standard_ProgramError("BRepMesh_DelabellaBaseMeshAlgo::buildBaseTriangulation: unable creating a triangulation algorithm");

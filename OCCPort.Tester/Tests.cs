@@ -1,0 +1,103 @@
+﻿using OCCPort.Enums;
+using OpenTK.Mathematics;
+using System;
+using System.Reflection.Metadata.Ecma335;
+
+
+namespace OCCPort.Tester
+{
+    public static class Tests
+    {
+        public static DelaBella_Triangle TriangulateTest1(Vector2d[] points)
+        {
+            Bnd_B2d aBox = new Bnd_B2d();
+            
+            //List<Standard_Real> aPoints(2 * (aNodesNb + 4));
+            var aNodesNb = points.Length;
+            double[] aPoints = new double[(2 * (aNodesNb + 4))];
+            //double[] aPoints = new double[(2 * (aNodesNb ))];
+            for (int aNodeIt = 0; aNodeIt < aNodesNb; ++aNodeIt)
+            {
+                var aVertex = points[aNodeIt];
+
+                int aBaseIdx = 2 * (aNodeIt);
+                aPoints[aBaseIdx + 0] = aVertex.X;
+                aPoints[aBaseIdx + 1] = aVertex.Y;
+
+                aBox.Add(new gp_Pnt2d(aVertex.X, aVertex.Y));
+            }
+
+            aBox.Enlarge(0.1 * (aBox.CornerMax() - aBox.CornerMin()).Modulus());
+            gp_XY aMin = aBox.CornerMin();
+            gp_XY aMax = aBox.CornerMax();
+
+            aPoints[2 * aNodesNb + 0] = aMin.X();
+            aPoints[2 * aNodesNb + 1] = aMin.Y();
+            
+
+            aPoints[2 * aNodesNb + 2] = aMax.X();
+            aPoints[2 * aNodesNb + 3] = aMin.Y();
+            
+
+            aPoints[2 * aNodesNb + 4] = aMax.X();
+            aPoints[2 * aNodesNb + 5] = aMax.Y();
+            
+
+            aPoints[2 * aNodesNb + 6] = aMin.X();
+            aPoints[2 * aNodesNb + 7] = aMax.Y();
+            
+            
+            double aDiffX = (aMax.X() - aMin.X());
+            double aDiffY = (aMax.Y() - aMin.Y());
+            for (int i = 0; i < aPoints.Length; i += 2)
+            {
+                 aPoints[i + 0] = (aPoints[i + 0] - aMin.X()) / aDiffX - 0.5;
+                 aPoints[i + 1] = (aPoints[i + 1] - aMin.Y()) / aDiffY - 0.5;
+            }
+
+            //IDelaBella aTriangulator = new ShewchukTriangulator();
+            IDelaBella aTriangulator = new CDelaBella();
+            if (aTriangulator == null) // should never happen
+            {
+                throw new Standard_ProgramError("BRepMesh_DelabellaBaseMeshAlgo::buildBaseTriangulation: unable creating a triangulation algorithm");
+            }
+
+            //          aTriangulator->SetErrLog(logDelabella2Occ, NULL);
+            //          try
+            //          {
+            int aVerticesNb = aTriangulator.Triangulate((int)(aPoints.Length / 2), aPoints);
+            DelaBella_Triangle ret = null;
+            if (aVerticesNb > 0)
+            {
+                DelaBella_Triangle aTrianglePtr = aTriangulator.GetFirstDelaunayTriangle();
+                if (ret == null)
+                    ret = aTrianglePtr;
+                while (aTrianglePtr != null)
+                {
+                    int[] aNodes = {
+                    aTrianglePtr.v[0].i + 1,
+                    aTrianglePtr.v[2].i + 1,
+                    aTrianglePtr.v[1].i + 1
+                  };
+
+                    int[] aEdges = new int[3];
+                    bool[] aOrientations = new bool[3];
+                    for (int k = 0; k < 3; ++k)
+                    {
+                        BRepMesh_Edge aLink = new BRepMesh_Edge(aNodes[k], aNodes[(k + 1) % 3], BRepMesh_DegreeOfFreedom.BRepMesh_Free);
+
+                        //int aLinkInfo = aStructure.AddLink(aLink);
+                        //aEdges[k] = Math.Abs(aLinkInfo);
+                       // aOrientations[k] = aLinkInfo > 0;
+                    }
+
+                    BRepMesh_Triangle aTriangle = new BRepMesh_Triangle(aEdges, aOrientations, BRepMesh_DegreeOfFreedom.BRepMesh_Free);
+                    //aStructure.AddElement(aTriangle);
+
+                    aTrianglePtr = aTrianglePtr.next;
+                }
+            }
+            return ret;
+        }
+    }
+}

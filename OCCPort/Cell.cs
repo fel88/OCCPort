@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Linq;
 
 namespace OCCPort
 {
@@ -10,25 +11,53 @@ namespace OCCPort
      */
     internal class Cell
     {
+        public double GetCoord(int ind, gp_XY p)
+        {
+            if (ind == 0)
+                return p.X();
+            return p.Y();
+        }
+        const int INT_MAX = 2147483647;
+        const int INT_MIN = (-2147483647 - 1);
+
         public Cell(gp_XY thePnt, NCollection_Array1<double> theCellSize)
         {
             index = new int[theCellSize.Size()];
             Objects = null;
             for (int i = 0; i < theCellSize.Size(); i++)
             {
-                // double aVal = (Standard_Real)(Inspector::Coord(i, thePnt) / theCellSize[theCellSize.Lower() + i]);
+                //double aVal = (double)(Inspector::Coord(i, thePnt) / theCellSize[theCellSize.Lower() + i]);
+                double aVal = (double)(GetCoord(i, thePnt) / theCellSize[theCellSize.Lower() + i]);
                 //If the value of index is greater than
                 //INT_MAX it is decreased correspondingly for the value of INT_MAX. If the value
                 //of index is less than INT_MIN it is increased correspondingly for the absolute
                 //value of INT_MIN.
-                //index[i] = Cell_IndexType((aVal > INT_MAX - 1) ? fmod(aVal, (Standard_Real)INT_MAX)
-                //            : (aVal < INT_MIN + 1) ? fmod(aVal, (Standard_Real)INT_MIN)
-                //                    : aVal);
+                index[i] = (int)((aVal > INT_MAX - 1) ? fmod(aVal, (double)INT_MAX)
+                            : (aVal < INT_MIN + 1) ? fmod(aVal, (double)INT_MIN)
+                                    : aVal);
             }
         }
+
+        private double fmod(double aVal, double iNT_MAX)
+        {
+            return aVal % iNT_MAX;
+        }
+
         public ListNode Objects;
 
 
+        //! Compare cell with other one
+        public override bool Equals(object obj)
+        {
+            var theOther = (Cell)obj;
+            int aDim = (int)((theOther).index.Count());
+            for (int i = 0; i < aDim; i++)
+                if (index[i] != theOther.index[i])
+                    return false;
+
+            return true;
+            //return base.Equals(obj);
+        }
 
         public int[] index = new int[10];
 

@@ -5,6 +5,7 @@ using OpenTK.GLControl;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
@@ -325,39 +326,68 @@ namespace OCCPort.Tester
             myAISContext.Display(shape, true);
             myAISContext.SetDisplayMode(shape, AIS_DisplayMode.AIS_Shaded, false);
 
-
-
             GravityViewManager.View.Redraw();
         }
 
         private void toolStripButton9_Click(object sender, EventArgs e)
         {
-
-
             GravityViewManager.View.MyViewer.StructureManager().SetDeviceLost();
             //GravityViewManager.View.Redraw();
             aIS_ViewController.FlushViewEvents(myAISContext, GravityViewManager.View, true);
-
         }
 
         private void toolStripButton10_Click(object sender, EventArgs e)
         {
-            gp_Pnt p1 = new gp_Pnt(0, 0, 0);
-            gp_Pnt p2 = new gp_Pnt(10, 10, 10);
-            BRepPrimAPI_MakeBox box = new BRepPrimAPI_MakeBox(p1, p2);
-
-            box.Build();
-            var solid = box.Solid();
-            var shape = new AIS_Shape(solid).Shape();
-            var sm = v3d_viewer.StructureManager();
-
-            for (TopExp_Explorer aExpFace = new TopExp_Explorer(shape, TopAbs_ShapeEnum.TopAbs_FACE); aExpFace.More(); aExpFace.Next())
+            Vector2d[] points = { new Vector2d(0, 0), new Vector2d(50, 0), new Vector2d(50, 50), new Vector2d(0, 50) };
+            var res = Tests.TriangulateTest1(points);
+            Form form1 = new Form() { Width = 1000, Height = 800 };
+            PictureBox pb = new PictureBox() { Dock = DockStyle.Fill };
+            pb.Paint += (s, e) =>
             {
-                TopoDS_Face aFace = TopoDS.Face(aExpFace.Current());
-                TopAbs_Orientation faceOrientation = aFace.Orientation();
-                TopLoc_Location aLocation = new TopLoc_Location();
-                Poly_Triangulation aTr = BRep_Tool.Triangulation(aFace, ref aLocation);
-            }
+                var gr = e.Graphics;
+                gr.Clear(Color.White);
+                gr.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+                while (res != null)
+                {
+                    List<PointF> pp = new List<PointF>();
+                    for (int i = 0; i < res.v.Length; i++)
+                    {
+                        float scale = 500;
+                        float offset = 400;
+
+                        var p = new PointF((float)(res.v[i].x * scale + offset), (float)(res.v[i].y * scale + offset));
+
+                        pp.Add(p);
+                    }
+                 
+                    gr.FillPolygon(Brushes.LightBlue,
+                    pp.ToArray());
+                    gr.DrawPolygon(Pens.Black,
+                     pp.ToArray());
+                    res = res.next;
+                }
+            };
+
+            form1.Controls.Add(pb);
+            form1.ShowDialog();
+
+            //return;
+            //gp_Pnt p1 = new gp_Pnt(0, 0, 0);
+            //gp_Pnt p2 = new gp_Pnt(10, 10, 10);
+            //BRepPrimAPI_MakeBox box = new BRepPrimAPI_MakeBox(p1, p2);
+
+            //box.Build();
+            //var solid = box.Solid();
+            //var shape = new AIS_Shape(solid).Shape();
+            //var sm = v3d_viewer.StructureManager();
+
+            //for (TopExp_Explorer aExpFace = new TopExp_Explorer(shape, TopAbs_ShapeEnum.TopAbs_FACE); aExpFace.More(); aExpFace.Next())
+            //{
+            //    TopoDS_Face aFace = TopoDS.Face(aExpFace.Current());
+            //    TopAbs_Orientation faceOrientation = aFace.Orientation();
+            //    TopLoc_Location aLocation = new TopLoc_Location();
+            //    Poly_Triangulation aTr = BRep_Tool.Triangulation(aFace, ref aLocation);
+            //}
         }
 
         private void toolStripButton11_Click(object sender, EventArgs e)
@@ -371,12 +401,11 @@ namespace OCCPort.Tester
                 if (aTr == null)
                     continue;
 
-                var triangles = aTr.Triangles();               
+                var triangles = aTr.Triangles();
                 var nodes = aTr.NbNodes();
                 var nnn = aTr.NbTriangles();
             }
 
         }
     }
-
 }

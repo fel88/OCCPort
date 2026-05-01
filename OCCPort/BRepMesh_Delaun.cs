@@ -30,10 +30,13 @@ namespace OCCPort
                 //InitCirclesTool(theCellsCountU, theCellsCountV);
             }
         }
+
+
+        //! Destruction of auxiliary triangles containing the given vertices.
+        //! Removes auxiliary vertices also.
+        //! @param theAuxVertices auxiliary vertices to be cleaned up.
         public void RemoveAuxElements()
         {
-
-
             MapOfIntegerInteger aLoopEdges = new MapOfIntegerInteger(10);
 
             // Destruction of triangles containing a top of the super triangle

@@ -18,7 +18,7 @@ namespace OCCPort
             myHSize[1] = -Bnd_B2x_RealLast;
         }
 
-        internal void Add(gp_Pnt2d thePnt)
+        public void Add(gp_Pnt2d thePnt)
         {
             Add(thePnt.XY());
         }
@@ -84,7 +84,7 @@ namespace OCCPort
         //! Query a box corner: (Center - HSize). You must make sure that
         //! the box is NOT VOID (see IsVoid()), otherwise the method returns
         //! irrelevant result.       
-        internal gp_XY CornerMin()
+        public gp_XY CornerMin()
         {
             return new gp_XY(myCenter[0] - myHSize[0], myCenter[1] - myHSize[1]);
         }

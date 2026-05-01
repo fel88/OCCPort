@@ -83,7 +83,7 @@ namespace OCCPort
         
         
         //! Computes Sqrt (X*X + Y*Y) where X and Y are the two coordinates of this number pair.
-        internal double Modulus()
+        public double Modulus()
         {
             return Math.Sqrt(x * x + y * y); 
         }

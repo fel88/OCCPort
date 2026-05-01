@@ -43,6 +43,12 @@ namespace OCCPort
             return mySelector.GetCoincidentPoint();
         }
 
+
+        //! Adds vertex with empty data to the tool.
+        //! @param theVertex node to be added to the mesh.
+        //! @param isForceAdd adds the given node to structure without 
+        //! checking on coincidence with other nodes.
+        //! @return index of the node in the structure.
         internal int Add(BRepMesh_Vertex theVertex, bool isForceAdd)
         {
             int aIndex = isForceAdd ? 0 : FindIndex(theVertex);
