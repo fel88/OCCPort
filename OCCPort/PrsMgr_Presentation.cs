@@ -34,9 +34,10 @@ namespace OCCPort
         public override void Compute()
         {
             int aDispMode = 0;
-            for (PrsMgr_Presentations.Iterator aPrsIter = new PrsMgr_Presentations.Iterator(myPresentableObject.myPresentations); aPrsIter.More(); aPrsIter.Next())
-            {
-                PrsMgr_Presentation aModedPresentation = aPrsIter.Value();
+			//for (PrsMgr_Presentations.Iterator aPrsIter = new PrsMgr_Presentations.Iterator(); aPrsIter.More(); aPrsIter.Next())
+			foreach (var aPrsIter in myPresentableObject.myPresentations)
+			{			
+                PrsMgr_Presentation aModedPresentation = aPrsIter;
                 if (aModedPresentation == this)
                 {
                     aDispMode = aModedPresentation.Mode();

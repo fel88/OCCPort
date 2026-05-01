@@ -1,5 +1,7 @@
 ﻿using OCCPort;
 using System;
+using System.Linq;
+using System.Xml.Linq;
 
 namespace OCCPort
 {
@@ -14,7 +16,40 @@ namespace OCCPort
         public BRepMesh_Triangle GetElement(int theIndex)
         {
             return myElements[theIndex - 1];
-        }  //! Returns map of indices of links registered in mesh.
+        }
+        public void RemoveElement(int theIndex)
+        {
+            BRepMesh_Triangle aElement = (BRepMesh_Triangle)GetElement(theIndex);
+            if (aElement.Movability() == Enums.BRepMesh_DegreeOfFreedom.BRepMesh_Deleted)
+                return;
+
+            cleanElement(theIndex, aElement);
+            aElement.SetMovability(Enums.BRepMesh_DegreeOfFreedom.BRepMesh_Deleted);
+            myElementsOfDomain.Remove(theIndex);
+        }
+
+        void cleanElement(int theIndex, BRepMesh_Triangle theElement)
+        {
+            if (theElement.Movability() != Enums.BRepMesh_DegreeOfFreedom.BRepMesh_Free)
+                return;
+
+            int[] e = theElement.myEdges;
+            for (int i = 0; i < 3; ++i)
+                removeElementIndex(theIndex, myLinks[e[i]]);
+        }
+
+        void removeElementIndex(int theIndex, BRepMesh_PairOfIndex thePair)
+        {
+            for (int i = 1, n = thePair.Extent(); i <= n; ++i)
+            {
+                if (thePair.Index(i) == theIndex)
+                {
+                    thePair.RemoveIndex(i);
+                    return;
+                }
+            }
+        }
+        //! Returns map of indices of links registered in mesh.
         public MapOfInteger LinksOfDomain()
         {
             return myLinksOfDomain;
@@ -26,6 +61,16 @@ namespace OCCPort
         {
             return myLinks.FindFromIndex(theLinkIndex);
         }
+
+        //! Get list of links attached to the node with the given index.
+        //! @param theIndex index of node whose links should be retrieved.
+        //! @return list of links attached to the node.
+        public ListOfInteger LinksConnectedTo(int theIndex)
+        {
+            return linksConnectedTo(theIndex);
+        }
+
+
         //! Returns number of links.
         public int NbLinks()
         {
@@ -194,8 +239,7 @@ namespace OCCPort
         //! Get list of links attached to the node with the given index.
         //! @param theIndex index of node whose links should be retrieved.
         //! @return list of links attached to the node.
-        ListOfInteger linksConnectedTo(
-    int theIndex)
+        ListOfInteger linksConnectedTo(int theIndex)
         {
             return (ListOfInteger)myNodeLinks.Find(theIndex);
         }
@@ -213,9 +257,19 @@ namespace OCCPort
             return myNodes.FindKey(theIndex);
         }
 
-        internal void RemoveNode(int v)
+
+        //! Removes node from the mesh in case if it has no connected links 
+        //! and its type is Free.
+        //! @param theIndex index of node to be removed.
+        //! @param isForce if TRUE node will be removed even if movability
+        //! is not Free.
+        internal void RemoveNode(int theIndex, bool isForce = false)
         {
-            throw new NotImplementedException();
+            if (isForce || myNodes.FindKey(theIndex).Movability() == Enums.BRepMesh_DegreeOfFreedom.BRepMesh_Free)
+            {
+                if (LinksConnectedTo(theIndex).Extent() == 0)
+                    myNodes.DeleteVertex(theIndex);
+            }
         }
 
         VectorOfElements myElements;

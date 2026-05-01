@@ -3,11 +3,16 @@ using System.Collections.Generic;
 
 namespace OCCPort
 {
-    internal class NCollection_DataMap<T1, T2>:Dictionary<T1,T2>
+    public class NCollection_DataMap<T1, T2> : Dictionary<T1, T2>
     {
-        internal void Bind(T1 aFreeEdgeId, T2 v)
+        public bool Bind(T1 aFreeEdgeId, T2 v)
         {
+            bool ret = false;
+            if (!ContainsKey(aFreeEdgeId))
+                ret = true;
+
             Add(aFreeEdgeId, v);
+            return ret;
         }
     }
 }

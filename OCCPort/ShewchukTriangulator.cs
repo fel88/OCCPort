@@ -21,7 +21,7 @@ namespace OCCPort
             double[] x = new double[points];
             double[] y = new double[points];
             List<Vector2d> vv = new List<Vector2d>();
-            for (int i = 0; i < points - 4; i++)// exclude 2 super-triangles
+            for (int i = 0; i < points; i++)// exclude 2 super-triangles
             {
                 x[i] = xy[i * 2];
                 y[i] = xy[i * 2 + 1];
@@ -52,7 +52,12 @@ namespace OCCPort
                     }
                 }
 
-                tt.Add(ret);
+                if (ret.v.Select(z => z.i).Distinct().Count() == 3)
+                    tt.Add(ret);
+                else
+                {
+
+                }
             }
 
             triangles = tt.ToArray();

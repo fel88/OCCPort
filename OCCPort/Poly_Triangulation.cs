@@ -1,4 +1,5 @@
 ﻿using System;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace OCCPort
 {//! Provides a triangulation for a surface, a set of surfaces, or more generally a shape.
@@ -35,7 +36,11 @@ namespace OCCPort
         public Poly_Triangle Triangle(int theIndex) { return myTriangles.Value(theIndex); }
         //! Returns mesh purpose bits.
         public Poly_MeshPurpose MeshPurpose() { return myPurpose; }
+        //! Returns the number of triangles for this triangulation.
+        public int NbTriangles() { return myTriangles.Length(); }
 
+        [Obsolete("Deprecated method, Triangle() should be used instead")]
+        public Poly_Array1OfTriangle Triangles() { return myTriangles; }
 
         //! Sets an UV-node coordinates.
         //! @param[in] theIndex node index within [1, NbNodes()] range
@@ -91,11 +96,7 @@ namespace OCCPort
         //! Returns the number of nodes for this triangulation.
         public int NbNodes() { return myNodes.Length(); }
 
-        //! Returns the number of triangles for this triangulation.
-        internal int NbTriangles()
-        {
-            return myTriangles.Length();
-        }
+   
 
         //! Returns Standard_True if nodal normals are defined.
         public bool HasNormals() { return !myNormals.IsEmpty(); }

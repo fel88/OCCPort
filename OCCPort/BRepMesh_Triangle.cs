@@ -21,10 +21,21 @@ namespace OCCPort
             myOrientations[2] = false;
         }
 
+        //! Sets movability of the triangle.
+        public void SetMovability(BRepMesh_DegreeOfFreedom theMovability)
+        {
+            myMovability = theMovability;
+        }
+
         public int[] myEdges = new int[3];
         public bool[] myOrientations = new bool[3];
         public BRepMesh_DegreeOfFreedom myMovability;
 
+        //! Returns movability of the triangle.
+        public BRepMesh_DegreeOfFreedom Movability()
+        {
+            return myMovability;
+        }
         public BRepMesh_Triangle(int[] theEdges, bool[] theOrientations, BRepMesh_DegreeOfFreedom theMovability)
         {
             Initialize(theEdges, theOrientations, theMovability);

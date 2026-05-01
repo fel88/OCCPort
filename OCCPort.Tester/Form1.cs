@@ -11,6 +11,7 @@ using System.Drawing;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static OpenTK.Graphics.OpenGL.GL;
 
 
 namespace OCCPort.Tester
@@ -105,11 +106,11 @@ namespace OCCPort.Tester
             GL.Viewport(0, 0, glControl.Width, glControl.Height);
             var o2 = Matrix4.CreateOrthographic(glControl.Width, glControl.Height, 1, 1000);
 
-            GL.MatrixMode(MatrixMode.Projection);
+            GL.MatrixMode(OpenTK.Graphics.OpenGL.MatrixMode.Projection);
             GL.LoadMatrix(ref o2);
 
             Matrix4 modelview2 = Matrix4.LookAt(0, 0, 70, 0, 0, 0, 0, 1, 0);
-            GL.MatrixMode(MatrixMode.Modelview);
+            GL.MatrixMode(OpenTK.Graphics.OpenGL.MatrixMode.Modelview);
             GL.LoadMatrix(ref modelview2);
 
 
@@ -266,7 +267,7 @@ namespace OCCPort.Tester
             var res1 = proxy.Convert(40);
 
         }
-
+        TopoDS_Shape lastGenerated = null;
         private void toolStripButton6_Click(object sender, EventArgs e)
         {
             GravityViewManager.View.myView.Items.Clear();
@@ -294,10 +295,14 @@ namespace OCCPort.Tester
 
             box.Build();
             var solid = box.Solid();
+            lastGenerated = solid;
             var shape = new AIS_Shape(solid);
             myAISContext.Display(shape, true);
             myAISContext.SetDisplayMode(shape, AIS_DisplayMode.AIS_Shaded, false);
             myAISContext.UpdateCurrentViewer();
+
+
+
             //auto hn = GetHandle(*shape);
             //hh->FromObjHandle(hn);
         }
@@ -353,6 +358,24 @@ namespace OCCPort.Tester
                 TopLoc_Location aLocation = new TopLoc_Location();
                 Poly_Triangulation aTr = BRep_Tool.Triangulation(aFace, ref aLocation);
             }
+        }
+
+        private void toolStripButton11_Click(object sender, EventArgs e)
+        {
+            TopExp_Explorer t = new TopExp_Explorer(lastGenerated, TopAbs_ShapeEnum.TopAbs_FACE);
+            for (; t.More(); t.Next())
+            {
+                var face = t.Current() as TopoDS_Face;
+                TopLoc_Location loc = new TopLoc_Location();
+                var aTr = BRep_Tool.Triangulation(face, ref loc);
+                if (aTr == null)
+                    continue;
+
+                var triangles = aTr.Triangles();               
+                var nodes = aTr.NbNodes();
+                var nnn = aTr.NbTriangles();
+            }
+
         }
     }
 

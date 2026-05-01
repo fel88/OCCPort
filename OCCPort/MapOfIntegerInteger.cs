@@ -8,6 +8,9 @@ namespace OCCPort
         {
         }
 
-      
+        internal void UnBind(int v)
+        {
+            Remove(v);
+        }
     }
 }

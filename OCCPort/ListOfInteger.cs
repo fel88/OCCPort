@@ -32,5 +32,10 @@ namespace OCCPort
         {
             return this[^1];
         }
+
+        internal int Extent()
+        {
+            return Count;
+        }
     }
 }

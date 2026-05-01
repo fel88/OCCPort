@@ -1,10 +1,16 @@
-﻿namespace OCCPort
+﻿using TriangleNet.Topology.DCEL;
+
+namespace OCCPort
 {
     public class CDelaBella : IDelaBella
     {
+
+
         public override DelaBella_Triangle GetFirstDelaunayTriangle()
         {
-            throw new System.NotImplementedException();
+            throw new Standard_NotImplemented();
+            //return first_dela_face;
+
         }
 
         // return 0: no output 
@@ -14,6 +20,8 @@
         // if advance_bytes is less than 2*sizeof coordinate type, it is treated as 2*sizeof coordinate type  
         public override int Triangulate(int points, double[] xy, int advance_bytes = 0)
         {
+            DelabellaWrapper d = new DelabellaWrapper();
+
             if (xy == null)
                 return 0;
 
@@ -24,8 +32,9 @@
                 x[i] = xy[i * 2];
                 y[i] = xy[i * 2 + 1];
             }
+            var res = d.Triangulate(points, x, y);
 
-            return 1;
+            return res;
             //   if (y == null)
             //     y = x + 1;
         }

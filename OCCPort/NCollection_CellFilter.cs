@@ -96,6 +96,79 @@ namespace OCCPort
             Reset(theCellSize);
         }
 
+        //! Find a target object in the range of cells defined by two points and
+        //! remove it from the structures
+        //! (the first point must have all coordinates equal or
+        //! less than the same coordinate of the second point).
+        //! For usage of this method "operator ==" should be defined for Target.
+        public void Remove(int theTarget,
+                 gp_XY thePntMin, gp_XY thePntMax)
+        {
+            // get cells range by minimal and maximal coordinates
+            Cell aCellMin = new Cell(thePntMin, myCellSize);
+            Cell aCellMax = new Cell(thePntMax, myCellSize);
+            Cell aCell = aCellMin;
+            // remove object recursively from all cells in range
+            iterateRemove(myDim - 1, aCell, aCellMin, aCellMax, theTarget);
+        }
+
+        //! Internal removal function, performing iteration for adjacent cells
+        //! by one dimension; called recursively to cover all dimensions
+        void iterateRemove(int idim, Cell theCell,
+                      Cell theCellMin, Cell theCellMax,
+                      int theTarget)
+        {
+            var aStart = theCellMin.index[idim];
+            var anEnd = theCellMax.index[idim];
+            for (int i = aStart; i <= anEnd; ++i)
+            {
+                theCell.index[idim] = i;
+                if (idim != 0) // recurse
+                {
+                    iterateRemove(idim - 1, theCell, theCellMin, theCellMax, theTarget);
+                }
+                else // remove from this cell
+                {
+                    remove(theCell, theTarget);
+                }
+            }
+        }
+
+        //! Remove the target object from the specified cell
+        void remove(Cell theCell, int theTarget)
+        {
+            // check if any objects are recorded in that cell
+            if (!myCells.Contains(theCell))
+                return;
+
+            // iterate by objects in the cell and check each
+            Cell aMapCell = (Cell)myCells.Added(theCell);
+            ListNode aNode = aMapCell.Objects;
+            ListNode aPrev = null;
+            while (aNode != null)
+            {
+                ListNode aNext = aNode.Next;
+                
+                if (aNode.Object == theTarget)
+                {
+                    if (aPrev != null)
+                    {
+                        aPrev.Next = aNext;
+                    }
+                    else
+                    {
+                        aMapCell.Objects = aNext;
+                    }
+                    //aNode->Object.~Target();
+                    //(aPrev ? aPrev->Next : aMapCell.Objects) = aNext;
+                    // note that aNode itself need not to be freed, since IncAllocator is used
+                }
+                else
+                    aPrev = aNode;
+                aNode = aNext;
+            }
+        }
+
         //! Clear the data structures, set new cell size and allocator
         public void Reset(double theCellSize)
         {
@@ -146,7 +219,7 @@ namespace OCCPort
             int anEnd = theCellMax.index[idim];
             for (int i = aStart; i <= anEnd; ++i)
             {
-                theCell.index[idim]= i;
+                theCell.index[idim] = i;
                 if (idim != 0) // recurse
                 {
                     iterateAdd(idim - 1, theCell, theCellMin, theCellMax, theTarget);

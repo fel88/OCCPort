@@ -6,16 +6,37 @@ namespace OCCPort
     {
         public BRepMesh_SelectorOfDataStructureOfDelaun(BRepMesh_DataStructureOfDelaun myMeshData)
         {
+            myMesh = myMeshData;
+        }
+        //! Returns number of links.
+        public int NbElements()
+        {
+            return myElements.Size();
         }
 
-        internal MapOfInteger Elements()
+        //! Returns selected elements.
+        public MapOfInteger Elements()
         {
-            throw new NotImplementedException();
+            return myElements;
         }
 
-        internal void NeighboursOfNode(int v)
+        BRepMesh_DataStructureOfDelaun myMesh;
+        MapOfInteger myElements = new MapOfInteger();
+
+        internal void NeighboursOfNode(int theNodeIndex)
         {
-            throw new NotImplementedException();
+            foreach (var aLinkIt in myMesh.LinksConnectedTo(theNodeIndex))
+            {
+                elementsOfLink(aLinkIt);
+            }
         }
+
+        public void elementsOfLink(int theIndex)
+        {
+            BRepMesh_PairOfIndex aPair = myMesh.ElementsConnectedTo(theIndex);
+            for (int j = 1, jn = aPair.Extent(); j <= jn; ++j)
+                myElements.Add(aPair.Index(j));
+        }
+
     }
 }

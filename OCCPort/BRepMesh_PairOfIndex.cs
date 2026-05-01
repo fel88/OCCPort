@@ -13,6 +13,19 @@ namespace OCCPort
             Clear();
         }
 
+        //! Remove index from the given position.
+        //! @param thePairPos position of index in the pair (1 or 2).
+        public void RemoveIndex(int thePairPos)
+        {
+            if (thePairPos != 1 && thePairPos != 2)
+                throw new Standard_OutOfRange("BRepMesh_PairOfIndex::RemoveIndex, requested index is out of range");
+
+            if (thePairPos == 1)
+                myIndex[0] = myIndex[1];
+
+            myIndex[1] = -1;
+        }
+
         //! Returns first index of pair.
         public int FirstIndex()
         {

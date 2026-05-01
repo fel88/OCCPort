@@ -12,11 +12,11 @@
 
     public class NCollection_BaseMap
     {
-        int mySize;
+        //int mySize;
 
         //! IsEmpty
-        public virtual bool IsEmpty()
-        { return mySize == 0; }
+        //public virtual bool IsEmpty()
+       // { return mySize == 0; }
 
     }
 }

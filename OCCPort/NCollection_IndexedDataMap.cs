@@ -12,9 +12,11 @@ namespace OCCPort
 
         public T2 this[int key]
         {
-            get => dic[key].Value;
+            get => FindFromIndex(key);
             //set => dic[key ]=new KeyValuePair<T1, T2> () = value;
         }
+        public virtual bool IsEmpty()
+        { return dic.Count == 0; }
 
         //! FindFromIndex
         public T2 FindFromIndex(int theIndex)
@@ -27,7 +29,10 @@ namespace OCCPort
 
         public T1 FindKey(int theIndex)
         {
-            return dic[theIndex].Key;
+            Exceptions.Standard_OutOfRange_Raise_if(theIndex < 1 || theIndex > Extent(), "NCollection_IndexedDataMap::FindKey");
+            var aNode = dic[theIndex - 1];
+            return aNode.Key;
+            //return dic[theIndex].Key;
         }
         //! Returns the Index of already bound Key or appends new Key with specified Item value.
         //! @param theKey1 Key to search (and to bind, if it was not bound already)
@@ -41,7 +46,7 @@ namespace OCCPort
                     return i;
             }
             dic.Add(new KeyValuePair<T1, T2>(theKey1, theItem));
-            return dic.Count - 1;
+            return dic.Count;
             //if (Resizable())
             //{
             //    ReSize(Extent());
@@ -124,7 +129,7 @@ namespace OCCPort
             for (int i = 0; i < dic.Count; i++)
             {
                 if (dic[i].Key.Equals(theKey1))
-                    return i;
+                    return i + 1;
             }
             //IndexedDataMapNode* pNode1 = (IndexedDataMapNode*)myData1[Hasher::HashCode(theKey1, NbBuckets())];
             //while (pNode1)

@@ -14,8 +14,16 @@ namespace OCCPort
         public int GetCoincidentPoint()
         {
             return myIndex;
-        } 
-        
+        }
+
+        //! Deletes vertex with the given index.
+        //! @param theIndex index of vertex to be removed.
+        public void Delete(int theIndex)
+        {
+            myVertices.Value(theIndex - 1).SetMovability(BRepMesh_DegreeOfFreedom.BRepMesh_Deleted);
+            myDelNodes.Append(theIndex);
+        }
+
         //! Returns vertex with the given index.
         public BRepMesh_Vertex GetVertex(int theIndex)
         {

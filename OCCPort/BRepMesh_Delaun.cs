@@ -32,18 +32,20 @@ namespace OCCPort
         }
         public void RemoveAuxElements()
         {
-            
 
-            MapOfIntegerInteger aLoopEdges=new MapOfIntegerInteger (10);
+
+            MapOfIntegerInteger aLoopEdges = new MapOfIntegerInteger(10);
 
             // Destruction of triangles containing a top of the super triangle
-            BRepMesh_SelectorOfDataStructureOfDelaun aSelector=new BRepMesh_SelectorOfDataStructureOfDelaun (myMeshData);
+            BRepMesh_SelectorOfDataStructureOfDelaun aSelector = new BRepMesh_SelectorOfDataStructureOfDelaun(myMeshData);
             for (int aSupVertId = 0; aSupVertId < mySupVert.Size(); ++aSupVertId)
                 aSelector.NeighboursOfNode(mySupVert[aSupVertId]);
 
-            IteratorOfMapOfInteger aFreeTriangles=new IteratorOfMapOfInteger (aSelector.Elements() );
-            for (; aFreeTriangles.More(); aFreeTriangles.Next())
-                deleteTriangle(aFreeTriangles.Key(), aLoopEdges);
+            //            IteratorOfMapOfInteger aFreeTriangles=new IteratorOfMapOfInteger ( aSelector.Elements());
+            foreach (var aFreeTriangles in aSelector.Elements())
+            {
+                deleteTriangle(aFreeTriangles, aLoopEdges);
+            }
 
             // All edges that remain free are removed from aLoopEdges;
             // only the boundary edges of the triangulation remain there
@@ -184,11 +186,9 @@ namespace OCCPort
         {
 
             MapOfInteger aResult = new MapOfInteger();
-            IteratorOfMapOfInteger anEdgeIt = new IteratorOfMapOfInteger(myMeshData.LinksOfDomain());
-
-            for (; anEdgeIt.More(); anEdgeIt.Next())
+            foreach (var anEdgeIt in myMeshData.LinksOfDomain())
             {
-                int anEdge = anEdgeIt.Key();
+                int anEdge = anEdgeIt;
                 bool isToAdd = (theEdgeType == BRepMesh_DegreeOfFreedom.BRepMesh_Free) ?
                   (myMeshData.ElementsConnectedTo(anEdge).Extent() <= 1) :
                   (GetEdge(anEdge).Movability() == theEdgeType);
@@ -307,9 +307,27 @@ namespace OCCPort
             }
         }
 
-        private void deleteTriangle(int v, MapOfIntegerInteger aLoopEdges)
+        private void deleteTriangle(int theIndex, MapOfIntegerInteger theLoopEdges)
         {
-            throw new NotImplementedException();
+            if (myInitCircles)
+            {
+                //myCircles.Delete(theIndex);
+            }
+
+            BRepMesh_Triangle aElement = GetTriangle(theIndex);
+            int[] e = aElement.myEdges;
+            bool[] o = aElement.myOrientations;
+
+            myMeshData.RemoveElement(theIndex);
+
+            for (int i = 0; i < 3; ++i)
+            {
+                if (!theLoopEdges.Bind(e[i], o[i] ? 1 : 0))
+                {
+                    theLoopEdges.UnBind(e[i]);
+                    myMeshData.RemoveLink(e[i]);
+                }
+            }
         }
 
         bool isBoundToFrontier(

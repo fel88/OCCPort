@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace OCCPort
 {
-    public class MapOfInteger:List<int>
+    public class MapOfInteger : List<int>
     {
         public bool IsEmpty()
         {
@@ -11,6 +11,11 @@ namespace OCCPort
         }
 
         internal int Extent()
+        {
+            return Count;
+        }
+
+        internal int Size()
         {
             return Count;
         }

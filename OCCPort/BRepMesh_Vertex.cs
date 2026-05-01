@@ -15,7 +15,11 @@ namespace OCCPort
             return myUV;
         }
         BRepMesh_DegreeOfFreedom myMovability;
-
+        //! Sets movability of the vertex.
+        public void SetMovability(BRepMesh_DegreeOfFreedom theMovability)
+        {
+            myMovability = theMovability;
+        }
 
         //! Returns index of 3d point associated with the vertex.
         public int Location3d()

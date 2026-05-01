@@ -45,6 +45,7 @@
             toolStripButton8 = new System.Windows.Forms.ToolStripButton();
             toolStripButton9 = new System.Windows.Forms.ToolStripButton();
             toolStripButton10 = new System.Windows.Forms.ToolStripButton();
+            toolStripButton11 = new System.Windows.Forms.ToolStripButton();
             toolStrip1.SuspendLayout();
             SuspendLayout();
             // 
@@ -56,7 +57,7 @@
             // 
             // toolStrip1
             // 
-            toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { toolStripButton1, toolStripDropDownButton1, toolStripButton2, toolStripButton3, toolStripButton4, toolStripButton5, toolStripButton6, toolStripButton7, toolStripButton8, toolStripButton9, toolStripButton10 });
+            toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { toolStripButton1, toolStripDropDownButton1, toolStripButton2, toolStripButton3, toolStripButton4, toolStripButton5, toolStripButton6, toolStripButton7, toolStripButton8, toolStripButton9, toolStripButton10, toolStripButton11 });
             toolStrip1.Location = new System.Drawing.Point(0, 0);
             toolStrip1.Name = "toolStrip1";
             toolStrip1.Size = new System.Drawing.Size(1058, 25);
@@ -185,6 +186,15 @@
             toolStripButton10.Text = "triangulate test";
             toolStripButton10.Click += toolStripButton10_Click;
             // 
+            // toolStripButton11
+            // 
+            toolStripButton11.Image = (System.Drawing.Image)resources.GetObject("toolStripButton11.Image");
+            toolStripButton11.ImageTransparentColor = System.Drawing.Color.Magenta;
+            toolStripButton11.Name = "toolStripButton11";
+            toolStripButton11.Size = new System.Drawing.Size(86, 22);
+            toolStripButton11.Text = "iterate poly";
+            toolStripButton11.Click += toolStripButton11_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -219,6 +229,7 @@
 		private System.Windows.Forms.ToolStripButton toolStripButton8;
         private System.Windows.Forms.ToolStripButton toolStripButton9;
         private System.Windows.Forms.ToolStripButton toolStripButton10;
+        private System.Windows.Forms.ToolStripButton toolStripButton11;
     }
 }
 

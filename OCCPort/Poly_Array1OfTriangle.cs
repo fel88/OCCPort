@@ -4,7 +4,7 @@ using System.Xml.Linq;
 
 namespace OCCPort
 {
-    internal class Poly_Array1OfTriangle
+    public class Poly_Array1OfTriangle
     {
         public Poly_Triangle[] triangles;
 

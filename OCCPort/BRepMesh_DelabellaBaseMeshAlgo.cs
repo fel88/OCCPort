@@ -63,6 +63,7 @@ namespace OCCPort
             }
 
             IDelaBella aTriangulator = new ShewchukTriangulator();
+            //IDelaBella aTriangulator = new CDelaBella();
             if (aTriangulator == null) // should never happen
             {
                 throw new Standard_ProgramError("BRepMesh_DelabellaBaseMeshAlgo::buildBaseTriangulation: unable creating a triangulation algorithm");

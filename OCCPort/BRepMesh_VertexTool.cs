@@ -19,6 +19,17 @@ namespace OCCPort
             return mySelector.GetVertex(theIndex);
         }
 
+        public void DeleteVertex(int theIndex)
+        {
+            BRepMesh_Vertex aV = mySelector.GetVertex(theIndex);
+
+            gp_XY aMinPnt = new gp_XY(), aMaxPnt = new gp_XY();
+            expandPoint(aV.Coord(), ref aMinPnt, ref aMaxPnt);
+
+            myCellFilter.Remove(theIndex, aMinPnt, aMaxPnt);
+            mySelector.Delete(theIndex);
+        }
+
         //! Returns a number of vertices.
         public int Extent()
         {
