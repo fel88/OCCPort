@@ -1,4 +1,5 @@
-﻿using static System.Net.Mime.MediaTypeNames;
+﻿using System;
+using static System.Net.Mime.MediaTypeNames;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace OCCPort
@@ -8,7 +9,7 @@ namespace OCCPort
     public struct gp_Pnt2d
     {
 
-        gp_XY coord;
+        public gp_XY coord;
         //=======================================================================
         public double SquareDistance(gp_Pnt2d theOther)
         {
@@ -39,6 +40,14 @@ namespace OCCPort
         }
         //! Assigns the two coordinates of Coord to this point.
         public void SetXY(gp_XY theCoord) { coord = theCoord; }
+//! Returns the coordinates of this point.
+            //! Note: This syntax allows direct modification of the returned value.
+        internal gp_XY ChangeCoord()
+        {
+            
+            return coord;
+
+        }
 
         public gp_Pnt2d(gp_XY gp_XY) : this()
         {

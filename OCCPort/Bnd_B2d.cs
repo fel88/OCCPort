@@ -9,13 +9,21 @@ namespace OCCPort
         {
             Clear();
         }
-        const double Bnd_B2x_RealLast =(double)(1e30);
+        const double Bnd_B2x_RealLast = (double)(1e30);
         private void Clear()
         {
             myCenter[0] = Bnd_B2x_RealLast;
             myCenter[1] = Bnd_B2x_RealLast;
             myHSize[0] = -Bnd_B2x_RealLast;
             myHSize[1] = -Bnd_B2x_RealLast;
+        }
+        /**
+ * Intersection Box-Box.
+ */
+        public bool IsOut(Bnd_B2d theBox)
+        {
+            return (Math.Abs(theBox.myCenter[0] - myCenter[0]) > theBox.myHSize[0] + myHSize[0] ||
+                    Math.Abs(theBox.myCenter[1] - myCenter[1]) > theBox.myHSize[1] + myHSize[1]);
         }
 
         public void Add(gp_Pnt2d thePnt)
@@ -24,9 +32,9 @@ namespace OCCPort
         }
 
         //! Extend the Box by the absolute value of theDiff.
-      public  void Enlarge( double aDiff)
+        public void Enlarge(double aDiff)
         {
-             double aD = Math.Abs(aDiff);
+            double aD = Math.Abs(aDiff);
             myHSize[0] += aD;
             myHSize[1] += aD;
         }
@@ -50,13 +58,13 @@ namespace OCCPort
             }
             else
             {
-                double[]aDiff = {
+                double[] aDiff = {
       (thePnt.X()) - myCenter[0],
       (thePnt.Y()) - myCenter[1]
     };
                 if (aDiff[0] > myHSize[0])
                 {
-                     double aShift = (aDiff[0] - myHSize[0]) / 2;
+                    double aShift = (aDiff[0] - myHSize[0]) / 2;
                     myCenter[0] += aShift;
                     myHSize[0] += aShift;
                 }
@@ -68,13 +76,13 @@ namespace OCCPort
                 }
                 if (aDiff[1] > myHSize[1])
                 {
-                     double aShift = (aDiff[1] - myHSize[1]) / 2;
+                    double aShift = (aDiff[1] - myHSize[1]) / 2;
                     myCenter[1] += aShift;
                     myHSize[1] += aShift;
                 }
                 else if (aDiff[1] < -myHSize[1])
                 {
-                     double aShift = (aDiff[1] + myHSize[1]) / 2;
+                    double aShift = (aDiff[1] + myHSize[1]) / 2;
                     myCenter[1] += aShift;
                     myHSize[1] -= aShift;
                 }

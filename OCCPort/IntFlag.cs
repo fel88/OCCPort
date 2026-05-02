@@ -1,4 +1,4 @@
-﻿enum IntFlag
+﻿public enum IntFlag
 {
     NoIntersection,
     Cross,

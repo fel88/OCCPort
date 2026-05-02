@@ -3,11 +3,51 @@ using System;
 using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
+using System.Transactions;
 
 namespace OCCPort
 {
     public class BRepMesh_GeomTool
     {
+
+        //=============================================================================
+        //function : classifyPoint
+        //purpose  : 
+        //=============================================================================
+      static  int classifyPoint(
+  gp_XY thePoint1,
+  gp_XY thePoint2,
+  gp_XY thePointToCheck)
+        {
+            gp_XY aP1 = thePoint2 - thePoint1;
+            gp_XY aP2 = thePointToCheck - thePoint1;
+
+            double aPrec = Precision.PConfusion();
+            double aSqPrec = aPrec * aPrec;
+            double aDist = Math.Abs(aP1 ^ aP2);
+            if (aDist > aPrec)
+            {
+                aDist = (aDist * aDist) / aP1.SquareModulus();
+                if (aDist > aSqPrec)
+                    return 0; //out
+            }
+
+            gp_XY aMult = aP1.Multiplied(aP2);
+            if (aMult.X() < 0.0 || aMult.Y() < 0.0)
+                return 0; //out
+
+            if (aP1.SquareModulus() < aP2.SquareModulus())
+                return 0; //out
+
+            if (thePointToCheck.IsEqual(thePoint1, aPrec) ||
+                thePointToCheck.IsEqual(thePoint2, aPrec))
+            {
+                return -1; //coincides with an end point
+            }
+
+            return 1;
+        }
+
         // For better meshing performance we try to estimate the acceleration circles grid structure sizes:
         // For each parametric direction (U, V) we estimate firstly an approximate distance between the future points -
         // this estimation takes into account the required face deflection and the complexity of the face.
@@ -63,9 +103,146 @@ namespace OCCPort
             AdjustCellsCounts(theSurface, theVerticesNb, ref aCellsCountU, ref aCellsCountV);
             return (aCellsCountU, aCellsCountV);
         }
+        public static IntFlag IntSegSeg(
+  gp_XY theStartPnt1,
+  gp_XY theEndPnt1,
+  gp_XY theStartPnt2,
+  gp_XY theEndPnt2,
+  bool isConsiderEndPointTouch,
+  bool isConsiderPointOnSegment,
+ ref  gp_Pnt2d theIntPnt)
+        {
+            int[] aPointHash = {
+    classifyPoint(theStartPnt1, theEndPnt1, theStartPnt2),
+    classifyPoint(theStartPnt1, theEndPnt1, theEndPnt2  ),
+    classifyPoint(theStartPnt2, theEndPnt2, theStartPnt1),
+    classifyPoint(theStartPnt2, theEndPnt2, theEndPnt1  )
+  };
 
+            int aPosHash =
+              aPointHash[0] + aPointHash[1] + aPointHash[2] + aPointHash[3];
+
+            // Consider case when edges have shared vertex
+            if (aPointHash[0] < 0 || aPointHash[1] < 0)
+            {
+                if (aPosHash == -1)
+                {
+                    // -1 means, that 2 points are equal, and 1 point is on another curve
+                    return IntFlag.Glued;
+                }
+                else
+                {
+                    if (isConsiderEndPointTouch)
+                        return IntFlag.EndPointTouch;
+
+                    return IntFlag.NoIntersection;
+                }
+            }
+
+            /*=========================================*/
+            /*  1) hash code == 1:
+
+                              0+
+                              /
+                     0      1/         0
+                     +======+==========+
+
+                2) hash code == 2:
+
+                     0    1        1   0
+                  a) +----+========+---+
+
+                     0       1   1     0
+                  b) +-------+===+=====+
+
+                                                       */
+            /*=========================================*/
+            if (aPosHash == 1)
+            {
+                if (isConsiderPointOnSegment)
+                {
+                    if (aPointHash[0] == 1)
+                        theIntPnt = new gp_Pnt2d(theStartPnt1);
+                    else if (aPointHash[1] == 1)
+                        theIntPnt = theEndPnt1.To_gp_Pnt2d();
+                    else if (aPointHash[2] == 1)
+                        theIntPnt = theStartPnt2.To_gp_Pnt2d();
+                    else
+                        theIntPnt = theEndPnt2.To_gp_Pnt2d();
+
+                    return IntFlag.PointOnSegment;
+                }
+
+                return IntFlag.NoIntersection;
+            }
+            else if (aPosHash == 2)
+                return IntFlag.Glued;
+
+            double[] aParam = new double[2];
+            IntFlag aIntFlag = IntLinLin(theStartPnt1, theEndPnt1,
+              theStartPnt2, theEndPnt2, ref theIntPnt.coord, aParam);
+
+            if (aIntFlag == IntFlag.NoIntersection)
+                return IntFlag.NoIntersection;
+
+            if (aIntFlag == IntFlag.Same)
+            {
+                if (aPosHash < -2)
+                    return IntFlag.Same;
+                else if (aPosHash == -1)
+                    return IntFlag.Glued;
+
+                return IntFlag.NoIntersection;
+            }
+
+            // Cross
+            // Intersection is out of segments ranges
+            double aPrec = Precision.PConfusion();
+            double aEndPrec = 1 - aPrec;
+            for (int i = 0; i < 2; ++i)
+            {
+                if (aParam[i] < aPrec || aParam[i] > aEndPrec)
+                    return IntFlag.NoIntersection;
+            }
+
+            return IntFlag.Cross;
+        }
+        public static IntFlag IntLinLin(
+  gp_XY theStartPnt1,
+  gp_XY theEndPnt1,
+  gp_XY theStartPnt2,
+  gp_XY theEndPnt2,
+  ref gp_XY theIntPnt,
+  double[] theParamOnSegment)
+        {
+            gp_XY aVec1 = theEndPnt1 - theStartPnt1;
+            gp_XY aVec2 = theEndPnt2 - theStartPnt2;
+            gp_XY aVecO1O2 = theStartPnt2 - theStartPnt1;
+
+            double aCrossD1D2 = aVec1 ^ aVec2;
+            double aCrossD1D3 = aVecO1O2 ^ aVec2;
+
+            double aPrec = gp.Resolution();
+            // Are edgegs codirectional
+            if (Math.Abs(aCrossD1D2) < aPrec)
+            {
+                // Just a parallel case?
+                if (Math.Abs(aCrossD1D3) < aPrec)
+                    return IntFlag.Same;
+                else
+                    return IntFlag.NoIntersection;
+            }
+
+            theParamOnSegment[0] = aCrossD1D3 / aCrossD1D2;
+            theIntPnt = theStartPnt1 +  aVec1* theParamOnSegment[0] ;
+
+            double aCrossD2D3 = aVecO1O2 ^ aVec1;
+            theParamOnSegment[1] = aCrossD2D3 / aCrossD1D2;
+
+            return IntFlag.Cross;
+        }
         private static void ComputeErrFactors(double theDeflection,
-            Adaptor3d_Surface theFace, ref double theErrFactorU, ref double theErrFactorV)
+                    Adaptor3d_Surface theFace, ref double theErrFactorU, ref double theErrFactorV)
         {
             theErrFactorU = theDeflection * 10.0;
             theErrFactorV = theDeflection * 10.0;

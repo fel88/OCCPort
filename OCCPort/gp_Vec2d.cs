@@ -23,9 +23,15 @@ namespace OCCPort
 
         }
 
+        //! Creates a vector with a doublet of coordinates.
+        public gp_Vec2d(gp_XY theCoord)
+        {
+            coord = (theCoord);
+        }
+
         public gp_Vec2d() { }
         //! Computes the magnitude of this vector.
-        public double Magnitude()  { return coord.Modulus(); }
+        public double Magnitude() { return coord.Modulus(); }
 
         public double Angle(gp_Vec2d Other)
         {

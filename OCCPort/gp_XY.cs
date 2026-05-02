@@ -10,9 +10,30 @@ namespace OCCPort
     //! It is used in vectorial computations or for holding this type
     //! of information in data structures.
     public struct gp_XY
-
     {
+        public gp_XY Multiplied(gp_XY theOther) { return new gp_XY(x * theOther.X(), y * theOther.Y()); }
+        public gp_XY Multiplied(double  v) { return new gp_XY(x * v, y * v); }
+
+        public bool IsEqual(gp_XY Other,
+                  double Tolerance)
+        {
+            double val;
+            val = x - Other.x;
+            if (val < 0) val = -val;
+            if (val > Tolerance)
+                return false;
+
+            val = y - Other.y;
+            if (val < 0) val = -val;
+            if (val > Tolerance)
+                return false;
+
+            return true;
+        }
+
+
         public static double operator ^(gp_XY theOther, gp_XY v2) { return theOther.Crossed(v2); }
+        
 
         public void SetLinearForm(double theA1, gp_XY theXY1,
                               gp_XY theXY2)
