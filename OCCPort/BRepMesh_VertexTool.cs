@@ -19,6 +19,30 @@ namespace OCCPort
             return mySelector.GetVertex(theIndex);
         }
 
+        //! Sets the tolerance to be used for identification of 
+        //! coincident vertices.
+        //! @param theToleranceX tolerance for X dimension.
+        //! @param theToleranceY tolerance for Y dimension.
+        public void SetTolerance(double theToleranceX,
+                      double theToleranceY)
+        {
+            mySelector.SetTolerance(theToleranceX, theToleranceY);
+            myTolerance[0] = theToleranceX;
+            myTolerance[1] = theToleranceY;
+        }
+
+        //! Sets new size of cell for cellfilter.
+        //! @param theSizeX size for X dimension.
+        //! @param theSizeY size for Y dimension.
+        public void SetCellSize(double theSizeX,
+                    double theSizeY)
+        {
+            double[] aCellSizeC = { theSizeX, theSizeY };
+            NCollection_Array1<double> aCellSize = new NCollection_Array1<double>(aCellSizeC[0], 1, 2);
+            myCellFilter.Reset(aCellSize);
+            mySelector.Clear();
+        }
+
         //! Gets the tolerance to be used for identification of 
         //! coincident vertices.
         //! @param theToleranceX tolerance for X dimension.

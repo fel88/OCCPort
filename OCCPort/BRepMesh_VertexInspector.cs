@@ -16,6 +16,12 @@ namespace OCCPort
             return myIndex;
         }
 
+        //! Clear inspector's internal data structures.
+       public  void Clear()
+        {
+            myVertices.Clear();
+            myDelNodes.Clear();
+        }
         //! Deletes vertex with the given index.
         //! @param theIndex index of vertex to be removed.
         public void Delete(int theIndex)
@@ -41,10 +47,19 @@ namespace OCCPort
         }
         //! Sets the tolerance to be used for identification of 
         //! coincident vertices equal for both dimensions.
-        void SetTolerance(double theTolerance)
+        public void SetTolerance(double theTolerance)
         {
             myTolerance[0] = theTolerance * theTolerance;
             myTolerance[1] = 0.0;
+        }  //! Sets the tolerance to be used for identification of 
+           //! coincident vertices.
+           //! @param theToleranceX tolerance for X dimension.
+           //! @param theToleranceY tolerance for Y dimension.
+        public void SetTolerance(double theToleranceX,
+                    double theToleranceY)
+        {
+            myTolerance[0] = theToleranceX * theToleranceX;
+            myTolerance[1] = theToleranceY * theToleranceY;
         }
         int myIndex;
         double myMinSqDist;

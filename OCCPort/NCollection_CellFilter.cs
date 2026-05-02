@@ -148,7 +148,7 @@ namespace OCCPort
             while (aNode != null)
             {
                 ListNode aNext = aNode.Next;
-                
+
                 if (aNode.Object == theTarget)
                 {
                     if (aPrev != null)
@@ -174,9 +174,21 @@ namespace OCCPort
         {
             for (int i = 0; i < myDim; i++)
                 myCellSize[i] = theCellSize;
-            //resetAllocator(theAlloc);
+            resetAllocator();
+        }  
+        
+        //! Clear the data structures and set new cell sizes and allocator
+        public void Reset(NCollection_Array1<double> theCellSize)
+        {
+            myCellSize = theCellSize;
+            resetAllocator();
         }
+        //! Reset allocator to the new one
+        void resetAllocator()
+        {
 
+            myCells.Clear();
+        }
         //! Inspect all targets in the cell corresponding to the given point
         public void Inspect(gp_XY thePnt, T theInspector)
         {

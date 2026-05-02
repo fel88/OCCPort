@@ -26,6 +26,13 @@ namespace OCCPort
             myTolV = (0.0);
             mySurfaceType = GeomAbs_SurfaceType.GeomAbs_OtherSurface;
         }
+        public gp_Pnt Value(double U,
+                                 double V)
+        {
+            gp_Pnt aValue = new gp_Pnt();
+            D0(U, V, ref aValue);
+            return aValue;
+        }
 
         public override Adaptor3d_Surface BasisSurface()
         {
@@ -402,11 +409,61 @@ namespace OCCPort
         {
             throw new NotImplementedException();
         }
-
-        public override void D0(double u, double v, ref gp_Pnt pnt)
+        public void RebuildCache(double theU,
+                                       double theV)
         {
-            throw new NotImplementedException();
+            if (mySurfaceType == GeomAbs_SurfaceType.GeomAbs_BezierSurface)
+            {
+                // Create cache for Bezier
+                //Geom_BezierSurface aBezier = (Geom_BezierSurface)mySurface;
+                //int aDegU = aBezier->UDegree();
+                //int aDegV = aBezier->VDegree();
+                //TColStd_Array1OfReal aFlatKnotsU(BSplCLib.FlatBezierKnots(aDegU), 1, 2 * (aDegU + 1));
+                //TColStd_Array1OfReal aFlatKnotsV(BSplCLib.FlatBezierKnots(aDegV), 1, 2 * (aDegV + 1));
+                //if (mySurfaceCache.IsNull())
+                //    mySurfaceCache = new BSplSLib_Cache(
+                //      aDegU, aBezier->IsUPeriodic(), aFlatKnotsU,
+                //      aDegV, aBezier->IsVPeriodic(), aFlatKnotsV, aBezier->Weights());
+                //mySurfaceCache->BuildCache(theU, theV, aFlatKnotsU, aFlatKnotsV,
+                //                            aBezier->Poles(), aBezier->Weights());
+            }
+            else if (mySurfaceType ==GeomAbs_SurfaceType. GeomAbs_BSplineSurface)
+            {
+                //// Create cache for B-spline
+                //if (mySurfaceCache.IsNull())
+                //    mySurfaceCache = new BSplSLib_Cache(
+                //      myBSplineSurface->UDegree(), myBSplineSurface->IsUPeriodic(), myBSplineSurface->UKnotSequence(),
+                //      myBSplineSurface->VDegree(), myBSplineSurface->IsVPeriodic(), myBSplineSurface->VKnotSequence(),
+                //      myBSplineSurface->Weights());
+                //mySurfaceCache->BuildCache(theU, theV, myBSplineSurface->UKnotSequence(), myBSplineSurface->VKnotSequence(),
+                //                            myBSplineSurface->Poles(), myBSplineSurface->Weights());
+            }
         }
+        public override void D0(double U, double V, ref gp_Pnt P)
+        {
+            switch (mySurfaceType)
+            {
+                case GeomAbs_SurfaceType.GeomAbs_BezierSurface:
+                case GeomAbs_SurfaceType.GeomAbs_BSplineSurface:
+                    //if (mySurfaceCache.IsNull() || !mySurfaceCache->IsCacheValid(U, V))
+                    //    RebuildCache(U, V);
+                    //mySurfaceCache->D0(U, V, P);
+                    break;
+
+                case GeomAbs_SurfaceType.GeomAbs_OffsetSurface:
+                case GeomAbs_SurfaceType.GeomAbs_SurfaceOfExtrusion:
+                //    //caseGeomAbs_SurfaceType.GeomAbs_SurfaceOfRevolution:
+                //  Exceptions.Standard_NoSuchObject_Raise_if(myNestedEvaluator.IsNull(),
+                  //      "GeomAdaptor_Surface::D0: evaluator is not initialized");
+                  //  myNestedEvaluator->D0(U, V, P);
+                    break;
+
+                default:
+                    mySurface.D0(U, V, ref P);
+                    break;
+            }
+        }
+        //BSplSLib_Cache mySurfaceCache; ///< Cached data for B-spline or Bezier surface
 
         public GeomAdaptor_Surface(Geom_Surface theSurf)
 

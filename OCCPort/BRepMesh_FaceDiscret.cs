@@ -65,7 +65,6 @@ namespace OCCPort
             {
 
             }
-
         }
 
         public override bool performInternal(IMeshData_Model theModel, IMeshTools_Parameters theParameters, Message_ProgressRange theRange)

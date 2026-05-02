@@ -160,7 +160,7 @@ namespace OCCPort
 
         //! Generates mesh for the contour stored in data structure.
         public abstract void generateMesh(Message_ProgressRange theRange);
-        public void Perform(IMeshData_Face theDFace, IMeshTools_Parameters theParameters, Message_ProgressRange theRange)
+        public virtual void Perform(IMeshData_Face theDFace, IMeshTools_Parameters theParameters, Message_ProgressRange theRange)
         {
             try
             {
@@ -221,7 +221,7 @@ namespace OCCPort
             return thePCurve.GetOrientation();
         }
 
-        private bool initDataStructure()
+        protected virtual bool initDataStructure()
         {
 
             for (int aWireIt = 0; aWireIt < myDFace.WiresNb(); ++aWireIt)

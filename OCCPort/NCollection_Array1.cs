@@ -20,6 +20,10 @@ namespace OCCPort
 
             //
         }
+        internal T First()
+        {
+            return this[this.myLowerBound];
+        }
         public bool IsEmpty()
         {
             return list == null || list.Length == 0;
@@ -50,6 +54,34 @@ namespace OCCPort
             list = theOther.ToArray();
 
         }
+
+        //! C array-based constructor.
+        //!
+        //! Makes this array to use the buffer pointed by theBegin
+        //! instead of allocating it dynamically.
+        //! Argument theBegin should be a reference to the first element
+        //! of the pre-allocated buffer (usually local C array buffer),
+        //! with size at least theUpper - theLower + 1 items.
+        //!
+        //! Warning: returning array object created using this constructor
+        //! from function by value will result in undefined behavior
+        //! if compiler performs return value optimization (this is likely
+        //! to be true for all modern compilers in release mode).
+        //! The same happens if array is copied using Move() function
+        //! or move constructor and target object's lifespan is longer
+        //! than that of the buffer.
+        public NCollection_Array1(T theBegin,
+                     int theLower,
+                     int theUpper)
+        {
+            myLowerBound = theLower;
+            myUpperBound = theUpper;
+            myDeletable = false;
+            Exceptions.Standard_RangeError_Raise_if(theUpper < theLower, "NCollection_Array1::Create");
+            list = new T[theUpper - theLower + 1];
+
+        }
+
         public T this[int key]
         {
             get => list[key - Lower()];

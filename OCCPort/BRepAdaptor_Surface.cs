@@ -16,6 +16,12 @@ namespace OCCPort
     //! set to false.
     public class BRepAdaptor_Surface : Adaptor3d_Surface
     {
+        public GeomAdaptor_Surface Surface()
+        {
+            return mySurf;
+        }
+
+
         //! Returns the type of the surface : Plane, Cylinder,
         //! Cone,      Sphere,        Torus,    BezierSurface,
         //! BSplineSurface,               SurfaceOfRevolution,
@@ -30,6 +36,11 @@ namespace OCCPort
         {
             Initialize(F, R);
 
+        }
+
+        public gp_Pnt Value(double U, double V)
+        {
+            return mySurf.Value(U, V).Transformed(myTrsf);
         }
 
         public override Adaptor3d_Surface BasisSurface()
@@ -77,22 +88,22 @@ namespace OCCPort
 
         public override bool IsVPeriodic()
         {
-            throw new System.NotImplementedException();
+            return mySurf.IsVPeriodic();
         }
 
         public override bool IsUPeriodic()
         {
-            throw new System.NotImplementedException();
+            return mySurf.IsUPeriodic();
         }
 
         public override double UPeriod()
         {
-            throw new System.NotImplementedException();
+            return mySurf.UPeriod();
         }
 
         public override double VPeriod()
         {
-            throw new System.NotImplementedException();
+            return mySurf.VPeriod();
         }
 
         public override double VResolution(double v)
@@ -115,9 +126,10 @@ namespace OCCPort
             throw new System.NotImplementedException();
         }
 
-        public override void D0(double u, double v, ref gp_Pnt pnt)
+        public override void D0(double U, double V, ref gp_Pnt P)
         {
-            throw new System.NotImplementedException();
+            mySurf.D0(U, V, ref P);
+            P.Transform(myTrsf);
         }
     }
 }

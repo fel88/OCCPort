@@ -9,6 +9,8 @@ namespace OCCPort
     {
         //! Returns orientation of the edge associated with current pcurve.
         TopAbs_Orientation GetOrientation();
+        //! Returns forward flag of this pcurve.
+        bool IsForward();
 
         int GetIndex(int theIndex);
         void SetIndex(int theIndex,int val);

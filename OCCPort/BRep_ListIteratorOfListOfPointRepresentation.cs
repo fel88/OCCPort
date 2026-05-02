@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace OCCPort
 {
-    public class BRep_ListIteratorOfListOfPointRepresentation : List<BRep_PointRepresentation>
+    public class BRep_ListIteratorOfListOfPointRepresentation 
     {
         public BRep_ListIteratorOfListOfPointRepresentation(BRep_ListOfPointRepresentation lpr)
         {

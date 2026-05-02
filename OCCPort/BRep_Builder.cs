@@ -417,27 +417,29 @@ namespace OCCPort
                          Geom_Surface S,
                          TopLoc_Location L)
         {
-            BRep_ListIteratorOfListOfPointRepresentation itpr = new BRep_ListIteratorOfListOfPointRepresentation(lpr);
-            while (itpr.More())
+            //BRep_ListIteratorOfListOfPointRepresentation itpr = new BRep_ListIteratorOfListOfPointRepresentation(lpr);
+            int i = 0;
+            for (; i < lpr.Count; i++)
             {
-                BRep_PointRepresentation pr = itpr.Value();
+                BRep_PointRepresentation itpr = lpr[i];
+                BRep_PointRepresentation pr = itpr;
                 bool isponcons = pr.IsPointOnCurveOnSurface(PC, S, L);
                 if (isponcons)
                     break;
 
-                itpr.Next();
+
             }
 
-            if (itpr.More())
+            if (i<lpr.Count)
             {
-                BRep_PointRepresentation pr = itpr.Value();
-                //pr.Parameter(p);
+                BRep_PointRepresentation pr = lpr[i];
+                pr.Parameter(p);
             }
             else
             {
-                /*   BRep_PointOnCurveOnSurface POCS =
+                   BRep_PointOnCurveOnSurface POCS =
                      new BRep_PointOnCurveOnSurface(p, PC, S, L);
-                   lpr.Append(POCS);*/
+                   lpr.Append(POCS);
             }
         }
         public void UpdateVertex(TopoDS_Vertex V,
@@ -484,20 +486,6 @@ namespace OCCPort
             TopoDS_TCompound TC = new TopoDS_TCompound();
             MakeShape(C, TC);
         }
-    }
-
-
-    //! Representation by   a parameter on  a curve   on a
-    //! surface.
-    public class BRep_PointOnCurveOnSurface : BRep_PointsOnSurface
-    {
-    }
-
-
-    //! Root for points on surface.
-    public class BRep_PointsOnSurface : BRep_PointRepresentation
-    {
-
     }
 }
 

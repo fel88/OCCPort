@@ -22,7 +22,7 @@ namespace OCCPort.Interfaces
             for (; exp.More(); exp.Next())
             {
                 TopoDS_Face F = TopoDS.Face(exp.Current());
-                Geom_Surface S = BRep_Tool.Surface(F, l);
+                Geom_Surface S = BRep_Tool.Surface(F, out l);
                 if (S != null)
                 {
                     GeomAdaptor_Surface AS = new GeomAdaptor_Surface(S);

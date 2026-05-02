@@ -14,6 +14,149 @@ namespace OCCPort
 {
     public static class BRep_Tool
     {
+
+        //=======================================================================
+        //function : Parameters
+        //purpose  : Returns the parameters of the vertex on the face.
+        //=======================================================================
+
+        public static gp_Pnt2d Parameters(TopoDS_Vertex V,
+                                 TopoDS_Face F)
+        {
+            TopLoc_Location L;
+            Geom_Surface S = BRep_Tool.Surface(F, out L);
+            L = L.Predivided(V.Location());
+            BRep_TVertex TV = (BRep_TVertex)V.TShape();
+            // It is checked if there is PointRepresentation (case non Manifold)
+            foreach (var itpr in TV.Points())
+            {
+
+                if (itpr.IsPointOnSurface(S, ref L))
+                {
+                    return new gp_Pnt2d(itpr.Parameter(),
+                                    itpr.Parameter2());
+                }
+
+            }
+
+            TopoDS_Vertex Vf = new TopoDS_Vertex(), Vl = new TopoDS_Vertex();
+            TopoDS_Edge E;
+            // Otherwise the edges are searched (PMN 4/06/97) It is not possible to succeed 999/1000!
+            // even if often there is a way to make more economically than above...
+            TopExp_Explorer exp = new TopExp_Explorer();
+            for (exp.Init(F, TopAbs_ShapeEnum.TopAbs_EDGE); exp.More(); exp.Next())
+            {
+                E = TopoDS.Edge(exp.Current());
+                TopExp.Vertices(E, ref Vf, ref Vl);
+                if ((V.IsSame(Vf)) || (V.IsSame(Vl)))
+                {
+                    gp_Pnt2d Pf = new gp_Pnt2d(), Pl = new gp_Pnt2d();
+                    UVPoints(E, F, ref Pf, ref Pl);
+                    if (V.IsSame(Vf))
+                        return Pf;
+                    else
+                        return Pl;//Ambiguity (natural) for degenerated edges.
+                }
+            }
+            throw new Standard_NoSuchObject("BRep_Tool:: no parameters on surface");
+        }
+
+        public static void UVPoints(TopoDS_Edge E,
+                              TopoDS_Face F,
+                           ref gp_Pnt2d PFirst,
+                          ref gp_Pnt2d PLast)
+        {
+            TopLoc_Location L;
+            Geom_Surface S = BRep_Tool.Surface(F, out L);
+            TopoDS_Edge aLocalEdge = E;
+            if (F.Orientation() == TopAbs_Orientation.TopAbs_REVERSED)
+            {
+                aLocalEdge.Reverse();
+                //    UVPoints(E,S,L,PFirst,PLast);
+            }
+            //    UVPoints(TopoDS::Edge(E.Reversed()),S,L,PFirst,PLast);
+            //  else
+            //    UVPoints(E,S,L,PFirst,PLast);
+            UVPoints(aLocalEdge, S, L, ref PFirst, ref PLast);
+        }
+        public static void UVPoints(TopoDS_Edge E,
+                          Geom_Surface S,
+                          TopLoc_Location L,
+                          ref gp_Pnt2d PFirst,
+                          ref gp_Pnt2d PLast)
+        {
+            TopLoc_Location l = L.Predivided(E.Location());
+            bool Eisreversed = (E.Orientation() == TopAbs_Orientation.TopAbs_REVERSED);
+
+            // find the representation
+            BRep_TEdge TE = (BRep_TEdge)E.TShape();
+            //BRep_ListIteratorOfListOfCurveRepresentation itcr(TE->Curves());
+            foreach (var cr in TE.Curves())
+            {
+
+                if (cr.IsCurveOnSurface(S, l))
+                {
+                    if (cr.IsCurveOnClosedSurface() && Eisreversed)
+                    {
+                        /*const BRep_CurveOnClosedSurface* CR =
+                          static_cast <const BRep_CurveOnClosedSurface*> (cr.get());
+                        CR->UVPoints2(PFirst, PLast);*/
+                    }
+                    else
+                    {
+                        // BRep_CurveOnSurface CR =
+                        //  (BRep_CurveOnSurface)cr;
+                        // CR.UVPoints(PFirst, PLast);
+                    }
+                    return;
+                }
+
+            }
+
+            // for planar surface project the vertices
+            // modif 21-05-97 : for RectangularTrimmedSurface, project the vertices
+            Geom_Plane GP;
+            Geom_RectangularTrimmedSurface GRTS;
+            GRTS = (Geom_RectangularTrimmedSurface)S;
+            if (GRTS != null)
+                GP = (Geom_Plane)GRTS.BasisSurface();
+            else
+                GP = (Geom_Plane)S;
+            //fin modif du 21-05-97
+            if (GP != null)
+            {
+                // get the two vertices
+                TopoDS_Vertex Vf = new TopoDS_Vertex(), Vl = new TopoDS_Vertex();
+                TopExp.Vertices(E, ref Vf, ref Vl);
+
+                TopLoc_Location Linverted = L.Inverted();
+                Vf.Move(Linverted, false);
+                Vl.Move(Linverted, false);
+                double u, v;
+                gp_Pln pln = GP.Pln();
+
+                u = v = 0.0;
+                if (!Vf.IsNull())
+                {
+                    gp_Pnt PF = BRep_Tool.Pnt(Vf);
+                    ElSLib.Parameters(pln, PF, ref u, ref v);
+                }
+                PFirst.SetCoord(u, v);
+
+                u = v = 0.0;
+                if (!Vl.IsNull())
+                {
+                    gp_Pnt PL = BRep_Tool.Pnt(Vl);
+                    ElSLib.Parameters(pln, PL, ref u, ref v);
+                }
+                PLast.SetCoord(u, v);
+            }
+            else
+            {
+                PFirst.SetCoord(0.0, 0.0);
+                PLast.SetCoord(0.0, 0.0);
+            }
+        }
         public static double Parameter(TopoDS_Vertex V,
                                     TopoDS_Edge E)
         {
@@ -635,12 +778,7 @@ namespace OCCPort
             return TE.Degenerated();
         }
 
-        internal static Geom_Surface Surface(TopoDS_Face F, out TopLoc_Location L)
-        {
-            BRep_TFace TF = (BRep_TFace)(F.TShape());
-            L = F.Location() * TF.Location();
-            return TF.Surface();
-        }
+
         public static Geom_Surface Surface(TopoDS_Face F)
         {
             BRep_TFace TF = (BRep_TFace)(F.TShape());
@@ -684,7 +822,7 @@ namespace OCCPort
 
         //! Returns the geometric surface of the face. Returns
         //! in <L> the location for the surface.
-        internal static Geom_Surface Surface(TopoDS_Face F, TopLoc_Location L)
+        internal static Geom_Surface Surface(TopoDS_Face F, out TopLoc_Location L)
         {
             BRep_TFace TF = (BRep_TFace)(F.TShape());
             L = F.Location() * TF.Location();
@@ -701,17 +839,17 @@ namespace OCCPort
             bool Eisreversed = (E.Orientation() == TopAbs_Orientation.TopAbs_REVERSED);
 
             // find the representation
-            BRep_TEdge TE = (BRep_TEdge) (E.TShape());
-            
+            BRep_TEdge TE = (BRep_TEdge)(E.TShape());
+
             foreach (var cr in TE.Curves())
-            {                            
+            {
                 if (cr.IsPolygonOnTriangulation(T, l))
                 {
                     if (cr.IsPolygonOnClosedTriangulation() && Eisreversed)
                         return cr.PolygonOnTriangulation2();
                     else
                         return cr.PolygonOnTriangulation();
-                }                
+                }
             }
 
             return null;

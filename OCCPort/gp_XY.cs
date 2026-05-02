@@ -20,7 +20,17 @@ namespace OCCPort
             x = theA1 * theXY1.x + theXY2.x;
             y = theA1 * theXY1.y + theXY2.y;
         }
-
+        public gp_XY Subtracted(gp_XY theOther)
+        {
+            gp_XY aCoord2D = new gp_XY(this);
+            aCoord2D.Subtract(theOther);
+            return aCoord2D;
+        }
+        void Subtract(gp_XY theOther)
+        {
+            x -= theOther.x;
+            y -= theOther.y;
+        }
         //! @code
         //! <me>.X() = -<me>.X()
         //! <me>.Y() = -<me>.Y()

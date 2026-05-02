@@ -46,7 +46,7 @@ namespace OCCPort.Tester
                 TopoDS_Face aFace = TopoDS.Face(aFaceIter.Current());
                 if (theToExcludeGeometric)
                 {
-                    Geom_Surface aSurf = BRep_Tool.Surface(aFace, aDummyLoc);
+                    Geom_Surface aSurf = BRep_Tool.Surface(aFace, out aDummyLoc);
                     if (aSurf != null)
                     {
                         continue;

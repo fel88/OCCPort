@@ -18,8 +18,10 @@ namespace OCCPort
             return (aX * aX + aY * aY);
         }
         //! For this point returns its two coordinates as a number pair.
-        public void Coord(ref double theXp, ref double theYp) { coord.Coord(ref theXp,ref  theYp); }
+        public void Coord(ref double theXp, ref double theYp) { coord.Coord(ref theXp, ref theYp); }
 
+        //! For this point, assigns the values theXp and theYp to its two coordinates
+        public void SetCoord(double theXp, double theYp) { coord.SetCoord(theXp, theYp); }
 
         public double X()
            => coord.X();

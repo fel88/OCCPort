@@ -64,9 +64,60 @@ namespace OCCPort
             return (aCellsCountU, aCellsCountV);
         }
 
-        private static void ComputeErrFactors(double theDeflection, Adaptor3d_Surface theSurface, ref double anErrFactorU, ref double anErrFactorV)
+        private static void ComputeErrFactors(double theDeflection,
+            Adaptor3d_Surface theFace, ref double theErrFactorU, ref double theErrFactorV)
         {
-            throw new NotImplementedException();
+            theErrFactorU = theDeflection * 10.0;
+            theErrFactorV = theDeflection * 10.0;
+
+            switch (theFace._GetType())
+            {
+                case GeomAbs_SurfaceType.GeomAbs_Cylinder:
+                case GeomAbs_SurfaceType.GeomAbs_Cone:
+                case GeomAbs_SurfaceType.GeomAbs_Sphere:
+                case GeomAbs_SurfaceType.GeomAbs_Torus:
+                    break;
+
+                case GeomAbs_SurfaceType.GeomAbs_SurfaceOfExtrusion:
+                case GeomAbs_SurfaceType.GeomAbs_SurfaceOfRevolution:
+                    {
+                        //Handle(Adaptor3d_Curve) aCurve = theFace->BasisCurve();
+                        //if (aCurve->GetType() == GeomAbs_BSplineCurve && aCurve->Degree() > 2)
+                        //{
+                        //    theErrFactorV /= (aCurve->Degree() * aCurve->NbKnots());
+                        //}
+                        break;
+                    }
+                case GeomAbs_SurfaceType.GeomAbs_BezierSurface:
+                    {
+                        //if (theFace->UDegree() > 2)
+                        //{
+                        //    theErrFactorU /= (theFace->UDegree());
+                        //}
+                        //if (theFace->VDegree() > 2)
+                        //{
+                        //    theErrFactorV /= (theFace->VDegree());
+                        //}
+                        break;
+                    }
+                case GeomAbs_SurfaceType.GeomAbs_BSplineSurface:
+                    {
+                        //if (theFace.UDegree() > 2)
+                        //{
+                        //    theErrFactorU /= (theFace.UDegree() * theFace.NbUKnots());
+                        //}
+                        //if (theFace.VDegree() > 2)
+                        //{
+                        //    theErrFactorV /= (theFace.VDegree() * theFace.NbVKnots());
+                        //}
+                        break;
+                    }
+
+                case GeomAbs_SurfaceType.GeomAbs_Plane:
+                default:
+                    theErrFactorU = theErrFactorV = 1.0;
+                    break;
+            }
         }
 
         static void AdjustCellsCounts(Adaptor3d_Surface theFace,

@@ -9,7 +9,11 @@ namespace OCCPort
     internal class BRepMeshData_PCurve : AbstractMeshData_PCurve, IMeshData_PCurve
     {
         //! Returns orientation of the edge associated with current pcurve.
-
+        //! Returns forward flag of this pcurve.
+        public bool IsForward()
+        {
+            return (myOrientation != TopAbs_Orientation.TopAbs_REVERSED);
+        }
         public TopAbs_Orientation GetOrientation()
         {
             return myOrientation;
