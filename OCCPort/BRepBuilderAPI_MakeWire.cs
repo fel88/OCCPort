@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace OCCPort.Tester
+namespace OCCPort
 {
     //! Describes functions to build wires from edges. A wire can
     //! be built from any number of edges.
@@ -35,14 +35,17 @@ namespace OCCPort.Tester
     //! -   consulting the result.
     public class BRepBuilderAPI_MakeWire : BRepBuilderAPI_MakeShape
     {
-        internal void Add(TopoDS_Edge e1)
+        public void Add(TopoDS_Edge e1)
         {
             throw new NotImplementedException();
         }
 
-        internal TopoDS_Wire Wire()
+        public TopoDS_Wire Wire()
         {
-            throw new NotImplementedException();
+            return myMakeWire.Wire();
+
         }
+        BRepLib_MakeWire myMakeWire;
+
     }
 }
