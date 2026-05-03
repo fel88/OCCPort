@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace OCCPort
 {
-    public class NCollection_DataMap<T1, T2> : Dictionary<T1, T2>
+    public class NCollection_DataMap<T1, T2,T3> : Dictionary<T1, T2>
     {
         public bool Bind(T1 aFreeEdgeId, T2 v)
         {

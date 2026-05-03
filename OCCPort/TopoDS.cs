@@ -19,7 +19,7 @@ namespace OCCPort
 			//return *(TopoDS_Solid*)&S;
 		}
 
-		internal static TopoDS_Edge Edge(TopoDS_Shape S)
+		public static TopoDS_Edge Edge(TopoDS_Shape S)
 		{
 			if (S is TopoDS_Edge)
 			{

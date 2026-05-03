@@ -7,7 +7,18 @@ namespace OCCPort
     //! Defines an array of 3D nodes of single/double precision configurable at construction time.
     public class Poly_ArrayOfNodes : NCollection_AliasedArray
     {
-
+        public gp_Pnt Value(int theIndex)
+        {
+            if (myStride == (int)sizeof(double)*3)
+            {
+                return base.Value<gp_Pnt>(theIndex);
+            }
+            else
+            {
+                gp_Vec3f aVec3 = base.Value<gp_Vec3f>(theIndex);
+                return new gp_Pnt(aVec3.x(), aVec3.y(), aVec3.z());
+            }
+        }
         public int Length()
         {
             if (pnts == null)//not origin code

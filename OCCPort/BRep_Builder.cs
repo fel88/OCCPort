@@ -26,6 +26,57 @@ namespace OCCPort
     public class BRep_Builder : TopoDS_Builder
 
     {
+        public void NaturalRestriction(TopoDS_Face F,
+                                       bool N)
+        {
+            BRep_TFace TF = (BRep_TFace)F.TShape();
+            if (TF.Locked())
+            {
+                throw new TopoDS_LockedShape("BRep_Builder::NaturalRestriction");
+            }
+            TF.NaturalRestriction(N);
+            F.TShape().Modified(true);
+        }
+
+        //! Sets the range of the 3d curve if Only3d=TRUE,
+        //! otherwise sets the range to all the representations
+        public void Range(TopoDS_Edge E, double First, double Last, bool Only3d = false)
+        {
+            //  set the range to all the representations if Only3d=FALSE
+            BRep_TEdge TE = (BRep_TEdge)E.TShape();
+            if (TE.Locked())
+            {
+                throw new TopoDS_LockedShape("BRep_Builder::Range");
+            }
+
+            BRep_GCurve GC;
+            foreach (var item in TE.ChangeCurves())
+            {
+                GC = item as BRep_GCurve;
+                if (GC != null && (!Only3d || GC.IsCurve3D()))
+                    GC.SetRange(First, Last);
+            }
+
+            TE.Modified(true);
+        }
+
+
+        public void Degenerated(TopoDS_Edge E,
+                                bool D)
+        {
+            BRep_TEdge TE = (BRep_TEdge)E.TShape();
+            if (TE.Locked())
+            {
+                throw new TopoDS_LockedShape("BRep_Builder::Degenerated");
+            }
+            TE.Degenerated(D);
+            if (D)
+            {
+                // set a null 3d curve
+                UpdateCurves(TE.ChangeCurves(), null, E.Location());
+            }
+            TE.Modified(true);
+        }
 
         public void UpdateEdge(TopoDS_Edge E,
                                       Poly_PolygonOnTriangulation P,
@@ -430,16 +481,16 @@ namespace OCCPort
 
             }
 
-            if (i<lpr.Count)
+            if (i < lpr.Count)
             {
                 BRep_PointRepresentation pr = lpr[i];
                 pr.Parameter(p);
             }
             else
             {
-                   BRep_PointOnCurveOnSurface POCS =
-                     new BRep_PointOnCurveOnSurface(p, PC, S, L);
-                   lpr.Append(POCS);
+                BRep_PointOnCurveOnSurface POCS =
+                  new BRep_PointOnCurveOnSurface(p, PC, S, L);
+                lpr.Append(POCS);
             }
         }
         public void UpdateVertex(TopoDS_Vertex V,

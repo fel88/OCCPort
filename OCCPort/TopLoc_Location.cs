@@ -126,7 +126,7 @@ namespace OCCPort
 
         }
 
-        internal void Identity()
+        public void Identity()
         {
             myItems.Clear();
         }

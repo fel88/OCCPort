@@ -51,5 +51,10 @@ namespace OCCPort
         {
             return items[index - 1].list;
         }
+
+        internal int Extent()
+        {
+            return items.Count;
+        }
     }
 }

@@ -13,6 +13,11 @@ namespace OCCPort
         {
             return (myFlags & ParameterMask) != 0;
         }
+        public void Degenerated(bool S)
+        {
+            if (S) myFlags |= DegeneratedMask;
+            else myFlags &= ~DegeneratedMask;
+        }
 
         public bool SameRange()
         {

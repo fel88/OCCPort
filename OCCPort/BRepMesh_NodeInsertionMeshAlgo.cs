@@ -10,7 +10,7 @@ namespace OCCPort
     //! Extends base meshing algo in order to enable possibility 
     //! of addition of free vertices into the mesh.
 
-    public class BRepMesh_NodeInsertionMeshAlgo<RangeSplitter> : BRepMesh_DelabellaBaseMeshAlgo where RangeSplitter : AbstractRangeSplitter, new() //: BaseAlgo
+    public class BRepMesh_NodeInsertionMeshAlgo<RangeSplitter> : BRepMesh_DelaunayBaseMeshAlgo where RangeSplitter : AbstractRangeSplitter, new() //: BaseAlgo
     {
         //! Returns range splitter.
         public RangeSplitter getRangeSplitter()
@@ -18,6 +18,7 @@ namespace OCCPort
             return myRangeSplitter;
         }
 
+        
         //! Performs initialization of data structure using existing model data.
         protected override bool initDataStructure()
         {

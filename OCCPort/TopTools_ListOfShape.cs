@@ -4,7 +4,7 @@ using System.Xml.Schema;
 
 namespace OCCPort.Tester
 {
-    internal class TopTools_ListOfShape : List<TopoDS_Shape>
+    public class TopTools_ListOfShape : List<TopoDS_Shape>
     {
         internal NCollection_BaseAllocator Allocator()
         {

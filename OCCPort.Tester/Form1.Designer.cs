@@ -46,6 +46,7 @@
             toolStripButton9 = new System.Windows.Forms.ToolStripButton();
             toolStripButton10 = new System.Windows.Forms.ToolStripButton();
             toolStripButton11 = new System.Windows.Forms.ToolStripButton();
+            toolStripButton12 = new System.Windows.Forms.ToolStripButton();
             toolStrip1.SuspendLayout();
             SuspendLayout();
             // 
@@ -57,7 +58,7 @@
             // 
             // toolStrip1
             // 
-            toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { toolStripButton1, toolStripDropDownButton1, toolStripButton2, toolStripButton3, toolStripButton4, toolStripButton5, toolStripButton6, toolStripButton7, toolStripButton8, toolStripButton9, toolStripButton10, toolStripButton11 });
+            toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { toolStripButton1, toolStripDropDownButton1, toolStripButton2, toolStripButton3, toolStripButton4, toolStripButton5, toolStripButton6, toolStripButton7, toolStripButton8, toolStripButton9, toolStripButton10, toolStripButton11, toolStripButton12 });
             toolStrip1.Location = new System.Drawing.Point(0, 0);
             toolStrip1.Name = "toolStrip1";
             toolStrip1.Size = new System.Drawing.Size(1058, 25);
@@ -195,6 +196,15 @@
             toolStripButton11.Text = "iterate poly";
             toolStripButton11.Click += toolStripButton11_Click;
             // 
+            // toolStripButton12
+            // 
+            toolStripButton12.Image = (System.Drawing.Image)resources.GetObject("toolStripButton12.Image");
+            toolStripButton12.ImageTransparentColor = System.Drawing.Color.Magenta;
+            toolStripButton12.Name = "toolStripButton12";
+            toolStripButton12.Size = new System.Drawing.Size(79, 22);
+            toolStripButton12.Text = "add plane";
+            toolStripButton12.Click += toolStripButton12_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -205,6 +215,7 @@
             Name = "Form1";
             StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             Text = "OCCPort testing";
+            Load += Form1_Load;
             toolStrip1.ResumeLayout(false);
             toolStrip1.PerformLayout();
             ResumeLayout(false);
@@ -230,6 +241,7 @@
         private System.Windows.Forms.ToolStripButton toolStripButton9;
         private System.Windows.Forms.ToolStripButton toolStripButton10;
         private System.Windows.Forms.ToolStripButton toolStripButton11;
+        private System.Windows.Forms.ToolStripButton toolStripButton12;
     }
 }
 

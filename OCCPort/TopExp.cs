@@ -35,7 +35,7 @@ namespace OCCPort
             return new TopoDS_Vertex();
         }
 
-        internal static void MapShapesAndAncestors(TopoDS_Shape S,
+        public static void MapShapesAndAncestors(TopoDS_Shape S,
                     TopAbs_ShapeEnum TS,
                     TopAbs_ShapeEnum TA,
                    TopTools_IndexedDataMapOfShapeListOfShape M)

@@ -11,10 +11,10 @@ namespace OCCPort
             list = aTriangles;
         }
 
-        internal int Key()
+        /*internal int Key()
         {
             return list[index];
-        }
+        }*/
         int index = 0;
         internal bool More()
         {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace OCCPort
 {
-    internal class TColStd_SequenceOfReal : List<double>
+    public class TColStd_SequenceOfReal : List<double>
     {
         internal void Append(double keptT3d)
         {

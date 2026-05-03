@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace OCCPort
 {
-    public class MapOfInteger : List<int>
+    public class MapOfInteger : HashSet<int>
     {
         public MapOfInteger() { }
         public MapOfInteger(IEnumerable<int> collection) : base(collection)
@@ -13,6 +13,7 @@ namespace OCCPort
                 Add(item);
             }
         }
+
 
         public bool IsEmpty()
         {

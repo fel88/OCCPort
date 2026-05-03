@@ -1,4 +1,5 @@
 ﻿using System;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace OCCPort
 {
@@ -11,6 +12,14 @@ namespace OCCPort
         {
             return coord.X();
         }
+
+        //! Returns for the  unit vector  its three coordinates theXv, theYv, and theZv.
+        public void Coord(ref double theXv, ref double theYv, ref double theZv)
+        {
+            coord.Coord(ref theXv, ref theYv, ref theZv);
+        }
+
+
         //! Computes the scalar product
         public double Dot(gp_Dir theOther) { return coord.Dot(theOther.coord); }
 

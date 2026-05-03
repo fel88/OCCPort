@@ -51,6 +51,61 @@ namespace OCCPort
             myUVNodes.SetValue(theIndex - 1, thePnt);
         }
 
+        //! Extends the passed box with bounding box of this triangulation.
+        //! Uses cached min - max range when available and:
+        //! - input transformation theTrsf has no rotation part;
+        //! - theIsAccurate is set to FALSE;
+        //! - no triangulation data available (e.g. it is deferred and not loaded).
+        //! @param theBox [in] [out] bounding box to extend by this triangulation
+        //! @param theTrsf [in] optional transformation
+        //! @param theIsAccurate [in] when FALSE, allows using a cached min - max range of this triangulation
+        //!                           even for non-identity transformation.
+        //! @return FALSE if there is no any data to extend the passed box (no both triangulation and cached min - max range).
+        public bool MinMax(Bnd_Box theBox, gp_Trsf theTrsf, bool theIsAccurate = false)
+        {
+            Bnd_Box aBox;
+            if (HasCachedMinMax() &&
+                (!HasGeometry() || !theIsAccurate ||
+                 theTrsf.Form() == gp_TrsfForm.gp_Identity || theTrsf.Form() == gp_TrsfForm.gp_Translation ||
+                 theTrsf.Form() == gp_TrsfForm.gp_PntMirror || theTrsf.Form() == gp_TrsfForm.gp_Scale))
+            {
+                aBox = myCachedMinMax.Transformed(theTrsf);
+            }
+            else
+            {
+                aBox = computeBoundingBox(theTrsf);
+            }
+            if (aBox.IsVoid())
+            {
+                return false;
+            }
+            theBox.Add(aBox);
+            return true;
+        }
+
+        Bnd_Box computeBoundingBox(gp_Trsf theTrsf)
+        {
+            Bnd_Box aBox = new Bnd_Box();
+            if (theTrsf.Form() == gp_TrsfForm.gp_Identity)
+            {
+                for (int aNodeIdx = 0; aNodeIdx < NbNodes(); aNodeIdx++)
+                {
+                    aBox.Add(myNodes.Value(aNodeIdx));
+                }
+            }
+            else
+            {
+                for (int aNodeIdx = 0; aNodeIdx < NbNodes(); aNodeIdx++)
+                {
+                    aBox.Add(myNodes.Value(aNodeIdx).Transformed(theTrsf));
+                }
+            }
+            return aBox;
+        }
+
+        //! Returns TRUE if there is some cached min - max range of this triangulation.
+        public bool HasCachedMinMax() { return myCachedMinMax != null; }
+
         //! Returns normal at the given index.
         //! @param[in] theIndex node index within [1, NbNodes()] range
         //! @return normalized 3D vector defining a surface normal
@@ -96,7 +151,7 @@ namespace OCCPort
         //! Returns the number of nodes for this triangulation.
         public int NbNodes() { return myNodes.Length(); }
 
-   
+
 
         //! Returns Standard_True if nodal normals are defined.
         public bool HasNormals() { return !myNormals.IsEmpty(); }

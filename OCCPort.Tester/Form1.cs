@@ -359,7 +359,7 @@ namespace OCCPort.Tester
 
                         pp.Add(p);
                     }
-                 
+
                     gr.FillPolygon(Brushes.LightBlue,
                     pp.ToArray());
                     gr.DrawPolygon(Pens.Black,
@@ -407,5 +407,81 @@ namespace OCCPort.Tester
             }
 
         }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void toolStripButton12_Click(object sender, EventArgs e)
+        {
+            var d = AutoDialog.DialogHelpers.StartDialog();
+            d.AddDouble("cx", "X");
+            d.AddDouble("cy", "Y");
+            d.AddDouble("cz", "Z");
+
+            d.AddDouble("w", "Width", 100);
+            d.AddDouble("h", "Height", 50);
+
+            if (!d.ShowDialog())
+                return;
+
+            var cx = d.GetDouble("cx");
+            var cy = d.GetDouble("cy");
+            var cz = d.GetDouble("cz");
+            var w = d.GetDouble("w");
+            var h = d.GetDouble("h");
+            double area = w * h;
+            if (Math.Abs(area) < (0.0))
+            {
+                MessageBox.Show("zero area. operation incorrect", Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            var center = new Vector3d(cx, cy, cz);
+            MakeRectFace(center + new Vector3d(-w / 2, -h / 2, 0),
+                     center + new Vector3d(w / 2, -h / 2, 0),
+                     center + new Vector3d(w / 2, h / 2, 0),
+                     center + new Vector3d(-w / 2, h / 2, 0));
+
+
+        }
+
+        void MakeRectFace(Vector3d v1, Vector3d v2, Vector3d v3, Vector3d v4)
+        {
+            // Define 4 points for the rectangle
+            gp_Pnt p1 = new gp_Pnt(v1.X, v1.Y, v1.Z);
+            gp_Pnt p2 = new gp_Pnt(v2.X, v2.Y, v2.Z);
+            gp_Pnt p3 = new gp_Pnt(v3.X, v3.Y, v3.Z);
+            gp_Pnt p4 = new gp_Pnt(v4.X, v4.Y, v4.Z);
+
+            // Create Edges
+            TopoDS_Edge e1 = new BRepBuilderAPI_MakeEdge(p1, p2);
+            TopoDS_Edge e2 = new BRepBuilderAPI_MakeEdge(p2, p3);
+            TopoDS_Edge e3 = new BRepBuilderAPI_MakeEdge(p3, p4);
+            TopoDS_Edge e4 = new BRepBuilderAPI_MakeEdge(p4, p1);
+
+            // Create Wire (Closed Contour)
+            BRepBuilderAPI_MakeWire mw = new BRepBuilderAPI_MakeWire();
+            mw.Add(e1);
+            mw.Add(e2);
+            mw.Add(e3);
+            mw.Add(e4);
+            TopoDS_Wire wire = mw.Wire();
+
+            // Create Face
+            TopoDS_Face face = new BRepBuilderAPI_MakeFace(wire);
+
+            var solid = face;
+            var shape = new AIS_Shape(solid);
+
+
+            myAISContext.Display(shape, true);
+            myAISContext.SetDisplayMode(shape, AIS_DisplayMode.AIS_Shaded, false);
+            myAISContext.UpdateCurrentViewer();
+
+
+
+        }
+
     }
 }

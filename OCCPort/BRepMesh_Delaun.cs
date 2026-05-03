@@ -38,8 +38,8 @@ namespace OCCPort
                 theRange = new Message_ProgressRange();
 
             ComparatorOfIndexedVertexOfDelaun aCmp = new ComparatorOfIndexedVertexOfDelaun(myMeshData);
-            std.make_heap(theVertices, aCmp);
-            std.sort_heap(theVertices, aCmp);
+            Std.make_heap(theVertices, aCmp);
+            Std.sort_heap(theVertices, aCmp);
 
             createTrianglesOnNewVertices(theVertices, theRange);
         }
@@ -348,10 +348,10 @@ namespace OCCPort
                 // 2 pass): find external triangles on boundary edges appeared 
                 //          during triangles replacement.
 
-                IteratorOfMapOfInteger aFrontierIt = new IteratorOfMapOfInteger(aFrontier);
-                for (; aFrontierIt.More(); aFrontierIt.Next())
+
+                foreach (var aFrontierId in aFrontier)
                 {
-                    int aFrontierId = aFrontierIt.Key();
+
                     BRepMesh_PairOfIndex aPair = myMeshData.ElementsConnectedTo(aFrontierId);
                     int aNbElem = aPair.Extent();
                     for (int aElemIt = 1; aElemIt <= aNbElem; ++aElemIt)
@@ -394,10 +394,10 @@ namespace OCCPort
 
                 // destruction of triangles crossing the boundary edges and 
                 // their replacement by makeshift triangles
-                aFrontierIt = new IteratorOfMapOfInteger(aFrontier);
-                for (/*aFrontierIt.Reset()*/; aFrontierIt.More(); aFrontierIt.Next())
+
+                foreach (var aFrontierId in aFrontier)
                 {
-                    int aFrontierId = aFrontierIt.Key();
+
                     if (!myMeshData.ElementsConnectedTo(aFrontierId).IsEmpty())
                         continue;
 
@@ -668,10 +668,12 @@ namespace OCCPort
                 MapOfInteger aDelTriangles = new MapOfInteger();
 
                 MapOfInteger aFreeEdges = FreeEdges();
-                IteratorOfMapOfInteger aFreeEdgesIt = new IteratorOfMapOfInteger(aFreeEdges);
-                for (; aFreeEdgesIt.More(); aFreeEdgesIt.Next())
+
+                foreach (var aFreeEdgeId in aFreeEdges)
                 {
-                    int aFreeEdgeId = aFreeEdgesIt.Key();
+
+
+
                     BRepMesh_Edge anEdge = GetEdge(aFreeEdgeId);
                     if (anEdge.Movability() == Enums.BRepMesh_DegreeOfFreedom.BRepMesh_Frontier)
                         continue;
@@ -746,10 +748,10 @@ namespace OCCPort
 
                 // Destruction of triangles :
                 int aDeletedTrianglesNb = 0;
-                IteratorOfMapOfInteger aDelTrianglesIt = new IteratorOfMapOfInteger(aDelTriangles);
-                for (; aDelTrianglesIt.More(); aDelTrianglesIt.Next())
+
+                foreach (var aDelTrianglesIt in aDelTriangles)
                 {
-                    deleteTriangle(aDelTrianglesIt.Key(), aLoopEdges);
+                    deleteTriangle(aDelTrianglesIt, aLoopEdges);
                     aDeletedTrianglesNb++;
                 }
 
@@ -884,9 +886,9 @@ namespace OCCPort
                 // Destruction of triangles intersecting internal edges
                 // and their replacement by makeshift triangles
                 IteratorOfMapOfInteger anInernalEdgesIt = new IteratorOfMapOfInteger(anInternalEdges);
-                for (; anInernalEdgesIt.More(); anInernalEdgesIt.Next())
+                foreach (var aLinkIndex in anInternalEdges)
                 {
-                    int aLinkIndex = anInernalEdgesIt.Key();
+
                     BRepMesh_PairOfIndex aPair = myMeshData.ElementsConnectedTo(aLinkIndex);
 
                     // Check both sides of link for adjusted triangle.
@@ -1711,12 +1713,40 @@ ref aNextPivotNode, ref aNextLinkDir, ref aNextLinkBndBox);
             //initCirclesTool(aBox, theCellsCountU, theCellsCountV);
             superMesh(aBox);
 
-            //ComparatorOfIndexedVertexOfDelaun aCmp(myMeshData);
-            //std::make_heap(theVertexIndices.begin(), theVertexIndices.end(), aCmp);
-            //std::sort_heap(theVertexIndices.begin(), theVertexIndices.end(), aCmp);
+            ComparatorOfIndexedVertexOfDelaun aCmp = new ComparatorOfIndexedVertexOfDelaun(myMeshData);
+            Std.make_heap(theVertexIndices, aCmp);
+            Std.sort_heap(theVertexIndices, aCmp);
 
-            //compute(theVertexIndices);
+            compute(theVertexIndices);
         }
+
+        //! Computes the triangulation and adds the vertices,
+        //! edges and triangles to the Mesh data structure.
+        void compute(VectorOfInteger theVertexIndexes)
+        {// Insertion of edges of super triangles in the list of free edges:
+
+
+            MapOfIntegerInteger aLoopEdges = new MapOfIntegerInteger(10);
+            int[] e = mySupTrian.myEdges;
+
+            aLoopEdges.Bind(e[0], 1);
+            aLoopEdges.Bind(e[1], 1);
+            aLoopEdges.Bind(e[2], 1);
+
+            if (theVertexIndexes.Length() > 0)
+            {
+                // Creation of 3 trianglers with the first node and the edges of the super triangle:
+                int anVertexIdx = theVertexIndexes.Lower();
+                createTriangles(theVertexIndexes[anVertexIdx], aLoopEdges);
+
+                // Add other nodes to the mesh
+                createTrianglesOnNewVertices(theVertexIndexes, new Message_ProgressRange());
+            }
+
+            RemoveAuxElements();
+
+        }
+
         BRepMesh_Triangle mySupTrian;
 
         void superMesh(Bnd_Box2d theBox)
@@ -1753,32 +1783,6 @@ ref aNextPivotNode, ref aNextLinkDir, ref aNextLinkBndBox);
             }
 
             mySupTrian = new BRepMesh_Triangle(e, o, Enums.BRepMesh_DegreeOfFreedom.BRepMesh_Free);
-        }
-    }
-
-    //! Sort two points in projection on vector (1,1)
-    class ComparatorOfIndexedVertexOfDelaun
-    {
-        public ComparatorOfIndexedVertexOfDelaun(BRepMesh_DataStructureOfDelaun theDS)
-        {
-
-            myStructure = (theDS);
-        }
-
-        BRepMesh_DataStructureOfDelaun myStructure;
-
-    }
-
-    public static class std
-    {
-        internal static void make_heap(VectorOfInteger theVertices, ComparatorOfIndexedVertexOfDelaun aCmp)
-        {
-
-        }
-
-        internal static void sort_heap(VectorOfInteger theVertices, ComparatorOfIndexedVertexOfDelaun aCmp)
-        {
-
         }
     }
 }

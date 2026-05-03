@@ -28,6 +28,12 @@ namespace OCCPort
         //! SurfaceOfExtrusion, OtherSurface
         public override GeomAbs_SurfaceType _GetType() { return mySurf._GetType(); }
 
+        //! Creates an undefined surface with no face loaded.
+        public BRepAdaptor_Surface()
+        {
+
+        }
+
         //! Creates a surface to  access the geometry  of <F>.
         //! If  <Restriction> is  true  the parameter range is
         //! the  parameter  range  in   the  UV space  of  the

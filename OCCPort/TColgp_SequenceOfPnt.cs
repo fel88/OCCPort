@@ -9,6 +9,11 @@ namespace OCCPort
 		{
 			list.Clear();
 		}
+
+		public int Length()
+		{
+			return list.Length();
+		}
 		internal int Size()
 		{
 			return list.Count;

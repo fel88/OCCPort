@@ -13,6 +13,116 @@ namespace OCCPort
             return (Flags & MaskFlags.VoidMask) != 0;
         }
 
+        //! Returns a bounding box which is the result of applying the
+        //! transformation T to this bounding box.
+        //! Warning
+        //! Applying a geometric transformation (for example, a
+        //! rotation) to a bounding box generally increases its
+        //! dimensions. This is not optimal for algorithms which use it.
+        public Bnd_Box Transformed(gp_Trsf T)
+        {
+            if (IsVoid())
+            {
+                return new Bnd_Box();
+            }
+            else if (T.Form() == gp_TrsfForm.gp_Identity)
+            {
+                Bnd_Box b = this;
+                return b;
+            }
+            else if (T.Form() == gp_TrsfForm.gp_Translation)
+            {
+                if (!HasFinitePart())
+                {
+                    Bnd_Box b = this;
+                    return b;
+                }
+
+                gp_XYZ aDelta = T.TranslationPart();
+                Bnd_Box _aNewBox = this;
+                _aNewBox.Xmin += aDelta.X();
+                _aNewBox.Xmax += aDelta.X();
+                _aNewBox.Ymin += aDelta.Y();
+                _aNewBox.Ymax += aDelta.Y();
+                _aNewBox.Zmin += aDelta.Z();
+                _aNewBox.Zmax += aDelta.Z();
+                return _aNewBox;
+            }
+
+            Bnd_Box aNewBox = new Bnd_Box();
+            if (HasFinitePart())
+            {
+                gp_Pnt[] aCorners =
+                {
+      new gp_Pnt (Xmin, Ymin, Zmin),
+      new gp_Pnt (Xmax, Ymin, Zmin),
+      new gp_Pnt (Xmin, Ymax, Zmin),
+      new gp_Pnt (Xmax, Ymax, Zmin),
+      new gp_Pnt (Xmin, Ymin, Zmax),
+      new gp_Pnt (Xmax, Ymin, Zmax),
+      new gp_Pnt (Xmin, Ymax, Zmax),
+      new gp_Pnt (Xmax, Ymax, Zmax),
+    };
+                for (int aCornerIter = 0; aCornerIter < 8; ++aCornerIter)
+                {
+                    aCorners[aCornerIter].Transform(T);
+                    aNewBox.Add(aCorners[aCornerIter]);
+                }
+            }
+            aNewBox.Gap = Gap;
+            if (!IsOpen())
+            {
+                return aNewBox;
+            }
+
+            gp_Dir[] aDirs = new gp_Dir[6];
+            int aNbDirs = 0;
+            if (IsOpenXmin())
+            {
+                aDirs[aNbDirs++].SetCoord(-1.0, 0.0, 0.0);
+            }
+            if (IsOpenXmax())
+            {
+                aDirs[aNbDirs++].SetCoord(1.0, 0.0, 0.0);
+            }
+            if (IsOpenYmin())
+            {
+                aDirs[aNbDirs++].SetCoord(0.0, -1.0, 0.0);
+            }
+            if (IsOpenYmax())
+            {
+                aDirs[aNbDirs++].SetCoord(0.0, 1.0, 0.0);
+            }
+            if (IsOpenZmin())
+            {
+                aDirs[aNbDirs++].SetCoord(0.0, 0.0, -1.0);
+            }
+            if (IsOpenZmax())
+            {
+                aDirs[aNbDirs++].SetCoord(0.0, 0.0, 1.0);
+            }
+
+            for (int aDirIter = 0; aDirIter < aNbDirs; ++aDirIter)
+            {
+                aDirs[aDirIter].Transform(T);
+                aNewBox.Add(aDirs[aDirIter]);
+            }
+
+            return aNewBox;
+        }
+
+        //! Sets this bounding box so that it is empty. All points are outside a void box.
+        public void SetVoid()
+        {
+            Xmin = Standard_Real.RealLast();
+            Xmax = -Standard_Real.RealLast();
+            Ymin = Standard_Real.RealLast();
+            Ymax = -Standard_Real.RealLast();
+            Zmin = Standard_Real.RealLast();
+            Zmax = -Standard_Real.RealLast();
+            Flags = MaskFlags.VoidMask;
+            Gap = 0.0;
+        }
         //! Returns the lower corner of this bounding box. The gap is included.
         //! If this bounding box is infinite (i.e. "open"), returned values
         //! may be equal to +/- Precision::Infinite().
@@ -70,6 +180,30 @@ namespace OCCPort
         {
             Gap = Math.Max(Gap, Math.Abs(Tol));
         }
+        //! Extends the Box  in the given Direction, i.e. adds
+        //! an  half-line. The   box  may become   infinite in
+        //! 1,2 or 3 directions.
+        public void Add(gp_Dir D)
+        {
+            double DX = 0, DY = 0, DZ = 0;
+            D.Coord(ref DX, ref DY, ref DZ);
+
+            if (DX < -Standard_Real.RealEpsilon())
+                OpenXmin();
+            else if (DX > Standard_Real.RealEpsilon())
+                OpenXmax();
+
+            if (DY < -Standard_Real.RealEpsilon())
+                OpenYmin();
+            else if (DY > Standard_Real.RealEpsilon())
+                OpenYmax();
+
+            if (DZ < -Standard_Real.RealEpsilon())
+                OpenZmin();
+            else if (DZ > Standard_Real.RealEpsilon())
+                OpenZmax();
+        }
+
         public void Add(Bnd_Box Other)
         {
             if (Other.IsVoid())
@@ -275,22 +409,22 @@ namespace OCCPort
 
 
         //! Returns true if this bounding box is open in the  Xmin direction.
-        bool IsOpenXmin() { return (Flags & MaskFlags.XminMask) != 0; }
+        public bool IsOpenXmin() { return (Flags & MaskFlags.XminMask) != 0; }
 
         //! Returns true if this bounding box is open in the  Xmax direction.
-        bool IsOpenXmax() { return (Flags & MaskFlags.XmaxMask) != 0; }
+        public bool IsOpenXmax() { return (Flags & MaskFlags.XmaxMask) != 0; }
 
         //! Returns true if this bounding box is open in the  Ymix direction.
-        bool IsOpenYmin() { return (Flags & MaskFlags.YminMask) != 0; }
+        public bool IsOpenYmin() { return (Flags & MaskFlags.YminMask) != 0; }
 
         //! Returns true if this bounding box is open in the  Ymax direction.
-        bool IsOpenYmax() { return (Flags & MaskFlags.YmaxMask) != 0; }
+        public bool IsOpenYmax() { return (Flags & MaskFlags.YmaxMask) != 0; }
 
         //! Returns true if this bounding box is open in the  Zmin direction.
-        bool IsOpenZmin() { return (Flags & MaskFlags.ZminMask) != 0; }
+        public bool IsOpenZmin() { return (Flags & MaskFlags.ZminMask) != 0; }
 
         //! Returns true if this bounding box is open in the  Zmax  direction.
-        bool IsOpenZmax() { return (Flags & MaskFlags.ZmaxMask) != 0; }
+        public bool IsOpenZmax() { return (Flags & MaskFlags.ZmaxMask) != 0; }
 
 
 

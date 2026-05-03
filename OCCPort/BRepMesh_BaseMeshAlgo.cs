@@ -2,6 +2,7 @@
 using OCCPort.Enums;
 using OCCPort.Interfaces;
 using System;
+using System.Linq;
 using System.Reflection.Metadata;
 using System.Security.Cryptography;
 
@@ -92,9 +93,10 @@ namespace OCCPort
             Poly_Triangulation aRes = new Poly_Triangulation();
             aRes.ResizeTriangles(aTriangles.Extent(), false);
             //IteratorOfMapOfInteger aTriIt = new IteratorOfMapOfInteger(aTriangles);
-            for (int aTriangeId = 0; aTriangeId < aTriangles.Count; aTriangeId++)
+
+            for (int aTriangeId = 1; aTriangeId < aTriangles.Count; aTriangeId++)
             {
-                int item = aTriangles[aTriangeId];
+                int item = aTriangles.ToArray()[aTriangeId];
                 BRepMesh_Triangle aCurElem = myStructure.GetElement(item);
 
                 int[] aNode = new int[3];

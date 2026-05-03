@@ -11,6 +11,8 @@ namespace OCCPort
         {
             myLocation = new TopLoc_Location();
         }
+        //! Sets the flag that is TRUE if the boundary of this face is known to be the parametric space.
+        public void NaturalRestriction(bool theRestriction) { myNaturalRestriction = theRestriction; }
 
         //! Returns current active triangulation.
         public Poly_Triangulation ActiveTriangulation() { return myActiveTriangulation; }
@@ -154,11 +156,11 @@ namespace OCCPort
                 if (item == myActiveTriangulation)
                 {
                     // Reset Active bit
-                    //   myActiveTriangulation.SetMeshPurpose(myActiveTriangulation->MeshPurpose() & ~Poly_MeshPurpose_Active);
+                    myActiveTriangulation.SetMeshPurpose(myActiveTriangulation.MeshPurpose() & ~Poly_MeshPurpose.Poly_MeshPurpose_Active);
                     myTriangulations.Set(i, theTriangulation);
                     myActiveTriangulation = theTriangulation;
                     // Set Active bit
-                    //  theTriangulation.SetMeshPurpose(theTriangulation->MeshPurpose() | Poly_MeshPurpose_Active);
+                    theTriangulation.SetMeshPurpose(theTriangulation.MeshPurpose() | Poly_MeshPurpose.Poly_MeshPurpose_Active);
                     return;
                 }
             }
