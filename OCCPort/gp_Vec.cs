@@ -14,6 +14,12 @@ namespace OCCPort
             aV.coord.Multiply(theScalar);
             return aV;
         }
+
+        public static implicit operator gp_Dir(gp_Vec f)
+        {
+            return new gp_Dir(f);
+        }
+
         //! For this vector, assigns
         //! -   the values theXv, theYv and theZv to its three coordinates.
         public void SetCoord(double theXv, double theYv, double theZv)
@@ -76,7 +82,7 @@ namespace OCCPort
         {
             gp_VectorWithNullMagnitude_Raise_if(coord.Modulus() <= gp.Resolution() ||
                                                  theOther.coord.Modulus() <= gp.Resolution(), " ");
-            return (new gp_Dir(coord)).Angle(theOther.To_gp_Dir());
+            return (new gp_Dir(coord)).Angle(theOther);
         }
 
         private void gp_VectorWithNullMagnitude_Raise_if(bool v1, string v2)

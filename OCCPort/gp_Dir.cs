@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OCCPort.Tester;
+using System;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace OCCPort
@@ -237,10 +238,11 @@ namespace OCCPort
             return Math.PI - Angle(new gp_Dir(theOther)) <= theAngularTolerance;
 
         }
-
-        internal gp_Vec to_gp_Vec()
+        public static implicit operator gp_Vec(gp_Dir f)
         {
-            return new gp_Vec(this);
+            return new gp_Vec(f);
         }
+
+        
     }
 }

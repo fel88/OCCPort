@@ -344,19 +344,19 @@ namespace OCCPort
                         {
                             case 0:
                                 anEdgeSeq.Add(aBestEdgeNum);
-                                aLastPnt3D = anEnds3D[aBestEdgeNum].To_gp_Pnt(); ;
+                                aLastPnt3D = anEnds3D[aBestEdgeNum];
                                 break;
                             case 1:
                                 anEdgeSeq.Prepend(aBestEdgeNum);
-                                aFirstPnt3D = aBegins3D[aBestEdgeNum].To_gp_Pnt();
+                                aFirstPnt3D = aBegins3D[aBestEdgeNum];
                                 break;
                             case 2:
                                 anEdgeSeq.Append(-aBestEdgeNum);
-                                aLastPnt3D = aBegins3D[aBestEdgeNum].To_gp_Pnt();
+                                aLastPnt3D = aBegins3D[aBestEdgeNum];
                                 break;
                             case 3:
                                 anEdgeSeq.Prepend(-aBestEdgeNum);
-                                aFirstPnt3D = anEnds3D[aBestEdgeNum].To_gp_Pnt();
+                                aFirstPnt3D = anEnds3D[aBestEdgeNum];
                                 break;
                         }
                         if (myMode == ModeType.ModeBoth)
@@ -383,8 +383,8 @@ namespace OCCPort
                     {
                         aLoops.Append(anEdgeSeq);
                         anEdgeSeq = new TColStd_HSequenceOfInteger();
-                        aFirstPnt3D = aBegins3D[aBestEdgeNum].To_gp_Pnt();
-                        aLastPnt3D = anEnds3D[aBestEdgeNum].To_gp_Pnt();
+                        aFirstPnt3D = aBegins3D[aBestEdgeNum];
+                        aLastPnt3D = anEnds3D[aBestEdgeNum];
                         if (myMode == ModeType.ModeBoth)
                         {
                             aFirstPnt2D = aBegins2D[aBestEdgeNum].To_gp_Pnt2d();
@@ -444,8 +444,8 @@ namespace OCCPort
                             int aPrevEdgeIt = aCurEdgeIt == 1 ? aCurLoopLength : aCurEdgeIt - 1;
                             int aCurEdgeIdx = aCurLoop.Value(aCurEdgeIt);
                             int aPrevEdgeIdx = aCurLoop.Value(aPrevEdgeIt);
-                            gp_Pnt aCurLoopFirst = aCurEdgeIdx > 0 ? aBegins3D[aCurEdgeIdx].To_gp_Pnt() : anEnds3D[-aCurEdgeIdx].To_gp_Pnt();
-                            gp_Pnt aCurLoopLast = aPrevEdgeIdx > 0 ? anEnds3D[aPrevEdgeIdx].To_gp_Pnt() : aBegins3D[-aPrevEdgeIdx].To_gp_Pnt();
+                            gp_Pnt aCurLoopFirst = aCurEdgeIdx > 0 ? aBegins3D[aCurEdgeIdx] : anEnds3D[-aCurEdgeIdx];
+                            gp_Pnt aCurLoopLast = aPrevEdgeIdx > 0 ? anEnds3D[aPrevEdgeIdx] : aBegins3D[-aPrevEdgeIdx];
                             // iterate over all gaps between edges in main loop
                             double aMinDist3 = Standard_Real.RealLast();
                             int aMainLoopIt3 = 0;
@@ -457,8 +457,8 @@ namespace OCCPort
                                 var aNextEdgeIt2 = aCurEdgeIt2 == aMainLoopLength ? 1 : aCurEdgeIt2 + 1;
                                 var aCurEdgeIdx2 = aMainLoop.Value(aCurEdgeIt2);
                                 var aNextEdgeIdx2 = aMainLoop.Value(aNextEdgeIt2);
-                                gp_Pnt aMainLoopFirst = (aCurEdgeIdx2 > 0 ? anEnds3D[aCurEdgeIdx2].To_gp_Pnt() : aBegins3D[-aCurEdgeIdx2].To_gp_Pnt());
-                                gp_Pnt aMainLoopLast = (aNextEdgeIdx2 > 0 ? aBegins3D[aNextEdgeIdx2].To_gp_Pnt() : anEnds3D[-aNextEdgeIdx2].To_gp_Pnt());
+                                gp_Pnt aMainLoopFirst = (aCurEdgeIdx2 > 0 ? anEnds3D[aCurEdgeIdx2] : aBegins3D[-aCurEdgeIdx2]);
+                                gp_Pnt aMainLoopLast = (aNextEdgeIdx2 > 0 ? aBegins3D[aNextEdgeIdx2] : anEnds3D[-aNextEdgeIdx2]);
                                 // getting the sum of square distances if we try to sew the current loop with the main loop in current positions
                                 double aDirectDist =
                                         aCurLoopFirst.SquareDistance(aMainLoopFirst) + aCurLoopLast.SquareDistance(aMainLoopLast);
@@ -618,38 +618,6 @@ namespace OCCPort
                 myXYZ.Append(theStart3d);
                 myXYZ.Append(theEnd3d);
             }
-        }
-    }
-
-    public static class Extensions
-    {
-        public static gp_Dir To_gp_Dir(this gp_Vec z)
-        {
-            return new gp_Dir(z);
-        }
-        public static gp_Pnt To_gp_Pnt(this gp_XYZ z)
-        {
-            return new gp_Pnt(z);
-        }
-        public static gp_Pnt2d To_gp_Pnt2d(this gp_XY z)
-        {
-            return new gp_Pnt2d(z);
-        }
-        public static int Value(this List<int> s, int ind)
-        {
-            return s[ind - 1];
-        }
-        public static T Value<T>(this List<T> s, int ind)
-        {
-            return s[ind - 1];
-        }
-        public static void InsertAfter<T>(this List<T> s, int ind, T val)
-        {
-            s.Insert(ind - 1, val);
-        }
-        public static int Length<T>(this List<T> s)
-        {
-            return s.Count;
         }
     }
 

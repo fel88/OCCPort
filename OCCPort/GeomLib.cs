@@ -68,13 +68,13 @@ namespace OCCPort
                 theSurf.D1(theUV.X(), theUV.Y() - sign * step, out aDummyPnt, out DU, out DV);
                 if ((DU.XYZ().SquareModulus() > eps) && (DV.XYZ().SquareModulus() > eps))
                 {
-                    aNormal1 = (DU ^ DV).To_gp_Dir();
+                    aNormal1 = (DU ^ DV);
                     theSurf.D1(theUV.X(), theUV.Y() + sign * step, out aDummyPnt, out DU, out DV);
                     if ((DU.XYZ().SquareModulus() > eps)
                      && (DV.XYZ().SquareModulus() > eps))
                     {
-                        aNormal2 = (DU ^ DV).To_gp_Dir();
-                        if (aNormal1.IsOpposite(aNormal2.to_gp_Vec(), aConeSingularityAngleEps))
+                        aNormal2 = (DU ^ DV);
+                        if (aNormal1.IsOpposite(aNormal2, aConeSingularityAngleEps))
                         {
                             return 2;
                         }
@@ -104,7 +104,7 @@ namespace OCCPort
                     Norm = DU ^ DV;
                 }
                 if (Norm.SquareMagnitude() >= eps
-                 && Norm.Dot(aNormal.to_gp_Vec()) < 0.0)
+                 && Norm.Dot(aNormal) < 0.0)
                 {
                     aNormal.Reverse();
                 }
@@ -133,7 +133,7 @@ namespace OCCPort
                     Norm = DU ^ DV;
                 }
                 if (Norm.SquareMagnitude() >= eps
-                 && Norm.Dot(aNormal.to_gp_Vec()) < 0.0)
+                 && Norm.Dot(aNormal) < 0.0)
                 {
                     aNormal.Reverse();
                 }

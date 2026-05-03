@@ -6,6 +6,12 @@ namespace OCCPort
 {
     public struct gp_XYZ
     {
+
+        public static implicit operator gp_Pnt(gp_XYZ f)
+        {
+            return new gp_Pnt(f);
+        }
+
         private double x;
         private double y;
         private double z;

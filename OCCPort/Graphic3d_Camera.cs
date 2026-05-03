@@ -65,8 +65,8 @@ namespace OCCPort
             // option is to perform frustum plane adjustment algorithm in view camera space,
             // which will lead to a number of additional world-view space conversions and
             // loosing precision as well.
-            gp_Pnt aBndMin = theBox.CornerMin().XYZ().Multiplied(myAxialScale).To_gp_Pnt();
-            gp_Pnt aBndMax = theBox.CornerMax().XYZ().Multiplied(myAxialScale).To_gp_Pnt();
+            gp_Pnt aBndMin = theBox.CornerMin().XYZ().Multiplied(myAxialScale);
+            gp_Pnt aBndMax = theBox.CornerMax().XYZ().Multiplied(myAxialScale);
             if (aBndMax.IsEqual(aBndMin, Standard_Real.RealEpsilon()))
             {
                 return false; // nothing to fit all
@@ -84,7 +84,7 @@ namespace OCCPort
             gp_Dir aCamSide = aCamDir ^ aCamUp;
 
             // Prepare scene bounding box parameters.
-            gp_Pnt aBndCenter = ((aBndMin.XYZ() + aBndMax.XYZ()) / 2.0).To_gp_Pnt();
+            gp_Pnt aBndCenter = ((aBndMin.XYZ() + aBndMax.XYZ()) / 2.0);
 
             gp_Pnt[] aBndCornerArray = new gp_Pnt[8];
             NCollection_Array1<gp_Pnt> aBndCorner = new NCollection_Array1<gp_Pnt>(aBndCornerArray, 1, 8);
@@ -132,7 +132,7 @@ namespace OCCPort
                 double aFitDist = aFitDistance[anI];
                 for (int aJ = aBndCorner.Lower(); aJ <= aBndCorner.Upper(); ++aJ)
                 {
-                    aFitDist = Math.Max(aFitDist, new gp_Vec(aBndCenter, aBndCorner[aJ]).Dot(aPlaneN.to_gp_Vec()));
+                    aFitDist = Math.Max(aFitDist, new gp_Vec(aBndCenter, aBndCorner[aJ]).Dot(aPlaneN));
                     //write back aFitDist to aFitDistance[anI];??
                 }
             }
@@ -221,8 +221,8 @@ namespace OCCPort
          !aProjection.IsParallel(anUp, Precision.Angular()),
           "Can not derive SIDE = PROJ x UP - directions are parallel");
 
-            theNear = new gp_Pln(Eye().Translated(aProjection * ZNear()), aProjection.To_gp_Dir());
-            theFar = new gp_Pln(Eye().Translated(aProjection * ZFar()), -aProjection.To_gp_Dir());
+            theNear = new gp_Pln(Eye().Translated(aProjection * ZNear()), aProjection);
+            theFar = new gp_Pln(Eye().Translated(aProjection * ZFar()), -aProjection);
 
             double aHScaleHor = 0.0, aHScaleVer = 0.0;
             if (Aspect() >= 1.0)
@@ -249,16 +249,16 @@ namespace OCCPort
             {
                 double aHFOVHor = Math.Atan(Math.Tan(DTR_HALF * FOVy()) * Aspect());
                 double aHFOVVer = DTR_HALF * FOVy();
-                aDirLeft.Rotate(new gp_Ax1(gp.Origin(), anUp.To_gp_Dir()), aHFOVHor);
-                aDirRight.Rotate(new gp_Ax1(gp.Origin(), anUp.To_gp_Dir()), -aHFOVHor);
-                aDirBottom.Rotate(new gp_Ax1(gp.Origin(), aSide.To_gp_Dir()), -aHFOVVer);
-                aDirTop.Rotate(new gp_Ax1(gp.Origin(), aSide.To_gp_Dir()), aHFOVVer);
+                aDirLeft.Rotate(new gp_Ax1(gp.Origin(), anUp), aHFOVHor);
+                aDirRight.Rotate(new gp_Ax1(gp.Origin(), anUp), -aHFOVHor);
+                aDirBottom.Rotate(new gp_Ax1(gp.Origin(), aSide), -aHFOVVer);
+                aDirTop.Rotate(new gp_Ax1(gp.Origin(), aSide), aHFOVVer);
             }
 
-            theLeft = new gp_Pln(aPntLeft, aDirLeft.To_gp_Dir());
-            theRight = new gp_Pln(aPntRight, aDirRight.To_gp_Dir());
-            theBottom = new gp_Pln(aPntBottom, aDirBottom.To_gp_Dir());
-            theTop = new gp_Pln(aPntTop, aDirTop.To_gp_Dir());
+            theLeft = new gp_Pln(aPntLeft, aDirLeft);
+            theRight = new gp_Pln(aPntRight, aDirRight);
+            theBottom = new gp_Pln(aPntBottom, aDirBottom);
+            theTop = new gp_Pln(aPntTop, aDirTop);
         }
         //! Get Field Of View (FOV) in y axis.
         //! @return the FOV value in degrees.

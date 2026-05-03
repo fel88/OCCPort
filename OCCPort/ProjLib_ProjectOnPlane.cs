@@ -222,9 +222,9 @@ namespace OCCPort
   gp_Vec Vec)
         {
             gp_Vec D = Vec;//todo replace with OpenTK Vector3d
-            gp_Vec Z = ThePlane.Direction().to_gp_Vec();
+            gp_Vec Z = ThePlane.Direction();
 
-            D -= ((Vec * Z) / (TheDir * Z.To_gp_Dir())) * TheDir;
+            D -= ((Vec * Z) / (TheDir * new gp_Dir( Z))) * TheDir;
 
             return D;
         }

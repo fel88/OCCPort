@@ -43,7 +43,7 @@ namespace OCCPort
                 myError = BRepLib_EdgeError.BRepLib_LineThroughIdenticPoints;
                 return;
             }
-            gp_Lin L = new gp_Lin(P1, new gp_Vec(P1, P2).To_gp_Dir());
+            gp_Lin L = new gp_Lin(P1, new gp_Vec(P1, P2));
             Geom_Line GL = new Geom_Line(L);
             Init(GL, P1, P2, 0, l);
         }

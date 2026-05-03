@@ -149,7 +149,7 @@ namespace OCCPort
                     gp_Vec D1U, D1V;
                     mySurface.D1(Puv.X(), Puv.Y(), out P, out D1U, out D1V);
                     V.SetLinearForm(Duv.X(), D1U, Duv.Y(), D1V);
-                    myLin = new gp_Lin(P, V.To_gp_Dir());
+                    myLin = new gp_Lin(P, V);
                 }
             }
             //else
