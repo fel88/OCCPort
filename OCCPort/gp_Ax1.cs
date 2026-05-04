@@ -15,6 +15,9 @@ namespace OCCPort
             vdir = (theV);
         }
 
+        //! Translates this axis by the vector theV, and assigns the result to this axis.
+        public void Translate(gp_Vec theV) { loc.Translate(theV); }
+
         //! Applies the transformation theT to this axis and assigns the result to this axis.
         public void Transform(gp_Trsf theT)
         {

@@ -1,7 +1,9 @@
 ﻿using OCCPort;
 using System;
 using System.Reflection.Metadata;
+using TriangleNet.Topology.DCEL;
 using static OpenTK.Graphics.OpenGL.GL;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace OCCPort
 {
@@ -278,6 +280,100 @@ namespace OCCPort
             BRepTools_ReShape aReshaper = new BRepTools_ReShape();
             InternalUpdateTolerances(S, verifyFaceTolerance, true, aReshaper);
 
+        }
+
+        public static void SameParameter(TopoDS_Shape S,
+    double Tolerance,
+    bool forced)
+        {
+            BRepTools_ReShape reshaper = new BRepTools_ReShape();
+            InternalSameParameter(S, reshaper, Tolerance, forced, true);
+        }
+        public static void InternalSameParameter(TopoDS_Shape theSh, BRepTools_ReShape theReshaper,
+  double theTol, bool IsForced, bool IsMutableInput)
+        {
+            TopExp_Explorer ex = new TopExp_Explorer(theSh, TopAbs_ShapeEnum.TopAbs_EDGE);
+            TopTools_MapOfShape Done = new TopTools_MapOfShape();
+            BRep_Builder aB = new BRep_Builder();
+            TopTools_DataMapOfShapeReal aShToTol;
+
+            //while (ex.More())
+            //{
+            //    TopoDS_Edge aCE = TopoDS.Edge(ex.Current());
+            //    if (Done.Add(aCE))
+            //    {
+            //        TopoDS_Edge aNE = TopoDS.Edge(theReshaper.Value(aCE));
+            //        bool UseOldEdge = IsMutableInput || theReshaper.IsNewShape(aCE) || !aNE.IsSame(aCE);
+            //        if (IsForced && (BRep_Tool.SameRange(aCE) || BRep_Tool.SameParameter(aCE)))
+            //        {
+            //            if (!UseOldEdge)
+            //            {
+            //                aNE = TopoDS.Edge(aCE.EmptyCopied());
+            //                TopoDS_Iterator sit = new TopoDS_Iterator(aCE);
+            //                for (; sit.More(); sit.Next())
+            //                    aB.Add(aNE, sit.Value());
+            //                theReshaper.Replace(aCE, aNE);
+            //                UseOldEdge = true;
+            //            }
+            //            aB.SameRange(aNE, false);
+            //            aB.SameParameter(aNE, false);
+            //        }
+            //        double aNewTol = -1;
+            //        TopoDS_Edge aResEdge = BRepLib.SameParameter(aNE, theTol, aNewTol, UseOldEdge);
+            //        if (!UseOldEdge && !aResEdge.IsNull())
+            //            //NE have been empty-copied
+            //            theReshaper.Replace(aNE, aResEdge);
+            //        if (aNewTol > 0)
+            //        {
+            //            TopoDS_Vertex aV1 = new TopoDS_Vertex(), aV2 = new TopoDS_Vertex();
+            //            TopExp.Vertices(aCE, ref aV1, ref aV2);
+            //            if (!aV1.IsNull())
+            //                UpdTolMap(aV1, aNewTol, aShToTol);
+            //            if (!aV2.IsNull())
+            //                UpdTolMap(aV2, aNewTol, aShToTol);
+            //        }
+            //    }
+            //    ex.Next();
+            //}
+
+            Done.Clear();
+            BRepAdaptor_Surface BS = new BRepAdaptor_Surface();
+            for (ex.Init(theSh, TopAbs_ShapeEnum.TopAbs_FACE); ex.More(); ex.Next())
+            {
+                TopoDS_Face curface = TopoDS.Face(ex.Current());
+                if (!Done.Add(curface))
+                    continue;
+
+                BS.Initialize(curface);
+                if (BS._GetType() != GeomAbs_SurfaceType.GeomAbs_Plane)
+                    continue;
+
+                TopExp_Explorer ex2 = new TopExp_Explorer();
+                for (ex2.Init(curface, TopAbs_ShapeEnum.TopAbs_EDGE); ex2.More(); ex2.Next())
+                {
+                    TopoDS_Edge E = TopoDS.Edge(ex2.Current());
+                    //TopoDS_Shape aNe = theReshaper.Value(E);
+                    double aNewEtol = -1;
+                  //  GetEdgeTol(TopoDS.Edge(aNe), curface, aNewEtol);
+                  //  if (aNewEtol >= 0) //not equal to -1
+                    //    UpdTolMap(E, aNewEtol, aShToTol);
+                }
+            }
+
+            //
+            //UpdShTol(aShToTol, IsMutableInput, theReshaper, false);
+
+            InternalUpdateTolerances(theSh, false, IsMutableInput, theReshaper);
+        }
+
+        private static void GetEdgeTol(TopoDS_Edge topoDS_Edge, TopoDS_Face curface, double aNewEtol)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void UpdTolMap(TopoDS_Edge e, double aNewEtol, TopTools_DataMapOfShapeReal aShToTol)
+        {
+            throw new NotImplementedException();
         }
 
         static double thePrecision = OCCPort.Precision.Confusion();

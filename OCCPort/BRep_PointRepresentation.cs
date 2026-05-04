@@ -6,6 +6,13 @@ namespace OCCPort
     //! Contains a location and a parameter.
     public abstract class BRep_PointRepresentation
     {
+        public bool IsPointOnCurve
+  (Geom_Curve c,
+    TopLoc_Location l)
+        {
+            return false;
+        }
+
         public BRep_PointRepresentation(double P,
                             TopLoc_Location L)
         {

@@ -1,4 +1,6 @@
-﻿namespace OCCPort
+﻿using System;
+
+namespace OCCPort
 {
     //! This class implements the real vector abstract data type.
     //! Vectors can have an arbitrary range which must be defined at
@@ -29,22 +31,62 @@
     //!    V1.Add(V3)  // --> will raise DimensionError;
     //! @endcode
     public class math_Vector
-    {  
-        
+    {
+
+        public math_Vector(int theLower,
+                         int theUpper,
+                         double theInitialValue)
+        {
+            myLocArray = new double[theUpper - theLower + 1];
+            Array = new NCollection_Array1<double>(myLocArray[0], theLower, theUpper);
+            Array.Init(theInitialValue);
+        }
+        double[] myLocArray = new double[512];
+
+        //! Returns the length of a vector
+        public int Length()
+        {
+            return Array.Length();
+        }
+
+        public double Norm2()
+        {
+            double Result = 0;
+
+            for (int Index = Lower(); Index <= Upper(); Index++)
+            {
+                Result = Result + Array[Index] * Array[Index];
+            }
+            return Result;
+        }
+        //! Returns the value of the theLower index of a vector.
+        public int Lower()
+        {
+            return Array.Lower();
+        }
+
+        //! Returns the value of the theUpper index of a vector.
+        public int Upper()
+        {
+            return Array.Upper();
+        }
+
+
+
         //! Constructs a non-initialized vector in the range [theLower..theUpper]
-       //! "theLower" and "theUpper" are the indexes of the lower and upper bounds of the constructed vector.
+        //! "theLower" and "theUpper" are the indexes of the lower and upper bounds of the constructed vector.
         public math_Vector(int theLower, int theUpper)
         {
             Array = new NCollection_Array1<double>(theLower, theUpper);
         }
-        
+
         public double this[int key]
         {
             get => Array[key];
             set => Array[key] = value;
         }
 
-        NCollection_Array1<double> Array;
+        public NCollection_Array1<double> Array;
 
     }
 }

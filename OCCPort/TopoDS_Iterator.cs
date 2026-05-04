@@ -39,13 +39,17 @@ namespace OCCPort
             //Standard_NoSuchObject_Raise_if(!More(),"TopoDS_Iterator::Value");  
             return myShape;
         }
-        //=======================================================================
-        //function : Initialize
-        //purpose  : 
-        //=======================================================================
-        void Initialize(TopoDS_Shape S,
-                                      bool cumOri,
-                                      bool cumLoc)
+
+        //! Initializes this iterator with shape S.
+        //! Note:
+        //! - If cumOri is true, the function composes all
+        //! sub-shapes with the orientation of S.
+        //! - If cumLoc is true, the function multiplies all
+        //! sub-shapes by the location of S, i.e. it applies to
+        //! each sub-shape the transformation that is associated with S.
+        public void Initialize(TopoDS_Shape S,
+                                      bool cumOri=true,
+                                      bool cumLoc=true)
         {
             if (cumLoc)
                 myLocation = S.Location();

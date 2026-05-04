@@ -43,6 +43,9 @@ namespace OCCPort
             return true;
         }
 
-
+        public override BRep_CurveRepresentation Copy()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

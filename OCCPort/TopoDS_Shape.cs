@@ -10,6 +10,26 @@ namespace OCCPort
         {
             myOrient = TopAbs_Orientation.TopAbs_EXTERNAL;
         }
+        //! Returns a new Shape with the  same Orientation and
+        //! Location and  a new TShape  with the same geometry
+        //! and no sub-shapes.
+        public TopoDS_Shape EmptyCopied()
+        {
+            var aShape = Activator.CreateInstance(this.GetType()) as TopoDS_Shape;
+
+            aShape.myOrient = this.myOrient;
+            aShape.myTShape = this.myTShape;
+            aShape.myLocation = this.myLocation;//clone ?
+
+            //TopoDS_Shape aShape(*this);
+            aShape.EmptyCopy();
+            return aShape;
+        }
+
+        //! Replace   <me> by  a  new   Shape with the    same
+        //! Orientation and Location and a new TShape with the
+        //! same geometry and no sub-shapes.
+        public void EmptyCopy() { myTShape = myTShape.EmptyCopy(); }
 
         public TopoDS_Shape(TopoDS_Shape theOther)
         {
@@ -56,7 +76,7 @@ namespace OCCPort
             aShape.myTShape = this.myTShape;
             aShape.myLocation = this.myLocation;//clone ?
 
-            
+
             aShape.Location(theLoc, theRaiseExc);
             return aShape;
         }
@@ -165,13 +185,13 @@ namespace OCCPort
             //TopoDS_Shape aShape = (TopoDS_Shape)MemberwiseClone();
             aShape.myOrient = this.myOrient;
             aShape.myTShape = this.myTShape;
-            aShape.myLocation =  this.myLocation;//clone ?
+            aShape.myLocation = this.myLocation;//clone ?
 
             aShape.Orientation(theOrient);
             return aShape;
         }
 
-        
+
 
         //! Returns the number of direct sub-shapes (children).
         //! @sa TopoDS_Iterator for accessing sub-shapes

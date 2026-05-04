@@ -15,6 +15,13 @@ namespace OCCPort
         {
             return myPolygon3D;
         }
+
+        public override BRep_CurveRepresentation Copy()
+        {
+            BRep_Polygon3D P = new BRep_Polygon3D(myPolygon3D, Location());
+            return P;
+        }
+
         Poly_Polygon3D myPolygon3D;
 
     }

@@ -25,10 +25,10 @@ namespace OCCPort
             
         }
 
-        protected TopoDS_Shape myShape;
-        protected TopTools_ListOfShape myGenFaces;
-        protected TopTools_ListOfShape myNewFaces;
-        protected TopTools_ListOfShape myEdgFaces;
+        protected TopoDS_Shape myShape = new TopoDS_Shape();
+        protected TopTools_ListOfShape myGenFaces = new TopTools_ListOfShape();
+        protected TopTools_ListOfShape myNewFaces = new TopTools_ListOfShape();
+        protected TopTools_ListOfShape myEdgFaces = new TopTools_ListOfShape();
 
     }
 }

@@ -2,9 +2,9 @@
 
 namespace OCCPort
 {
-    public class NCollection_IndexedMap<T>:List<T>
+    public class NCollection_IndexedMap<T, Hasher> : List<T>
     {
-        internal new  int Add(T theStruct)
+        internal new int Add(T theStruct)
         {
             base.Add(theStruct);
             return Count;

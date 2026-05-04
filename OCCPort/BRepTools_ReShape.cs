@@ -1,4 +1,6 @@
-﻿namespace OCCPort
+﻿using System;
+
+namespace OCCPort
 {
     //! Rebuilds a Shape by making pre-defined substitutions on some
     //! of its components
@@ -14,7 +16,11 @@
     //! contain one or more of these individual shapes
     //!
     //! Supports the 'BRepTools_History' history by method 'History'.
-    public class BRepTools_ReShape 
+    public class BRepTools_ReShape
     {
+        internal bool IsNewShape(TopoDS_Edge aCE)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

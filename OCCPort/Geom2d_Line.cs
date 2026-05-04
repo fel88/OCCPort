@@ -9,6 +9,14 @@
         {
             pos = (L.Position());
         }
+        //! Constructs a line passing through point P and parallel to
+        //! vector V (P and V are, respectively, the origin
+        //! and the unit vector of the positioning axis of the line).
+        public Geom2d_Line(gp_Pnt2d P, gp_Dir2d V)
+        {
+            pos = new gp_Ax2d(P, V);
+
+        }
 
         public override Geom2d_Geometry Copy()
         {
@@ -57,7 +65,7 @@
         public override void D1(double U, out gp_Pnt2d P, out gp_Vec2d V1)
         {
             P = new gp_Pnt2d();
-            V1 = new gp_Vec2d ();
+            V1 = new gp_Vec2d();
             ElCLib.LineD1(U, pos, ref P, ref V1);
 
         }

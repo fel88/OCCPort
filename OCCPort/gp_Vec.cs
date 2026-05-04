@@ -1,4 +1,6 @@
-﻿using System;
+﻿using OCCPort;
+using System;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace OCCPort
 {
@@ -59,7 +61,14 @@ namespace OCCPort
 
         //! Assigns the given value to the X coordinate of this vector.
         public void SetZ(double theZ) { coord.SetZ(theZ); }
+        //! For this vector, returns its X coordinate.
+        public double X() { return coord.X(); }
 
+        //! For this vector, returns its Y coordinate.
+        public double Y() { return coord.Y(); }
+
+        //! For this vector, returns its Z  coordinate.
+        public double Z() { return coord.Z(); }
         public void Rotate(gp_Ax1 theA1, double theAng)
         {
             gp_Trsf aT = new gp_Trsf();
@@ -166,6 +175,13 @@ namespace OCCPort
         public gp_Vec(gp_XYZ theCoord)
         {
             coord = (theCoord);
+        }
+
+        //! Creates a point with its three cartesian coordinates.
+        public gp_Vec(double theXv, double theYv, double theZv)
+        {
+
+            coord = new gp_XYZ(theXv, theYv, theZv);
         }
 
 

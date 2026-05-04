@@ -23,6 +23,26 @@ namespace OCCPort
     {
         TopLoc_SListNodeOfItemLocation myNode;
 
+        //! Creates a list from an other one. The lists  are shared.
+        public TopLoc_SListOfItemLocation(TopLoc_SListOfItemLocation Other)
+
+        {
+            myNode = (Other.myNode);
+        }
+        public TopLoc_SListOfItemLocation Tail()
+        {
+            if (myNode != null)
+                return myNode.Tail();
+            else
+            {
+                //return new TopLoc_SListOfItemLocation (this);
+                //retutn *this
+                var ret = new TopLoc_SListOfItemLocation(this);
+
+                return this;
+            }
+        }
+
         public TopLoc_SListOfItemLocation(TopLoc_ItemLocation anItem, TopLoc_SListOfItemLocation aTail)
         {
             myNode = (new TopLoc_SListNodeOfItemLocation(anItem, aTail));
@@ -70,7 +90,7 @@ namespace OCCPort
 
         public TopLoc_SListOfItemLocation Assign(TopLoc_SListOfItemLocation Other)
         {
-            if (this == Other) 
+            if (this == Other)
                 return this;
 
             Clear();

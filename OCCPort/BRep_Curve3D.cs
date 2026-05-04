@@ -30,7 +30,12 @@ C == null ? Standard_Real.RealLast() : C.LastParameter())
             return true;
         }
 
-        
+        public override BRep_CurveRepresentation Copy()
+        {
+            BRep_Curve3D C = new BRep_Curve3D(myCurve, Location());
 
+            C.SetRange(First(), Last());
+            return C;
+        }
     }
 }

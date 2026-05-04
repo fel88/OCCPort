@@ -289,8 +289,9 @@ namespace OCCPort
 
             Update(true);
         }
-        NCollection_IndexedMap<Graphic3d_Structure> myDescendants = new NCollection_IndexedMap<Graphic3d_Structure>();
-        NCollection_IndexedMap<Graphic3d_Structure> myAncestors = new NCollection_IndexedMap<Graphic3d_Structure>();
+
+        NCollection_IndexedMap<Graphic3d_Structure, NCollection_DefaultHasher<Graphic3d_Structure>> myDescendants = new NCollection_IndexedMap<Graphic3d_Structure, NCollection_DefaultHasher<Graphic3d_Structure>>();
+        NCollection_IndexedMap<Graphic3d_Structure, NCollection_DefaultHasher<Graphic3d_Structure>> myAncestors = new NCollection_IndexedMap<Graphic3d_Structure, NCollection_DefaultHasher<Graphic3d_Structure>>();
         void getBox(out Graphic3d_BndBox3d theBox,
                                   bool theToIgnoreInfiniteFlag)
         {

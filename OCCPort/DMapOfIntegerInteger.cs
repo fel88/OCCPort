@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace OCCPort
 {
-    internal class DMapOfIntegerInteger : NCollection_DataMap<int, int, NCollection_DefaultHasher>
+    internal class DMapOfIntegerInteger : NCollection_DataMap<int, int, NCollection_DefaultHasher<int>>
     {
         Dictionary<int, int> map = new Dictionary<int, int>();
         public DMapOfIntegerInteger(int v, NCollection_IncAllocator myAllocator)

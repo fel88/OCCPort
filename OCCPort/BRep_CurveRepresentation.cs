@@ -11,6 +11,9 @@ namespace OCCPort
             throw new Standard_DomainError("BRep_CurveRepresentation");
         }
 
+        //! Return a copy of this representation.
+        public abstract BRep_CurveRepresentation Copy();
+
         public virtual bool IsRegularity()
         {
             return false;

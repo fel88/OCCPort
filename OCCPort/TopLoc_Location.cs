@@ -1,5 +1,7 @@
 ﻿using OCCPort;
+using OpenTK.Graphics.OpenGL;
 using System;
+using System.Data.SqlTypes;
 using System.Globalization;
 
 namespace OCCPort
@@ -22,6 +24,8 @@ namespace OCCPort
             TopLoc_Datum3D D = new TopLoc_Datum3D(T);
             myItems.Construct(new TopLoc_ItemLocation(D, 1));
         }
+
+        
         internal static double ScalePrec()
         {
 
@@ -50,9 +54,9 @@ namespace OCCPort
             // prepend the chain Other in front of this
             // cancelling null exponents
 
-            if (IsIdentity()) 
+            if (IsIdentity())
                 return Other;
-            if (Other.IsIdentity()) 
+            if (Other.IsIdentity())
                 return this;
 
             // prepend the queue of Other
@@ -76,7 +80,9 @@ namespace OCCPort
 
         private TopLoc_Location NextLocation()
         {
+            //????
             throw new NotImplementedException();
+            //return new  TopLoc_Location( myItems.Tail());            //not origin code
         }
 
         private int FirstPower()
@@ -89,7 +95,7 @@ namespace OCCPort
             throw new NotImplementedException();
         }
 
-        
+
 
         internal TopLoc_Location Inverted()
         {
@@ -129,6 +135,26 @@ namespace OCCPort
         public void Identity()
         {
             myItems.Clear();
+        }
+
+        internal bool IsEqual(TopLoc_Location Other)
+        {
+            if (myItems == Other.myItems)
+            {
+                return true;
+            }
+            if (myItems.Value() == Other.myItems.Value()) 
+                return true;
+
+            //const void** p = (const void**) &myItems;
+            //const void** q = (const void**) &Other.myItems;
+            //if (*p == *q) { return Standard_True; }
+            if (IsIdentity() || Other.IsIdentity()) { return false; }
+            if (FirstDatum() != Other.FirstDatum()) { return false; }
+            if (FirstPower() != Other.FirstPower()) { return false; }
+            else { return NextLocation() == Other.NextLocation(); }
+
+
         }
     }
 }

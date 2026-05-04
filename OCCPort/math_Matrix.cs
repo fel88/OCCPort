@@ -41,12 +41,51 @@
     //! @endcode
     public class math_Matrix
     {
-        double[,] data = null;
+
+        //! Returns the column of index <Col> of a matrix.
+        public math_Vector Col(int Col)
+        {
+            math_Vector Result = new math_Vector(LowerRowIndex, UpperRowIndex);
+
+            for (int Index = LowerRowIndex; Index <= UpperRowIndex; Index++)
+            {
+                Result.Array[Index] = Array[Index, Col];
+            }
+            return Result;
+        }
+
         public double this[int key, int key2]
         {
-            get => data[key, key2];
-            set => data[key, key2] = value;
+            get => Array[key, key2];
+            set => Array[key, key2] = value;
         }
+
+        public int RowNumber()
+        { return UpperRowIndex - LowerRowIndex + 1; }
+
+        public int ColNumber()
+        { return UpperColIndex - LowerColIndex + 1; }
+
+        //! Constructs a non-initialized  matrix of range [LowerRow..UpperRow,
+        //! LowerCol..UpperCol]
+        //! For the constructed matrix:
+        //! -   LowerRow and UpperRow are the indexes of the
+        //! lower and upper bounds of a row, and
+        //! -   LowerCol and UpperCol are the indexes of the
+        //! lower and upper bounds of a column.
+        public math_Matrix(int LowerRow, int UpperRow, int LowerCol, int UpperCol)
+        {
+            LowerRowIndex = (LowerRow);
+            UpperRowIndex = (UpperRow);
+            LowerColIndex = (LowerCol);
+            UpperColIndex = (UpperCol);
+            Array = new math_DoubleTab(LowerRow, UpperRow,
+              LowerCol, UpperCol);
+
+            Exceptions.Standard_RangeError_Raise_if((LowerRow > UpperRow)
+                             || (LowerCol > UpperCol), "math_Matrix() - invalid dimensions");
+        }
+
 
         public math_Matrix(int LowerRow,
 

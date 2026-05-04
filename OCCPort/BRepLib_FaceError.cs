@@ -1,4 +1,4 @@
-﻿namespace OCCPort.Tester
+﻿namespace OCCPort
 {
     //! Errors that can occur at face construction.
     //! no error

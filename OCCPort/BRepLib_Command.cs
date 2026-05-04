@@ -21,6 +21,14 @@
             if (!myDone)
                 throw new StdFail_NotDone("BRep_API: command not done");
         }
+        public void NotDone()
+        {
+            myDone = false;
+        }
+
+
+
+
 
         public void Done()
         {

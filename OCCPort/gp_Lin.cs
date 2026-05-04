@@ -19,6 +19,7 @@ namespace OCCPort
 
     public class gp_Lin
     {
+        public void Translate(gp_Vec theV) { pos.Translate(theV); }
 
         gp_Ax1 pos;
         //! Returns the direction of the line.
@@ -26,7 +27,7 @@ namespace OCCPort
 
         //! Returns the location point (origin) of the line.
         public gp_Pnt Location() { return pos.Location(); }
-        public void Transform( gp_Trsf theT) { pos.Transform(theT); }
+        public void Transform(gp_Trsf theT) { pos.Transform(theT); }
 
 
         //! Returns the axis placement one axis with the same

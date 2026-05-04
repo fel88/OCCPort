@@ -12,12 +12,18 @@ namespace OCCPort
 
         internal void ChangeValue(int i, double theParam)
         {
-            this[i] = theParam;
+            this[i-1] = theParam;
+        }
+
+        public new double this[int key]
+        {
+            get => base[key - 1];
+            set => base[key - 1] = value;
         }
 
         internal void InsertBefore(int i, double theParam)
         {
-            Insert(i, theParam);
+            Insert(i-1, theParam);
         }
     }
 }

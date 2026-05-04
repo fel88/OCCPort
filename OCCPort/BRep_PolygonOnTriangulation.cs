@@ -32,5 +32,12 @@ namespace OCCPort
 
         }
 
+        public override BRep_CurveRepresentation Copy()
+        {
+            BRep_PolygonOnTriangulation P =
+   new BRep_PolygonOnTriangulation(myPolygon, myTriangulation, Location());
+
+            return P;
+        }
     }
 }

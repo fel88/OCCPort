@@ -94,7 +94,7 @@ namespace OCCPort
         {
             for (int i = myLowerBound; i <= myUpperBound; i++)
             {
-                list[i] = val;
+                list[i - myLowerBound] = val;
             }
         }
 

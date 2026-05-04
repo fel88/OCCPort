@@ -2,7 +2,7 @@
 using System;
 using System.Runtime.Intrinsics.X86;
 
-namespace OCCPort.Tester
+namespace OCCPort
 {
     //! Provides an  algorithm to find  a Surface  through a
     //! set of edges.
@@ -26,6 +26,16 @@ namespace OCCPort.Tester
     //! location given by the Location method.
     public class BRepLib_FindSurface
     {
+
+        public Geom_Surface Surface()
+        {
+            return mySurface;
+        }
+        public TopLoc_Location Location()
+        {
+            return myLocation;
+        }
+
         public double Tolerance()
         {
             return myTolerance;
@@ -47,7 +57,7 @@ namespace OCCPort.Tester
         double myTolerance;
         double myTolReached;
         bool isExisted;
-        TopLoc_Location myLocation;
+        TopLoc_Location myLocation = new TopLoc_Location();
 
 
 
@@ -79,17 +89,17 @@ namespace OCCPort.Tester
             if (!ex.More()) return;    // no edges ....
 
             TopoDS_Edge E = TopoDS.Edge(ex.Current());
-            double f, l, ff, ll;
-            Geom2d_Curve PC, aPPC;
-            Geom_Surface SS;
-            TopLoc_Location L;
+            double f = 0, l = 0, ff = 0, ll = 0;
+            Geom2d_Curve PC = null, aPPC = null;
+            Geom_Surface SS = null;
+            TopLoc_Location L = new TopLoc_Location();
             int i = 0, j;
 
             // iterate on the surfaces of the first edge
             for (; ; )
             {
                 i++;
-                //BRep_Tool.CurveOnSurface(E, PC, mySurface, myLocation, f, l, i);
+                BRep_Tool.CurveOnSurface(E, ref PC, ref mySurface, ref myLocation, ref f, ref l, i);
                 if (mySurface == null)
                 {
                     break;
@@ -103,33 +113,33 @@ namespace OCCPort.Tester
                         for (; ; )
                         {
                             j++;
-                            //BRep_Tool::CurveOnSurface(TopoDS::Edge(ex.Current()), aPPC, SS, L, ff, ll, j);
-                            //if (SS.IsNull())
-                            //{
-                            //    break;
-                            //}
-                            //if ((SS == mySurface) && (L.IsEqual(myLocation)))
-                            //{
-                            //    break;
-                            //}
-                            //SS.Nullify();
+                            BRep_Tool.CurveOnSurface(TopoDS.Edge(ex.Current()), ref aPPC, ref SS, ref L, ref ff, ref ll, j);
+                            if (SS == null)
+                            {
+                                break;
+                            }
+                            if ((SS == mySurface) && (L.IsEqual(myLocation)))
+                            {
+                                break;
+                            }
+                            SS = null;
                         }
 
-                        //if (SS.IsNull())
-                        //{
-                        //    mySurface.Nullify();
-                        //    break;
-                        //}
+                        if (SS == null)
+                        {
+                            mySurface = null;
+                            break;
+                        }
                     }
                 }
 
-                //// if OnlyPlane, eval if mySurface is a plane.
-                //if (OnlyPlane && !mySurface.IsNull())
-                //{
-                //    if (mySurface->IsKind(STANDARD_TYPE(Geom_RectangularTrimmedSurface)))
-                //        mySurface = Handle(Geom_RectangularTrimmedSurface)::DownCast(mySurface)->BasisSurface();
-                //    mySurface = Handle(Geom_Plane)::DownCast(mySurface);
-                //}
+                // if OnlyPlane, eval if mySurface is a plane.
+                if (OnlyPlane && mySurface != null)
+                {
+                    if (mySurface is Geom_RectangularTrimmedSurface)
+                        mySurface = ((Geom_RectangularTrimmedSurface)mySurface).BasisSurface();
+                    mySurface = (Geom_Plane)mySurface;
+                }
 
                 //if (!mySurface.IsNull())
                 //    // if S is e.g. the bottom face of a cylinder, mySurface can be the
@@ -153,7 +163,7 @@ namespace OCCPort.Tester
             //                       compute coefficients of the sought plane.
 
             TColgp_SequenceOfPnt aPoints = new TColgp_SequenceOfPnt();
-            TColStd_SequenceOfReal aWeight;
+            TColStd_SequenceOfReal aWeight = new TColStd_SequenceOfReal();
 
             // ======================= Step #1
             for (ex.Init(S, TopAbs_ShapeEnum.TopAbs_EDGE); ex.More(); ex.Next())
@@ -162,11 +172,11 @@ namespace OCCPort.Tester
 
                 double dfUf = c.FirstParameter();
                 double dfUl = c.LastParameter();
-                //if (IsEqual(dfUf, dfUl))
-                //{
-                //    // Degenerate
-                //    continue;
-                //}
+                if (Standard_Real.IsEqual(dfUf, dfUl))
+                {
+                    // Degenerate
+                    continue;
+                }
                 int iNbPoints = 0;
 
                 // Fill the parameters of the sampling points
@@ -220,7 +230,7 @@ namespace OCCPort.Tester
                 }
 
                 // Add the points with weights to the sequences
-                //fillPoints(c, aParams, aPoints, aWeight);
+                fillPoints(c, aParams, aPoints, aWeight);
             }
 
             if (aPoints.Length() < 3)
@@ -228,152 +238,181 @@ namespace OCCPort.Tester
                 return;
             }
 
-            //// ======================= Step #2
-            //myLocation.Identity();
-            //int iPoint;
-            //math_Matrix aMat = new math_Matrix(1, 3, 1, 3, 0.);
-            //math_Vector aVec = new math_Vector(1, 3, 0.);
-            //// Find the barycenter and normalize weights 
-            //double dfMaxWeight = 0.;
-            //gp_XYZ aBaryCenter = new gp_XYZ(0., 0., 0.);
-            //double dfSumWeight = 0.;
-            //for (iPoint = 1; iPoint <= aPoints.Length(); iPoint++)
-            //{
-            //    double dfW = aWeight(iPoint);
-            //    aBaryCenter += dfW * aPoints(iPoint).XYZ();
-            //    dfSumWeight += dfW;
-            //    if (dfW > dfMaxWeight)
-            //    {
-            //        dfMaxWeight = dfW;
-            //    }
-            //}
-            //aBaryCenter /= dfSumWeight;
+            // ======================= Step #2
+            myLocation.Identity();
+            int iPoint;
+            math_Matrix aMat = new math_Matrix(1, 3, 1, 3, 0.0);
+            math_Vector aVec = new math_Vector(1, 3, 0.0);
+            // Find the barycenter and normalize weights 
+            double dfMaxWeight = 0.0;
+            gp_XYZ aBaryCenter = new gp_XYZ(0.0, 0.0, 0.0);
+            double dfSumWeight = 0.0;
+            for (iPoint = 1; iPoint <= aPoints.Length(); iPoint++)
+            {
+                double dfW = aWeight[iPoint];
+                aBaryCenter += aPoints[iPoint].XYZ() * dfW;
+                dfSumWeight += dfW;
+                if (dfW > dfMaxWeight)
+                {
+                    dfMaxWeight = dfW;
+                }
+            }
+            aBaryCenter /= dfSumWeight;
 
-            //// Fill the matrix and the right vector
-            //for (iPoint = 1; iPoint <= aPoints.Length(); iPoint++)
-            //{
-            //    gp_XYZ p = aPoints[iPoint].XYZ() - aBaryCenter;
-            //    double w = aWeight(iPoint) / dfMaxWeight;
-            //    aMat[1, 1] += w * p.X() * p.X();
-            //    aMat(1, 2) += w * p.X() * p.Y();
-            //    aMat(1, 3) += w * p.X() * p.Z();
-            //    //  
-            //    aMat(2, 2) += w * p.Y() * p.Y();
-            //    aMat(2, 3) += w * p.Y() * p.Z();
-            //    //  
-            //    aMat(3, 3) += w * p.Z() * p.Z();
-            //}
-            //aMat(2, 1) = aMat(1, 2);
-            //aMat(3, 1) = aMat(1, 3);
-            //aMat(3, 2) = aMat(2, 3);
-            ////
-            //math_Jacobi anEignval(aMat);
-            //math_Vector anEVals(1,3);
-            //Standard_Boolean isSolved = anEignval.IsDone();
-            //Standard_Integer isol = 0;
-            //if (isSolved)
-            //{
-            //    anEVals = anEignval.Values();
-            //    //We need vector with eigenvalue ~ 0.
-            //    Standard_Real anEMin = RealLast();
-            //    Standard_Real anEMax = -anEMin;
-            //    for (i = 1; i <= 3; ++i)
-            //    {
-            //        Standard_Real anE = Abs(anEVals(i));
-            //        if (anEMin > anE)
-            //        {
-            //            anEMin = anE;
-            //            isol = i;
-            //        }
-            //        if (anEMax < anE)
-            //        {
-            //            anEMax = anE;
-            //        }
-            //    }
+            // Fill the matrix and the right vector
+            for (iPoint = 1; iPoint <= aPoints.Length(); iPoint++)
+            {
+                gp_XYZ p = aPoints[iPoint].XYZ() - aBaryCenter;
+                double w = aWeight[iPoint] / dfMaxWeight;
+                aMat[1, 1] += w * p.X() * p.X();
+                aMat[1, 2] += w * p.X() * p.Y();
+                aMat[1, 3] += w * p.X() * p.Z();
+                //  
+                aMat[2, 2] += w * p.Y() * p.Y();
+                aMat[2, 3] += w * p.Y() * p.Z();
+                //  
+                aMat[3, 3] += w * p.Z() * p.Z();
+            }
+            aMat[2, 1] = aMat[1, 2];
+            aMat[3, 1] = aMat[1, 3];
+            aMat[3, 2] = aMat[2, 3];
+            //
+            math_Jacobi anEignval = new math_Jacobi(aMat);
+            math_Vector anEVals = new math_Vector(1, 3);
+            bool isSolved = anEignval.IsDone();
+            int isol = 0;
+            if (isSolved)
+            {
+                anEVals = anEignval.Values();
+                //We need vector with eigenvalue ~ 0.
+                double anEMin = Standard_Real.RealLast();
+                double anEMax = -anEMin;
+                for (i = 1; i <= 3; ++i)
+                {
+                    double anE = Math.Abs(anEVals[i]);
+                    if (anEMin > anE)
+                    {
+                        anEMin = anE;
+                        isol = i;
+                    }
+                    if (anEMax < anE)
+                    {
+                        anEMax = anE;
+                    }
+                }
 
-            //    if (isol == 0)
-            //    {
-            //        isSolved = Standard_False;
-            //    }
-            //    else
-            //    {
-            //        Standard_Real eps = Epsilon(anEMax);
-            //        if (anEMin <= eps)
-            //        {
-            //            anEignval.Vector(isol, aVec);
-            //        }
-            //        else
-            //        {
-            //            //try using vector product of other axes
-            //            Standard_Integer ind[2] = { 0, 0 };
-            //            for (i = 1; i <= 3; ++i)
-            //            {
-            //                if (i == isol)
-            //                {
-            //                    continue;
-            //                }
-            //                if (ind[0] == 0)
-            //                {
-            //                    ind[0] = i;
-            //                    continue;
-            //                }
-            //                if (ind[1] == 0)
-            //                {
-            //                    ind[1] = i;
-            //                    continue;
-            //                }
-            //            }
-            //            math_Vector aVec1(1, 3, 0.), aVec2(1, 3, 0.);
-            //            anEignval.Vector(ind[0], aVec1);
-            //            anEignval.Vector(ind[1], aVec2);
-            //            gp_Vec aV1(aVec1(1), aVec1(2), aVec1(3));
-            //            gp_Vec aV2(aVec2(1), aVec2(2), aVec2(3));
-            //            gp_Vec aN = aV1 ^ aV2;
-            //            aVec(1) = aN.X();
-            //            aVec(2) = aN.Y();
-            //            aVec(3) = aN.Z();
-            //        }
-            //        if (aVec.Norm2() < gp::Resolution())
-            //        {
-            //            isSolved = Standard_False;
-            //        }
-            //    }
-            //}
+                if (isol == 0)
+                {
+                    isSolved = false;
+                }
+                else
+                {
+                    double eps1 = Standard_Real.Epsilon(anEMax);
+                                        
+                    if (anEMin <= eps1)
+                    {
+                         anEignval.Vector(isol, aVec);
+                    }
+                    else
+                    {
+                        //try using vector product of other axes
+                        int[] ind = { 0, 0 };
+                        for (i = 1; i <= 3; ++i)
+                        {
+                            if (i == isol)
+                            {
+                                continue;
+                            }
+                            if (ind[0] == 0)
+                            {
+                                ind[0] = i;
+                                continue;
+                            }
+                            if (ind[1] == 0)
+                            {
+                                ind[1] = i;
+                                continue;
+                            }
+                        }
+                        math_Vector aVec1 = new math_Vector(1, 3, 0.0), aVec2 = new math_Vector(1, 3, 0.0);
+                        //      anEignval.Vector(ind[0], aVec1);
+                        //    anEignval.Vector(ind[1], aVec2);
+                        gp_Vec aV1 = new gp_Vec(aVec1[1], aVec1[2], aVec1[3]);
+                        gp_Vec aV2 = new gp_Vec(aVec2[1], aVec2[2], aVec2[3]);
+                        gp_Vec _aN = aV1 ^ aV2;
+                        aVec[1] = _aN.X();
+                        aVec[2] = _aN.Y();
+                        aVec[3] = _aN.Z();
+                    }
+                    if (aVec.Norm2() < gp.Resolution())
+                    {
+                        isSolved = false;
+                    }
+                }
+            }
 
-            //if (!isSolved)
-            //    return;
-            ////Removing very small values
-            //double aMaxV = Max(Abs(aVec(1)), Max(Abs(aVec(2)), Abs(aVec(3))));
-            //double eps = Epsilon(aMaxV);
-            //for (i = 1; i <= 3; ++i)
-            //{
-            //    if (Abs(aVec(i)) <= eps)
-            //        aVec(i) = 0.;
-            //}
-            //gp_Vec aN=new gp_Vec (aVec (1), aVec(2), aVec(3));
-            //Geom_Plane aPlane = new Geom_Plane(aBaryCenter, aN);
+            if (!isSolved)
+                return;
+
+            //Removing very small values
+            double aMaxV = Math.Max(Math.Abs(aVec[1]), Math.Max(Math.Abs(aVec[2]), Math.Abs(aVec[3])));
+            double eps = Standard_Real.Epsilon(aMaxV);
+            for (i = 1; i <= 3; ++i)
+            {
+                if (Math.Abs(aVec[i]) <= eps)
+                    aVec[i] = 0.0;
+            }
+            gp_Vec aN = new gp_Vec(aVec[1], aVec[2], aVec[3]);
+            Geom_Plane aPlane = new Geom_Plane(aBaryCenter, aN);
             //myTolReached = Controle(aPoints, aPlane);
             double aWeakness = 5.0;
-            //if (myTolReached <= myTolerance || (Tol < 0 && myTolReached < myTolerance * aWeakness))
+            if (myTolReached <= myTolerance || (Tol < 0 && myTolReached < myTolerance * aWeakness))
             {
-                // mySurface = aPlane;
+                mySurface = aPlane;
                 //If S is wire, try to orient surface according to orientation of wire.
-                //if (S.ShapeType() == TopAbs_WIRE && S.Closed())
+                if (S.ShapeType() == TopAbs_ShapeEnum.TopAbs_WIRE && S.Closed())
                 {
-                    //TopoDS_Wire aW = TopoDS::Wire(S);
-                    //TopoDS_Face aTmpFace = BRepLib_MakeFace(mySurface, Precision::Confusion());
-                    //BRep_Builder BB;
+                    //TopoDS_Wire aW = TopoDS.Wire(S);
+                    //TopoDS_Face aTmpFace = new BRepLib_MakeFace(mySurface, Precision.Confusion());
+                    //BRep_Builder BB = new BRep_Builder();
                     //BB.Add(aTmpFace, aW);
-                    //BRepTopAdaptor_FClass2d FClass(aTmpFace, 0.);
-                    //if (FClass.PerformInfinitePoint() == TopAbs_IN)
+                    //BRepTopAdaptor_FClass2d FClass = new BRepTopAdaptor_FClass2d(aTmpFace, 0.0);
+                    //if (FClass.PerformInfinitePoint() == TopAbs_State.TopAbs_IN)
                     //{
-                    //    gp_Dir aNorm = aPlane->Position().Direction();
+                    //    gp_Dir aNorm = aPlane.Position().Direction();
                     //    aNorm.Reverse();
-                    //    mySurface = new Geom_Plane(aPlane->Position().Location(), aNorm);
+                    //    mySurface = new Geom_Plane(aPlane.Position().Location(), aNorm);
                     //}
                 }
             }
         }
+
+        private void fillPoints(BRepAdaptor_Curve theCurve, NCollection_Vector<double> theParams,
+            TColgp_SequenceOfPnt thePoints, TColStd_SequenceOfReal theWeights)
+        {
+            double aDistPrev = 0.0, aDistNext;
+            gp_Pnt aPPrev = (theCurve.Value(theParams[0]));
+            gp_Pnt aPNext = new gp_Pnt();
+
+            for (int iP = 1; iP <= theParams.Length(); ++iP)
+            {
+                if (iP < theParams.Length())
+                {
+                    double aParam = theParams[iP];
+                    aPNext = theCurve.Value(aParam);
+                    aDistNext = aPPrev.Distance(aPNext);
+                }
+                else
+                    aDistNext = 0.0;
+
+                thePoints.Append(aPPrev);
+                theWeights.Append(aDistPrev + aDistNext);
+                aDistPrev = aDistNext;
+                aPPrev = aPNext;
+            }
+
+        }
+
         public bool Found()
         {
             return mySurface != null;
@@ -386,4 +425,5 @@ namespace OCCPort.Tester
 
 
     }
+
 }

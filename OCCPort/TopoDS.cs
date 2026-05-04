@@ -26,7 +26,7 @@ namespace OCCPort
 				return S as TopoDS_Edge;
 			}
 			throw new ArgumentException("\"TopoDS::Edge\"");
-			//t Standard_TypeMismatch_Raise_if(TopoDS_Mismatch(S, TopAbs_EDGE),"TopoDS::Edge");
+			 //Standard_TypeMismatch_Raise_if(TopoDS_Mismatch(S, TopAbs_EDGE),"TopoDS::Edge");
 			//return *(TopoDS_Edge*)&S;
 		}
 

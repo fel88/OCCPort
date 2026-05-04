@@ -369,6 +369,50 @@ namespace OCCPort
             First = Last = 0.0;
             return null;
         }
+
+        public static void CurveOnSurface(TopoDS_Edge E,
+                                ref Geom2d_Curve C,
+                                ref Geom_Surface S,
+                                ref TopLoc_Location L,
+                                ref double First,
+                                ref double Last,
+                                int Index)
+        {
+            if (Index < 1)
+                return;
+
+            int i = 0;
+            // find the representation
+            BRep_TEdge TE = (BRep_TEdge)(E.TShape());
+            //BRep_ListIteratorOfListOfCurveRepresentation itcr(TE->Curves());
+            //for (; itcr.More(); itcr.Next())
+            foreach (var cr in TE.Curves())
+            {
+                if (cr.IsCurveOnSurface())
+                {
+                    BRep_GCurve GC = (BRep_GCurve)cr;
+                    ++i;
+                    // Compare index taking into account the fact that for the curves on
+                    // closed surfaces there are two PCurves
+                    if (i == Index)
+                        C = GC.PCurve();
+                    else if (GC.IsCurveOnClosedSurface() && (++i == Index))
+                        C = GC.PCurve2();
+                    else
+                        continue;
+
+                    S = GC.Surface();
+                    L = E.Location() * GC.Location();
+                    GC.Range(ref First, ref Last);
+                    return;
+                }
+            }
+
+            C = null;
+            S = null;
+            L.Identity();
+            First = Last = 0.0;
+        }
         //=======================================================================
         //function : CurveOnSurface
         //purpose  : Returns the curve  associated to the  edge in  the

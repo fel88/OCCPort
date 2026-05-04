@@ -61,6 +61,26 @@
             throw new System.NotImplementedException();
         }
 
+        public override Geom_Curve UIso(double U)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override Geom_Curve VIso(double V)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override bool IsUClosed()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override bool IsVClosed()
+        {
+            throw new System.NotImplementedException();
+        }
+
         Geom_Surface basisSurf;
         double utrim1;
         double vtrim1;

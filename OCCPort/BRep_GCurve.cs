@@ -7,7 +7,7 @@ namespace OCCPort
     //! representation. Contains a range.
     //! Contains a first and a last parameter.
 
-    internal class BRep_GCurve : BRep_CurveRepresentation
+    internal  abstract class BRep_GCurve : BRep_CurveRepresentation
     {
         public void First(double F)
         {
@@ -59,6 +59,6 @@ namespace OCCPort
             Last = myLast;
         }
 
-
+        
     }//! Root class for the curve repre ntations. Contains
 }

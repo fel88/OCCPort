@@ -18,6 +18,10 @@ namespace OCCPort
             if (S) myFlags |= DegeneratedMask;
             else myFlags &= ~DegeneratedMask;
         }
+        public void Tolerance(double T)
+        {
+            myTolerance = T;
+        }
 
         public bool SameRange()
         {
@@ -80,6 +84,34 @@ namespace OCCPort
         internal void UpdateTolerance(double T)
         {
             if (T > myTolerance) myTolerance = T;
+        }
+
+        public override TopoDS_TShape EmptyCopy()
+        {
+
+            BRep_TEdge TE =
+              new BRep_TEdge();
+            TE.Tolerance(myTolerance);
+            // copy the curves representations
+            BRep_ListOfCurveRepresentation l = TE.ChangeCurves();
+
+            foreach (var item in myCurves)
+            {
+                // on ne recopie PAS les polygones
+                if (item is BRep_GCurve ||
+                     item is BRep_CurveOn2Surfaces)
+                {
+                    l.Append(item.Copy());
+                }
+
+            }
+
+            TE.Degenerated(Degenerated());
+            TE.SameParameter(SameParameter());
+            TE.SameRange(SameRange());
+
+            return TE;
+
         }
     }
 }

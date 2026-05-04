@@ -3,9 +3,33 @@
 namespace OCCPort
 {
     public static class Standard_Real
-    {//-------------------------------------------------------------------
-     // RealLast : Returns the maximum value of a real
-     //-------------------------------------------------------------------
+    {
+
+
+        public static double Epsilon(double Value)
+        {
+            double aEpsilon;
+
+            if (Value >= 0.0)
+            {
+                aEpsilon = NextAfter(Value, RealLast()) - Value;
+            }
+            else
+            {
+                aEpsilon = Value - NextAfter(Value, RealFirst());
+            }
+            return aEpsilon;
+        }
+
+        private static double NextAfter(double value, double v)
+        {
+            return Math.BitIncrement(value);            
+        }
+
+
+        //-------------------------------------------------------------------
+        // RealLast : Returns the maximum value of a real
+        //-------------------------------------------------------------------
         public static double RealLast()
         { return double.MaxValue; }
 
@@ -35,6 +59,11 @@ namespace OCCPort
         internal static double RealFirst()
         {
             return -DBL_MAX;
+        }
+
+        internal static bool IsEqual(double Value1, double Value2)
+        {
+            return Math.Abs((Value1 - Value2)) < RealSmall();
         }
     }
 

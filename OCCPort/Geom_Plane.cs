@@ -10,6 +10,13 @@ namespace OCCPort
 
             return new gp_Pln(Position());
         }
+        //! P is the "Location" point or origin of the plane.
+        //! V is the direction normal to the plane.
+        public Geom_Plane(gp_Pnt P, gp_Dir V)
+        {
+            gp_Pln Pl = new gp_Pln(P, V);
+            pos = Pl.Position();
+        }
 
         public Geom_Plane(gp_Pln Pl)
         {
@@ -79,6 +86,27 @@ namespace OCCPort
             D2U.SetCoord(0.0, 0.0, 0.0);
             D2V.SetCoord(0.0, 0.0, 0.0);
             D2UV.SetCoord(0.0, 0.0, 0.0);
+        }
+
+        public override Geom_Curve UIso(double U)
+        {
+            Geom_Line GL = new Geom_Line(ElSLib.PlaneUIso(pos, U));
+            return GL;
+        }
+
+        public override Geom_Curve VIso(double V)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override bool IsUClosed()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override bool IsVClosed()
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

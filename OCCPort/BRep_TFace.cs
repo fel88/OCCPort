@@ -187,6 +187,8 @@ namespace OCCPort
 
         //! Returns the face location.
         public TopLoc_Location Location() { return myLocation; }
+        //! Sets the location for this face.
+        public void Location(TopLoc_Location theLocation) { myLocation = theLocation; }
 
     }
 

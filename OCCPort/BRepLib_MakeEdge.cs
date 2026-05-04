@@ -37,6 +37,7 @@ namespace OCCPort
     {
         public BRepLib_MakeEdge(gp_Pnt P1, gp_Pnt P2)
         {
+            myShape = new TopoDS_Edge();//not origin code!!
             double l = P1.Distance(P2);
             if (l <= gp.Resolution())
             {

@@ -31,6 +31,17 @@ namespace OCCPort
             Vv.SetZ(YDir.Z());
         }
 
+
+        public static gp_Lin PlaneUIso(gp_Ax3 Pos,
+              double U)
+        {
+            gp_Lin L = new gp_Lin(Pos.Location(), Pos.YDirection());
+            gp_Vec Ve=new gp_Vec (Pos.XDirection());
+            Ve *= U;
+            L.Translate(Ve);
+            return L;
+        }
+
         internal static gp_Pnt PlaneValue(double U, double V, gp_Ax3 Pos)
         {
             gp_XYZ XDir = Pos.XDirection().XYZ();

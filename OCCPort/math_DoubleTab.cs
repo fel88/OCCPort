@@ -10,7 +10,11 @@ namespace OCCPort
 
         double[] Addr;
         double[] Buf = new double[16];
-
+        public double this[int key, int key2]
+        {
+            get => Value(key, key2);
+            set => Value(key, key2, value);
+        }
         public math_DoubleTab(int LowerRow,
 
                    int UpperRow,
@@ -27,6 +31,21 @@ namespace OCCPort
 
             Allocate();
         }
+
+        public double Value(int RowIndex,
+
+                     int ColIndex)
+        {
+            return Addr[(UppC - LowC + 1) * (RowIndex - LowR) + (ColIndex - LowC)];
+        }
+        public void Value(int RowIndex,
+
+                    int ColIndex, double val
+            )
+        {
+            Addr[(UppC - LowC + 1) * (RowIndex - LowR) + (ColIndex - LowC)] = val;
+        }
+
         void Allocate()
         {
             int RowNumber = UppR - LowR + 1;

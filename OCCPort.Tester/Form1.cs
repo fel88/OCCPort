@@ -474,14 +474,9 @@ namespace OCCPort.Tester
             var solid = face;
             var shape = new AIS_Shape(solid);
 
-
             myAISContext.Display(shape, true);
             myAISContext.SetDisplayMode(shape, AIS_DisplayMode.AIS_Shaded, false);
             myAISContext.UpdateCurrentViewer();
-
-
-
         }
-
     }
 }

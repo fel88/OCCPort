@@ -2,7 +2,7 @@
 
 namespace OCCPort
 {
-    internal class MapOfIntegerInteger : NCollection_DataMap<int, int, NCollection_DefaultHasher>
+    internal class MapOfIntegerInteger : NCollection_DataMap<int, int, NCollection_DefaultHasher<int>>
     {
         public MapOfIntegerInteger(int v)
         {

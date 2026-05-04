@@ -232,9 +232,25 @@ namespace OCCPort
             MakeShape(E, TE);
         }
 
+        public void MakeFace(TopoDS_Face F,
+                                   Geom_Surface S,
+                                   TopLoc_Location L,
+                                   double Tol)
+        {
+            BRep_TFace TF = new BRep_TFace();
+            if (!F.IsNull() && F.Locked())
+            {
+                throw new TopoDS_LockedShape("BRep_Builder::MakeFace");
+            }
+            TF.Surface(S);
+            TF.Tolerance(Tol);
+            TF.Location(L);
+            MakeShape(F, TF);
+        }
+
         public void MakeFace(TopoDS_Face theFace,
 
-                             Poly_Triangulation theTriangulation)
+                                     Poly_Triangulation theTriangulation)
         {
             BRep_TFace aTFace = new BRep_TFace();
             if (!theFace.IsNull() && theFace.Locked())
@@ -536,6 +552,16 @@ namespace OCCPort
         {
             TopoDS_TCompound TC = new TopoDS_TCompound();
             MakeShape(C, TC);
+        }
+
+        internal void SameParameter(TopoDS_Edge aNE, bool v)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void SameRange(TopoDS_Edge aNE, bool v)
+        {
+            throw new NotImplementedException();
         }
     }
 }

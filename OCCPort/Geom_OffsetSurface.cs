@@ -68,5 +68,25 @@ namespace OCCPort
         {
             throw new NotImplementedException();
         }
+
+        public override Geom_Curve UIso(double U)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Geom_Curve VIso(double V)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool IsUClosed()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool IsVClosed()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

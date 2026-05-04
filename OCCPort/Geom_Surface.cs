@@ -35,6 +35,29 @@ namespace OCCPort
         public abstract void Bounds(out double U1, out double U2,
             out double V1, out double V2);
 
+
+        //! Computes the U isoparametric curve.
+        public abstract Geom_Curve UIso(double U);
+
+        //! Computes the V isoparametric curve.
+        public abstract Geom_Curve VIso(double V);
+
+
+        //! Checks whether this surface is closed in the u parametric direction.
+        //! Returns true if, in the u parametric direction:
+        //! taking uFirst and uLast as the parametric bounds in
+        //! the u parametric direction, for each parameter v,
+        //! the distance between the points P(uFirst, v) and
+        //! P(uLast, v) is less than or equal to gp::Resolution().
+        public abstract bool IsUClosed();
+
+        //! Checks whether this surface is closed in the u parametric direction.
+        //! Returns true if, in the v parametric direction:
+        //! taking vFirst and vLast as the parametric bounds in the v parametric direction,
+        //! for each parameter u, the distance between the points
+        //! P(u, vFirst) and P(u, vLast) is less than or equal to gp::Resolution().
+        public abstract bool IsVClosed();
+
         //! Computes the point P and the first derivatives in the directions U and V at this point.
         //! Raised if the continuity of the surface is not C1.
         //!

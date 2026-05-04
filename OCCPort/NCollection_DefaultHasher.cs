@@ -1,6 +1,6 @@
 ﻿namespace OCCPort
 {
-    internal class NCollection_DefaultHasher
+    public class NCollection_DefaultHasher<T>
     {
     }
 }

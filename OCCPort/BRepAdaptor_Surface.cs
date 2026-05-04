@@ -1,4 +1,5 @@
-﻿using System.Reflection.Metadata;
+﻿using System;
+using System.Reflection.Metadata;
 
 namespace OCCPort
 {
@@ -136,6 +137,11 @@ namespace OCCPort
         {
             mySurf.D0(U, V, ref P);
             P.Transform(myTrsf);
+        }
+
+        internal void Initialize(TopoDS_Face curface)
+        {
+            throw new NotImplementedException();
         }
     }
 }
