@@ -30,7 +30,7 @@ namespace OCCPort
         //! Returns the eigenvector V of number Num.
         //! Eigenvectors are in the range (1..n).
         //! Exception NotDone is raised if calculation is not done successfully.
-        public void Vector(int Num, math_Vector V)
+        public void Vector(int Num, ref math_Vector V)
         {
 
             Exceptions.StdFail_NotDone_Raise_if(!Done, " ");

@@ -18,6 +18,7 @@ namespace OCCPort
         internal void Initialize(TopoDS_ListOfShape myShapes)
         {
             list = myShapes.list.ToArray().ToList();
+            index = 0;
         }
 
         NCollection_ListNode myCurrent;

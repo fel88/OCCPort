@@ -1,4 +1,5 @@
 ﻿using OCCPort;
+using OCCPort.Tester;
 using System;
 using System.Formats.Asn1;
 using System.Reflection.Metadata;
@@ -33,9 +34,19 @@ namespace OCCPort
     //! - The new wire is a perforation.
     public class BRepLib_MakeFace : BRepLib_MakeShape
     {
+        public static implicit operator TopoDS_Face(BRepLib_MakeFace f)
+        {
+            return f.Face();
+        }
+
+        //! Make a face from a Surface. Accepts tolerance value (TolDegen)
+        //! for resolution of degenerated edges.        
+
         public BRepLib_MakeFace(Geom_Surface S,
                                    double TolDegen)
         {
+            myShape = new TopoDS_Face();//not origin code!
+
             Init(S, true, TolDegen);
         }
         public void Init(Geom_Surface S,
@@ -145,7 +156,7 @@ namespace OCCPort
 
             Geom_Surface S = SS, BS = SS;
             Geom_RectangularTrimmedSurface RS =
-              (Geom_RectangularTrimmedSurface)S;
+              S as Geom_RectangularTrimmedSurface;
             if (RS != null)
                 BS = RS.BasisSurface();
 
@@ -229,7 +240,7 @@ namespace OCCPort
 
             // compute 3d curves and degenerate flag
             double maxTol = TolDegen;
-            Geom_Curve Cumin = null, Cumax = null, Cvmin = null, Cvmax  = null;
+            Geom_Curve Cumin = null, Cumax = null, Cvmin = null, Cvmax = null;
             bool Dumin, Dumax, Dvmin, Dvmax;
             Dumin = Dumax = Dvmin = Dvmax = false;
             double uminTol = Precision.Confusion(),
@@ -320,7 +331,7 @@ namespace OCCPort
                     B.MakeEdge(eumin);
                 if (uclosed)
                 {
-                 //   B.UpdateEdge(eumin, Lumax, Lumin, F, Math.Max(uminTol, umaxTol));
+                    //   B.UpdateEdge(eumin, Lumax, Lumin, F, Math.Max(uminTol, umaxTol));
                 }
                 else
                     B.UpdateEdge(eumin, Lumin, F, uminTol);
@@ -372,7 +383,7 @@ namespace OCCPort
                     B.MakeEdge(evmin);
                 if (vclosed)
                 {
-                 //   B.UpdateEdge(evmin, Lvmin, Lvmax, F, Math.Max(vminTol, vmaxTol));
+                    //   B.UpdateEdge(evmin, Lvmin, Lvmax, F, Math.Max(vminTol, vmaxTol));
                 }
                 else
                     B.UpdateEdge(evmin, Lvmin, F, vminTol);

@@ -37,7 +37,12 @@ namespace OCCPort
     //! -   The "Z Axis" is also the "main Axis".
     //! -   gp_Ax2 is used to define a coordinate system that must be always right-handed.
     public struct gp_Ax3
-    {
+    {  
+        
+        //! Returns  True if  the  coordinate  system is right-handed. i.e.
+       //! XDirection().Crossed(YDirection()).Dot(Direction()) > 0
+        public bool Direct() { return (vxdir.Crossed(vydir).Dot(axis.Direction()) > 0.0); }
+
         public void Transform(gp_Trsf theT)
         {
             axis.Transform(theT);

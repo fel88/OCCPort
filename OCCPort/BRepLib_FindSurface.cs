@@ -1,5 +1,6 @@
 ﻿using OCCPort;
 using System;
+using System.Reflection.Metadata;
 using System.Runtime.Intrinsics.X86;
 
 namespace OCCPort
@@ -308,10 +309,10 @@ namespace OCCPort
                 else
                 {
                     double eps1 = Standard_Real.Epsilon(anEMax);
-                                        
+
                     if (anEMin <= eps1)
                     {
-                         anEignval.Vector(isol, aVec);
+                        anEignval.Vector(isol, ref aVec);
                     }
                     else
                     {
@@ -364,7 +365,7 @@ namespace OCCPort
             }
             gp_Vec aN = new gp_Vec(aVec[1], aVec[2], aVec[3]);
             Geom_Plane aPlane = new Geom_Plane(aBaryCenter, aN);
-            //myTolReached = Controle(aPoints, aPlane);
+            myTolReached = Controle(aPoints, aPlane);
             double aWeakness = 5.0;
             if (myTolReached <= myTolerance || (Tol < 0 && myTolReached < myTolerance * aWeakness))
             {
@@ -372,23 +373,40 @@ namespace OCCPort
                 //If S is wire, try to orient surface according to orientation of wire.
                 if (S.ShapeType() == TopAbs_ShapeEnum.TopAbs_WIRE && S.Closed())
                 {
-                    //TopoDS_Wire aW = TopoDS.Wire(S);
-                    //TopoDS_Face aTmpFace = new BRepLib_MakeFace(mySurface, Precision.Confusion());
-                    //BRep_Builder BB = new BRep_Builder();
-                    //BB.Add(aTmpFace, aW);
-                    //BRepTopAdaptor_FClass2d FClass = new BRepTopAdaptor_FClass2d(aTmpFace, 0.0);
-                    //if (FClass.PerformInfinitePoint() == TopAbs_State.TopAbs_IN)
-                    //{
-                    //    gp_Dir aNorm = aPlane.Position().Direction();
-                    //    aNorm.Reverse();
-                    //    mySurface = new Geom_Plane(aPlane.Position().Location(), aNorm);
-                    //}
+                    TopoDS_Wire aW = TopoDS.Wire(S);
+                    TopoDS_Face aTmpFace = new BRepLib_MakeFace(mySurface, Precision.Confusion());
+                    BRep_Builder BB = new BRep_Builder();
+                    BB.Add(aTmpFace, aW);
+                    BRepTopAdaptor_FClass2d FClass = new BRepTopAdaptor_FClass2d(aTmpFace, 0.0);
+                    if (FClass.PerformInfinitePoint() == TopAbs_State.TopAbs_IN)
+                    {
+                        gp_Dir aNorm = aPlane.Position().Direction();
+                        aNorm.Reverse();
+                        mySurface = new Geom_Plane(aPlane.Position().Location(), aNorm);
+                    }
                 }
             }
         }
 
+        public static double Controle(TColgp_SequenceOfPnt thePoints,
+     Geom_Plane thePlane)
+        {
+            double dfMaxDist = 0.0;
+            double a = 0, b = 0, c = 0, d = 0, dist;
+            int ii;
+            thePlane.Coefficients(ref a, ref b, ref c, ref d);
+            for (ii = 1; ii <= thePoints.Length(); ii++)
+            {
+                gp_XYZ xyz = thePoints.Value(ii).XYZ();
+                dist = Math.Abs(a * xyz.X() + b * xyz.Y() + c * xyz.Z() + d);
+                if (dist > dfMaxDist)
+                    dfMaxDist = dist;
+            }
+
+            return dfMaxDist;
+        }
         private void fillPoints(BRepAdaptor_Curve theCurve, NCollection_Vector<double> theParams,
-            TColgp_SequenceOfPnt thePoints, TColStd_SequenceOfReal theWeights)
+                    TColgp_SequenceOfPnt thePoints, TColStd_SequenceOfReal theWeights)
         {
             double aDistPrev = 0.0, aDistNext;
             gp_Pnt aPPrev = (theCurve.Value(theParams[0]));

@@ -36,7 +36,7 @@ namespace OCCPort
               double U)
         {
             gp_Lin L = new gp_Lin(Pos.Location(), Pos.YDirection());
-            gp_Vec Ve=new gp_Vec (Pos.XDirection());
+            gp_Vec Ve = new gp_Vec(Pos.XDirection());
             Ve *= U;
             L.Translate(Ve);
             return L;
@@ -66,7 +66,13 @@ namespace OCCPort
             V = Ploc.Y();
         }
 
-
-
+        public static gp_Lin PlaneVIso(gp_Ax3 Pos, double V)
+        {
+            gp_Lin L = new gp_Lin(Pos.Location(), Pos.XDirection());
+            gp_Vec Ve = new gp_Vec(Pos.YDirection());
+            Ve *= V;
+            L.Translate(Ve);
+            return L;
+        }
     }
 }

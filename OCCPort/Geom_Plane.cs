@@ -2,8 +2,14 @@
 
 namespace OCCPort
 {
-    internal class Geom_Plane : Geom_ElementarySurface
+    public class Geom_Plane : Geom_ElementarySurface
     {
+        public void Coefficients(ref double A, ref double B, ref double C, ref double D)
+        {
+
+            gp_Pln Pl = new gp_Pln(Position());
+            Pl.Coefficients(ref A, ref B, ref C, ref D);
+        }
 
         public gp_Pln Pln()
         {
@@ -96,17 +102,18 @@ namespace OCCPort
 
         public override Geom_Curve VIso(double V)
         {
-            throw new System.NotImplementedException();
+            Geom_Line GL = new Geom_Line(ElSLib.PlaneVIso(pos, V));
+            return GL;
         }
 
         public override bool IsUClosed()
         {
-            throw new System.NotImplementedException();
+            return false;
         }
 
         public override bool IsVClosed()
         {
-            throw new System.NotImplementedException();
+            return false;
         }
     }
 }

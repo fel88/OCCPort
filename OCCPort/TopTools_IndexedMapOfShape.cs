@@ -8,6 +8,10 @@ namespace OCCPort
         {
             return Count;
         }
+        public bool IsEmpty()
+        {
+            return Count == 0;
+        }
 
         internal TopoDS_Shape FindKey(int i)
         {

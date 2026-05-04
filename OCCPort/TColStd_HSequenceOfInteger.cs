@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace OCCPort
 {
-    internal class TColStd_HSequenceOfInteger : List<int>
+    public class TColStd_HSequenceOfInteger : List<int>
     {
         internal void Append(int v)
         {

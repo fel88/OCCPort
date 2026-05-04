@@ -1,4 +1,5 @@
-﻿using OpenTK.Audio.OpenAL;
+﻿using OCCPort;
+using OpenTK.Audio.OpenAL;
 using System;
 using System.Threading;
 
@@ -6,6 +7,27 @@ namespace OCCPort
 {
     public class gp_Pln
     {
+        public void Coefficients(ref double theA,
+                                 ref double theB,
+                                 ref double theC,
+                                 ref double theD)
+        {
+            gp_Dir aDir = pos.Direction();
+            if (pos.Direct())
+            {
+                theA = aDir.X();
+                theB = aDir.Y();
+                theC = aDir.Z();
+            }
+            else
+            {
+                theA = -aDir.X();
+                theB = -aDir.Y();
+                theC = -aDir.Z();
+            }
+            gp_Pnt aP = pos.Location();
+            theD = -(theA * aP.X() + theB * aP.Y() + theC * aP.Z());
+        }
 
         //! Returns the local coordinate system of the plane .
         public gp_Ax3 Position() { return pos; }
