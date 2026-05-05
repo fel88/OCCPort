@@ -68,8 +68,9 @@ namespace OCCPort
         GeomAdaptor_Surface mySurf = new GeomAdaptor_Surface();
         gp_Trsf myTrsf;
         TopoDS_Face myFace;
-        void Initialize(TopoDS_Face F,
-                      bool Restriction)
+
+        //! Sets the surface to the geometry of <F>.
+        public void Initialize(TopoDS_Face F, bool Restriction = true)
         {
             myFace = F;
             TopLoc_Location L;
@@ -86,6 +87,11 @@ namespace OCCPort
             else
                 mySurf.Load(aSurface);
             myTrsf = L.Transformation();
+        }
+
+        public TopoDS_Face Face()
+        {
+            return myFace;
         }
 
         public override gp_Pln Plane()
@@ -139,9 +145,6 @@ namespace OCCPort
             P.Transform(myTrsf);
         }
 
-        internal void Initialize(TopoDS_Face curface)
-        {
-            throw new NotImplementedException();
-        }
+
     }
 }

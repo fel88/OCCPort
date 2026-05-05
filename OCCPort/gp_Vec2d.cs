@@ -7,6 +7,8 @@ namespace OCCPort
     {
         //! For this vector, returns its X  coordinate.
         public double X() { return coord.X(); }
+        //! For this vector, returns its two coordinates as a number pair
+        public gp_XY XY() { return coord; }
 
         //! For this vector, returns its Y  coordinate.
         public double Y() { return coord.Y(); }

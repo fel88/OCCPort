@@ -17,5 +17,10 @@ namespace OCCPort
         {
             return this[i - 1];
         }
+
+        internal void RemoveKey(TopoDS_Shape v1)
+        {
+            Remove(v1);
+        }
     }
 }

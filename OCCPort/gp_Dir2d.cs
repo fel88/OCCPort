@@ -1,5 +1,6 @@
 ﻿using System;
 using static System.Net.Mime.MediaTypeNames;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace OCCPort
 {
@@ -8,8 +9,8 @@ namespace OCCPort
         private double dU;
         private double dV;
         //! Computes the scalar product
-        public double Dot( gp_Dir2d theOther)  { return coord.Dot(theOther.coord); }
-        public void  Reverse() { coord.Reverse(); }
+        public double Dot(gp_Dir2d theOther) { return coord.Dot(theOther.coord); }
+        public void Reverse() { coord.Reverse(); }
 
         gp_XY coord;
         //! For this unit vector, returns its two coordinates as a number pair.
@@ -51,6 +52,18 @@ namespace OCCPort
                     else return -Math.PI - Math.Asin(Sinus);
                 }
             }
+        }
+
+      
+        public gp_Dir2d(gp_Vec2d theV)
+        {
+            gp_XY aXY = theV.XY();
+            double aX = aXY.X();
+            double anY = aXY.Y();
+            double aD = Math.Sqrt(aX * aX + anY * anY);
+            Exceptions.Standard_ConstructionError_Raise_if(aD <= gp.Resolution(), "gp_Dir2d() - input vector has zero norm");
+            coord.SetX(aX / aD);
+            coord.SetY(anY / aD);
         }
 
         public gp_Dir2d(double theXv, double theYv)

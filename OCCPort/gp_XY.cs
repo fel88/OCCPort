@@ -11,8 +11,14 @@ namespace OCCPort
     //! of information in data structures.
     public struct gp_XY
     {
+        public void Subtract(gp_XY theOther)
+        {
+            x -= theOther.x;
+            y -= theOther.y;
+        }
+
         public gp_XY Multiplied(gp_XY theOther) { return new gp_XY(x * theOther.X(), y * theOther.Y()); }
-        public gp_XY Multiplied(double  v) { return new gp_XY(x * v, y * v); }
+        public gp_XY Multiplied(double v) { return new gp_XY(x * v, y * v); }
 
         public bool IsEqual(gp_XY Other,
                   double Tolerance)
@@ -33,7 +39,7 @@ namespace OCCPort
 
 
         public static double operator ^(gp_XY theOther, gp_XY v2) { return theOther.Crossed(v2); }
-        
+
 
         public void SetLinearForm(double theA1, gp_XY theXY1,
                               gp_XY theXY2)
@@ -47,11 +53,7 @@ namespace OCCPort
             aCoord2D.Subtract(theOther);
             return aCoord2D;
         }
-        void Subtract(gp_XY theOther)
-        {
-            x -= theOther.x;
-            y -= theOther.y;
-        }
+        
         //! @code
         //! <me>.X() = -<me>.X()
         //! <me>.Y() = -<me>.Y()

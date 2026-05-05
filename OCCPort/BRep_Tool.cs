@@ -763,6 +763,107 @@ namespace OCCPort
 
             return pMin;
         }
+        //! Returns  True  if  <E>  has  two  PCurves  in  the
+        //! parametric space of <F>. i.e.  <F>  is on a closed
+        //! surface and <E> is on the closing curve.
+        //=======================================================================
+        //function : IsClosed
+        //purpose  : Returns  True  if  <E>  has  two  PCurves  in  the
+        //           parametric space of <F>. i.e.  <F>  is on a closed
+        //           surface and <E> is on the closing curve.
+        //=======================================================================
+
+        public static bool IsClosed(TopoDS_Edge E, TopoDS_Face F)
+        {
+            TopLoc_Location l;
+            Geom_Surface S = BRep_Tool.Surface(F, out l);
+            if (IsClosed(E, S, l))
+                return true;
+
+            Poly_Triangulation T = BRep_Tool.Triangulation(F, ref l);
+            return IsClosed(E, T, l);
+        }
+
+
+        //! Returns  True  if <E> has two arrays of indices in
+        //! the triangulation <T>.
+        public static bool IsClosed(TopoDS_Edge E, Poly_Triangulation T, TopLoc_Location L)
+        {
+            TopLoc_Location l = L.Predivided(E.Location());
+
+            // find the representation
+            BRep_TEdge TE = (BRep_TEdge)E.TShape();
+            //BRep_ListIteratorOfListOfCurveRepresentation itcr(TE->Curves());
+            foreach (var cr in TE.Curves())
+            {           
+                if (cr.IsPolygonOnTriangulation(T, l) &&
+                    cr.IsPolygonOnClosedTriangulation())
+                    return true;             
+            }
+            return false;
+        }
+
+
+        //=======================================================================
+        //function : IsClosed
+        //purpose  : Returns  True  if  <E>  has  two  PCurves  in  the
+        //           parametric space  of <S>.  i.e.   <S>  is a closed
+        //           surface and <E> is on the closing curve.
+        //=======================================================================
+
+        public static bool IsClosed(TopoDS_Edge E,
+    Geom_Surface S,
+    TopLoc_Location L)
+        {
+            //modified by NIZNHY-PKV Fri Oct 17 12:16:58 2008f
+            if (IsPlane(S))
+            {
+                return false;
+            }
+            //modified by NIZNHY-PKV Fri Oct 17 12:16:54 2008t
+            //
+            TopLoc_Location l = L.Predivided(E.Location());
+
+            // find the representation
+            BRep_TEdge TE = (BRep_TEdge)E.TShape();
+
+            foreach (var cr in TE.Curves())
+            {
+                if (cr.IsCurveOnSurface(S, l) &&
+                    cr.IsCurveOnClosedSurface())
+                    return true;
+            }
+            return false;
+        }
+
+        public static bool IsPlane(Geom_Surface aS)
+        {
+            bool bRet;
+            Geom_Plane aGP;
+            Geom_RectangularTrimmedSurface aGRTS;
+            Geom_OffsetSurface aGOFS;
+            //
+            aGRTS = aS as Geom_RectangularTrimmedSurface;
+            aGOFS = aS as Geom_OffsetSurface;
+            //
+            if (aGOFS != null)
+            {
+                aGP = (Geom_Plane)(aGOFS.BasisSurface());
+            }
+            else if (aGRTS != null)
+            {
+                aGP = (Geom_Plane)(aGRTS.BasisSurface());
+            }
+
+            else
+            {
+                aGP = (Geom_Plane)aS;
+            }
+            //
+            bRet = aGP != null;
+            //
+            return bRet;
+        }
 
         public static bool IsClosed(TopoDS_Shape theShape)
         {

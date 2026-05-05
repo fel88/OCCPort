@@ -23,6 +23,24 @@ namespace OCCPort
     //! for the equivalent Geom or Geom2d curves.
     public class ElCLib
     {
+
+        public static gp_Pnt2d Value(double U, gp_Lin2d L)
+        {
+            return ElCLib.LineValue(U, L.Position());
+        }
+
+        public static double Parameter(gp_Lin2d L, gp_Pnt2d P)
+        {
+            return ElCLib.LineParameter(L.Position(), P);
+        }
+
+        public static double LineParameter(gp_Ax2d L, gp_Pnt2d P)
+        {
+            gp_XY Coord = P.XY();
+            Coord.Subtract(L.Location().XY());
+            return Coord.Dot(L.Direction().XY());
+        }
+
         internal static double Parameter(gp_Lin L, gp_Pnt P)
         {
             return LineParameter(L.Position(), P);
@@ -108,7 +126,7 @@ namespace OCCPort
             return (P.XYZ() - L.Location().XYZ()).Dot(L.Direction().XYZ());
         }
 
-        internal static gp_Pnt2d LineValue(double U, gp_Ax2d Pos)
+        public static gp_Pnt2d LineValue(double U, gp_Ax2d Pos)
         {
             gp_XY ZDir = Pos.Direction().XY();
             gp_XY PLoc = Pos.Location().XY();
@@ -117,7 +135,7 @@ namespace OCCPort
 
         }
 
-        internal static void LineD1(double U, gp_Ax2d Pos, ref gp_Pnt2d P, ref gp_Vec2d V1)
+        public static void LineD1(double U, gp_Ax2d Pos, ref gp_Pnt2d P, ref gp_Vec2d V1)
         {
             gp_XY Coord = Pos.Direction().XY();
             V1.SetXY(Coord);

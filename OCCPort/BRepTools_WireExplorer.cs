@@ -1,7 +1,11 @@
 ﻿using OCCPort;
 using OCCPort.Tester;
+using OpenTK.Audio.OpenAL;
+using OpenTK.Core.Exceptions;
 using System;
 using System.Reflection.Metadata;
+using System.Runtime.Intrinsics.Arm;
+using System.Security.Cryptography;
 
 namespace OCCPort
 {
@@ -48,6 +52,42 @@ namespace OCCPort
             }
 
             Init(W, F, UMin, UMax, VMin, VMax);
+        }
+        public bool SelectDouble(TopTools_MapOfShape Doubles,
+                  TopTools_ListOfShape L,
+                  TopoDS_Edge E)
+        {
+            //TopTools_ListIteratorOfListOfShape it(L);
+            foreach (var item in L)
+            {
+                TopoDS_Shape CE = item;
+                if (Doubles.Contains(CE) && (!E.IsSame(CE)))
+                {
+                    E = TopoDS.Edge(CE);
+                    L.Remove(item);
+                    return true;
+                }
+            }
+            return false;
+        }
+        public bool SelectDegenerated(TopTools_ListOfShape L,
+                   TopoDS_Edge E)
+        {
+            //TopTools_ListIteratorOfListOfShape it = new TopTools_ListIteratorOfListOfShape(L);
+            foreach (var item in L)
+            {
+                if (!item.IsSame(E))
+                {
+                    E = TopoDS.Edge(item);
+                    if (BRep_Tool.Degenerated(E))
+                    {
+                        L.Remove(item);
+                        return true;
+                    }
+                }
+
+            }
+            return false;
         }
 
         public void Init(TopoDS_Wire W,
@@ -147,7 +187,7 @@ namespace OCCPort
 
             // list the vertices
             TopoDS_Vertex V1 = new TopoDS_Vertex(), V2 = new TopoDS_Vertex();
-            TopTools_ListOfShape empty;
+            TopTools_ListOfShape empty = new TopTools_ListOfShape();
 
             TopoDS_Iterator it = new TopoDS_Iterator(W);
             while (it.More())
@@ -163,17 +203,18 @@ namespace OCCPort
 
                 if (!V1.IsNull())
                 {
-                    //  if (!myMap.IsBound(V1))
-                    //     myMap.Bind(V1, empty);
-                    //  myMap(V1).Append(E);
+                    if (!myMap.IsBound(V1))
+                        //myMap.Bind(V1, empty);
+                        myMap.Bind(V1, new TopTools_ListOfShape());// ????
+                    myMap[V1].Append(E);
 
                     // add or remove in the vertex map
                     V1.Orientation(TopAbs_Orientation.TopAbs_FORWARD);
-                    // int currsize = vmap.Extent(),
-                    //                ind = vmap.Add(V1);
-                    // if (currsize >= ind)
+                    int currsize = vmap.Extent(),
+                                   ind = vmap.Add(V1);
+                    if (currsize >= ind)
                     {
-                        // vmap.RemoveKey(V1);
+                        vmap.RemoveKey(V1);
                     }
                 }
 
@@ -281,37 +322,391 @@ namespace OCCPort
             }
 
             if (V1.IsNull()) return;
-            //if (!myMap.IsBound(V1)) return;
+            if (!myMap.IsBound(V1)) return;
 
-            //   TopTools_ListOfShape l = myMap(V1);
-            //  myEdge = TopoDS.Edge(l.First());
-            //  l.RemoveFirst();
-            //   myVertex = TopExp.FirstVertex(myEdge, true);
+            TopTools_ListOfShape l = myMap[V1];
+            myEdge = TopoDS.Edge(l.First());
+            l.RemoveFirst();
+            myVertex = TopExp.FirstVertex(myEdge, true);
 
         }
+        public double GetNextParamOnPC(Geom2d_Curve aPC,
 
-        TopTools_DataMapOfShapeListOfShape myMap;
+                   gp_Pnt2d aPRef,
+                   double fP,
+                   double lP,
+                   double tolU,
+                   double tolV,
+                   bool reverse)
+        {
+            double result = (reverse) ? fP : lP;
+            double dP = Math.Abs(lP - fP) / 1000.0; // was / 16.;
+            if (reverse)
+            {
+                double startPar = fP;
+                bool nextPntOnEdge = false;
+                while (!nextPntOnEdge && startPar < lP)
+                {
+                    gp_Pnt2d pnt = new gp_Pnt2d();
+                    startPar += dP;
+                    aPC.D0(startPar, ref pnt);
+                    if (Math.Abs(aPRef.X() - pnt.X()) < tolU && Math.Abs(aPRef.Y() - pnt.Y()) < tolV)
+                        continue;
+                    else
+                    {
+                        result = startPar;
+                        nextPntOnEdge = true;
+                        break;
+                    }
+                }
+
+                if (!nextPntOnEdge)
+                    result = lP;
+
+                if (result > lP)
+                    result = lP;
+            }
+            else
+            {
+                double startPar = lP;
+                bool nextPntOnEdge = false;
+                while (!nextPntOnEdge && startPar > fP)
+                {
+                    gp_Pnt2d pnt = new gp_Pnt2d();
+                    startPar -= dP;
+                    aPC.D0(startPar, ref pnt);
+                    if (Math.Abs(aPRef.X() - pnt.X()) < tolU && Math.Abs(aPRef.Y() - pnt.Y()) < tolV)
+                        continue;
+                    else
+                    {
+                        result = startPar;
+                        nextPntOnEdge = true;
+                        break;
+                    }
+                }
+
+                if (!nextPntOnEdge)
+                    result = fP;
+
+                if (result < fP)
+                    result = fP;
+            }
+
+            return result;
+        }
+
+        TopTools_DataMapOfShapeListOfShape myMap = new TopTools_DataMapOfShapeListOfShape();
         TopoDS_Edge myEdge;
         TopoDS_Vertex myVertex;
         TopoDS_Face myFace;
-        TopTools_MapOfShape myDoubles;
+        TopTools_MapOfShape myDoubles = new TopTools_MapOfShape();
         bool myReverse;
         double myTolU;
         double myTolV;
 
-        internal TopoDS_Shape Current()
+        public TopoDS_Shape Current()
         {
-            throw new NotImplementedException();
+            return myEdge;
         }
 
         internal bool More()
         {
-            throw new NotImplementedException();
+            return !myEdge.IsNull();
         }
 
-        internal object Next()
+        internal void Next()
         {
-            throw new NotImplementedException();
+            myVertex = TopExp.LastVertex(myEdge, true);
+
+            if (myVertex.IsNull())
+            {
+                myEdge = new TopoDS_Edge();
+                return;
+            }
+            if (!myMap.IsBound(myVertex))
+            {
+                myEdge = new TopoDS_Edge();
+                return;
+            }
+
+            TopTools_ListOfShape l = myMap[myVertex];
+
+            if (l.IsEmpty())
+            {
+                myEdge = new TopoDS_Edge();
+            }
+            else if (l.Extent() == 1)
+            {
+                //  Modified by Sergey KHROMOV - Fri Jun 21 10:28:01 2002 OCC325 Begin
+                TopoDS_Vertex aV1 = new TopoDS_Vertex();
+                TopoDS_Vertex aV2 = new TopoDS_Vertex();
+                TopoDS_Edge aNextEdge = TopoDS.Edge(l.First());
+
+                TopExp.Vertices(aNextEdge, ref aV1, ref aV2, true);
+
+                if (!aV1.IsSame(myVertex))
+                {
+                    myEdge = new TopoDS_Edge();
+                    return;
+                }
+                if (!myFace.IsNull() && aV1.IsSame(aV2))
+                {
+                    Geom2d_Curve aPrevPC;
+                    Geom2d_Curve aNextPC;
+                    double aPar11 = 0, aPar12 = 0;
+                    double aPar21 = 0, aPar22 = 0;
+                    double aPrevPar;
+                    double aNextFPar;
+                    double aNextLPar;
+
+                    aPrevPC = BRep_Tool.CurveOnSurface(myEdge, myFace, ref aPar11, ref aPar12);
+                    aNextPC = BRep_Tool.CurveOnSurface(aNextEdge, myFace, ref aPar21, ref aPar22);
+
+                    if (aPrevPC == null || aNextPC == null)
+                    {
+                        myEdge = new TopoDS_Edge();
+                        return;
+                    }
+
+                    if (myEdge.Orientation() == TopAbs_Orientation.TopAbs_FORWARD)
+                        aPrevPar = aPar12;
+                    else
+                        aPrevPar = aPar11;
+
+                    if (aNextEdge.Orientation() == TopAbs_Orientation.TopAbs_FORWARD)
+                    {
+                        aNextFPar = aPar21;
+                        aNextLPar = aPar22;
+                    }
+                    else
+                    {
+                        aNextFPar = aPar22;
+                        aNextLPar = aPar21;
+                    }
+
+                    gp_Pnt2d aPPrev = aPrevPC.Value(aPrevPar);
+                    gp_Pnt2d aPNextF = aNextPC.Value(aNextFPar);
+                    gp_Pnt2d aPNextL = aNextPC.Value(aNextLPar);
+
+                    if (aPPrev.SquareDistance(aPNextF) > aPPrev.SquareDistance(aPNextL))
+                    {
+                        myEdge = new TopoDS_Edge();
+                        return;
+                    }
+                }
+                //  Modified by Sergey KHROMOV - Fri Jun 21 11:08:16 2002 End
+                myEdge = TopoDS.Edge(l.First());
+                l.Clear();
+            }
+            else
+            {
+                if (myFace.IsNull())
+                {
+                    // Without Face - try to return edges
+                    // as logically as possible
+                    // At first degenerated edges.
+                    TopoDS_Edge E = myEdge;
+                    if (SelectDegenerated(l, E))
+                    {
+                        myEdge = E;
+                        return;
+                    }
+                    // At second double edges.
+                    E = myEdge;
+                    if (SelectDouble(myDoubles, l, E))
+                    {
+                        myEdge = E;
+                        return;
+                    }
+
+                    //TopTools_ListIteratorOfListOfShape it(l);
+                    bool notfound = true;
+                    foreach (var it in l)
+                    {
+                        if (!it.IsSame(myEdge))
+                        {
+                            myEdge = TopoDS.Edge(it);
+                            l.Remove(it);
+                            notfound = false;
+                            break;
+                        }
+
+                    }
+
+                    if (notfound)
+                    {
+                        myEdge = new TopoDS_Edge();
+                        return;
+                    }
+
+                }
+                else
+                {
+                    // If we have more than one edge attached to the list
+                    // probably wire that we explore contains a loop or loops.
+                    double dfFPar = 0.0, dfLPar = 0.0;
+                    Geom2d_Curve aPCurve = BRep_Tool.CurveOnSurface(myEdge, myFace, ref dfFPar, ref dfLPar);
+                    if (aPCurve == null)
+                    {
+                        myEdge = new TopoDS_Edge();
+                        return;
+                    }
+                    // Note: current < myVertex > which is last on < myEdge >
+                    //       equals in 2D to following 2D points:
+                    //       edge is FORWARD  - point with MAX parameter on PCurve;
+                    //       edge is REVERSED - point with MIN parameter on PCurve.
+
+                    // Get 2D point equals to < myVertex > in 2D for current edge.
+                    gp_Pnt2d PRef = new gp_Pnt2d();
+                    if (myEdge.Orientation() == TopAbs_Orientation.TopAbs_REVERSED)
+                        aPCurve.D0(dfFPar, ref PRef);
+                    else
+                        aPCurve.D0(dfLPar, ref PRef);
+
+                    // Get next 2D point from current edge's PCurve with parameter
+                    // F + dP (REV) or L - dP (FOR)
+                    bool isrevese = (myEdge.Orientation() == TopAbs_Orientation.TopAbs_REVERSED);
+                    double dfMPar = GetNextParamOnPC(aPCurve, PRef, dfFPar, dfLPar, myTolU, myTolV, isrevese);
+
+                    gp_Pnt2d PRefm = new gp_Pnt2d();
+                    aPCurve.D0(dfMPar, ref PRefm);
+                    // Get vector from PRef to PRefm
+                    gp_Vec2d anERefDir = new gp_Vec2d(PRef, PRefm);
+                    if (anERefDir.SquareMagnitude() < gp.Resolution())
+                    {
+                        myEdge = new TopoDS_Edge();
+                        return;
+                    }
+
+                    // Search the list of edges looking for the edge having hearest
+                    // 2D point of connected vertex to current one and smallest angle.
+                    // First process all degenerated edges, then - all others.
+
+                    TopTools_ListIteratorOfListOfShape it = new TopTools_ListIteratorOfListOfShape();
+                    int k = 1, kMin = 0, iDone = 0;
+                    bool isDegenerated = true;
+                    double dmin = Standard_Real.RealLast();
+                    double dfMinAngle = 3.0 * Math.PI, dfCurAngle = 3.0 * Math.PI;
+
+                    for (iDone = 0; iDone < 2; iDone++)
+                    {
+                        it.Initialize(l);
+                        while (it.More())
+                        {
+                            TopoDS_Edge E = TopoDS.Edge(it.Value());
+                            if (E.IsSame(myEdge))
+                            {
+                                it.Next();
+                                k++;
+                                continue;
+                            }
+
+                            TopoDS_Vertex aVert1 = new TopoDS_Vertex(), aVert2 = new TopoDS_Vertex();
+                            TopExp.Vertices(E, ref aVert1, ref aVert2, true);
+                            if (aVert1.IsNull() || aVert2.IsNull())
+                            {
+                                it.Next();
+                                k++;
+                                continue;
+                            }
+
+                            aPCurve = BRep_Tool.CurveOnSurface(E, myFace, ref dfFPar, ref dfLPar);
+                            if (aPCurve == null)
+                            {
+                                it.Next();
+                                k++;
+                                continue;
+                            }
+
+                            gp_Pnt2d aPEb = new gp_Pnt2d(), aPEe = new gp_Pnt2d();
+                            if (aVert1.IsSame(aVert2) == isDegenerated)
+                            {
+                                if (E.Orientation() == TopAbs_Orientation.TopAbs_REVERSED)
+                                    aPCurve.D0(dfLPar, ref aPEb);
+                                else
+                                    aPCurve.D0(dfFPar, ref aPEb);
+
+                                if (Math.Abs(dfLPar - dfFPar) > Precision.PConfusion())
+                                {
+                                    isrevese = (E.Orientation() == TopAbs_Orientation.TopAbs_REVERSED);
+                                    isrevese = !isrevese;
+                                    double aEPm = GetNextParamOnPC(aPCurve, aPEb, dfFPar, dfLPar, myTolU, myTolV, isrevese);
+
+                                    aPCurve.D0(aEPm, ref aPEe);
+                                    if (aPEb.SquareDistance(aPEe) <= gp.Resolution())
+                                    {
+                                        //seems to be very short curve
+                                        gp_Vec2d aD = new gp_Vec2d();
+                                        aPCurve.D1(aEPm, out aPEe, out aD);
+                                        if (E.Orientation() == TopAbs_Orientation.TopAbs_REVERSED)
+                                            aPEe.SetXY(aPEb.XY() - aD.XY());
+                                        else
+                                            aPEe.SetXY(aPEb.XY() + aD.XY());
+
+                                        if (aPEb.SquareDistance(aPEe) <= gp.Resolution())
+                                        {
+                                            it.Next();
+                                            k++;
+                                            continue;
+                                        }
+                                    }
+                                    gp_Vec2d anEDir = new gp_Vec2d(aPEb, aPEe);
+                                    dfCurAngle = Math.Abs(anEDir.Angle(anERefDir));
+                                }
+
+                                if (dfCurAngle <= dfMinAngle)
+                                {
+                                    double d = PRef.SquareDistance(aPEb);
+                                    if (d <= Precision.PConfusion())
+                                        d = 0.0;
+                                    if (Math.Abs(aPEb.X() - PRef.X()) < myTolU && Math.Abs(aPEb.Y() - PRef.Y()) < myTolV)
+                                    {
+                                        if (d <= dmin)
+                                        {
+                                            dfMinAngle = dfCurAngle;
+                                            kMin = k;
+                                            dmin = d;
+                                        }
+                                    }
+                                }
+                            }
+                            it.Next();
+                            k++;
+                        }// while it
+
+                        if (kMin == 0)
+                        {
+                            isDegenerated = false;
+                            k = 1;
+                            dmin = Standard_Real.RealLast();
+                        }
+                        else
+                            break;
+                    }// for iDone
+
+                    if (kMin == 0)
+                    {
+                        // probably unclosed in 2d space wire
+                        myEdge = new TopoDS_Edge();
+                        return;
+                    }
+
+                    // Selection the edge.
+                    it.Initialize(l);
+                    k = 1;
+                    while (it.More())
+                    {
+                        if (k == kMin)
+                        {
+                            myEdge = TopoDS.Edge(it.Value());
+                            l.Remove(it.Value());
+                            break;
+                        }
+                        it.Next();
+                        k++;
+                    }
+                }//else face != NULL && l > 1
+            }//else l > 1
         }
     }
 }

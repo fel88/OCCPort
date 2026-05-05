@@ -17,6 +17,11 @@ namespace OCCPort.Tester
         {
         }
 
+        public bool IsEmpty()
+        {
+            return Count == 0;
+        }
+
 
         //typedef NCollection_List<TopoDS_Shape> TopTools_ListOfShape;
 
@@ -35,6 +40,16 @@ namespace OCCPort.Tester
         internal int Extent()
         {
             return Count; 
+        }
+
+        internal void RemoveFirst()
+        {
+            RemoveAt(0);
+        }
+
+        internal TopoDS_Shape First()
+        {
+            return this[0];
         }
     }
 }
