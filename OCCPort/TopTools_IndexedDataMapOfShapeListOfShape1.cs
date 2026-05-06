@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace OCCPort
 {
-    internal partial class TopTools_IndexedDataMapOfShapeListOfShape
+    public partial class TopTools_IndexedDataMapOfShapeListOfShape
     {
         //typedef NCollection_IndexedDataMap<TopoDS_Shape,TopTools_ListOfShape,TopTools_ShapeMapHasher> TopTools_IndexedDataMapOfShapeListOfShape;
         public class Item

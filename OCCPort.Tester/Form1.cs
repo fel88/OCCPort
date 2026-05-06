@@ -459,13 +459,13 @@ namespace OCCPort.Tester
             TopoDS_Edge e2 = new BRepBuilderAPI_MakeEdge(p2, p3);
             TopoDS_Edge e3 = new BRepBuilderAPI_MakeEdge(p3, p4);
             TopoDS_Edge e4 = new BRepBuilderAPI_MakeEdge(p4, p1);
-
+          
             // Create Wire (Closed Contour)
             BRepBuilderAPI_MakeWire mw = new BRepBuilderAPI_MakeWire();
             mw.Add(e1);
             mw.Add(e2);
             mw.Add(e3);
-            mw.Add(e4);
+            mw.Add(e4);            
             TopoDS_Wire wire = mw.Wire();
 
             // Create Face

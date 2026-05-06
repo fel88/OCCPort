@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace OCCPort
 {
-    internal class TopExp
+    public class TopExp
     {  //! Returns the Vertex of orientation FORWARD in E. If
        //! there is none returns a Null Shape.
        //! CumOri = True : taking account the edge orientation

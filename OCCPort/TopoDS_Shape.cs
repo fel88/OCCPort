@@ -10,6 +10,28 @@ namespace OCCPort
         {
             myOrient = TopAbs_Orientation.TopAbs_EXTERNAL;
         }
+        //! Returns True if two shapes are same, i.e.  if they
+        //! share  the  same TShape  with the same  Locations.
+        //! Orientations may differ.
+        public bool IsSame(TopoDS_Shape theOther)
+        {
+            return myTShape == theOther.myTShape
+                && myLocation == theOther.myLocation;
+        }
+
+        //! Returns True if two shapes are equal, i.e. if they
+        //! share the same TShape with  the same Locations and
+        //! Orientations.
+        public override bool Equals(object obj)
+        {
+            if (obj is not TopoDS_Shape) return false;
+
+            TopoDS_Shape theOther = obj as TopoDS_Shape;
+            return myTShape == theOther.myTShape
+     && myLocation == theOther.myLocation
+     && myOrient == theOther.myOrient;
+        }
+
         //! Returns a new Shape with the  same Orientation and
         //! Location and  a new TShape  with the same geometry
         //! and no sub-shapes.
@@ -37,24 +59,13 @@ namespace OCCPort
             myTShape = theOther.myTShape;
             myLocation = theOther.myLocation;
         }
-
-        //! Returns True if two shapes are same, i.e.  if they
-        //! share  the  same TShape  with the same  Locations.
-        //! Orientations may differ.
-        public bool IsSame(TopoDS_Shape theOther)
-        {
-            return myTShape == theOther.myTShape
-                && myLocation == theOther.myLocation;
-        }
-
-        public static int idx = 0;
+                
         public int HashCode(int theUpperBound)
         {
-            return idx++;
             // PKV
-            //  //int aHS = ::HashCode(myTShape.get(), theUpperBound);
-            //  int aHL = myLocation.HashCode(theUpperBound);
-            //  return ::HashCode(aHS ^ aHL, theUpperBound);
+            int aHS = myTShape.GetHashCode() % theUpperBound;
+            int aHL = myLocation.GetHashCode() % theUpperBound;
+            return (aHS ^ aHL) % theUpperBound;
         }
 
         //! Returns the checked flag.

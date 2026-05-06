@@ -221,11 +221,11 @@ namespace OCCPort
                 if (!V2.IsNull())
                 {
                     V2.Orientation(TopAbs_Orientation.TopAbs_REVERSED);
-                    //   int currsize = vmap.Extent(),
-                    //                   ind = vmap.Add(V2);
-                    //  if (currsize >= ind)
+                    int currsize = vmap.Extent(),
+                                    ind = vmap.Add(V2);
+                    if (currsize >= ind)
                     {
-                        // vmap.RemoveKey(V2);
+                        vmap.RemoveKey(V2);
                     }
                 }
 
@@ -236,13 +236,13 @@ namespace OCCPort
 
                     if (Eori == TopAbs_Orientation.TopAbs_FORWARD)
                     {
-                        // if (aF == -Precision.Infinite())
-                        //   anInfEmap.Add(E);
+                        if (aF == -Precision.Infinite())
+                            anInfEmap.Add(E);
                     }
                     else
                     { // Eori == TopAbs_REVERSED
-                      //   if (aL == Precision.Infinite())
-                      //    anInfEmap.Add(E);
+                        if (aL == Precision.Infinite())
+                            anInfEmap.Add(E);
                     }
                 }
                 it.Next();
@@ -330,6 +330,8 @@ namespace OCCPort
             myVertex = TopExp.FirstVertex(myEdge, true);
 
         }
+
+
         public double GetNextParamOnPC(Geom2d_Curve aPC,
 
                    gp_Pnt2d aPRef,

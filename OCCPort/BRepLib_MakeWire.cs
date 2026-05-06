@@ -258,7 +258,7 @@ namespace OCCPort
                                     B.UpdateVertex(VW, PC, maxtol);
 
                                     newvertex = true;
-                                    myVertex = VW;
+                                    myVertex = new TopoDS_Vertex(VW);
                                     myVertex.Orientation(VE.Orientation());
                                     B.Add(myEdge, myVertex);
                                     B.Transfert(EE, myEdge, VE, myVertex);
@@ -296,7 +296,7 @@ namespace OCCPort
             {
                 if (myError == BRepLib_WireError.BRepLib_WireDone)
                 { // Update only
-                    TopoDS_Vertex V1 = new TopoDS_Vertex(), V2 = new TopoDS_Vertex (), VRef = null;
+                    TopoDS_Vertex V1 = new TopoDS_Vertex(), V2 = new TopoDS_Vertex(), VRef = null;
                     TopExp.Vertices(myEdge, ref V1, ref V2);
                     if (V1.IsSame(myVertex)) VRef = V2;
                     else if (V2.IsSame(myVertex)) VRef = V1;
