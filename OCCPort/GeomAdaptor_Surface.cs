@@ -101,6 +101,10 @@ namespace OCCPort
         double myTolU;
         double myTolV;
 
+        Geom_BSplineSurface myBSplineSurface; ///< B-spline representation to prevent downcasts
+  
+
+
         //=======================================================================
         //function : Load
         //purpose  : 
@@ -407,8 +411,11 @@ namespace OCCPort
 
         public override int NbVKnots()
         {
-            throw new NotImplementedException();
+            if (mySurfaceType == GeomAbs_SurfaceType.GeomAbs_BSplineSurface)
+                return myBSplineSurface.NbVKnots();
+            throw new Standard_NoSuchObject("GeomAdaptor_Surface::NbVKnots");
         }
+
         public void RebuildCache(double theU,
                                        double theV)
         {
@@ -427,7 +434,7 @@ namespace OCCPort
                 //mySurfaceCache->BuildCache(theU, theV, aFlatKnotsU, aFlatKnotsV,
                 //                            aBezier->Poles(), aBezier->Weights());
             }
-            else if (mySurfaceType ==GeomAbs_SurfaceType. GeomAbs_BSplineSurface)
+            else if (mySurfaceType == GeomAbs_SurfaceType.GeomAbs_BSplineSurface)
             {
                 //// Create cache for B-spline
                 //if (mySurfaceCache.IsNull())
@@ -452,10 +459,10 @@ namespace OCCPort
 
                 case GeomAbs_SurfaceType.GeomAbs_OffsetSurface:
                 case GeomAbs_SurfaceType.GeomAbs_SurfaceOfExtrusion:
-                //    //caseGeomAbs_SurfaceType.GeomAbs_SurfaceOfRevolution:
-                //  Exceptions.Standard_NoSuchObject_Raise_if(myNestedEvaluator.IsNull(),
-                  //      "GeomAdaptor_Surface::D0: evaluator is not initialized");
-                  //  myNestedEvaluator->D0(U, V, P);
+                    //    //caseGeomAbs_SurfaceType.GeomAbs_SurfaceOfRevolution:
+                    //  Exceptions.Standard_NoSuchObject_Raise_if(myNestedEvaluator.IsNull(),
+                    //      "GeomAdaptor_Surface::D0: evaluator is not initialized");
+                    //  myNestedEvaluator->D0(U, V, P);
                     break;
 
                 default:

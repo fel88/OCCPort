@@ -35,7 +35,7 @@ namespace OCCPort
             BRepAdaptor_Surface BS = new BRepAdaptor_Surface();
             TopLoc_Location l = new TopLoc_Location(), aDummyLoc = new TopLoc_Location();
             int i, nbNodes;
-            BRepAdaptor_Curve BC;
+            BRepAdaptor_Curve BC = new BRepAdaptor_Curve();
 
             for (ex.Init(S, TopAbs_ShapeEnum.TopAbs_FACE); ex.More(); ex.Next())
             {
@@ -51,10 +51,10 @@ namespace OCCPort
                 {
                     if (GS != null)
                     {
-                     //   BS.Initialize(F, false);
+                        BS.Initialize(F, false);
                         if (BS._GetType() != GeomAbs_SurfaceType.GeomAbs_Plane)
                         {
-                           // BS.Initialize(F);
+                            BS.Initialize(F);
                             BndLib_AddSurface.Add(BS, BRep_Tool.Tolerance(F), B);
                         }
                         else
@@ -63,7 +63,7 @@ namespace OCCPort
                             TopExp_Explorer ex2 = new TopExp_Explorer(F, TopAbs_ShapeEnum.TopAbs_EDGE);
                             if (!ex2.More())
                             {
-                              //  BS.Initialize(F);
+                                BS.Initialize(F);
                                 BndLib_AddSurface.Add(BS, BRep_Tool.Tolerance(F), B);
                             }
                             else
@@ -73,8 +73,8 @@ namespace OCCPort
                                     TopoDS_Edge anEdge = TopoDS.Edge(ex2.Current());
                                     if (BRep_Tool.IsGeometric(anEdge))
                                     {
-                                     //  BC.Initialize(anEdge);
-                                      //  BndLib_Add3dCurve.Add(BC, BRep_Tool.Tolerance(anEdge), B);
+                                        BC.Initialize(anEdge);
+                                        BndLib_Add3dCurve.Add(BC, BRep_Tool.Tolerance(anEdge), B);
                                     }
                                 }
                                 B.Enlarge(BRep_Tool.Tolerance(F));
@@ -91,50 +91,50 @@ namespace OCCPort
             for (ex.Init(S, TopAbs_ShapeEnum.TopAbs_EDGE, TopAbs_ShapeEnum.TopAbs_FACE); ex.More(); ex.Next())
             {
                 TopoDS_Edge E = TopoDS.Edge(ex.Current());
-             //   Poly_Polygon3D P3d = BRep_Tool.Polygon3D(E, l);
+                //   Poly_Polygon3D P3d = BRep_Tool.Polygon3D(E, l);
                 //if (P3d != null && P3d.NbNodes() > 0)
                 {
-                   // TColgp_Array1OfPnt Nodes = P3d.Nodes();
-                  // nbNodes = P3d.NbNodes();
-                   // for (i = 1; i <= nbNodes; i++)
+                    // TColgp_Array1OfPnt Nodes = P3d.Nodes();
+                    // nbNodes = P3d.NbNodes();
+                    // for (i = 1; i <= nbNodes; i++)
                     {
-                       // if (l.IsIdentity()) B.Add(Nodes[i]);
+                        // if (l.IsIdentity()) B.Add(Nodes[i]);
 
-                       //else B.Add(Nodes[i].Transformed(l));
+                        //else B.Add(Nodes[i].Transformed(l));
                     }
                     //       B.Enlarge(P3d->Deflection());
-                  //  B.Enlarge(P3d, Deflection() + BRep_Tool.Tolerance(E));
+                    //  B.Enlarge(P3d, Deflection() + BRep_Tool.Tolerance(E));
                 }
-               // else
+                // else
                 {
-                  //  BRep_Tool.PolygonOnTriangulation(E, Poly, T, l);
-                   // if (useTriangulation && Poly != null && T != null && T.NbNodes() > 0)
+                    //  BRep_Tool.PolygonOnTriangulation(E, Poly, T, l);
+                    // if (useTriangulation && Poly != null && T != null && T.NbNodes() > 0)
                     {
-                     /*   TColStd_Array1OfInteger Indices = Poly.Nodes();
-                        nbNodes = Indices.Length();
-                        if (l.IsIdentity())
-                        {
-                            for (i = 1; i <= nbNodes; i++)
-                            {
-                                B.Add(T.Node(Indices[i]));
-                            }
-                        }
-                        else
-                        {
-                            for (i = 1; i <= nbNodes; i++)
-                            {
-                                B.Add(T.Node(Indices[i]).Transformed(l));
-                            }
-                        }*/
+                        /*   TColStd_Array1OfInteger Indices = Poly.Nodes();
+                           nbNodes = Indices.Length();
+                           if (l.IsIdentity())
+                           {
+                               for (i = 1; i <= nbNodes; i++)
+                               {
+                                   B.Add(T.Node(Indices[i]));
+                               }
+                           }
+                           else
+                           {
+                               for (i = 1; i <= nbNodes; i++)
+                               {
+                                   B.Add(T.Node(Indices[i]).Transformed(l));
+                               }
+                           }*/
                         // 	B.Enlarge(T->Deflection());
                         //B.Enlarge(Poly.Deflection() + BRep_Tool.Tolerance(E));
                     }
-                   // else
+                    // else
                     {
-                       // if (BRep_Tool.IsGeometric(E))
+                        // if (BRep_Tool.IsGeometric(E))
                         {
-                          //  BC.Initialize(E);
-                          //  BndLib_Add3dCurve.Add(BC, BRep_Tool.Tolerance(E), B);
+                            //  BC.Initialize(E);
+                            //  BndLib_Add3dCurve.Add(BC, BRep_Tool.Tolerance(E), B);
                         }
                     }
                 }
@@ -144,8 +144,8 @@ namespace OCCPort
 
             //for (ex.Init(S, TopAbs_ShapeEnum.TopAbs_VERTEX, TopAbs_ShapeEnum.TopAbs_EDGE); ex.More(); ex.Next())
             {
-          //      B.Add(BRep_Tool.Pnt(TopoDS.Vertex(ex.Current())));
-            //    B.Enlarge(BRep_Tool.Tolerance(TopoDS.Vertex(ex.Current())));
+                //      B.Add(BRep_Tool.Pnt(TopoDS.Vertex(ex.Current())));
+                //    B.Enlarge(BRep_Tool.Tolerance(TopoDS.Vertex(ex.Current())));
             }
         }
     }

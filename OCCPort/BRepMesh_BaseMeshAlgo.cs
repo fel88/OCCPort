@@ -175,9 +175,9 @@ namespace OCCPort
 
                 if (initDataStructure())
                 {
-                    // if (!theRange.More())
+                    if (!theRange.More())
                     {
-                        //   return;
+                        return;
                     }
                     generateMesh(theRange);
                     commitSurfaceTriangulation();

@@ -5,6 +5,8 @@ namespace OCCPort
 {
     public class BndLib_Add3dCurve
     {
+      
+
         public static void Add(Adaptor3d_Curve C,
                double U1,
                double U2,
@@ -122,7 +124,7 @@ namespace OCCPort
         //function : Add
         //purpose  : 
         //=======================================================================
-        public void Add(Adaptor3d_Curve C,
+        public static void Add(Adaptor3d_Curve C,
                double Tol,
                      Bnd_Box B)
         {

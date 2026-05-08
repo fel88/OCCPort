@@ -80,22 +80,22 @@
             }
             else
             {
-                 IMeshTools_ModelBuilder aModelBuilder =
-                  aContext.GetModelBuilder();
+                IMeshTools_ModelBuilder aModelBuilder =
+                 aContext.GetModelBuilder();
 
-                 if (aModelBuilder == null)
-                 {
-                     SetStatus(Message_Status.Message_Fail1);
-                 }
-                 else
-                 {
-                     // Is null shape or another problem?
-                     SetStatus(aModelBuilder.GetStatus().IsSet(Message_Status.Message_Fail1) ?
-                       Message_Status.Message_Warn1 : Message_Status.Message_Fail2);
-                 }
+                if (aModelBuilder == null)
+                {
+                    SetStatus(Message_Status.Message_Fail1);
+                }
+                else
+                {
+                    // Is null shape or another problem?
+                    SetStatus(aModelBuilder.GetStatus().IsSet(Message_Status.Message_Fail1) ?
+                      Message_Status.Message_Warn1 : Message_Status.Message_Fail2);
+                }
             }
             aPS.Next(1);
-            	aContext.Clean();
+            aContext.Clean();
         }
 
     }

@@ -39,7 +39,7 @@ namespace OCCPort
 
             Face.Orientation(TopAbs_Orientation.TopAbs_FORWARD);
             BRepAdaptor_Surface surf = new BRepAdaptor_Surface();
-            //surf.Initialize(aFace, false);
+            surf.Initialize(aFace, false);
 
             TopoDS_Edge edge;
             TopAbs_Orientation Or;
