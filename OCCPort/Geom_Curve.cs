@@ -61,13 +61,29 @@ namespace OCCPort
         //! are parallel.
         public abstract void D0(double U, ref gp_Pnt P);
 
+        //! Computes the point of parameter U on <me>.
+        //! If the curve is periodic  then the returned point is P(U) with
+        //! U = Ustart + (U - Uend)  where Ustart and Uend are the
+        //! parametric bounds of the curve.
+        //! it is implemented with D0.
+        //!
+        //! Raised only for the "OffsetCurve" if it is not possible to
+        //! compute the current point. For example when the first
+        //! derivative on the basis curve and the offset direction are parallel.
+        public gp_Pnt Value(double U)
+        {
+            gp_Pnt P = new gp_Pnt();
+            D0(U, ref P);
+            return P;
+        }
+
         public virtual double TransformedParameter(double U,
                            gp_Trsf t)
         {
             return U;
         }
 
-       
+
 
 
     }

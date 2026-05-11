@@ -1,4 +1,6 @@
-﻿namespace OCCPort.Interfaces
+﻿using System;
+
+namespace OCCPort.Interfaces
 {
     public class MeshTools_MeshBuilder : Message_Algorithm, IMeshTools_MeshBuilder
     {
@@ -31,10 +33,15 @@
             {
                 if (aContext.DiscretizeEdges())
                 {
+
+                    CheckEdges();
+
                     if (aContext.HealModel())
                     {
                         if (aContext.PreProcessModel())
                         {
+
+                            CheckEdges();
 
                             if (aContext.DiscretizeFaces(aPS.Next(9)))
                             {
@@ -98,5 +105,16 @@
             aContext.Clean();
         }
 
+        private void CheckEdges()
+        {
+            var edge0 = GetContext().GetModel().GetEdge(0);
+            var edge1 = GetContext().GetModel().GetFace(0).GetWire(0).GetEdge(0);
+            if (edge0 == edge1)
+            {
+
+            }
+            var curve = edge1.GetCurve();
+
+        }
     }
 }

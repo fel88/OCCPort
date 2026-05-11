@@ -70,6 +70,7 @@ namespace OCCPort
             }
         }
 
+       
         //! Returns  in  Vfirst,  Vlast   the first   and last
         //! vertices of the open wire <W>. May be null shapes.
         //! if   <W>  is closed Vfirst and Vlast  are a same
@@ -122,10 +123,12 @@ namespace OCCPort
             }
         }
 
+       
+
         //! Returns in Vfirst, Vlast the  FORWARD and REVERSED
         //! vertices of the edge <E>. May be null shapes.
         //! CumOri = True : taking account the edge orientation
-        internal static void Vertices(TopoDS_Edge E, ref TopoDS_Vertex Vfirst,
+        public static void Vertices(TopoDS_Edge E, ref TopoDS_Vertex Vfirst,
             ref TopoDS_Vertex Vlast, bool CumOri = false)
         {
             // minor optimization for case when Vfirst and Vlast are non-null:

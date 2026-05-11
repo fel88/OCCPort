@@ -56,7 +56,13 @@ namespace OCCPort
 
         public override IMeshData_Edge GetEdge(int v)
         {
-            return myDEdges.Get(v);            
+            return myDEdges.Get(v);
+        }
+
+        //! Returns maximum size of shape's bounding box.
+        public override double GetMaxSize()
+        {
+            return myMaxSize;
         }
 
         double myMaxSize;

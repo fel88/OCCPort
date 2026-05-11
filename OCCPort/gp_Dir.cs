@@ -7,7 +7,16 @@ namespace OCCPort
     public struct gp_Dir
     {
         private gp_XYZ coord;
+
         //! Creates a direction corresponding to X axis.
+        //! Returns true if the angle between this unit vector and the
+        //! unit vector theOther is equal to 0 or to Pi.
+        //! Note: the tolerance criterion is given by theAngularTolerance.
+        public bool IsParallel(gp_Dir theOther, double theAngularTolerance)
+        {
+            double anAng = Angle(theOther);
+            return anAng <= theAngularTolerance || Math.PI - anAng <= theAngularTolerance;
+        }
 
         internal double X()
         {
@@ -243,6 +252,6 @@ namespace OCCPort
             return new gp_Vec(f);
         }
 
-        
+
     }
 }

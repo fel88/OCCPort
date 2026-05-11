@@ -58,6 +58,13 @@ namespace OCCPort
         {
             return mySameParam;
         }
+
+        //! Sets value of angular deflection for the discrete model.
+        public void SetAngularDeflection(double theValue)
+        {
+            myAngDeflection = theValue;
+        }
+
         //! Returns same range flag.
         //! By default equals to flag stored in topological shape.
         public bool GetSameRange()

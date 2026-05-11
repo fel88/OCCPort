@@ -19,7 +19,7 @@ namespace OCCPort
             {
                 //OCC_CATCH_SIGNALS
 
-                //BRepMesh_Deflection.ComputeDeflection(aDEdge, myModel.GetMaxSize(), myParameters);
+                BRepMesh_Deflection.ComputeDeflection(aDEdge, myModel.GetMaxSize(), myParameters);
 
                 IMeshTools_CurveTessellator aEdgeTessellator = null;
                 if (!aDEdge.IsFree())

@@ -21,6 +21,6 @@ namespace OCCPort
         public abstract IMeshData_Face AddFace(TopoDS_Face theFace);
 
         public abstract IMeshData_Edge GetEdge(int v);
-        
+        public abstract double GetMaxSize();
     }
 }

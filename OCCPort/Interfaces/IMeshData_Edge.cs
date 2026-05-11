@@ -19,6 +19,10 @@
         {
             return TopoDS.Edge(GetShape());
         }
+
+        //! Sets value of angular deflection for the discrete model.
+        public void SetAngularDeflection(double theValue);
+
         //! By default equals to flag stored in topological shape.
         public bool GetSameParam();
 
