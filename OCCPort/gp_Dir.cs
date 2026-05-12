@@ -1,5 +1,6 @@
 ﻿using OCCPort.Tester;
 using System;
+using System.Diagnostics;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace OCCPort
@@ -7,6 +8,11 @@ namespace OCCPort
     public struct gp_Dir
     {
         private gp_XYZ coord;
+
+        public override string ToString()
+        {
+            return $"gp_Dir: X:{coord.X()} Y:{coord.Y()} Z:{coord.Z()}";
+        }
 
         //! Creates a direction corresponding to X axis.
         //! Returns true if the angle between this unit vector and the

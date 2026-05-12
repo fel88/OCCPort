@@ -12,6 +12,11 @@ namespace OCCPort
             return new gp_Pnt(f);
         }
 
+        public override string ToString()
+        {
+            return $"gp_XYZ: X:{x} Y:{y} Z:{z}";
+        }
+
         private double x;
         private double y;
         private double z;

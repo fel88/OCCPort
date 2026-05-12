@@ -148,10 +148,10 @@ namespace OCCPort
         //! Subtracts two vectors
         public void Subtract(gp_Vec theRight) { coord.Subtract(theRight.coord); }
 
-        public static gp_Vec operator -(gp_Vec theRight, gp_Vec v)
+        public static gp_Vec operator -(gp_Vec left, gp_Vec v)
         {
-            v.Subtract(theRight);
-            return v;
+            left.Subtract(v);
+            return left;
         }
 
         public static gp_Vec operator -(gp_Vec f)
@@ -212,6 +212,11 @@ namespace OCCPort
         {
 
             coord = theP2.XYZ().Subtracted(theP1.XYZ());
+        }
+
+        public override string ToString()
+        {
+            return $"gp_Vec: X:{coord.X()} Y:{coord.Y()} Z:{coord.Z()}";
         }
 
     }
