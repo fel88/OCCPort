@@ -429,6 +429,14 @@ namespace OCCPort
             bool? v = null;
             return CurveOnSurface(E, F, ref First, ref Last, ref v);
         }
+
+        //! Returns the curve  associated to the  edge in  the
+        //! parametric  space of  the  face.  Returns   a NULL
+        //! handle  if this curve  does not exist.  Returns in
+        //! <First> and <Last> the parameter range.
+        //! If the surface is a plane the curve can be not stored but created a new
+        //! each time. The flag pointed by <theIsStored> serves to indicate storage status. 
+        //! It is valued if the pointer is non-null.
         public static Geom2d_Curve CurveOnSurface(TopoDS_Edge E,
                                                TopoDS_Face F,
                                                ref double First,
@@ -444,6 +452,14 @@ namespace OCCPort
             }
             return CurveOnSurface(aLocalEdge, S, ref l, ref First, ref Last, ref theIsStored);
         }
+
+        //! Returns the  curve associated to   the edge in the
+        //! parametric  space of the   surface. Returns a NULL
+        //! handle  if this curve does  not exist.  Returns in
+        //! <First> and <Last> the parameter range.
+        //! If the surface is a plane the curve can be not stored but created a new
+        //! each time. The flag pointed by <theIsStored> serves to indicate storage status. 
+        //! It is valued if the pointer is non-null.
         public static Geom2d_Curve CurveOnSurface(TopoDS_Edge E,
                                                Geom_Surface S,
                                                ref TopLoc_Location L,
@@ -479,6 +495,11 @@ namespace OCCPort
                 theIsStored = false;
             return CurveOnPlane(E, S, L, ref First, ref Last);
         }
+
+        //! Returns in <C>, <S>, <L> a 2d curve, a surface and
+        //! a location for the edge <E>. <C> and <S>  are null
+        //! if the  edge has no curve on  surface.  Returns in
+        //! <First> and <Last> the parameter range.
         public static void CurveOnSurface(TopoDS_Edge E,
                                       out Geom2d_Curve C,
                                      out Geom_Surface S,

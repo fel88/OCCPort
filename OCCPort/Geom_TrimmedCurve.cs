@@ -28,11 +28,47 @@ namespace OCCPort
         double uTrim2;
         Geom_Curve basisCurve;
 
+
+        //! Constructs a trimmed curve from the basis curve C
+        //! which is limited between parameter values U1 and U2.
+        //! Note: - U1 can be greater or less than U2; in both cases,
+        //! the returned curve is oriented from U1 to U2.
+        //! - If the basis curve C is periodic, there is an
+        //! ambiguity because two parts are available. In this
+        //! case, the trimmed curve has the same orientation
+        //! as the basis curve if Sense is true (default value)
+        //! or the opposite orientation if Sense is false.
+        //! - If the curve is closed but not periodic, it is not
+        //! possible to keep the part of the curve which
+        //! includes the junction point (except if the junction
+        //! point is at the beginning or at the end of the
+        //! trimmed curve). If you tried to do this, you could
+        //! alter the fundamental characteristics of the basis
+        //! curve, which are used, for example, to compute
+        //! the derivatives of the trimmed curve. The rules
+        //! for a closed curve are therefore the same as
+        //! those for an open curve.
+        //! Warning: The trimmed curve is built from a copy of curve C.
+        //! Therefore, when C is modified, the trimmed curve
+        //! is not modified.
+        //! - If the basis curve is periodic and theAdjustPeriodic is True,
+        //! the bounds of the trimmed curve may be different from U1 and U2
+        //! if the parametric origin of the basis curve is within
+        //! the arc of the trimmed curve. In this case, the
+        //! modified parameter will be equal to U1 or U2
+        //! plus or minus the period.
+        //! When theAdjustPeriodic is False, parameters U1 and U2 will be
+        //! the same, without adjustment into the first period.
+        //! Exceptions
+        //! Standard_ConstructionError if:
+        //! - C is not periodic and U1 or U2 is outside the
+        //! bounds of C, or
+        //! - U1 is equal to U2.
         public Geom_TrimmedCurve(Geom_Curve C,
                                       double U1,
                                       double U2,
-                                      bool Sense,
-                                      bool theAdjustPeriodic)
+                                      bool Sense = true,
+                                      bool theAdjustPeriodic = true)
 
         {
             uTrim1 = (U1);

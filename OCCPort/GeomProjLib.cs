@@ -55,13 +55,14 @@ namespace OCCPort
 
             }
 
-            /*if (Curve.IsKind(STANDARD_TYPE(Geom_TrimmedCurve)))
+            //if (Curve.IsKind(STANDARD_TYPE(Geom_TrimmedCurve)))
+            if (Curve is Geom_TrimmedCurve)
             {
-                Handle(Geom_TrimmedCurve) CTrim
-                  = Handle(Geom_TrimmedCurve)::DownCast(Curve);
+                Geom_TrimmedCurve CTrim
+                  = (Geom_TrimmedCurve)Curve;
                 GC = new Geom_TrimmedCurve(GC, Proj.FirstParameter(),
                                     Proj.LastParameter());
-            }*/
+            }
 
             return GC;
 

@@ -210,6 +210,21 @@ namespace OCCPort
         }
 
 
+        public override double FirstParameter()
+        {
+            if (myKeepParam || myIsApprox)
+                return myCurve.FirstParameter();
+            else
+                return myFirstPar;
+        }
+
+        public override double LastParameter()
+        {
+            if (myKeepParam || myIsApprox)
+                return myCurve.LastParameter();
+            else
+                return myLastPar;
+        }
 
         //=======================================================================
         //function : Project
