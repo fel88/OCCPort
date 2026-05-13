@@ -7,6 +7,14 @@ namespace OCCPort
         public abstract (double, double) GetRangeU();
         //! Returns True if computed range is valid.
         public abstract bool IsValid();
+        //! Scales the given point from real parametric space 
+        //! to face basis and otherwise.
+        //! @param thePoint point to be scaled.
+        //! @param isToFaceBasis if TRUE converts point to face basis,
+        //! otherwise performs reverse conversion.
+        //! @return scaled point.
+        public abstract gp_Pnt2d Scale(gp_Pnt2d thePoint,
+                                 bool isToFaceBasis);
 
         //! Returns V range.
         public abstract (double, double) GetRangeV();

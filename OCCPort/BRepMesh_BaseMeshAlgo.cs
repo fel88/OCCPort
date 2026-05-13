@@ -72,7 +72,7 @@ namespace OCCPort
         }
         VectorOfPnt myNodesMap;
 
-        public int addNodeToStructure(
+        public virtual int addNodeToStructure(
           gp_Pnt2d thePoint,
           int theLocation3d,
           BRepMesh_DegreeOfFreedom theMovability,

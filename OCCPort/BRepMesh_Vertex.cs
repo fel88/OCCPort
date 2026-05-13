@@ -8,12 +8,38 @@ namespace OCCPort
     //! associated with 3d point stored in external map.
     public class BRepMesh_Vertex
     {
+        //! Checks for equality with another vertex.
+        //! @param theOther vertex to be checked against this one.
+        //! @return TRUE if equal, FALSE if not.
+        public bool IsEqual(BRepMesh_Vertex theOther)
+        {
+            if (myMovability == BRepMesh_DegreeOfFreedom.BRepMesh_Deleted ||
+                theOther.myMovability == BRepMesh_DegreeOfFreedom.BRepMesh_Deleted)
+            {
+                return false;
+            }
+
+            return (myUV.IsEqual(theOther.myUV, Precision.PConfusion()));
+        }
+
+        public override bool Equals(object obj)
+        {
+            return IsEqual(obj as BRepMesh_Vertex);
+        }
+
+        public override int GetHashCode()
+        {
+            int theUpperBound = int.MaxValue;
+            //return HashCode(Floor(1e5 * myUV.X()) * Floor(1e5 * myUV.Y()), theUpperBound);
+            return (int)(((Math.Floor(1e5 * myUV.X()) * Math.Floor(1e5 * myUV.Y())) % theUpperBound));
+        }
 
         //! Returns position of the vertex in parametric space.
         public gp_XY Coord()
         {
             return myUV;
         }
+
         BRepMesh_DegreeOfFreedom myMovability;
         //! Sets movability of the vertex.
         public void SetMovability(BRepMesh_DegreeOfFreedom theMovability)

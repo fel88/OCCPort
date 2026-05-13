@@ -20,11 +20,19 @@ namespace OCCPort
         //! reference to either newly added or previously existing object
         public T Added(T K)
         {
-            //probably should clone here
-            if (!Contains(K))
+            foreach (var item in this)
             {
-                base.Add(K);
+                if (item.Equals(K))
+                {
+                    return item;
+                }
             }
+            //probably should clone here
+            //if (!Contains(K))
+            //{
+              base.Add(K);
+            //}
+            
             return K;
         }
 

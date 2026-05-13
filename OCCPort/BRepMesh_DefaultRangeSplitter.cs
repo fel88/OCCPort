@@ -245,5 +245,14 @@ namespace OCCPort
         {
             return myDelta;
         }
+
+        public override gp_Pnt2d Scale(gp_Pnt2d thePoint, bool isToFaceBasis)
+        {
+            return isToFaceBasis ?
+    new gp_Pnt2d((thePoint.X() - myRangeU.Item1) / myDelta.Item1,
+              (thePoint.Y() - myRangeV.Item1) / myDelta.Item2) :
+    new gp_Pnt2d(thePoint.X() * myDelta.Item1 + myRangeU.Item1,
+              thePoint.Y() * myDelta.Item2 + myRangeV.Item1);
+        }
     }
 }

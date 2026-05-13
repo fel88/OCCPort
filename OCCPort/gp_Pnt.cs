@@ -7,6 +7,10 @@ namespace OCCPort
     {
         public gp_XYZ coord;
 
+        public override string ToString()
+        {
+            return $"gp_Pnt  X: {coord.X()} Y: {coord.Y()} Z: {coord.Z()}";
+        }
 
         //! Creates a point with zero coordinates.
         //public gp_Pnt() { }

@@ -1,4 +1,5 @@
 ﻿using OCCPort;
+using OCCPort.Enums;
 using OCCPort.Interfaces;
 using System;
 using System.Reflection.Metadata;
@@ -18,7 +19,20 @@ namespace OCCPort
             return myRangeSplitter;
         }
 
-        
+        //! Adds the given 2d point to mesh data structure.
+        //! Returns index of node in the structure.
+        public override int addNodeToStructure(
+    gp_Pnt2d thePoint,
+    int theLocation3d,
+    BRepMesh_DegreeOfFreedom theMovability,
+    bool isForceAdd)
+        {
+            return base.addNodeToStructure(
+              myRangeSplitter.Scale(thePoint, true),
+              theLocation3d, theMovability, isForceAdd);
+        }
+
+
         //! Performs initialization of data structure using existing model data.
         protected override bool initDataStructure()
         {

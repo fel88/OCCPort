@@ -38,7 +38,7 @@ namespace OCCPort
                     double theSizeY)
         {
             double[] aCellSizeC = { theSizeX, theSizeY };
-            NCollection_Array1<double> aCellSize = new NCollection_Array1<double>(aCellSizeC[0], 1, 2);
+            NCollection_Array1<double> aCellSize = new NCollection_Array1<double>(aCellSizeC, 1, 2);
             myCellFilter.Reset(aCellSize);
             mySelector.Clear();
         }

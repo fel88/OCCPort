@@ -1785,4 +1785,5 @@ ref aNextPivotNode, ref aNextLinkDir, ref aNextLinkBndBox);
             mySupTrian = new BRepMesh_Triangle(e, o, Enums.BRepMesh_DegreeOfFreedom.BRepMesh_Free);
         }
     }
+
 }
