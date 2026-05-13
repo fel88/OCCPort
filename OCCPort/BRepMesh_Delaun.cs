@@ -20,13 +20,15 @@ namespace OCCPort
                                    bool isFillCircles)
         {
             myMeshData = (theOldMesh);
-            //myCircles(new NCollection_IncAllocator(
+            myCircles = new BRepMesh_CircleTool();
+            //(new NCollection_IncAllocator(
             //         IMeshData::MEMORY_BLOCK_SIZE_HUGE)),
             mySupVert = new VectorOfInteger(3);
             myInitCircles = (false);
 
             if (isFillCircles)
             {
+                throw new NotImplementedException();
                 //InitCirclesTool(theCellsCountU, theCellsCountV);
             }
         }
@@ -1196,9 +1198,36 @@ ref aNextPivotNode, ref aNextLinkDir, ref aNextLinkBndBox);
             return true;
         }
 
+        //! Decomposes the given closed simple polygon (polygon without glued edges 
+        //! and loops) on two simpler ones by adding new link at the most thin part 
+        //! in respect to end point of the first link.
+        //! In case if source polygon consists of three links, creates new triangle 
+        //! and clears source container.
+        //! @param thePolygon source polygon to be decomposed (first part of decomposition).
+        //! @param thePolyBoxes bounding boxes corresponded to source polygon's links.
+        //! @param thePolygonCut product of decomposition of source polygon (second part of decomposition).
+        //! @param thePolyBoxesCut bounding boxes corresponded to resulting polygon's links.
+        public void decomposeSimplePolygon(
+          SequenceOfInteger thePolygon,
+          SequenceOfBndB2d thePolyBoxes,
+          SequenceOfInteger thePolygonCut,
+          SequenceOfBndB2d thePolyBoxesCut)
+        {
+            // Check is the given polygon elementary
+            if (meshElementaryPolygon(thePolygon))
+            {
+                thePolygon.Clear();
+                thePolyBoxes.Clear();
+                return;
+            }
+        }
+
+        //! Triangulatiion of a closed polygon described by the list
+        //! of indexes of its edges in the structure.
+        //! (negative index means reversed edge)
         void meshPolygon(SequenceOfInteger thePolygon,
                                   SequenceOfBndB2d thePolyBoxes,
-                                  MapOfInteger theSkipped)
+                                  MapOfInteger theSkipped = null)
         {
             // Check is the source polygon elementary
             if (meshElementaryPolygon(thePolygon))
@@ -1659,6 +1688,7 @@ ref aNextPivotNode, ref aNextLinkDir, ref aNextLinkBndBox);
         VectorOfInteger mySupVert;
         bool myInitCircles;
         BRepMesh_DataStructureOfDelaun myMeshData;
+        BRepMesh_CircleTool myCircles;
 
         //! Explicitly sets ids of auxiliary vertices used to build mesh and used by 3rd-party algorithms.
         public void SetAuxVertices(VectorOfInteger theSupVert)
@@ -1672,7 +1702,8 @@ ref aNextPivotNode, ref aNextLinkDir, ref aNextLinkBndBox);
                                    int theCellsCountV)
         {
             myMeshData = (theOldMesh);
-            //myCircles(theVertexIndices.Length(), new NCollection_IncAllocator(
+            myCircles = new BRepMesh_CircleTool(theVertexIndices.Length());
+            //, new NCollection_IncAllocator(
             //         IMeshData::MEMORY_BLOCK_SIZE_HUGE)),
             mySupVert = new VectorOfInteger(3);
             myInitCircles = false;
@@ -1710,7 +1741,7 @@ ref aNextPivotNode, ref aNextLinkDir, ref aNextLinkBndBox);
 
             aBox.Enlarge(_Precision);
 
-            //initCirclesTool(aBox, theCellsCountU, theCellsCountV);
+            initCirclesTool(aBox, theCellsCountU, theCellsCountV);
             superMesh(aBox);
 
             ComparatorOfIndexedVertexOfDelaun aCmp = new ComparatorOfIndexedVertexOfDelaun(myMeshData);
@@ -1718,6 +1749,33 @@ ref aNextPivotNode, ref aNextLinkDir, ref aNextLinkBndBox);
             Std.sort_heap(theVertexIndices, aCmp);
 
             compute(theVertexIndices);
+        }
+
+        void initCirclesTool(Bnd_Box2d theBox,
+    int theCellsCountU,
+    int theCellsCountV)
+        {
+
+            double aMinX = 0, aMinY = 0, aMaxX = 0, aMaxY = 0;
+            theBox.Get(ref aMinX, ref aMinY, ref aMaxX, ref aMaxY);
+            double aDeltaX = aMaxX - aMinX;
+            double aDeltaY = aMaxY - aMinY;
+
+            int aScaler = 2;
+            if (myMeshData.NbNodes() > 100)
+            {
+                aScaler = 5;
+            }
+            else if (myMeshData.NbNodes() > 1000)
+            {
+                aScaler = 7;
+            }
+
+            myCircles.SetMinMaxSize(new gp_XY(aMinX, aMinY), new gp_XY(aMaxX, aMaxY));
+            myCircles.SetCellSize(aDeltaX / Math.Max(theCellsCountU, aScaler),
+                aDeltaY / Math.Max(theCellsCountV, aScaler));
+
+            myInitCircles = true;
         }
 
         //! Computes the triangulation and adds the vertices,

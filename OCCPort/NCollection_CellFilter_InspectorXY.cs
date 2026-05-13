@@ -6,5 +6,7 @@
     internal class NCollection_CellFilter_InspectorXY
     {
         public static int Dimension=2;
+
+        
     }
 }

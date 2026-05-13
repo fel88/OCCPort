@@ -1,6 +1,6 @@
 ﻿namespace OCCPort
 {
-    internal class SequenceOfBndB2d : NCollection_Sequence<Bnd_B2d>
+    public class SequenceOfBndB2d : NCollection_Sequence<Bnd_B2d>
     {
     }
 }

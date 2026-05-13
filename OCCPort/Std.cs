@@ -1,4 +1,6 @@
-﻿namespace OCCPort
+﻿using System.Collections.Generic;
+
+namespace OCCPort
 {
     public static class Std
     {
@@ -25,10 +27,17 @@
                 heap.Add(item);
             }
             theVertices.Clear();
+            List<int> temp = new List<int>();
             while (heap.Count > 0)
             {
-                theVertices.Add(heap.PopTop());
+                temp.Add(heap.PopTop());
             }
+            temp.Reverse();
+            foreach (var item in temp)
+            {
+                theVertices.Add(item);
+            }
+            
         }
     }
 }

@@ -7,7 +7,6 @@ namespace OCCPort
     {
         public ComparatorOfIndexedVertexOfDelaun(BRepMesh_DataStructureOfDelaun theDS)
         {
-
             myStructure = (theDS);
         }
 
@@ -17,7 +16,8 @@ namespace OCCPort
         {
             BRepMesh_Vertex aLeft = myStructure.GetNode(theLeft);
             BRepMesh_Vertex aRight = myStructure.GetNode(theRight);
-            return new ComparatorOfVertexOfDelaun().Compare(aLeft, aRight);
+            var res = new ComparatorOfVertexOfDelaun().Compare(aLeft, aRight);
+            return res ? -1 : 1;
         }
     }
 }

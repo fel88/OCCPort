@@ -150,6 +150,12 @@ namespace OCCPort
             y = theY;
         }
 
+        internal double ChangeCoord(int v)
+        {
+            if (v == 1) return X();
+            return Y();
+        }
+
         double x;
         double y;
 
