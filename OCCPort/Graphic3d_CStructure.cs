@@ -11,6 +11,18 @@ namespace OCCPort
         internal int highlight;
         public int visible;
         int myId;
+        Graphic3d_SequenceOfHClipPlane myClipPlanes;
+
+        //! Set transformation persistence.
+        public virtual void SetTransformPersistence(Graphic3d_TransformPers theTrsfPers) { myTrsfPers = theTrsfPers; }
+
+
+
+        //! Set z layer ID to display the structure in specified layer
+        public virtual void SetZLayer(Graphic3d_ZLayerId theLayerIndex) { myZLayer = theLayerIndex; }
+
+        //! Pass clip planes to the associated graphic driver structure
+        public void SetClipPlanes(Graphic3d_SequenceOfHClipPlane thePlanes) { myClipPlanes = thePlanes; }
 
         //! Return transformation.
         public TopLoc_Datum3D Transformation() { return myTrsf; }

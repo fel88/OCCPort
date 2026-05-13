@@ -7,6 +7,11 @@ namespace OCCPort
 {
     public class Graphic3d_Layer
     {
+        // =======================================================================
+        public void InvalidateBVHData()
+        {
+            myIsBVHPrimitivesNeedsReset = true;
+        }
 
         public double considerZoomPersistenceObjects(int theViewId,
                                                                 Graphic3d_Camera theCamera,

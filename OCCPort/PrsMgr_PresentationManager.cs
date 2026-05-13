@@ -153,10 +153,10 @@ namespace OCCPort
             }
 
             PrsMgr_Presentation aPrs = new PrsMgr_Presentation(this, thePrsObj, theMode);
-            //aPrs.SetZLayer(thePrsObj.ZLayer());
-            //	aPrs.CStructure().ViewAffinity = !theSelObj.IsNull() ? theSelObj->ViewAffinity() : thePrsObj->ViewAffinity();
+            aPrs.SetZLayer(thePrsObj.ZLayer());
+            aPrs.CStructure().ViewAffinity = theSelObj!=null ? theSelObj.ViewAffinity() : thePrsObj.ViewAffinity();
             thePrsObj.Presentations().Append(aPrs);
-            //thePrsObj.Fill(this, aPrs, theMode);
+            thePrsObj.Fill(this, aPrs, theMode);
 
             // set layer index accordingly to object's presentations
             aPrs.SetUpdateStatus(false);

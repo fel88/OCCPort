@@ -17,6 +17,28 @@ namespace OCCPort
     {
         Graphic3d_GraphicDriver myGraphicDriver;
         Graphic3d_MapOfStructure myDisplayedStructure = new Graphic3d_MapOfStructure();
+        public void ChangeZLayer(Graphic3d_Structure theStructure,
+                                               Graphic3d_ZLayerId theLayerId)
+        {
+            if (!myDisplayedStructure.Contains(theStructure))
+            {
+                return;
+            }
+
+            foreach (var item in myDefinedViews)
+            {
+                item.ChangeZLayer(theStructure, theLayerId);
+            }
+        }
+
+        public void SetTransform(Graphic3d_Structure theStructure,
+                                                 TopLoc_Datum3D theTrsf)
+        {
+            foreach (var item in myDefinedViews)
+            {
+               item.SetTransform(theStructure, theTrsf);
+            }
+        }
 
         public void ReCompute(Graphic3d_Structure theStructure)
         {

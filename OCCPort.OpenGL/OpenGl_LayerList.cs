@@ -3,6 +3,7 @@ using OCCPort.OpenGL;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata;
 
 namespace OCCPort
 {
@@ -13,6 +14,72 @@ namespace OCCPort
         {
 
         }
+
+        public void ChangeLayer(OpenGl_Structure theStructure,
+                                    Graphic3d_ZLayerId theOldLayerId,
+                                    Graphic3d_ZLayerId theNewLayerId)
+        {
+            Graphic3d_Layer aLayerPtr = myLayerIds.Seek(theOldLayerId);
+            Graphic3d_Layer aLayer = aLayerPtr != null ? aLayerPtr : myLayerIds.Find(Graphic3d_ZLayerId.Graphic3d_ZLayerId_Default);
+
+            Graphic3d_DisplayPriority aPriority = Graphic3d_DisplayPriority.Graphic3d_DisplayPriority_INVALID;
+
+            // take priority and remove structure from list found by <theOldLayerId>
+            // if the structure is not found there, scan through all other layers
+            if (aLayer.Remove(theStructure, ref aPriority, false))
+            {
+                if (aLayer.LayerSettings().IsRaytracable()
+                && !aLayer.LayerSettings().IsImmediate()
+                && theStructure.IsRaytracable())
+                {
+                    ++myModifStateOfRaytraceable;
+                }
+
+                --myNbStructures;
+                if (aLayer.IsImmediate())
+                {
+                    --myImmediateNbStructures;
+                }
+
+                // isForChangePriority should be Standard_False below, because we want
+                // the BVH tree in the target layer to be updated with theStructure
+                AddStructure(theStructure, theNewLayerId, aPriority);
+                return;
+            }
+
+            // scan through layers and remove it
+            foreach (var aLayerIter in myLayers)
+            {
+                OpenGl_Layer aLayerEx = aLayerIter as OpenGl_Layer;
+                if (aLayerEx == aLayer)
+                {
+                    continue;
+                }
+
+                // try to remove structure and get priority value from this layer
+                if (aLayerEx.Remove(theStructure, ref aPriority, true))
+                {
+                    if (aLayerEx.LayerSettings().IsRaytracable()
+                    && !aLayerEx.LayerSettings().IsImmediate()
+                    && theStructure.IsRaytracable())
+                    {
+                        ++myModifStateOfRaytraceable;
+                    }
+
+                    --myNbStructures;
+                    if (aLayerEx.IsImmediate())
+                    {
+                        --myImmediateNbStructures;
+                    }
+
+                    // isForChangePriority should be Standard_False below, because we want
+                    // the BVH tree in the target layer to be updated with theStructure
+                    AddStructure(theStructure, theNewLayerId, aPriority);
+                    return;
+                }
+            }
+        }
+
         LayersCollection myLayers = new LayersCollection();
         internal Graphic3d_Layer[] Layers()
         {
@@ -192,7 +259,7 @@ namespace OCCPort
                     if (aLayer.IsImmediate() != theToDrawImmediate)
                         continue;
                     //todo: layers filter!!!
-                    
+
 
                     //var aLayer = aLayerIter.Value();
 
@@ -258,6 +325,13 @@ namespace OCCPort
                     return;
                 }
             }
+        }
+
+        public void InvalidateBVHData(Graphic3d_ZLayerId theLayerId)
+        {
+            Graphic3d_Layer aLayerPtr = myLayerIds.Seek(theLayerId);
+            Graphic3d_Layer aLayer = aLayerPtr != null ? aLayerPtr : myLayerIds.Find(Graphic3d_ZLayerId.Graphic3d_ZLayerId_Default);
+            aLayer.InvalidateBVHData();
         }
 
         MyLayersDic myLayerIds = new MyLayersDic();

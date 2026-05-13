@@ -12,12 +12,87 @@ namespace OCCPort
         {
         }
 
+        public void SetTransformPersistence(Graphic3d_TransformPers theTrsfPers)
+        {
+            if (IsDeleted())
+            {
+                return;
+            }
+
+            myCStructure.SetTransformPersistence(theTrsfPers);
+        }
+
+        //! Internal method which sets new transformation without calling graphic manager callbacks.
+        public void GraphicTransform(TopLoc_Datum3D theTrsf)
+        {
+            if (myCStructure != null)
+            {
+                myCStructure.SetTransformation(theTrsf);
+            }
+        }
+
+        //! Changes a sequence of clip planes slicing the structure on rendering.
+        //! @param thePlanes [in] the set of clip planes.
+        public void SetClipPlanes(Graphic3d_SequenceOfHClipPlane thePlanes)
+        {
+            if (myCStructure != null)
+            {
+                myCStructure.SetClipPlanes(thePlanes);
+            }
+        }
+
+        //! Returns TRUE if the structure is transformed.
+        public bool IsTransformed()
+        {
+            return myCStructure != null
+                && myCStructure.Transformation() != null
+                && myCStructure.Transformation().Form() != gp_TrsfForm.gp_Identity;
+        }
+
+
+        public void SetTransformation(TopLoc_Datum3D theTrsf)
+        {
+            if (IsDeleted())
+                return;
+
+            bool wasTransformed = IsTransformed();
+
+            if (theTrsf != null
+              && theTrsf.Trsf().Form() == gp_TrsfForm.gp_Identity)
+            {
+                myCStructure.SetTransformation(null);
+            }
+            else
+            {
+                myCStructure.SetTransformation(theTrsf);
+            }
+
+            // If transformation, no validation of hidden already calculated parts
+            if (IsTransformed() || (!IsTransformed() && wasTransformed))
+            {
+                ReCompute();
+            }
+
+            myStructureManager.SetTransform(this, theTrsf);
+
+            Update(true);
+        }
         //! Returns true if structure has mutable nature (content or location are be changed regularly).
         //! Mutable structure will be managed in different way than static onces.
         public bool IsMutable()
         {
             return myCStructure != null
                 && myCStructure.IsMutable;
+        }
+
+        public void SetZLayer(Graphic3d_ZLayerId theLayerId)
+        {
+            // if the structure is not displayed, unable to change its display layer
+            if (IsDeleted())
+                return;
+
+            myStructureManager.ChangeZLayer(this, theLayerId);
+            myCStructure.SetZLayer(theLayerId);
         }
 
         public void SetVisual(Graphic3d_TypeOfStructure theVisual)

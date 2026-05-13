@@ -11,6 +11,21 @@ namespace OCCPort.OpenGL
     {
         OpenGl_FrameBuffer[] myMainSceneFbos;
         OpenGl_FrameBuffer[] myMainSceneFbosOit;
+        public override void changeZLayer(Graphic3d_CStructure theStructure,
+                                 Graphic3d_ZLayerId theNewLayerId)
+        {
+            Graphic3d_ZLayerId anOldLayer = theStructure.ZLayer();
+            OpenGl_Structure aStruct = (OpenGl_Structure)(theStructure);
+            myZLayers.ChangeLayer(aStruct, anOldLayer, theNewLayerId);
+            Update(anOldLayer);
+            Update(theNewLayerId);
+        }
+
+        public override void InvalidateBVHData(Graphic3d_ZLayerId theLayerId)
+        {
+            myZLayers.InvalidateBVHData(theLayerId);
+        }
+
         public OpenGl_View(Graphic3d_StructureManager theMgr,
             OpenGl_GraphicDriver theDriver,
             OpenGl_Caps theCaps,

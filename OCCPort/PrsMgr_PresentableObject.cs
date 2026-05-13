@@ -225,7 +225,28 @@ namespace OCCPort
         public abstract void Compute(PrsMgr_PresentationManager myPresentationManager,
             Prs3d_Presentation prsMgr_Presentation, int aDispMode)
         ;
-    }
+
+        //! Fills the given 3D view presentation for specified display mode using Compute() method.
+        //! In addition, configures other properties of presentation (transformation, clipping planes).
+        //! @param thePrsMgr presentation manager where presentation has been created
+        //! @param thePrs    presentation to fill
+        //! @param theMode   display mode to compute; can be any number accepted by AcceptDisplayMode() method
+        internal void Fill(PrsMgr_PresentationManager thePrsMgr, PrsMgr_Presentation thePrs, int theMode)
+        {
+            Prs3d_Presentation aStruct3d = thePrs;
+            Compute(thePrsMgr, aStruct3d, theMode);
+            aStruct3d.SetTransformation(myTransformation);
+            aStruct3d.SetClipPlanes(myClipPlanes);
+            aStruct3d.SetTransformPersistence(TransformPersistence());
+        }
+
+        //! Returns Transformation Persistence defining a special Local Coordinate system where this presentable object is located or NULL handle if not defined.
+        //! Position of the object having Transformation Persistence is mutable and depends on camera position.
+        //! The same applies to a bounding box of the object.
+        //! @sa Graphic3d_TransformPers class description
+        public Graphic3d_TransformPers TransformPersistence() { return myTransformPersistence; }
+
+}
 
 
 }

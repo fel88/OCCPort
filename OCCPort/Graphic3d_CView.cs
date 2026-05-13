@@ -10,6 +10,32 @@ namespace OCCPort
 {
     public abstract class Graphic3d_CView : Graphic3d_DataStructureManager
     {
+        public void ChangeZLayer(Graphic3d_Structure theStructure,
+                                    Graphic3d_ZLayerId theLayerId)
+        {
+            if (!IsActive()
+            || !IsDisplayed(theStructure))
+            {
+                return;
+            }
+
+            if (!myIsInComputedMode)
+            {
+                changeZLayer(theStructure.CStructure(), theLayerId);
+                return;
+            }
+
+            int anIndex = IsComputed(theStructure);
+            Graphic3d_CStructure aCStruct = anIndex != 0
+                                           ? myStructsComputed.Value(anIndex).CStructure()
+                                           : theStructure.CStructure();
+
+            changeZLayer(aCStruct, theLayerId);
+        }
+
+        //! Change Z layer of a structure already presented in view.
+        public abstract void changeZLayer(Graphic3d_CStructure theCStructure,
+                             Graphic3d_ZLayerId theNewLayerId);
 
         public Graphic3d_CView(Graphic3d_StructureManager theMgr)
         {
@@ -18,6 +44,45 @@ namespace OCCPort
             myId = myStructureManager.Identification(this);
 
         }
+
+        //! Transforms the structure in the view.
+        public void SetTransform(Graphic3d_Structure theStructure,
+                                     TopLoc_Datum3D theTrsf)
+        {
+            int anIndex = IsComputed(theStructure);
+            if (anIndex != 0)
+            {
+                // Test is somewhat light !
+                // trsf is transferred only if it is :
+                // a translation
+                // a scale
+                if (theTrsf != null
+                  && (theTrsf.Form() == gp_TrsfForm.gp_Translation
+                   || theTrsf.Form() == gp_TrsfForm.gp_Scale
+                   || theTrsf.Form() == gp_TrsfForm.gp_CompoundTrsf))
+                {
+                    ReCompute(theStructure);
+                }
+                else
+                {
+                    Graphic3d_Structure aCompStruct = myStructsComputed.ChangeValue(anIndex);
+                    aCompStruct.GraphicTransform(theTrsf);
+                }
+            }
+
+            theStructure.CalculateBoundBox();
+            if (!theStructure.IsMutable()
+             && !theStructure.CStructure().IsForHighlight
+             && !theStructure.CStructure().IsInfinite)
+            {
+                Graphic3d_ZLayerId aLayerId = theStructure.GetZLayer();
+                InvalidateBVHData(aLayerId);
+            }
+        }
+        //! Marks BVH tree and the set of BVH primitives of correspondent priority list with id theLayerId as outdated.
+        public abstract void InvalidateBVHData(Graphic3d_ZLayerId theLayerId);
+
+
         public void ReCompute(Graphic3d_Structure theStruct)
         {
             theStruct.CalculateBoundBox();
@@ -52,7 +117,7 @@ namespace OCCPort
             Graphic3d_Structure aCompStructOld = myStructsComputed.ChangeValue(anIndex);
             Graphic3d_Structure aCompStruct = aCompStructOld;
             //aCompStruct.SetTransformation(null);
-          //  theStruct.computeHLR(myCamera, aCompStruct);
+            //  theStruct.computeHLR(myCamera, aCompStruct);
             if (aCompStruct == null)
             {
                 return;
@@ -77,7 +142,7 @@ namespace OCCPort
 
             if (theStruct.IsHighlighted())
             {
-             //   aCompStruct.Highlight(theStruct.HighlightStyle(), false);
+                //   aCompStruct.Highlight(theStruct.HighlightStyle(), false);
             }
 
             // The previous calculation is removed and the new one is displayed
