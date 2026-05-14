@@ -19,8 +19,9 @@ namespace OCCPort.Tester
 {
     public partial class Form1 : Form
     {
+     
         public Form1()
-        {
+        {          
             InitializeComponent();
             //glControl = new GLControl(new OpenTK.Graphics.GraphicsMode(32, 24, 0, 8));
             glControl = new GLControl(new GLControlSettings()

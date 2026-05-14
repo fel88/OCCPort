@@ -155,7 +155,10 @@ namespace OCCPort
             if (v == 1) return X();
             return Y();
         }
-
+        internal void ChangeCoord(int index, double v)
+        {
+            SetCoord(index, v);
+        }
         double x;
         double y;
 

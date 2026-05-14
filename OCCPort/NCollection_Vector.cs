@@ -10,6 +10,7 @@ namespace OCCPort
         public new T this[int key]
         {
             get => Value(key);
+            set => base[key] = value;
 
         }
 
@@ -23,7 +24,7 @@ namespace OCCPort
             return findV(theIndex);
         }
 
-     
+
 
         public void Append(T t)
         {

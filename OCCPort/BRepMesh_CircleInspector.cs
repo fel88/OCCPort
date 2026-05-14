@@ -5,6 +5,38 @@ namespace OCCPort
     //! Auxiliary class to find circles shot by the given point.
     internal class BRepMesh_CircleInspector : NCollection_CellFilter_InspectorXY, IInspector
     {
+        //! Returns list of circles shot by the reference point.
+        public ListOfInteger GetShotCircles()
+        {
+            return myResIndices;
+        }
+
+
+        //! Returns circle with the given index.
+        //! @param theIndex index of circle.
+        //! @return circle with the given index.
+        public BRepMesh_Circle Circle(int theIndex)
+        {
+            return myCircles[theIndex];
+        }
+
+        //! Adds the circle to vector of circles at the given position.
+        //! @param theIndex position of circle in the vector.
+        //! @param theCircle circle to be added.
+        public void Bind(int theIndex,
+              BRepMesh_Circle theCircle)
+        {
+            myCircles.SetValue(theIndex, theCircle);
+        }
+
+        //! Set reference point to be checked.
+        //! @param thePoint bullet point.
+        public void SetPoint(gp_XY thePoint)
+        {
+            myResIndices.Clear();
+            myPoint = thePoint;
+        }
+
         //! Performs inspection of a circle with the given index.
         //! @param theTargetIndex index of a circle to be checked.
         //! @return status of the check.
