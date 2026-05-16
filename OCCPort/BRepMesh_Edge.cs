@@ -35,8 +35,22 @@ namespace OCCPort
         {
             return base.IsEqual(theOther);
         }
+        //! Checks for equality with another edge.
+        //! @param theOther edge to be checked against this one.
+        //! @return TRUE if equal, FALSE if not.
+        public bool IsEqual(BRepMesh_Edge theOther)
+        {
+            if (myMovability == BRepMesh_DegreeOfFreedom.BRepMesh_Deleted || theOther.myMovability == BRepMesh_DegreeOfFreedom.BRepMesh_Deleted)
+                return false;
 
+            return IsSameOrientation(theOther) ||
+              (FirstNode() == theOther.LastNode() && LastNode() == theOther.FirstNode());
+        }
 
+        public override bool Equals(object obj)
+        {
+            return IsEqual(obj as BRepMesh_Edge);
+        }
 
         BRepMesh_DegreeOfFreedom myMovability;
     }

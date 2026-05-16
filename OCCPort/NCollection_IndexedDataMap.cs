@@ -9,7 +9,7 @@ namespace OCCPort
     public class NCollection_IndexedDataMap<T1, T2> : NCollection_BaseMap
     {
         List<KeyValuePair<T1, T2>> dic = new List<KeyValuePair<T1, T2>>();
-
+        //Hasher hasher = new Hasher();
         public T2 this[int key]
         {
             get => FindFromIndex(key);
@@ -128,8 +128,17 @@ namespace OCCPort
 
             for (int i = 0; i < dic.Count; i++)
             {
-                if (dic[i].Key.Equals(theKey1))
-                    return i + 1;
+              /*  if (hasher != null)
+                {
+                    if (hasher.Equals(dic[i].Key, theKey1))
+                        return i + 1;
+                }
+                else*/
+                {
+
+                    if (dic[i].Key.Equals(theKey1))
+                        return i + 1;
+                }
             }
             //IndexedDataMapNode* pNode1 = (IndexedDataMapNode*)myData1[Hasher::HashCode(theKey1, NbBuckets())];
             //while (pNode1)
