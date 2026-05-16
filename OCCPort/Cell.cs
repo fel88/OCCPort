@@ -20,6 +20,13 @@ namespace OCCPort
         const int INT_MAX = 2147483647;
         const int INT_MIN = (-2147483647 - 1);
 
+        //! Copy constructor: ensure that list is not deleted twice
+        public Cell( Cell theOther)      
+        {
+            index = theOther.index.ToArray();
+            Objects = theOther.Objects;//clone?
+        }
+
         public Cell(gp_XY thePnt, NCollection_Array1<double> theCellSize)
         {
             index = new int[theCellSize.Size()];

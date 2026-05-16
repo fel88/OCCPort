@@ -175,8 +175,8 @@ namespace OCCPort
             for (int i = 0; i < myDim; i++)
                 myCellSize[i] = theCellSize;
             resetAllocator();
-        }  
-        
+        }
+
         //! Clear the data structures and set new cell sizes and allocator
         public void Reset(NCollection_Array1<double> theCellSize)
         {
@@ -206,7 +206,7 @@ namespace OCCPort
             // get cells range by minimal and maximal coordinates
             Cell aCellMin = new Cell(thePntMin, myCellSize);
             Cell aCellMax = new Cell(thePntMax, myCellSize);
-            Cell aCell = aCellMin;
+            Cell aCell = new Cell(aCellMin);
             // add object recursively into all cells in range
             iterateAdd(myDim - 1, aCell, aCellMin, aCellMax, theTarget);
         }
@@ -238,7 +238,7 @@ namespace OCCPort
                 }
                 else // add to this cell
                 {
-                    add(theCell, theTarget);
+                    add(new Cell(theCell), theTarget);
                 }
             }
         }
