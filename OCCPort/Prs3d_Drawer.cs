@@ -1,5 +1,6 @@
 ﻿using OCCPort;
 using System;
+using System.Reflection.Metadata;
 using System.Runtime.InteropServices;
 
 namespace OCCPort
@@ -48,6 +49,61 @@ namespace OCCPort
   myHasOwnDimLengthDisplayUnits(Standard_False),
   myHasOwnDimAngleDisplayUnits(Standard_False)*/
         }
+
+        //! Returns True if the drawing of isos on planes is enabled.
+        public bool IsoOnPlane()
+        {
+            return myHasOwnIsoOnPlane || myLink == null
+                 ? myIsoOnPlane
+                 : myLink.IsoOnPlane();
+        }
+
+
+        //! Sets the maximum value allowed for the first and last parameters of an infinite curve.
+        //! By default, this value is 500000.
+        public double MaximalParameterValue()
+        {
+            return myMaximalParameterValue > 0.0
+                 ? myMaximalParameterValue
+                 : (myLink != null
+                   ? myLink.MaximalParameterValue()
+                   : 500000.0);
+        }
+
+
+        //! Returns True if the drawing of the wire is enabled.
+        public bool WireDraw()
+        {
+            return myHasOwnWireDraw || myLink == null
+                 ? myWireDraw
+                 : myLink.WireDraw();
+        }
+
+        //! Defines own attributes for drawing an U isoparametric curve of a face,
+        //! settings from linked Drawer or NULL if neither was set.
+        //!
+        //! These attributes are used by the following algorithms:
+        //!   Prs3d_WFDeflectionSurface
+        //!   Prs3d_WFDeflectionRestrictedFace
+        public Prs3d_IsoAspect UIsoAspect()
+        {
+            if (myUIsoAspect == null && myLink != null)
+            {
+                return myLink.UIsoAspect();
+            }
+            return myUIsoAspect;
+        }
+
+        public Prs3d_IsoAspect VIsoAspect()
+        {
+            if (myVIsoAspect == null
+            && myLink != null)
+            {
+                return myLink.VIsoAspect();
+            }
+            return myVIsoAspect;
+        }
+
         //! Returns the value for deviation angle in radians, 20 * M_PI / 180 by default.
         public double DeviationAngle()
         {
@@ -56,6 +112,16 @@ namespace OCCPort
                  : (myLink != null
                    ? myLink.DeviationAngle()
                    : 20.0 * Math.PI / 180.0);
+        }
+
+        public Prs3d_LineAspect WireAspect()
+        {
+            if (myWireAspect == null
+            && myLink != null)
+            {
+                return myLink.WireAspect();
+            }
+            return myWireAspect;
         }
 
         //! Defines the maximal chordial deviation when drawing any curve.
@@ -99,6 +165,8 @@ namespace OCCPort
         bool myHasOwnFreeBoundaryDraw;
         Prs3d_LineAspect myUnFreeBoundaryAspect;
         bool myUnFreeBoundaryDraw;
+
+
         bool myHasOwnUnFreeBoundaryDraw;
         Prs3d_LineAspect myFaceBoundaryAspect;
         int myFaceBoundaryUpperContinuity; //!< the most edge continuity class (GeomAbs_Shape) to be included to face boundaries presentation, or -1 if undefined
@@ -390,11 +458,13 @@ namespace OCCPort
         bool myIsAutoTriangulated;
         bool myHasOwnIsAutoTriangulated;
 
-        /*Handle(Prs3d_IsoAspect)       myUIsoAspect;
-	Handle(Prs3d_IsoAspect)       myVIsoAspect;
-	Handle(Prs3d_LineAspect)      myWireAspect;
-	Standard_Boolean myWireDraw;
-		Standard_Boolean myHasOwnWireDraw;
+        Prs3d_IsoAspect myUIsoAspect;
+        Prs3d_IsoAspect myVIsoAspect;
+        Prs3d_LineAspect myWireAspect;
+
+        bool myWireDraw;
+        bool myHasOwnWireDraw;
+        /*
 		Handle(Prs3d_PointAspect)     myPointAspect;
 	Handle(Prs3d_LineAspect)      myLineAspect;
 	Handle(Prs3d_TextAspect)      myTextAspect;
@@ -541,5 +611,4 @@ namespace OCCPort
         Prs3d_VDM_All,
         Prs3d_VDM_Inherited
     }
-
 }

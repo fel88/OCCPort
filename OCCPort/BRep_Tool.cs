@@ -816,10 +816,10 @@ namespace OCCPort
             BRep_TEdge TE = (BRep_TEdge)E.TShape();
             //BRep_ListIteratorOfListOfCurveRepresentation itcr(TE->Curves());
             foreach (var cr in TE.Curves())
-            {           
+            {
                 if (cr.IsPolygonOnTriangulation(T, l) &&
                     cr.IsPolygonOnClosedTriangulation())
-                    return true;             
+                    return true;
             }
             return false;
         }
@@ -945,6 +945,15 @@ namespace OCCPort
         }
 
 
+        
+        //! Returns the geometric surface of the face. Returns
+        //! in <L> the location for the surface.
+        internal static Geom_Surface Surface(TopoDS_Face F, out TopLoc_Location L)
+        {
+            BRep_TFace TF = (BRep_TFace)(F.TShape());
+            L = F.Location() * TF.Location();
+            return TF.Surface();
+        }
         public static Geom_Surface Surface(TopoDS_Face F)
         {
             BRep_TFace TF = (BRep_TFace)(F.TShape());
@@ -986,14 +995,7 @@ namespace OCCPort
             return aTFace.Triangulation(theMeshPurpose);
         }
 
-        //! Returns the geometric surface of the face. Returns
-        //! in <L> the location for the surface.
-        internal static Geom_Surface Surface(TopoDS_Face F, out TopLoc_Location L)
-        {
-            BRep_TFace TF = (BRep_TFace)(F.TShape());
-            L = F.Location() * TF.Location();
-            return TF.Surface();
-        }
+      
 
         //! Returns the polygon associated to the  edge in  the
         //! parametric  space of  the  face.  Returns   a NULL

@@ -233,10 +233,13 @@ namespace OCCPort
 
         TColgp_SequenceOfPnt myPoints = new TColgp_SequenceOfPnt();
         TColStd_SequenceOfReal myParameters = new TColStd_SequenceOfReal();
-        public int AddPoint
- (gp_Pnt thePnt,
+
+        //! Add point to already calculated points (or replace existing)
+        //! Returns index of new added point
+        //! or founded with parametric tolerance (replaced if theIsReplace is true)
+        public int AddPoint(gp_Pnt thePnt,
   double theParam,
-  bool theIsReplace)
+  bool theIsReplace = true)
         {
             double tol = Precision.PConfusion();
             int index = -1;

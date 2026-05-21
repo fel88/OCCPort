@@ -34,11 +34,25 @@ namespace OCCPort.Tester
             {
                 thePrs.SetInfiniteState(true); //not taken in account during FITALL
             }
-
-            theMode = (int)AIS_DisplayMode.AIS_Shaded;
+                        
             switch (theMode)
             {
 
+                case (int)AIS_DisplayMode.AIS_WireFrame:
+                    {
+                        StdPrs_ToolTriangulatedShape.ClearOnOwnDeflectionChange(myshape, myDrawer, true);
+                        try
+                        {
+                            //OCC_CATCH_SIGNALS
+                            StdPrs_WFShape.Add(thePrs, myshape, myDrawer);
+                        }
+                        catch (Standard_Failure anException)
+                        {
+                            Message.SendFail(("Error: AIS_Shape::Compute() wireframe presentation builder has failed (")
+                                             + anException.Message + ")");
+                        }
+                        break;
+                    }                    
                 case (int)AIS_DisplayMode.AIS_Shaded:
                     {
                         StdPrs_ToolTriangulatedShape.ClearOnOwnDeflectionChange(myshape, myDrawer, true);
@@ -103,7 +117,7 @@ namespace OCCPort.Tester
         {
             switch (theSelMode)
             {
-                case 1: return TopAbs_ShapeEnum. TopAbs_VERTEX;
+                case 1: return TopAbs_ShapeEnum.TopAbs_VERTEX;
                 case 2: return TopAbs_ShapeEnum.TopAbs_EDGE;
                 case 3: return TopAbs_ShapeEnum.TopAbs_WIRE;
                 case 4: return TopAbs_ShapeEnum.TopAbs_FACE;

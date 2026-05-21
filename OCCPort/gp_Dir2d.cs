@@ -8,6 +8,13 @@ namespace OCCPort
     {
         private double dU;
         private double dV;
+        //! For this unit vector, returns its X coordinate.
+        public double X() { return coord.X(); }
+
+        //! For this unit vector, returns its Y coordinate.
+        public double Y() { return coord.Y(); }
+
+
         //! Computes the scalar product
         public double Dot(gp_Dir2d theOther) { return coord.Dot(theOther.coord); }
         public void Reverse() { coord.Reverse(); }
@@ -54,7 +61,7 @@ namespace OCCPort
             }
         }
 
-      
+
         public gp_Dir2d(gp_Vec2d theV)
         {
             gp_XY aXY = theV.XY();

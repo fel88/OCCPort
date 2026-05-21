@@ -1,4 +1,5 @@
 ﻿using OCCPort;
+using OCCPort.Tester;
 using System;
 using System.Reflection.Metadata;
 
@@ -56,19 +57,52 @@ namespace OCCPort
             return Math.Max(aDiag.maxComp() * theDeviationCoefficient * 4.0, Precision.Confusion());
         }
 
-        //public void AddPrimitivesGroup(Prs3d_Presentation thePrs,
-        //                          Prs3d_LineAspect theAspect,
-        //                          Prs3d_NListOfSequenceOfPnt thePolylines)
-        //{
-        //    Graphic3d_ArrayOfPrimitives aPrims = Prs3d.PrimitivesFromPolylines(thePolylines);
-        //    thePolylines.Clear();
-        //    if (!aPrims.IsNull())
-        //    {
-        //        Handle(Graphic3d_Group) aGroup = thePrs.NewGroup();
-        //        aGroup->SetPrimitivesAspect(theAspect->Aspect());
-        //        aGroup->AddPrimitiveArray(aPrims);
-        //    }
-        //}
+        public static Graphic3d_ArrayOfPrimitives PrimitivesFromPolylines(Prs3d_NListOfSequenceOfPnt thePoints)
+        {
+            if (thePoints.IsEmpty())
+            {
+                return null;
+            }
+
+            int aNbVertices = 0;
+            foreach (var anIt in thePoints)
+            {
+                aNbVertices += anIt.Length();
+            }
+
+            int aSegmentEdgeNb = (aNbVertices - thePoints.Size()) * 2;
+            Graphic3d_ArrayOfSegments aSegments = new Graphic3d_ArrayOfSegments(aNbVertices, aSegmentEdgeNb);
+            foreach (var anIt in thePoints)
+            {            
+                TColgp_SequenceOfPnt aPoints = anIt;
+
+                int aSegmentEdge = aSegments.VertexNumber() + 1;
+                aSegments.AddVertex(aPoints.First());
+                for (int aPntIter = aPoints.Lower() + 1; aPntIter <= aPoints.Upper(); ++aPntIter)
+                {
+                    aSegments.AddVertex(aPoints.Value(aPntIter));
+                    aSegments.AddEdge(aSegmentEdge);
+                    aSegments.AddEdge(++aSegmentEdge);
+                }
+            }
+
+            return aSegments;
+        }
+
+
+        public static void AddPrimitivesGroup(Prs3d_Presentation thePrs,
+                                  Prs3d_LineAspect theAspect,
+                                  Prs3d_NListOfSequenceOfPnt thePolylines)
+        {
+            Graphic3d_ArrayOfPrimitives aPrims = Prs3d.PrimitivesFromPolylines(thePolylines);
+            thePolylines.Clear();
+            if (aPrims != null)
+            {
+                Graphic3d_Group aGroup = thePrs.NewGroup();
+                aGroup.SetPrimitivesAspect(theAspect.Aspect());
+                aGroup.AddPrimitiveArray(aPrims);
+            }
+        }
 
     }
 }

@@ -36,6 +36,12 @@ namespace OCCPort
             return new TopoDS_Vertex();
         }
 
+
+        //! Stores in the map <M> all the subshape of <S> of
+        //! type <TS>  for each one append  to  the list all
+        //! the ancestors of type <TA>.  For example map all
+        //! the edges and bind the list of faces.
+        //! Warning: The map is not cleared at first.
         public static void MapShapesAndAncestors(TopoDS_Shape S,
                     TopAbs_ShapeEnum TS,
                     TopAbs_ShapeEnum TA,
@@ -54,7 +60,7 @@ namespace OCCPort
                 {
                     int index = M.FindIndex(exs.Current());
                     if (index == 0) index = M.Add(exs.Current(), empty);
-                    M.Get(index).Append(anc);
+                    M[index].Append(anc);
                     exs.Next();
                 }
                 exa.Next();

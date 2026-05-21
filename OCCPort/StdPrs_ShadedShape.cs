@@ -191,7 +191,7 @@ namespace OCCPort.Tester
                 gp_Trsf aTrsf = aLoc.Transformation();
 
                 // Determinant of transform matrix less then 0 means that mirror transform applied.
-                  bool isMirrored = aTrsf.VectorialPart().Determinant() < 0;
+                bool isMirrored = aTrsf.VectorialPart().Determinant() < 0;
 
                 // Extracts vertices & normals from nodes
                 StdPrs_ToolTriangulatedShape.ComputeNormals(aFace, aT);
@@ -225,7 +225,7 @@ namespace OCCPort.Tester
                                               ? aNode2d
                                               : new gp_Pnt2d((-theUVOrigin.X() + (theUVRepeat.X() * (aNode2d.X() - aUmin)) / dUmax) / theUVScale.X(),
                                                           (-theUVOrigin.Y() + (theUVRepeat.Y() * (aNode2d.Y() - aVmin)) / dVmax) / theUVScale.Y());
-                       // anArray.AddVertex(aPoint, aNorm, aTexel);
+                        // anArray.AddVertex(aPoint, aNorm, aTexel);
                     }
                     else
                     {
@@ -243,7 +243,7 @@ namespace OCCPort.Tester
                     }
                     else
                     {
-                        aT.Triangle(aTriIter).Get(ref anIndex[0], ref anIndex[1], ref  anIndex[2]);
+                        aT.Triangle(aTriIter).Get(ref anIndex[0], ref anIndex[1], ref anIndex[2]);
                     }
 
                     gp_Pnt aP1 = aT.Node(anIndex[0]);
@@ -392,28 +392,28 @@ namespace OCCPort.Tester
             // explore all boundary edges
             TopTools_IndexedDataMapOfShapeListOfShape anEdgesMap = new TopTools_IndexedDataMapOfShapeListOfShape();
             TopExp.MapShapesAndAncestors(theShape, TopAbs_ShapeEnum.TopAbs_EDGE, TopAbs_ShapeEnum.TopAbs_FACE, anEdgesMap);
-            foreach (var item in anEdgesMap.items)
+            //foreach (var item in anEdgesMap.items)
 
-            //  for (TopTools_IndexedDataMapOfShapeListOfShape::Iterator anEdgeIter (anEdgesMap); anEdgeIter.More(); anEdgeIter.Next())
+            for (TopTools_IndexedDataMapOfShapeListOfShape.Iterator anEdgeIter = new TopTools_IndexedDataMapOfShapeListOfShape.Iterator(anEdgesMap); anEdgeIter.More(); anEdgeIter.Next())
             {
-                var anEdgeIter = item;
+                //var anEdgeIter = item;
                 // reject free edges
-                if (anEdgeIter.list.Extent() == 0)
+                if (anEdgeIter.Value().Extent() == 0)
                 {
                     continue;
                 }
 
                 // take one of the shared edges and get edge triangulation
-                TopoDS_Face aFace = TopoDS.Face(anEdgeIter.list.First());
+                TopoDS_Face aFace = TopoDS.Face(anEdgeIter.Value().First());
                 Poly_Triangulation aTriangulation = BRep_Tool.Triangulation(aFace, ref aTrsf);
                 if (aTriangulation == null)
                 {
                     continue;
                 }
 
-                TopoDS_Edge anEdge = TopoDS.Edge(anEdgeIter.shape);
+                TopoDS_Edge anEdge = TopoDS.Edge(anEdgeIter.Key());
                 if (theUpperContinuity < GeomAbs_Shape.GeomAbs_CN
-                 && anEdgeIter.list.Extent() >= 2
+                 && anEdgeIter.Value().Extent() >= 2
                  && BRep_Tool.MaxContinuity(anEdge) > theUpperContinuity)
                 {
                     continue;
@@ -438,7 +438,7 @@ namespace OCCPort.Tester
                 }
 
                 aSegments = new Graphic3d_ArrayOfSegments(aNbExtra);
-                foreach (var aPntIter in aSeqPntsExtra.list)
+                foreach (var aPntIter in aSeqPntsExtra)
 
                 //for (TColgp_SequenceOfPnt::Iterator aPntIter (*aSeqPntsExtra); aPntIter.More(); aPntIter.Next())
                 {
@@ -451,27 +451,28 @@ namespace OCCPort.Tester
             int aSegmentEdgeNb = (aNodeNumber - aNbPolylines) * 2;
 
             aSegments = new Graphic3d_ArrayOfSegments(aNodeNumber + aNbExtra, aSegmentEdgeNb + aNbExtra);
-            foreach (var anEdgeIter in anEdgesMap.items)
+            //foreach (var anEdgeIter in anEdgesMap)
+            for (TopTools_IndexedDataMapOfShapeListOfShape.Iterator anEdgeIter =new TopTools_IndexedDataMapOfShapeListOfShape.Iterator (anEdgesMap); anEdgeIter.More(); anEdgeIter.Next())
             {
 
 
-                //for (TopTools_IndexedDataMapOfShapeListOfShape::Iterator anEdgeIter (anEdgesMap); anEdgeIter.More(); anEdgeIter.Next())
 
-                if (anEdgeIter.list.Extent() == 0)
+
+                if (anEdgeIter.Value().Extent() == 0)
                 {
                     continue;
                 }
 
-                TopoDS_Face aFace = TopoDS.Face(anEdgeIter.list.First());
+                TopoDS_Face aFace = TopoDS.Face(anEdgeIter.Value().First());
                 Poly_Triangulation aTriangulation = BRep_Tool.Triangulation(aFace, ref aTrsf);
                 if (aTriangulation == null)
                 {
                     continue;
                 }
 
-                TopoDS_Edge anEdge = TopoDS.Edge(anEdgeIter.shape);
+                TopoDS_Edge anEdge = TopoDS.Edge(anEdgeIter.Key());
                 if (theUpperContinuity < GeomAbs_Shape.GeomAbs_CN
-                 && anEdgeIter.list.Extent() >= 2
+                 && anEdgeIter.Value().Extent() >= 2
                  && BRep_Tool.MaxContinuity(anEdge) > theUpperContinuity)
                 {
                     continue;
@@ -512,7 +513,7 @@ namespace OCCPort.Tester
             if (aSeqPntsExtra != null)
             {
                 int aSegmentEdge = aSegments.VertexNumber();
-                foreach (var aPntIter in aSeqPntsExtra.list)
+                foreach (var aPntIter in aSeqPntsExtra)
                 {
                     //for (TColgp_SequenceOfPnt::Iterator aPntIter (*aSeqPntsExtra); aPntIter.More(); aPntIter.Next())
                     //{

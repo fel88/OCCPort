@@ -17,6 +17,46 @@ namespace OCCPort
             //myAlphaMode(Graphic3d_AlphaMod*/
         }
 
+        //! Check for equality with another aspects.
+        public bool IsEqual(Graphic3d_Aspects theOther)
+        {
+            if (this == theOther)
+                return true;            
+
+            return myProgram == theOther.myProgram
+                && myTextureSet == theOther.myTextureSet
+                && myMarkerImage == theOther.myMarkerImage
+                && myInteriorColor == theOther.myInteriorColor
+                && myBackInteriorColor == theOther.myBackInteriorColor
+              //  && myFrontMaterial == theOther.myFrontMaterial
+             //   && myBackMaterial == theOther.myBackMaterial
+             //   && myInteriorStyle == theOther.myInteriorStyle
+                && myShadingModel == theOther.myShadingModel
+                && myFaceCulling == theOther.myFaceCulling
+                && myAlphaMode == theOther.myAlphaMode
+                && myAlphaCutoff == theOther.myAlphaCutoff
+                && myLineType == theOther.myLineType
+                && myEdgeColor == theOther.myEdgeColor
+                && myLineWidth == theOther.myLineWidth
+                && myLineFactor == theOther.myLineFactor
+                && myLinePattern == theOther.myLinePattern
+            //    && myMarkerType == theOther.myMarkerType
+                && myMarkerScale == theOther.myMarkerScale
+               // && myHatchStyle == theOther.myHatchStyle
+                && myTextFont == theOther.myTextFont
+                //&& myPolygonOffset == theOther.myPolygonOffset
+              //  && myTextStyle == theOther.myTextStyle
+             //   && myTextDisplayType == theOther.myTextDisplayType
+              //  && myTextFontAspect == theOther.myTextFontAspect
+                && myTextAngle == theOther.myTextAngle
+                && myToSkipFirstEdge == theOther.myToSkipFirstEdge
+                && myToDistinguishMaterials == theOther.myToDistinguishMaterials
+                && myToDrawEdges == theOther.myToDrawEdges
+                && myToDrawSilhouette == theOther.myToDrawSilhouette
+                && myToMapTexture == theOther.myToMapTexture
+                && myIsTextZoomable == theOther.myIsTextZoomable;
+        }
+
         //! Return true if texture mapping is enabled (false by default).
         public bool ToMapTexture() { return myToMapTexture; }
         bool myToSkipFirstEdge;
@@ -57,7 +97,7 @@ namespace OCCPort
             return 0xFFFF;
         }
 
-        protected Quantity_ColorRGBA myInteriorColor;
+        
         Aspect_TypeOfLine myLineType;
 
         //! Modifies the line thickness
@@ -108,9 +148,9 @@ namespace OCCPort
         // Graphic3d_MaterialAspect myFrontMaterial;
         //  Graphic3d_MaterialAspect myBackMaterial;
 
-        //Quantity_ColorRGBA myInteriorColor;
-        //Quantity_ColorRGBA myBackInteriorColor;
-        //Quantity_ColorRGBA myEdgeColor;
+        protected Quantity_ColorRGBA myInteriorColor;
+        protected Quantity_ColorRGBA myBackInteriorColor;
+        protected Quantity_ColorRGBA myEdgeColor;
 
         //  Graphic3d_PolygonOffset myPolygonOffset;
         //  Aspect_InteriorStyle myInteriorStyle;

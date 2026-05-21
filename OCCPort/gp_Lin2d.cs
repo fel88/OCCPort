@@ -1,4 +1,6 @@
-﻿namespace OCCPort
+﻿using System;
+
+namespace OCCPort
 {
     public class gp_Lin2d
     {
@@ -20,6 +22,18 @@
         //! Returns the location point (origin) of the line.
         public gp_Pnt2d Location() { return pos.Location(); }
 
+        //! Computes the distance between <me> and the point <theP>.
+        internal double Distance(gp_Pnt2d theP)
+        {
+            gp_XY aCoord = theP.XY();
+            aCoord.Subtract((pos.Location()).XY());
+            double aVal = aCoord.Crossed(pos.Direction().XY());
+            if (aVal < 0)
+            {
+                aVal = -aVal;
+            }
+            return aVal;
+        }
 
         gp_Ax2d pos;
 

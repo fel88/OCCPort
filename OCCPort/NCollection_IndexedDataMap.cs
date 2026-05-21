@@ -1,15 +1,22 @@
 ﻿using OCCPort;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 
 namespace OCCPort
 {
-    public class NCollection_IndexedDataMap<T1, T2> : NCollection_BaseMap
+    public class NCollection_IndexedDataMap<T1, T2, Hasher> : NCollection_BaseMap where Hasher : IEqualityComparer<T1>, new()
     {
-        List<KeyValuePair<T1, T2>> dic = new List<KeyValuePair<T1, T2>>();
-        //Hasher hasher = new Hasher();
+        public NCollection_IndexedDataMap()
+        {
+            dic = new List<KeyValuePair<T1, T2>>();
+        }
+
+        public List<KeyValuePair<T1, T2>> dic = null;
+
+        Hasher hasher = new Hasher();
         public T2 this[int key]
         {
             get => FindFromIndex(key);
@@ -42,7 +49,8 @@ namespace OCCPort
         {
             for (int i = 0; i < dic.Count; i++)
             {
-                if (dic[i].Key.Equals(theKey1))
+                if (hasher.Equals(dic[i].Key, theKey1))
+                    //if (dic[i].Key.Equals(theKey1))
                     return i;
             }
             dic.Add(new KeyValuePair<T1, T2>(theKey1, theItem));
@@ -128,12 +136,12 @@ namespace OCCPort
 
             for (int i = 0; i < dic.Count; i++)
             {
-              /*  if (hasher != null)
-                {
-                    if (hasher.Equals(dic[i].Key, theKey1))
-                        return i + 1;
-                }
-                else*/
+                /*  if (hasher != null)
+                  {
+                      if (hasher.Equals(dic[i].Key, theKey1))
+                          return i + 1;
+                  }
+                  else*/
                 {
 
                     if (dic[i].Key.Equals(theKey1))
