@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection.Metadata;
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
 
 namespace OCCPort.Tester
 {
@@ -43,13 +44,13 @@ namespace OCCPort.Tester
 
             // Draw isolines
             {
-                Prs3d_NListOfSequenceOfPnt aUPolylines = null, aVPolylines = null;
+                Prs3d_NListOfSequenceOfPnt aUPolylines = new Prs3d_NListOfSequenceOfPnt(), aVPolylines = new Prs3d_NListOfSequenceOfPnt();
                 Prs3d_NListOfSequenceOfPnt aUPolylinesPtr = aUPolylines;
                 Prs3d_NListOfSequenceOfPnt aVPolylinesPtr = aVPolylines;
 
                 Prs3d_LineAspect anIsoAspectU = theDrawer.UIsoAspect();
                 Prs3d_LineAspect anIsoAspectV = theDrawer.VIsoAspect();
-                
+
                 if (anIsoAspectV.Aspect().IsEqual(anIsoAspectU.Aspect()))
                 {
                     aVPolylinesPtr = aUPolylinesPtr;  // put both U and V isolines into single group
@@ -79,13 +80,13 @@ namespace OCCPort.Tester
                         for (TopExp_Explorer aFaceExplorer = new TopExp_Explorer(theShape, TopAbs_ShapeEnum.TopAbs_FACE); aFaceExplorer.More(); aFaceExplorer.Next())
                         {
                             TopoDS_Face aFace = TopoDS.Face(aFaceExplorer.Current());
-                            /*    if (theDrawer.IsoOnPlane() || !StdPrs_ShapeTool.IsPlanarFace(aFace))
-                                {
-                                    aFaces[aNbFaces++] = aFace;
-                                }*/
+                            if (theDrawer.IsoOnPlane() || !StdPrs_ShapeTool.IsPlanarFace(aFace))
+                            {
+                                aFaces[aNbFaces++] = aFace;
+                            }
                         }
 
-                        //   StdPrs_WFShape_IsoFunctor anIsoFunctor(*aUPolylinesPtr, *aVPolylinesPtr, aFaces, theDrawer, aShapeDeflection);
+                        //StdPrs_WFShape_IsoFunctor anIsoFunctor(*aUPolylinesPtr, *aVPolylinesPtr, aFaces, theDrawer, aShapeDeflection);
                         //  OSD_Parallel::For(0, aNbFaces, anIsoFunctor, aNbFaces < 2);
                     }
                 }
@@ -107,27 +108,27 @@ namespace OCCPort.Tester
             }
 
             {
-                Prs3d_NListOfSequenceOfPnt anUnfree = null, aFree = null;
+                Prs3d_NListOfSequenceOfPnt anUnfree = new Prs3d_NListOfSequenceOfPnt(), aFree = new Prs3d_NListOfSequenceOfPnt();
                 Prs3d_NListOfSequenceOfPnt anUnfreePtr = anUnfree;
                 Prs3d_NListOfSequenceOfPnt aFreePtr = aFree;
                 /*
-                   if (!theDrawer.UnFreeBoundaryDraw())
-                   {
-                       anUnfreePtr = null;
-                   }
-                   else if (theDrawer.UnFreeBoundaryAspect()->Aspect()->IsEqual(aWireAspect.Aspect()))
-                   {
-                       anUnfreePtr = &aCommonPolylines; // put unfree edges into single group with common edges
-                   }
+                if (!theDrawer.UnFreeBoundaryDraw())
+                {
+                    anUnfreePtr = null;
+                }
+                else if (theDrawer.UnFreeBoundaryAspect()->Aspect()->IsEqual(aWireAspect.Aspect()))
+                {
+                    anUnfreePtr = &aCommonPolylines; // put unfree edges into single group with common edges
+                }
 
-                   if (!theDrawer.FreeBoundaryDraw())
-                   {
-                       aFreePtr = null;
-                   }
-                   else if (theDrawer.FreeBoundaryAspect().Aspect().IsEqual(aWireAspect.Aspect()))
-                   {
-                       aFreePtr = &aCommonPolylines; // put free edges into single group with common edges
-                   }*/
+                if (!theDrawer.FreeBoundaryDraw())
+                {
+                    aFreePtr = null;
+                }
+                else if (theDrawer.FreeBoundaryAspect().Aspect().IsEqual(aWireAspect.Aspect()))
+                {
+                    aFreePtr = &aCommonPolylines; // put free edges into single group with common edges
+                }*/
 
                 addEdges(theShape,
                           theDrawer,
@@ -136,7 +137,7 @@ namespace OCCPort.Tester
                           aFreePtr,
                           anUnfreePtr);
 
-                //Prs3d.AddPrimitivesGroup(thePresentation, theDrawer.UnFreeBoundaryAspect(), anUnfree);
+                Prs3d.AddPrimitivesGroup(thePresentation, theDrawer.UnFreeBoundaryAspect(), anUnfree);
                 Prs3d.AddPrimitivesGroup(thePresentation, theDrawer.FreeBoundaryAspect(), aFree);
             }
 
@@ -168,7 +169,10 @@ namespace OCCPort.Tester
                 return;
             }
 
-            TopTools_ListOfShape aLWire, aLFree, aLUnFree;
+            TopTools_ListOfShape aLWire = new TopTools_ListOfShape();
+            TopTools_ListOfShape aLFree = new TopTools_ListOfShape();
+            TopTools_ListOfShape aLUnFree = new TopTools_ListOfShape();
+
             TopTools_IndexedDataMapOfShapeListOfShape anEdgeMap = new TopTools_IndexedDataMapOfShapeListOfShape();
             TopExp.MapShapesAndAncestors(theShape, TopAbs_ShapeEnum.TopAbs_EDGE, TopAbs_ShapeEnum.TopAbs_FACE, anEdgeMap);
 
@@ -182,7 +186,7 @@ namespace OCCPort.Tester
                         {
                             if (theWire != null)
                             {
-                                //aLWire.Append(anEdge);
+                                aLWire.Append(anEdge);
                             }
                             break;
                         }
@@ -190,33 +194,115 @@ namespace OCCPort.Tester
                         {
                             if (theFree != null)
                             {
-                                // aLFree.Append(anEdge);
+                                aLFree.Append(anEdge);
                             }
                             break;
                         }
                     default:
                         {
-                            /*     if (theUnFree)
-                                 {
-                                     aLUnFree.Append(anEdge);
-                                 }*/
+                            if (theUnFree != null)
+                            {
+                                aLUnFree.Append(anEdge);
+                            }
                             break;
                         }
                 }
             }
 
-            //if (!aLWire.IsEmpty())
-            //{
-            //    addEdges(aLWire, theDrawer, theShapeDeflection, *theWire);
-            //}
-            //if (!aLFree.IsEmpty())
-            //{
-            //    addEdges(aLFree, theDrawer, theShapeDeflection, *theFree);
-            //}
-            //if (!aLUnFree.IsEmpty())
-            //{
-            //    addEdges(aLUnFree, theDrawer, theShapeDeflection, *theUnFree);
-            //}
+            if (!aLWire.IsEmpty())
+            {
+                addEdges(aLWire, theDrawer, theShapeDeflection, theWire);
+            }
+            if (!aLFree.IsEmpty())
+            {
+                addEdges(aLFree, theDrawer, theShapeDeflection, theFree);
+            }
+            if (!aLUnFree.IsEmpty())
+            {
+                addEdges(aLUnFree, theDrawer, theShapeDeflection, theUnFree);
+            }
+        }
+
+        static void addEdges(TopTools_ListOfShape theEdges,
+                                   Prs3d_Drawer theDrawer,
+                                   double theShapeDeflection,
+                                  Prs3d_NListOfSequenceOfPnt thePolylines)
+        {
+            TopTools_ListIteratorOfListOfShape anEdgesIter = new TopTools_ListIteratorOfListOfShape();
+            for (anEdgesIter.Initialize(theEdges); anEdgesIter.More(); anEdgesIter.Next())
+            {
+                TopoDS_Edge anEdge = TopoDS.Edge(anEdgesIter.Value());
+                if (BRep_Tool.Degenerated(anEdge))
+                {
+                    continue;
+                }
+
+                TColgp_SequenceOfPnt aPoints = new TColgp_SequenceOfPnt();
+
+                TopLoc_Location aLocation = new TopLoc_Location();
+                Poly_Triangulation aTriangulation = null;
+                Poly_PolygonOnTriangulation anEdgeIndicies = null;
+                BRep_Tool.PolygonOnTriangulation(anEdge, ref anEdgeIndicies, ref aTriangulation, aLocation);
+                Poly_Polygon3D aPolygon;
+
+                if (anEdgeIndicies != null)
+                {
+                    // Presentation based on triangulation of a face.
+                    TColStd_Array1OfInteger anIndices = anEdgeIndicies.Nodes();
+
+                    int anIndex = anIndices.Lower();
+                    if (aLocation.IsIdentity())
+                    {
+                        for (; anIndex <= anIndices.Upper(); ++anIndex)
+                        {
+                            aPoints.Append(aTriangulation.Node(anIndices[anIndex]));
+                        }
+                    }
+                    else
+                    {
+                        for (; anIndex <= anIndices.Upper(); ++anIndex)
+                        {
+                            aPoints.Append(aTriangulation.Node(anIndices[anIndex]).Transformed(aLocation));
+                        }
+                    }
+                }
+                else if ((aPolygon = BRep_Tool.Polygon3D(anEdge, ref aLocation)) != null)
+                {
+                    // Presentation based on triangulation of the free edge on a surface.
+                    TColgp_Array1OfPnt aNodes = aPolygon.Nodes();
+                    int anIndex = aNodes.Lower();
+                    if (aLocation.IsIdentity())
+                    {
+                        for (; anIndex <= aNodes.Upper(); ++anIndex)
+                        {
+                            aPoints.Append(aNodes.Value(anIndex));
+                        }
+                    }
+                    else
+                    {
+                        for (; anIndex <= aNodes.Upper(); ++anIndex)
+                        {
+                            aPoints.Append(aNodes.Value(anIndex).Transformed(aLocation));
+                        }
+                    }
+                }
+                else if (BRep_Tool.IsGeometric(anEdge))
+                {
+                    // Default presentation for edges without triangulation.
+                    BRepAdaptor_Curve aCurve = new BRepAdaptor_Curve(anEdge);
+                    StdPrs_DeflectionCurve.Add(null,
+                                                 aCurve,
+                                                 theShapeDeflection,
+                                                 theDrawer,
+                                                 aPoints.ChangeSequence(),
+                                                 false);
+                }
+
+                if (!aPoints.IsEmpty())
+                {
+                    thePolylines.Append(aPoints);
+                }
+            }
         }
 
 
@@ -321,4 +407,4 @@ namespace OCCPort.Tester
         }
 
     }
-    }
+}

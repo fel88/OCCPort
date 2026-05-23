@@ -287,6 +287,11 @@ namespace OCCPort
 
         public override int NbIntervals(GeomAbs_Shape S)
         {
+            return myCurve.NbIntervals(S);
+        }
+
+        public override void Intervals(TColStd_Array1OfReal T, GeomAbs_Shape S)
+        {
             throw new NotImplementedException();
         }
 

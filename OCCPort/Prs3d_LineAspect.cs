@@ -7,7 +7,7 @@ namespace OCCPort
         //! Returns the line aspect. This is defined as the set of
         //! color, type and thickness attributes.
         public Graphic3d_AspectLine3d Aspect() { return myAspect; }
-        Graphic3d_AspectLine3d myAspect;
+        public Graphic3d_AspectLine3d myAspect;
         public Prs3d_LineAspect(Quantity_Color theColor,
                                      Aspect_TypeOfLine theType,
                                      double theWidth)

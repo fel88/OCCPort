@@ -19,22 +19,21 @@ namespace OCCPort
             myHasOwnTypeOfDeflection(Standard_False),
             myTypeOfHLR(Prs3d_TOH_NotSet),
             myDeviationCoefficient(-1.0),*/
-            myDeviationAngle = (-1.0);/*
-            myIsoOnPlane(Standard_False),
-            myHasOwnIsoOnPlane(Standard_False),*/
+            myDeviationAngle = (-1.0);
+            myIsoOnPlane = (false);
+            myHasOwnIsoOnPlane = (false);
             myIsoOnTriangulation = (false);
             myHasOwnIsoOnTriangulation = (false);
             myIsAutoTriangulated = (true);
             myHasOwnIsAutoTriangulated = (false);
+            myWireDraw = true;
             /*
-
-		myWireDraw(Standard_True),
-		myHasOwnWireDraw(Standard_False),
-		myLineArrowDraw(Standard_False),
-		myHasOwnLineArrowDraw(Standard_False),
-		myDrawHiddenLine(Standard_False),
-		myHasOwnDrawHiddenLine(Standard_False),
-		myVertexDrawMode(Prs3d_VDM_Inherited),*/
+    myHasOwnWireDraw(Standard_False),
+    myLineArrowDraw(Standard_False),
+    myHasOwnLineArrowDraw(Standard_False),
+    myDrawHiddenLine(Standard_False),
+    myHasOwnDrawHiddenLine(Standard_False),
+    myVertexDrawMode(Prs3d_VDM_Inherited),*/
 
             myFreeBoundaryDraw = (true);
             myHasOwnFreeBoundaryDraw = (false);
@@ -48,6 +47,12 @@ namespace OCCPort
   myHasOwnDimAngleModelUnits(Standard_False),
   myHasOwnDimLengthDisplayUnits(Standard_False),
   myHasOwnDimAngleDisplayUnits(Standard_False)*/
+        }
+
+        //! Sets the parameter theAspect for display of wires.
+        public void SetWireAspect(Prs3d_LineAspect theAspect)
+        {
+            myWireAspect = theAspect;
         }
 
         //! Returns True if the drawing of isos on planes is enabled.
@@ -240,6 +245,14 @@ namespace OCCPort
 
         static Quantity_NameOfColor THE_DEF_COLOR_FaceBoundary = Quantity_NameOfColor.Quantity_NOC_BLACK;
         static Quantity_NameOfColor THE_DEF_COLOR_FreeBoundary = Quantity_NameOfColor.Quantity_NOC_GREEN;
+        static Quantity_NameOfColor THE_DEF_COLOR_UnFreeBoundary = Quantity_NameOfColor.Quantity_NOC_YELLOW;
+        static Quantity_NameOfColor THE_DEF_COLOR_Wire = Quantity_NameOfColor.Quantity_NOC_RED;
+        static Quantity_NameOfColor THE_DEF_COLOR_Line = Quantity_NameOfColor.Quantity_NOC_YELLOW;
+        static Quantity_NameOfColor THE_DEF_COLOR_SeenLine = Quantity_NameOfColor.Quantity_NOC_YELLOW;
+        static Quantity_NameOfColor THE_DEF_COLOR_HiddenLine = Quantity_NameOfColor.Quantity_NOC_YELLOW;
+        static Quantity_NameOfColor THE_DEF_COLOR_Vector = Quantity_NameOfColor.Quantity_NOC_SKYBLUE;
+        static Quantity_NameOfColor THE_DEF_COLOR_Section = Quantity_NameOfColor.Quantity_NOC_ORANGE;
+
         // =======================================================================
         // function : SetOwnLineAspects
         // purpose  :
@@ -251,36 +264,41 @@ namespace OCCPort
                 theDefaults = new Prs3d_Drawer();
             }
             bool isUpdateNeeded = false;
-            /*  const Handle(Prs3d_Drawer)&aLink = (!theDefaults.IsNull() && theDefaults != this) ? theDefaults : myLink;
-			  if (myUIsoAspect.IsNull())
-			  {
-				  isUpdateNeeded = true;
-				  myUIsoAspect = new Prs3d_IsoAspect(Quantity_NOC_GRAY75, Aspect_TOL_SOLID, 1.0, 1);
-				  if (const Prs3d_IsoAspect* aLinked = !aLink.IsNull() ? aLink->UIsoAspect().get() : NULL)
-	  {
-					  *myUIsoAspect->Aspect() = *aLinked->Aspect();
-					  myUIsoAspect->SetNumber(aLinked->Number());
-				  }
-			  }
-			  if (myVIsoAspect.IsNull())
-			  {
-				  isUpdateNeeded = true;
-				  myVIsoAspect = new Prs3d_IsoAspect(Quantity_NOC_GRAY75, Aspect_TOL_SOLID, 1.0, 1);
-				  if (const Prs3d_IsoAspect* aLinked = !aLink.IsNull() ? aLink->VIsoAspect().get() : NULL)
-	  {
-					  *myVIsoAspect->Aspect() = *aLinked->Aspect();
-					  myVIsoAspect->SetNumber(aLinked->Number());
-				  }
-			  }
-			  if (myWireAspect.IsNull())
-			  {
-				  isUpdateNeeded = true;
-				  myWireAspect = new Prs3d_LineAspect(THE_DEF_COLOR_Wire, Aspect_TOL_SOLID, 1.0);
-				  if (const Prs3d_LineAspect* aLinked = !aLink.IsNull() ? aLink->WireAspect().get() : NULL)
-	  {
-					  *myWireAspect->Aspect() = *aLinked->Aspect();
-				  }
-			  }
+            Prs3d_Drawer aLink = (theDefaults != null && theDefaults != this) ? theDefaults : myLink;
+            if (myUIsoAspect == null)
+            {
+                isUpdateNeeded = true;
+                myUIsoAspect = new Prs3d_IsoAspect(new Quantity_Color(Quantity_NameOfColor.Quantity_NOC_GRAY75), Aspect_TypeOfLine.Aspect_TOL_SOLID, 1.0, 1);
+                Prs3d_IsoAspect aLinked = aLink != null ? aLink.UIsoAspect() : null;
+                if (aLinked != null)
+                {
+                    //myUIsoAspect.Aspect() = aLinked.Aspect();
+                    myUIsoAspect.myAspect = aLinked.Aspect();
+                    myUIsoAspect.SetNumber(aLinked.Number());
+                }
+            }
+            if (myVIsoAspect == null)
+            {
+                isUpdateNeeded = true;
+                myVIsoAspect = new Prs3d_IsoAspect(new Quantity_Color(Quantity_NameOfColor.Quantity_NOC_GRAY75), Aspect_TypeOfLine.Aspect_TOL_SOLID, 1.0, 1);
+                Prs3d_IsoAspect aLinked = aLink != null ? aLink.VIsoAspect() : null;
+                if (aLinked != null)
+                {
+                    //myVIsoAspect.Aspect() = aLinked.Aspect();
+                    myVIsoAspect.myAspect = aLinked.Aspect();
+                    myVIsoAspect.SetNumber(aLinked.Number());
+                }
+            }
+            if (myWireAspect == null)
+            {
+                isUpdateNeeded = true;
+                myWireAspect = new Prs3d_LineAspect(new Quantity_Color(THE_DEF_COLOR_Wire), Aspect_TypeOfLine.Aspect_TOL_SOLID, 1.0);
+                Prs3d_LineAspect aLinked = aLink != null ? aLink.WireAspect() : null;
+                if (aLinked != null)
+                {
+                    myWireAspect.myAspect = aLinked.Aspect();
+                }
+            }/*
 			  if (myLineAspect.IsNull())
 			  {
 				  isUpdateNeeded = true;
@@ -312,23 +330,26 @@ namespace OCCPort
             {
                 isUpdateNeeded = true;
                 myFreeBoundaryAspect = new Prs3d_LineAspect(new Quantity_Color(THE_DEF_COLOR_FreeBoundary), Aspect_TypeOfLine.Aspect_TOL_SOLID, 1.0);
-                /* if (const Prs3d_LineAspect* aLinked = !aLink.IsNull() ? aLink->FreeBoundaryAspect().get() : NULL)
-	 {
-					 *myFreeBoundaryAspect->Aspect() = *aLinked->Aspect();
-				 }*/
+                Prs3d_LineAspect aLinked = aLink != null ? aLink.FreeBoundaryAspect() : null;
+                if (aLinked != null)
+                {
+                    myFreeBoundaryAspect.myAspect = aLinked.Aspect();
+                }
             }
-            /*  if (myUnFreeBoundaryAspect.IsNull())
-			  {
-				  isUpdateNeeded = true;
-				  myUnFreeBoundaryAspect = new Prs3d_LineAspect(THE_DEF_COLOR_UnFreeBoundary, Aspect_TOL_SOLID, 1.0);
-				  if (const Prs3d_LineAspect* aLinked = !aLink.IsNull() ? aLink->UnFreeBoundaryAspect().get() : NULL)
-	  {
-					  *myUnFreeBoundaryAspect->Aspect() = *aLinked->Aspect();
-				  }
-			  }*/
+            if (myUnFreeBoundaryAspect == null)
+            {
+                isUpdateNeeded = true;
+                myUnFreeBoundaryAspect = new Prs3d_LineAspect(new Quantity_Color(THE_DEF_COLOR_UnFreeBoundary), Aspect_TypeOfLine.Aspect_TOL_SOLID, 1.0);
+                Prs3d_LineAspect aLinked = aLink != null ? aLink.UnFreeBoundaryAspect() : null;
+                if (aLinked != null)
+                {
+                    myUnFreeBoundaryAspect.myAspect = aLinked.Aspect();
+                }
+            }
             isUpdateNeeded = SetupOwnFaceBoundaryAspect(theDefaults) || isUpdateNeeded;
             return isUpdateNeeded;
         }
+
         public bool SetupOwnFaceBoundaryAspect(Prs3d_Drawer theDefaults = null)
         {
             if (theDefaults == null)
@@ -516,7 +537,8 @@ namespace OCCPort
             }
             return myFaceBoundaryAspect;
         }
-        internal Prs3d_LineAspect FreeBoundaryAspect()
+
+        public Prs3d_LineAspect FreeBoundaryAspect()
         {
             if (myFreeBoundaryAspect == null && myLink != null)
             {
@@ -524,28 +546,38 @@ namespace OCCPort
             }
             return myFreeBoundaryAspect;
         }
+
+        public Prs3d_LineAspect UnFreeBoundaryAspect()
+        {
+            if (myUnFreeBoundaryAspect == null
+            && myLink != null)
+            {
+                return myLink.UnFreeBoundaryAspect();
+            }
+            return myUnFreeBoundaryAspect;
+        }
+
+
         //! Returns true if there is a local setting for deviation
         //! angle in this framework for a specific interactive object.
         public bool HasOwnDeviationAngle() { return myDeviationAngle > 0.0; }
-
 
         //! Returns true if there is a local setting for deviation
         //! coefficient in this framework for a specific interactive object.
         public bool HasOwnDeviationCoefficient() { return myDeviationCoefficient > 0.0; }
 
-
         internal double PreviousDeviationAngle()
         {
             return HasOwnDeviationAngle()
-     ? myPreviousDeviationAngle
-     : 0.0;
+        ? myPreviousDeviationAngle
+        : 0.0;
         }
 
         internal double PreviousDeviationCoefficient()
         {
             return HasOwnDeviationCoefficient()
-       ? myPreviousDeviationCoefficient
-       : 0.0;
+        ? myPreviousDeviationCoefficient
+        : 0.0;
         }
 
         internal void UpdatePreviousDeviationAngle()

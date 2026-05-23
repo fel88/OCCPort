@@ -32,7 +32,7 @@ namespace OCCPort
             myCTXPtr = theCtx;
             if (theCtx != null)
             {
-                //myDrawer.Link(theCtx.DefaultDrawer());
+                myDrawer.Link(theCtx.DefaultDrawer());
             }
 
         }

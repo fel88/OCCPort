@@ -945,7 +945,7 @@ namespace OCCPort
         }
 
 
-        
+
         //! Returns the geometric surface of the face. Returns
         //! in <L> the location for the surface.
         internal static Geom_Surface Surface(TopoDS_Face F, out TopLoc_Location L)
@@ -995,7 +995,33 @@ namespace OCCPort
             return aTFace.Triangulation(theMeshPurpose);
         }
 
-      
+        //! Returns in <P>, <T>, <L> a polygon on triangulation, a
+        //! triangulation and a location for the edge <E>.
+        //! <P>  and  <T>  are null  if  the  edge has no
+        //! polygon on  triangulation.
+        public static void PolygonOnTriangulation(TopoDS_Edge E, ref Poly_PolygonOnTriangulation P, ref Poly_Triangulation T, TopLoc_Location L)
+        {
+            // find the representation
+            BRep_TEdge TE = (BRep_TEdge)(E.TShape());
+            foreach (var item in TE.Curves())
+            {
+                BRep_CurveRepresentation cr = item;
+                if (cr.IsPolygonOnTriangulation())
+                {
+                    BRep_PolygonOnTriangulation PT =
+                        (BRep_PolygonOnTriangulation)(cr);
+                    P = PT.PolygonOnTriangulation();
+                    T = PT.Triangulation();
+                    L = E.Location() * PT.Location();
+                    return;
+                }                
+            }
+
+            L.Identity();
+            P = null;
+            T = null;
+        }
+
 
         //! Returns the polygon associated to the  edge in  the
         //! parametric  space of  the  face.  Returns   a NULL

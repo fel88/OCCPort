@@ -15,12 +15,19 @@ namespace OCCPort
     //! Polynomial coefficients of BSpline curves used for their evaluation are
     //! cached for better performance. Therefore these evaluations are not
     //! thread-safe and parallel evaluations need to be prevented.
-    public abstract class Adaptor3d_Curve:ITheCurve
+    public abstract class Adaptor3d_Curve : ITheCurve
     {
 
         //! Returns  the number  of  intervals for  continuity
         //! <S>. May be one if Continuity(me) >= <S>
         public abstract int NbIntervals(GeomAbs_Shape S);
+
+        //! Stores in <T> the  parameters bounding the intervals
+        //! of continuity <S>.
+        //!
+        //! The array must provide  enough room to  accommodate
+        //! for the parameters. i.e. T.Length() > NbIntervals()
+        public abstract void Intervals(TColStd_Array1OfReal T, GeomAbs_Shape S);
 
 
         //=======================================================================

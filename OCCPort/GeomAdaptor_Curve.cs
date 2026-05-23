@@ -256,5 +256,10 @@ namespace OCCPort
         {
             throw new NotImplementedException();
         }
+
+        public override void Intervals(TColStd_Array1OfReal T, GeomAbs_Shape S)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

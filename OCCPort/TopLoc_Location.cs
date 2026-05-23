@@ -15,6 +15,11 @@ namespace OCCPort
     {
         public TopLoc_SListOfItemLocation myItems = new TopLoc_SListOfItemLocation();
 
+        public static implicit operator gp_Trsf(TopLoc_Location f)
+        {
+            return f.Transformation();
+        }        
+
         public TopLoc_Location()
         {
             myItems = new TopLoc_SListOfItemLocation();
@@ -25,7 +30,7 @@ namespace OCCPort
             myItems.Construct(new TopLoc_ItemLocation(D, 1));
         }
 
-        
+
         internal static double ScalePrec()
         {
 
@@ -143,7 +148,7 @@ namespace OCCPort
             {
                 return true;
             }
-            if (myItems.Value() == Other.myItems.Value()) 
+            if (myItems.Value() == Other.myItems.Value())
                 return true;
 
             //const void** p = (const void**) &myItems;

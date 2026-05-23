@@ -64,9 +64,9 @@ namespace OCCPort
                                                           double theLastParameter,
                                                           double theAngularDeflection,
                                                           double theCurvatureDeflection,
-                                                          int theMinimumOfPoints,
-                                                          double theUTol,
-                                                          double theMinLen)
+                                                          int theMinimumOfPoints = 2,
+                                                          double theUTol = 1.0e-9,
+                                                          double theMinLen = 1.0e-7)
         {
             myAngularDeflection = 0.0;
             myCurvatureDeflection = (0.0);

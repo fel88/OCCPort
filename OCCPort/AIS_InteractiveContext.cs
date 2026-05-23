@@ -75,13 +75,15 @@ namespace OCCPort
 
 
 
+        //! Returns the default attribute manager.
+        //! This contains all the color and line attributes which can be used by interactive objects which do not have their own attributes.
+        public Prs3d_Drawer DefaultDrawer() { return myDefaultDrawer; }
+
         //! Return rotation gravity point.
         public gp_Pnt GravityPoint(V3d_View theView)
         {
             return theView.GravityPoint();
         }
-
-
 
         void InitAttributes()
         {
@@ -111,6 +113,7 @@ namespace OCCPort
               aPlaneAspect->SetPlaneLength(aPlaneLength, aPlaneLength);
               aPlaneAspect->EdgesAspect()->SetColor(Quantity_NOC_SKYBLUE);*/
         }
+
         //! Initialize default highlighting attributes.
         static void initDefaultHilightAttributes(Prs3d_Drawer theDrawer,
                                              Quantity_Color theColor)
@@ -123,8 +126,10 @@ namespace OCCPort
             //theDrawer.SetupOwnPointAspect();
             /*theDrawer.SetLineAspect(new Prs3d_LineAspect(Quantity_NOC_BLACK, Aspect_TOL_SOLID, 1.0));
         *theDrawer->LineAspect()->Aspect() = *theDrawer->Link()->LineAspect()->Aspect();
-            theDrawer->SetWireAspect(new Prs3d_LineAspect(Quantity_NOC_BLACK, Aspect_TOL_SOLID, 1.0));
-        *theDrawer->WireAspect()->Aspect() = *theDrawer->Link()->WireAspect()->Aspect();
+        */
+            theDrawer.SetWireAspect(new Prs3d_LineAspect(new Quantity_Color(Quantity_NameOfColor.Quantity_NOC_BLACK), Aspect_TypeOfLine.Aspect_TOL_SOLID, 1.0));
+            //theDrawer.WireAspect().Aspect() = theDrawer.Link().WireAspect().Aspect();
+            /*
             theDrawer->SetPlaneAspect(new Prs3d_PlaneAspect());
         *theDrawer->PlaneAspect()->EdgesAspect() = *theDrawer->Link()->PlaneAspect()->EdgesAspect();
             theDrawer->SetFreeBoundaryAspect(new Prs3d_LineAspect(Quantity_NOC_BLACK, Aspect_TOL_SOLID, 1.0));
@@ -438,7 +443,7 @@ namespace OCCPort
         //! Removes dynamic highlight draw
         void clearDynamicHighlight()
         {
-            if (myLastPicked==null)
+            if (myLastPicked == null)
                 return;
 
             //myLastPicked.Selectable().ClearDynamicHighlight(myMainPM);

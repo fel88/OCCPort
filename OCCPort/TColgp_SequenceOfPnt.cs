@@ -14,7 +14,7 @@ namespace OCCPort
         //{
         //	return list.Length();
         //}
-     
+
 
 
         //public gp_Pnt Value(int index)
@@ -36,12 +36,15 @@ namespace OCCPort
         //	list.Insert(i-1, thePnt);
         //      }
 
-  
+
 
         //      internal int Lower()
         //      {
 
         //      }
-       
+        internal TColgp_SequenceOfPnt ChangeSequence()
+        {
+            return this;
+        }
     }
 }
