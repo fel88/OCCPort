@@ -1,4 +1,5 @@
 ﻿using OCCPort.Interfaces;
+using static OCCPort.IMeshData.IMeshData;
 
 namespace OCCPort
 {
@@ -9,7 +10,7 @@ namespace OCCPort
     public class BRepMesh_ShapeVisitor : MeshTools_ShapeVisitor, IMeshTools_ShapeVisitor
     {
         IMeshData_Model myModel;
-        IMeshData.DMapOfShapeInteger myDEdgeMap;
+        DMapOfShapeInteger myDEdgeMap;
         //IMeshData::DMapOfShapeInteger myDEdgeMap;
         //=======================================================================
         // Function: Constructor
@@ -19,7 +20,7 @@ namespace OCCPort
 
         {
             myModel = (theModel);
-            myDEdgeMap = new IMeshData.DMapOfShapeInteger(/*1, new NCollection_IncAllocator(IMeshData::MEMORY_BLOCK_SIZE_HUGE)*/);
+            myDEdgeMap = new DMapOfShapeInteger(/*1, new NCollection_IncAllocator(IMeshData::MEMORY_BLOCK_SIZE_HUGE)*/);
         }
 
         //=======================================================================

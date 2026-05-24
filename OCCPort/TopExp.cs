@@ -47,7 +47,7 @@ namespace OCCPort
                     TopAbs_ShapeEnum TA,
                    TopTools_IndexedDataMapOfShapeListOfShape M)
         {
-            TopTools_ListOfShape empty = new TopTools_ListOfShape();
+            //TopTools_ListOfShape empty = new TopTools_ListOfShape();
 
             // visit ancestors
             TopExp_Explorer exa = new TopExp_Explorer(S, TA);
@@ -59,7 +59,7 @@ namespace OCCPort
                 while (exs.More())
                 {
                     int index = M.FindIndex(exs.Current());
-                    if (index == 0) index = M.Add(exs.Current(), empty);
+                    if (index == 0) index = M.Add(exs.Current(), new TopTools_ListOfShape());
                     M[index].Append(anc);
                     exs.Next();
                 }
@@ -71,12 +71,12 @@ namespace OCCPort
             while (ex.More())
             {
                 int index = M.FindIndex(ex.Current());
-                if (index == 0) index = M.Add(ex.Current(), empty);
+                if (index == 0) index = M.Add(ex.Current(), new TopTools_ListOfShape());
                 ex.Next();
             }
         }
 
-       
+
         //! Returns  in  Vfirst,  Vlast   the first   and last
         //! vertices of the open wire <W>. May be null shapes.
         //! if   <W>  is closed Vfirst and Vlast  are a same
@@ -129,7 +129,7 @@ namespace OCCPort
             }
         }
 
-       
+
 
         //! Returns in Vfirst, Vlast the  FORWARD and REVERSED
         //! vertices of the edge <E>. May be null shapes.

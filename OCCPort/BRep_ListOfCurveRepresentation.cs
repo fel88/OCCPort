@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace OCCPort
 {
@@ -10,5 +11,9 @@ namespace OCCPort
             Add(c3d);
         }
 
+        internal void Remove(BRep_ListIteratorOfListOfCurveRepresentation itcr)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

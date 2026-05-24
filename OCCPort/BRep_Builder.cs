@@ -26,6 +26,46 @@ namespace OCCPort
     public class BRep_Builder : TopoDS_Builder
 
     {
+        public void UpdateEdge(TopoDS_Edge E,
+                                     Poly_Polygon3D P,
+                                     ref TopLoc_Location L)
+        {
+            BRep_TEdge TE = (BRep_TEdge)E.TShape();
+            if (TE.Locked())
+            {
+                throw new TopoDS_LockedShape("BRep_Builder::UpdateEdge");
+            }
+            BRep_ListOfCurveRepresentation lcr = TE.ChangeCurves();
+            BRep_ListIteratorOfListOfCurveRepresentation itcr = new BRep_ListIteratorOfListOfCurveRepresentation(lcr);
+
+            while (itcr.More())
+            {
+                if (itcr.Value().IsPolygon3D())
+                {
+                    if (P == null)
+                        lcr.Remove(itcr);
+                    else
+                        itcr.Value().Polygon3D(P);
+                    TE.Modified(true);
+                    return;
+                }
+                itcr.Next();
+            }
+
+            TopLoc_Location l = L.Predivided(E.Location());
+            BRep_Polygon3D P3d = new BRep_Polygon3D(P, l);
+            lcr.Append(P3d);
+
+            TE.Modified(true);
+        }
+
+        public void UpdateEdge(TopoDS_Edge E,
+                                 Poly_Polygon3D P)
+        {
+            var tt = new TopLoc_Location();
+            UpdateEdge(E, P, ref tt);
+        }
+
         public void NaturalRestriction(TopoDS_Face F,
                                        bool N)
         {
@@ -82,9 +122,53 @@ namespace OCCPort
                                       Poly_PolygonOnTriangulation P,
                                      ref Poly_Triangulation T)
         {
-            //UpdateEdge(E, P, T, new TopLoc_Location());
+            var tt = new TopLoc_Location();
+            UpdateEdge(E, P, T, ref tt);
         }
 
+        public void UpdateEdge(TopoDS_Edge E,
+                               Poly_PolygonOnTriangulation P,
+                               Poly_Triangulation T,
+                               ref TopLoc_Location L)
+        {
+            BRep_TEdge TE = (BRep_TEdge)E.TShape();
+            if (TE.Locked())
+            {
+                throw new TopoDS_LockedShape("BRep_Builder::UpdateEdge");
+            }
+            TopLoc_Location l = L.Predivided(E.Location());
+
+            bool isModified = false;
+
+            BRep_ListOfCurveRepresentation  lcr = TE.ChangeCurves();
+            BRep_ListIteratorOfListOfCurveRepresentation itcr=new BRep_ListIteratorOfListOfCurveRepresentation (lcr);
+            BRep_CurveRepresentation cr = null;
+
+            while (itcr.More())
+            {
+                if (itcr.Value().IsPolygonOnTriangulation(T, l))
+                {
+                    // cr is used to keep a reference on the curve representation
+                    // this avoid deleting it as its content may be referenced by T
+                    cr = itcr.Value();
+                    lcr.Remove(itcr);
+                    isModified = true;
+                    break;
+                }
+                itcr.Next();
+            }
+
+            if (P!=null)
+            {
+                BRep_PolygonOnTriangulation PT =
+                  new BRep_PolygonOnTriangulation(P, T, l);
+                lcr.Append(PT);
+                isModified = true;
+            }
+
+            if (isModified)
+                TE.Modified(true);
+        }
 
         internal void MakeEdge(TopoDS_Edge E,
             Geom_Curve C, double Tol)

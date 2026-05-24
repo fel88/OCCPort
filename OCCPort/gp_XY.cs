@@ -15,8 +15,16 @@ namespace OCCPort
         {
             x -= theOther.x;
             y -= theOther.y;
+        }  //! Divides <me> by a real.
+        public gp_XY Divided(double theScalar)
+        {
+            return new gp_XY(x / theScalar, y / theScalar);
         }
 
+        public static gp_XY operator /(gp_XY vv, double theInvFactor)
+        {
+            return vv.Divided(theInvFactor);
+        }
         public gp_XY Multiplied(gp_XY theOther) { return new gp_XY(x * theOther.X(), y * theOther.Y()); }
         public gp_XY Multiplied(double v) { return new gp_XY(x * v, y * v); }
 
@@ -53,7 +61,7 @@ namespace OCCPort
             aCoord2D.Subtract(theOther);
             return aCoord2D;
         }
-        
+
         //! @code
         //! <me>.X() = -<me>.X()
         //! <me>.Y() = -<me>.Y()

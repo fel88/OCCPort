@@ -10,6 +10,15 @@ namespace OCCPort
             Add(aPoints);
         }
 
+        public T First()
+        {
+            return this[0];
+        }
+        public T Last()
+        {
+            return this[^1];
+        }
+
         public bool IsEmpty()
         {
             return Count == 0;

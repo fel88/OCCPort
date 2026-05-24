@@ -1,4 +1,5 @@
-﻿using OCCPort.Interfaces;
+﻿using OCCPort.IMeshData.Model;
+using OCCPort.Interfaces;
 using System;
 using System.Collections.Generic;
 
@@ -53,7 +54,7 @@ namespace OCCPort
             return myPoints2d[theIndex];
         }
 
-        List<gp_Pnt2d> myPoints2d = new List<gp_Pnt2d>();
+        OCCPort.IMeshData.Model.SequenceOfPnt2d myPoints2d = new();
 
         private void Standard_OutOfRange_Raise_if(bool v1, string v2)
         {
@@ -61,8 +62,8 @@ namespace OCCPort
                 throw new Exception(v2);
         }
 
-        List<double> myParameters = new List<double>();
-        List<int> myIndices = new List<int>();
+        OCCPort.IMeshData.Model.SequenceOfReal myParameters = new();
+        OCCPort.IMeshData.Model.SequenceOfInteger myIndices = new();
 
         public BRepMeshData_PCurve(IMeshData_Face theDFace, TopAbs_Orientation theOrientation) : base(theDFace, theOrientation)
         {
@@ -76,6 +77,30 @@ namespace OCCPort
         public void SetIndex(int theIndex, int val)
         {
             myIndices[theIndex] = val;
+        }
+
+        public double GetParameter(int theIndex)
+        {
+            Standard_OutOfRange_Raise_if(
+   theIndex < 0 || theIndex >= ParametersNb(),
+   "BRepMeshData_PCurve::GetParameter");
+            return myParameters[theIndex];
+        }
+
+        public void Clear(bool isKeepEndPoints)
+        {
+            if (!isKeepEndPoints)
+            {
+                myPoints2d.clear();
+                myParameters.clear();
+                myIndices.clear();
+            }
+            else if (ParametersNb() > 2)
+            {
+                myPoints2d.erase(1, (myPoints2d.size() - 1));
+                myParameters.erase(1, (myParameters.size() - 1));
+                myIndices.erase(1, (myIndices.size() - 1));
+            }
         }
     }
 }

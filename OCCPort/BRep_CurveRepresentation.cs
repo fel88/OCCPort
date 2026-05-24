@@ -11,6 +11,15 @@ namespace OCCPort
             throw new Standard_DomainError("BRep_CurveRepresentation");
         }
 
+        public virtual Poly_Polygon3D Polygon3D()
+        {
+            throw new Standard_DomainError("BRep_CurveRepresentation");
+        }
+
+        public virtual void Polygon3D(Poly_Polygon3D P)
+        {
+
+        }
         //! Return a copy of this representation.
         public abstract BRep_CurveRepresentation Copy();
 

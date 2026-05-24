@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection.Metadata;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace OCCPort
@@ -29,6 +30,13 @@ namespace OCCPort
             myPurpose = Poly_MeshPurpose.Poly_MeshPurpose_NONE;
             //
         }
+
+
+        Poly_TriangulationParameters myParams = null;
+
+        //! Updates initial set of parameters used to generate this triangulation.
+        public void Parameters(Poly_TriangulationParameters theParams) { myParams = theParams; }
+
         Bnd_Box myCachedMinMax;
         //! Returns triangle at the given index.
         //! @param[in] theIndex triangle index within [1, NbTriangles()] range
@@ -142,6 +150,10 @@ namespace OCCPort
 
         //! Returns the deflection of this triangulation.
         public double Deflection() { return myDeflection; }
+
+        //! Sets the deflection of this triangulation to theDeflection.
+        //! See more on deflection in Polygon2D
+        public void Deflection(double theDeflection) { myDeflection = theDeflection; }
 
         Poly_ArrayOfNodes myNodes = new Poly_ArrayOfNodes();
         NCollection_Array1<gp_Vec3f> myNormals = new NCollection_Array1<gp_Vec3f>();

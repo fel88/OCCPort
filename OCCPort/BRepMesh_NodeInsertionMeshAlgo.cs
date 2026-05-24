@@ -47,7 +47,7 @@ namespace OCCPort
                     continue;
                 }
 
-                aWires[aWireIt] = collectWirePoints(aDWire);
+                //aWires[aWireIt] = collectWirePoints(aDWire);// todo: ??
             }
 
             myRangeSplitter.AdjustRange();
@@ -84,7 +84,10 @@ namespace OCCPort
             return base.initDataStructure();
         }
 
+        public class SequenceOfPnt2d: NCollection_Sequence<gp_Pnt2d>
+        {
 
+        }
         //! Iterates over internal vertices of a face and 
         //! creates corresponding nodes in data structure.
         void insertInternalVertices()
@@ -124,11 +127,11 @@ namespace OCCPort
         }
 
         //! Creates collection of points representing discrete wire.
-        SequenceOfPnt2d collectWirePoints(
+        OCCPort.IMeshData.Model.SequenceOfPnt2d collectWirePoints(
     IWireHandle theDWire
     )
         {
-            SequenceOfPnt2d aWirePoints = new SequenceOfPnt2d();
+            OCCPort.IMeshData.Model.SequenceOfPnt2d aWirePoints = new OCCPort.IMeshData.Model.SequenceOfPnt2d();
             for (int aEdgeIt = 0; aEdgeIt < theDWire.EdgesNb(); ++aEdgeIt)
             {
                 var aDEdge = theDWire.GetEdge(aEdgeIt);

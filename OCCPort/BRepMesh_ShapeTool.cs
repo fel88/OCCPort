@@ -171,24 +171,55 @@ ref double theLastParam,
    ref TopLoc_Location theLocation)
         {
             BRep_Builder aBuilder = new BRep_Builder();
-//aBuilder.UpdateEdge(theEdge, null, ref theLocation);
+            //aBuilder.UpdateEdge(theEdge, null, ref theLocation);
         }
 
         internal static void NullifyEdge(TopoDS_Edge theEdge, Poly_Triangulation theTriangulation, ref TopLoc_Location theLocation)
         {
 
-          /*  UpdateEdge(theEdge, null,
-              theTriangulation, ref theLocation);*/
+            /*  UpdateEdge(theEdge, null,
+                theTriangulation, ref theLocation);*/
 
         }
-        public void UpdateEdge(
+        //! Updates the given seam edge by the given tessellated representations.
+        //! @param theEdge edge to be updated.
+        //! @param thePolygon1 tessellated representation corresponding to
+        //! forward direction of the seam edge.
+        //! @param thePolygon2 tessellated representation corresponding to
+        //! reversed direction of the seam edge.
+        //! @param theTriangulation triangulation the given edge is associated to.
+        //! @param theLocation face location.
+        public static void UpdateEdge(
+    TopoDS_Edge theEdge,
+    Poly_PolygonOnTriangulation thePolygon1,
+    Poly_PolygonOnTriangulation thePolygon2,
+    Poly_Triangulation theTriangulation,
+    ref TopLoc_Location theLocation)
+        {
+            BRep_Builder aBuilder = new BRep_Builder();
+            aBuilder.UpdateEdge(theEdge, thePolygon1, thePolygon2,
+              theTriangulation, theLocation);
+        }
+
+        //! Updates the given edge by the given tessellated representation.
+        //! @param theEdge edge to be updated.
+        //! @param thePolygon tessellated representation of the edge to be stored.
+        public static void UpdateEdge(
+  TopoDS_Edge theEdge,
+  Poly_Polygon3D thePolygon)
+        {
+            BRep_Builder aBuilder = new BRep_Builder();
+            aBuilder.UpdateEdge(theEdge, thePolygon);
+        }
+
+        public static void UpdateEdge(
       TopoDS_Edge theEdge,
       Poly_PolygonOnTriangulation thePolygon,
       Poly_Triangulation theTriangulation,
     ref TopLoc_Location theLocation)
         {
             BRep_Builder aBuilder = new BRep_Builder();
-         //   aBuilder.UpdateEdge(theEdge, thePolygon, theTriangulation, theLocation);
+            //   aBuilder.UpdateEdge(theEdge, thePolygon, theTriangulation, theLocation);
         }
 
         internal static void NullifyFace(TopoDS_Face theFace)

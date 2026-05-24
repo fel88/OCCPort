@@ -13,11 +13,10 @@ namespace OCCPort
         //    public TopTools_ListOfShape list;
         //}
         ////public List<Item> items = new List<Item>();
-        //internal int Add(TopoDS_Shape topoDS_Shape, TopTools_ListOfShape empty)
-        //{
-        //    items.Add(new Item() { list = empty, shape = topoDS_Shape });
-        //    return items.Count;
-        //}
+        public new int Add(TopoDS_Shape topoDS_Shape, TopTools_ListOfShape empty)
+        {
+           return base.Add(topoDS_Shape, empty);
+        }
 
         //int mySize;
         ////! IsEmpty

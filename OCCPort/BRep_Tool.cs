@@ -673,7 +673,7 @@ namespace OCCPort
             return S != null;
         }
 
-        public static Poly_Polygon3D nullPolygon3D = new Poly_Polygon3D();
+        public static Poly_Polygon3D nullPolygon3D = null;
         //=======================================================================
         //function : IsGeometric
         //purpose  : Returns True if <E> is a 3d curve or a curve on

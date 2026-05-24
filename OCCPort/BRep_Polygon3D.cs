@@ -11,7 +11,7 @@ namespace OCCPort
             myPolygon3D = (P);
         }
         
-        public Poly_Polygon3D Polygon3D()
+        public override Poly_Polygon3D Polygon3D()
         {
             return myPolygon3D;
         }
@@ -20,6 +20,12 @@ namespace OCCPort
         {
             BRep_Polygon3D P = new BRep_Polygon3D(myPolygon3D, Location());
             return P;
+        }
+
+        public override void Polygon3D(Poly_Polygon3D P)
+        {
+            myPolygon3D = P;
+
         }
 
         Poly_Polygon3D myPolygon3D;

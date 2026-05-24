@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace OCCPort
+namespace OCCPort.IMeshData
 {
     public interface IMeshData
     {

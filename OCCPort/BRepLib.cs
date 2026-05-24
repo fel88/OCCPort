@@ -1,5 +1,6 @@
 ﻿using OCCPort;
 using System;
+using System.Diagnostics;
 using System.Reflection.Metadata;
 using TriangleNet.Topology.DCEL;
 using static OpenTK.Graphics.OpenGL.GL;
@@ -21,8 +22,122 @@ namespace OCCPort
             return thePrecision;
 
         }
+        public static void UpdateDeflection(TopoDS_Shape theShape)
+        {
+            TopExp_Explorer anExpFace = new TopExp_Explorer(theShape, TopAbs_ShapeEnum.TopAbs_FACE);
+            for (; anExpFace.More(); anExpFace.Next())
+            {
+                TopoDS_Face aFace = TopoDS.Face(anExpFace.Current());
+                Geom_Surface aSurf = BRep_Tool.Surface(aFace);
+                if (aSurf == null)
+                {
+                    continue;
+                }
+
+                TopLoc_Location aLoc = new TopLoc_Location();
+                Poly_Triangulation aPT = BRep_Tool.Triangulation(aFace, ref aLoc);
+                if (aPT == null || !aPT.HasUVNodes())
+                {
+                    continue;
+                }
+
+                // Collect all nodes of degenerative edges and skip elements
+                // build upon them due to huge distortions introduced by passage
+                // from UV space to 3D.
+                NCollection_Map<int> aDegNodes = new NCollection_Map<int>();
+                TopExp_Explorer anExpEdge = new TopExp_Explorer(aFace, TopAbs_ShapeEnum.TopAbs_EDGE);
+                for (; anExpEdge.More(); anExpEdge.Next())
+                {
+                    TopoDS_Edge aEdge = TopoDS.Edge(anExpEdge.Current());
+                    if (BRep_Tool.Degenerated(aEdge))
+                    {
+                        Poly_PolygonOnTriangulation aPolygon = BRep_Tool.PolygonOnTriangulation(aEdge, aPT, aLoc);
+                        if (aPolygon == null)
+                        {
+                            continue;
+                        }
+
+                        for (int aNodeIt = aPolygon.Nodes().Lower(); aNodeIt <= aPolygon.Nodes().Upper(); ++aNodeIt)
+                        {
+                            aDegNodes.Add(aPolygon.Node(aNodeIt));
+                        }
+                    }
+                }
+
+                EvalDeflection aTool = new EvalDeflection(aFace);
+                NCollection_Map<Link> aLinks = new NCollection_Map<Link>();
+                double aSqDeflection = 0.0;
+                gp_Trsf aTrsf = aLoc.Transformation();
+                for (int aTriIt = 1; aTriIt <= aPT.NbTriangles(); ++aTriIt)
+                {
+                    Poly_Triangle aTriangle = aPT.Triangle(aTriIt);
+
+                    int[] aNode = new int[3];
+                    aTriangle.Get(ref aNode[0], ref aNode[1], ref aNode[2]);
+                    if (aDegNodes.Contains(aNode[0]) ||
+                        aDegNodes.Contains(aNode[1]) ||
+                        aDegNodes.Contains(aNode[2]))
+                    {
+                        continue;
+                    }
+
+                    gp_Pnt[] aP3d = {
+        aPT.Node (aNode[0]).Transformed (aTrsf),
+        aPT.Node (aNode[1]).Transformed (aTrsf),
+        aPT.Node (aNode[2]).Transformed (aTrsf)
+      };
+
+                    gp_Pnt2d[] aP2d = {
+        aPT.UVNode (aNode[0]),
+        aPT.UVNode (aNode[1]),
+        aPT.UVNode (aNode[2])
+      };
+
+                    // Check midpoint of triangle.
+                    gp_Pnt aMid3d_t = (aP3d[0].XYZ() + aP3d[1].XYZ() + aP3d[2].XYZ()) / 3.0;
+                    gp_Pnt2d aMid2d_t = new gp_Pnt2d((aP2d[0].XY() + aP2d[1].XY() + aP2d[2].XY()) / 3.0);
+
+                    aSqDeflection = Math.Max(aSqDeflection, aTool.Eval(aMid2d_t, aMid3d_t));
+
+                    for (int i = 0; i < 3; ++i)
+                    {
+                        int j = (i + 1) % 3;
+                        Link aLink = new Link(aNode[i], aNode[j]);
+                        if (!aLinks.Add(aLink))
+                        {
+                            // Do not estimate boundary links due to high distortions at the edge.
+                            gp_Pnt aP3d1 = aP3d[i];
+                            gp_Pnt aP3d2 = aP3d[j];
+
+                            gp_Pnt2d aP2d1 = aP2d[i];
+                            gp_Pnt2d aP2d2 = aP2d[j];
+
+                            gp_Pnt aMid3d_l = (aP3d1.XYZ() + aP3d2.XYZ()) / 2.0;
+                            gp_Pnt2d aMid2d_l = new gp_Pnt2d((aP2d1.XY() + aP2d2.XY()) / 2.0);
+
+                            aSqDeflection = Math.Max(aSqDeflection, aTool.Eval(aMid2d_l, aMid3d_l));
+                        }
+                    }
+                }
+
+                aPT.Deflection(Math.Sqrt(aSqDeflection));
+            }
+        }
+        //! Represents link of triangulation.
+        struct Link
+        {
+            int[] Node = new int[2];
+
+            //! Constructor
+            public Link(int theNode1, int theNode2)
+            {
+                Node[0] = theNode1;
+                Node[1] = theNode2;
+            }
+        }
+
         static void InternalUpdateTolerances(TopoDS_Shape theOldShape,
-  bool IsVerifyTolerance, bool IsMutableInput, BRepTools_ReShape theReshaper)
+bool IsVerifyTolerance, bool IsMutableInput, BRepTools_ReShape theReshaper)
         {
             TopTools_DataMapOfShapeReal aShToTol;
             // Harmonize tolerances
@@ -354,8 +469,8 @@ namespace OCCPort
                     TopoDS_Edge E = TopoDS.Edge(ex2.Current());
                     //TopoDS_Shape aNe = theReshaper.Value(E);
                     double aNewEtol = -1;
-                  //  GetEdgeTol(TopoDS.Edge(aNe), curface, aNewEtol);
-                  //  if (aNewEtol >= 0) //not equal to -1
+                    //  GetEdgeTol(TopoDS.Edge(aNe), curface, aNewEtol);
+                    //  if (aNewEtol >= 0) //not equal to -1
                     //    UpdTolMap(E, aNewEtol, aShToTol);
                 }
             }
