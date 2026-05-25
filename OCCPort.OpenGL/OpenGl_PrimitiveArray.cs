@@ -453,16 +453,16 @@ namespace OCCPort.OpenGL
             return true;
         }
 
-        private void clearMemoryGL(OpenGl_Context theCtx)
+        private void clearMemoryGL(OpenGl_Context theGlCtx)
         {
             if (myVboIndices != null)
             {
-                myVboIndices.Release(theGlCtx.operator->());
+                myVboIndices.Release(theGlCtx/*.operator->()*/);
                 myVboIndices = null;
             }
             if (myVboAttribs != null)
             {
-                //myVboAttribs.Release(theGlCtx.operator->());
+                myVboAttribs.Release(theGlCtx/*.operator->()*/);
                 myVboAttribs = null;
             }
         }

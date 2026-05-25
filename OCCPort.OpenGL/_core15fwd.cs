@@ -39,5 +39,10 @@ namespace OCCPort.OpenGL
         {
             myBufferId = GL.GenBuffer();
         }
+
+        internal void glDeleteBuffers(int v,ref uint myBufferId)
+        {
+            GL.DeleteBuffers(v,ref myBufferId);
+        }
     }
 }

@@ -16,7 +16,8 @@ namespace OCCPort.OpenGL
 
         internal bool HasColorAttribute()
         {
-            throw new NotImplementedException();
+            return false;
+
         }
 
         internal bool HasNormalAttribute()

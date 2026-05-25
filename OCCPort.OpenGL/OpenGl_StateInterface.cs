@@ -2,7 +2,7 @@
 
 namespace OCCPort.OpenGL
 {
-    internal class OpenGl_StateInterface
+    public class OpenGl_StateInterface
     {
 
         //! Returns current state index.

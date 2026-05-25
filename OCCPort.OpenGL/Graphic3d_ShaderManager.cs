@@ -179,7 +179,13 @@ namespace OCCPort.OpenGL
 
         protected OpenGl_Context myContext;            //!< OpenGL context
 
-        protected bool Create(Graphic3d_ShaderProgram theProxy,
+
+        //! Creates new shader program or re-use shared instance.
+        //! @param theProxy    [IN]  program definition
+        //! @param theShareKey [OUT] sharing key
+        //! @param theProgram  [OUT] OpenGL program
+        //! @return true on success
+        public bool Create(Graphic3d_ShaderProgram theProxy,
                 ref string theShareKey,
                 OpenGl_ShaderProgram theProgram)
         {

@@ -5,6 +5,14 @@
         protected byte[] myData;      //!< data pointer
         protected int mySize;      //!< buffer length in bytes
                                    //Handle(NCollection_BaseAllocator) myAllocator; //!< buffer allocator
+
+
+        //! @return true if buffer is not allocated
+        public bool IsEmpty()
+        {
+            return myData == null;
+        }
+
         public NCollection_Buffer(NCollection_BaseAllocator theAlloc,
                         int theSize = 0,
                        byte[] theData = null)
@@ -28,11 +36,11 @@
             return myData;
         }
         //! De-allocate buffer.
-     protected   void Free()
+        protected void Free()
         {
             //if (!myAllocator.IsNull())
             {
-             //   myAllocator->Free(myData);
+                //   myAllocator->Free(myData);
             }
             myData = null;
             mySize = 0;

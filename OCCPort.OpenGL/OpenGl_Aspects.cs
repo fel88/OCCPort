@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection.Metadata;
 
 namespace OCCPort.OpenGL
 {
@@ -20,6 +21,14 @@ namespace OCCPort.OpenGL
             myAspect.SetBackMaterial(THE_DEFAULT_MATERIAL);
             myAspect.SetShadingModel(myShadingModel);
             myAspect.SetHatchStyle(Handle(Graphic3d_HatchStyle)());*/
+        }
+        //! Returns textures map.
+        public OpenGl_TextureSet TextureSet(OpenGl_Context theCtx,
+                                               bool theToHighlight = false)
+        {
+            OpenGl_PointSprite aSprite = myResSprite.Sprite(theCtx, myAspect, false);
+            OpenGl_PointSprite aSpriteA = myResSprite.Sprite(theCtx, myAspect, true);
+            return myResTextureSet.TextureSet(theCtx, myAspect, aSprite, aSpriteA, theToHighlight);
         }
 
         public OpenGl_Aspects(Graphic3d_Aspects theAspect)
@@ -70,14 +79,20 @@ namespace OCCPort.OpenGL
             throw new NotImplementedException();
         }
 
+
+        //! Returns shading model; Graphic3d_TypeOfShadingModel_DEFAULT by default.
+        //! Graphic3d_TOSM_DEFAULT means that Shading Model set as default for entire Viewer will be used.
         internal Graphic3d_TypeOfShadingModel ShadingModel()
         {
-            throw new NotImplementedException();
+            return myShadingModel;
         }
 
-        internal OpenGl_ShaderProgram ShaderProgramRes(OpenGl_Context aCtx)
+
+        //! Init and return OpenGl shader program resource.
+        //! @return shader program resource.
+        internal OpenGl_ShaderProgram ShaderProgramRes(OpenGl_Context theCtx)
         {
-            throw new NotImplementedException();
+            return myResProgram.ShaderProgram(theCtx, myAspect.ShaderProgram());
         }
     }
 }

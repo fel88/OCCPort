@@ -8,7 +8,7 @@ namespace OCCPort
     {
 
         //! Default value of THE_MAX_LIGHTS macros within GLSL program (see Declarations.glsl).
-         public const int THE_MAX_LIGHTS_DEFAULT = 8;
+        public const int THE_MAX_LIGHTS_DEFAULT = 8;
 
         //! Default value of THE_MAX_CLIP_PLANES macros within GLSL program (see Declarations.glsl).
         public const int THE_MAX_CLIP_PLANES_DEFAULT = 8;
@@ -20,39 +20,65 @@ namespace OCCPort
         //! Returns unique ID used to manage resource in graphic driver.
         public string GetId() { return myID; }
         //! Attaches shader object to the program object.
-        bool AttachShader(Graphic3d_ShaderObject theShader)
+        public bool AttachShader(Graphic3d_ShaderObject theShader)
         {
-            throw new Exception();
+            if (theShader == null)
+            {
+                return false;
+            }
+
+            //for (Graphic3d_ShaderObjectList::Iterator anIt (myShaderObjects); anIt.More(); anIt.Next())
+            foreach (var anIt in myShaderObjects)
+            {
+                if (anIt == theShader)
+                    return false;
+            }
+
+            myShaderObjects.Append(theShader);
+            return true;
         }
 
-        public void AttachShader(object value)
+
+
+        //! Specify the length of array of light sources (THE_MAX_LIGHTS).
+        public void SetNbLightsMax(int theNbLights)
         {
-            throw new NotImplementedException();
+            myNbLightsMax = theNbLights;
         }
 
-        public void SetNbLightsMax(int v)
+        //! Specify the length of array of shadow maps (THE_NB_SHADOWMAPS).
+        public void SetNbShadowMaps(int theNbMaps)
         {
-            throw new NotImplementedException();
+            myNbShadowMaps = theNbMaps;
         }
 
-        public void SetNbShadowMaps(int v)
+        int myNbLightsMax;   //!< length of array of light sources (THE_MAX_LIGHTS)
+        int myNbShadowMaps;  //!< length of array of shadow maps (THE_NB_SHADOWMAPS)
+        int myNbClipPlanesMax; //!< length of array of clipping planes (THE_MAX_CLIP_PLANES)
+        int myNbFragOutputs; //!< length of array of Fragment Shader outputs (THE_NB_FRAG_OUTPUTS)
+        int myTextureSetBits;//!< texture units declared within the program, @sa Graphic3d_TextureSetBits
+        //! Set if standard program header should define default texture sampler occSampler0.
+        public void SetDefaultSampler(bool theHasDefSampler)
         {
-            throw new NotImplementedException();
+            myHasDefSampler = theHasDefSampler;
         }
 
-        public void SetDefaultSampler(bool v)
+        bool myHasDefSampler; //!< flag indicating that program defines default texture sampler occSampler0
+        bool myHasAlphaTest;       //!< flag indicating that Fragment Shader performs alpha test
+        bool myIsPBR;         //!< flag indicating that program defines functions and variables used in PBR pipeline
+
+
+        //! Set if Fragment Shader should perform alpha test.
+        //! Note that this flag is designed for usage with - custom shader program may discard fragment regardless this flag.
+        public void SetAlphaTest(bool theAlphaTest)
         {
-            throw new NotImplementedException();
+            myHasAlphaTest = theAlphaTest;
         }
 
-        public void SetAlphaTest(bool v)
-        {
-            throw new NotImplementedException();
-        }
-
+        //! Returns list of attached shader objects.
         public object ShaderObjects()
         {
-            throw new NotImplementedException();
+            return myShaderObjects;
         }
 
         //! Pushes int uniform.
@@ -62,8 +88,8 @@ namespace OCCPort
         }
 
 
-        
-        Graphic3d_ShaderObjectList myShaderObjects; //!< the list of attached shader objects
+
+        Graphic3d_ShaderObjectList myShaderObjects = new Graphic3d_ShaderObjectList(); //!< the list of attached shader objects
         Graphic3d_ShaderVariableList myVariables;     //!< the list of custom uniform variables
         Graphic3d_ShaderAttributeList myAttributes;    //!< the list of custom vertex attributes
         string myHeader;        //!< GLSL header with version code and used extensions

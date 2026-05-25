@@ -1,11 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.AccessControl;
+using System.Threading;
 
 namespace OCCPort
 {
     public class Graphic3d_ShaderObject
     {
+        public Graphic3d_ShaderObject(Graphic3d_TypeOfShaderObject theType)
+        {
+            myType = (theType);
+            myID = ("Graphic3d_ShaderObject_")
+                 + (Interlocked.Increment(ref THE_SHADER_OBJECT_COUNTER));
+        }
+        static volatile int THE_SHADER_OBJECT_COUNTER = 0;
+
+        //! The type of shader object.
+        Graphic3d_TypeOfShaderObject myType;
+
+        string myID;     //!< the ID of shader object
+        string mySource; //!< the source code of shader object
+        //OSD_Path myPath;   //!< the path to shader source (may be empty)
         public static Graphic3d_ShaderObject CreateFromSource(string theSource, Graphic3d_TypeOfShaderObject theType,
             ShaderVariableList theUniforms,
             ShaderVariableList theStageInOuts,
@@ -15,7 +31,7 @@ namespace OCCPort
         {
             if (string.IsNullOrEmpty(theSource))
             {
-                return new Graphic3d_ShaderObject();
+                return null;
             }
             string aSrcUniforms = "", aSrcInOuts = "", aSrcInStructs = "", aSrcOutStructs = "";
             foreach (var aVar in theUniforms)
@@ -144,7 +160,9 @@ namespace OCCPort
 
         private static Graphic3d_ShaderObject CreateFromSource(Graphic3d_TypeOfShaderObject theType, string theSource)
         {
-            throw new NotImplementedException();
+            Graphic3d_ShaderObject aShader = new Graphic3d_ShaderObject(theType);
+            aShader.mySource = theSource;
+            return aShader;
         }
 
         public class ShaderVariableList : List<ShaderVariable>

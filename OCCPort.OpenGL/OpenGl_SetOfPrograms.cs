@@ -1,12 +1,20 @@
-﻿using System;
+﻿using OCCPort.Enums;
+using System;
 
 namespace OCCPort.OpenGL
 {
     internal class OpenGl_SetOfPrograms
     {
-        internal OpenGl_ShaderProgram ChangeValue(int theBits)
+        internal OpenGl_ShaderProgram ChangeValue(int theProgramBits)
         {
-            throw new NotImplementedException();
+            return myPrograms[theProgramBits];
         }
+        internal void ChangeValue(int theProgramBits, OpenGl_ShaderProgram sp)//not original code
+        {
+            myPrograms[theProgramBits] = sp;
+        }
+
+        public OpenGl_ShaderProgram[] myPrograms = new OpenGl_ShaderProgram[(int)Graphic3d_ShaderFlags.Graphic3d_ShaderFlags_NB]; //!< programs array
+
     }
 }

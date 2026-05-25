@@ -10,7 +10,7 @@ namespace OCCPort.OpenGL
         {
             myDataType = All.Float;
         }
-        public void Release(OpenGl_Context* theGlCtx)
+        public void Release(OpenGl_Context theGlCtx)
         {
             if (myBufferId == NO_BUFFER)
             {
@@ -18,14 +18,14 @@ namespace OCCPort.OpenGL
             }
 
             // application can not handle this case by exception - this is bug in code
-            Standard_ASSERT_RETURN(theGlCtx != NULL,
-              "OpenGl_Buffer destroyed without GL context! Possible GPU memory leakage...",);
+            Exceptions.Standard_ASSERT_RETURN(theGlCtx != null,
+              "OpenGl_Buffer destroyed without GL context! Possible GPU memory leakage...");
 
-            if (theGlCtx->IsValid())
+            if (theGlCtx.IsValid())
             {
-                theGlCtx->core15fwd->glDeleteBuffers(1, &myBufferId);
+                theGlCtx.core15fwd.glDeleteBuffers(1, ref myBufferId);
             }
-            myOffset = NULL;
+            myOffset = null;
             myBufferId = NO_BUFFER;
         }
 
@@ -36,7 +36,7 @@ namespace OCCPort.OpenGL
         //! Return buffer target.
         public abstract BufferTarget GetTarget();
         //! @return offset to data, NULL by default
-        public int GetDataOffset() { return myOffset; }
+        public int GetDataOffset() { return myOffset.Value; }
 
         //! Unbind this buffer object.
         public virtual void Unbind(OpenGl_Context theGlCtx)
@@ -48,7 +48,7 @@ namespace OCCPort.OpenGL
         //! Helpful constants
         const uint NO_BUFFER = 0;
 
-        int myOffset;       //!< offset to data
+        int? myOffset;       //!< offset to data
         uint myBufferId;     //!< VBO name (index)
         uint myComponentsNb; //!< Number of components per generic vertex attribute, must be 1, 2, 3, or 4
         int myElemsNb;      //!< Number of vertex attributes / number of vertices

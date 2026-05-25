@@ -4,9 +4,16 @@ namespace OCCPort.OpenGL
 {
     internal class OpenGl_MaterialState
     {
+        //! Return TRUE if alpha test should be enabled.
         internal bool HasAlphaCutoff()
         {
-            throw new NotImplementedException();
+            return myAlphaCutoff <= 1.0f;
+
         }
+        OpenGl_Material myMaterial;      //!< material
+        float myAlphaCutoff;   //!< alpha cutoff value
+        bool myToDistinguish; //!< distinguish front/back flag
+        bool myToMapTexture;  //!< flag for mapping a texture
     }
+
 }

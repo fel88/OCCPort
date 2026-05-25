@@ -9,6 +9,13 @@ namespace OCCPort.OpenGL
         public OpenGl_ShaderProgram()
         {
         }
+        //! Decrements counter of users.
+        //! Used by OpenGl_ShaderManager.
+        //! @return true when there are no more users of this program has been left
+        public bool UnShare()
+        {
+            return --myShareCount == 0;
+        }
 
         public OpenGl_ShaderProgram(Graphic3d_ShaderProgram theProxy)
         {
@@ -16,7 +23,7 @@ namespace OCCPort.OpenGL
 
         int myProgramID;     //!< Handle of OpenGL shader program
                              // OpenGl_ShaderList myShaderObjects; //!< List of attached shader objects
-        Graphic3d_ShaderProgram myProxy;         //!< Proxy shader program (from application layer)
+        protected Graphic3d_ShaderProgram myProxy;         //!< Proxy shader program (from application layer)
         int myShareCount;    //!< program users count, initialized with 1 (already shared by one user)
         int myNbLightsMax;   //!< length of array of light sources (THE_MAX_LIGHTS)
         int myNbShadowMaps;  //!< length of array of shadow maps (THE_NB_SHADOWMAPS)
@@ -72,7 +79,7 @@ namespace OCCPort.OpenGL
             return myProgramID;
         }
 
-        
+
 
         internal void Release(OpenGl_Context myContext)
         {

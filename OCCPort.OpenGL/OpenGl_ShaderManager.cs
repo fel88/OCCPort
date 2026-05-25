@@ -16,6 +16,43 @@ namespace OCCPort.OpenGL
         }
 
 
+        // =======================================================================
+        // function : Unregister
+        // purpose  : Removes specified shader program from the manager
+        // =======================================================================
+        public void Unregister(ref string theShareKey,
+                                                OpenGl_ShaderProgram theProgram)
+        {
+            //for (OpenGl_ShaderProgramList::Iterator anIt (myProgramList); anIt.More(); anIt.Next())
+            foreach (var anIt in myProgramList)
+            {
+                if (anIt == theProgram)
+                {
+                    if (!theProgram.UnShare())
+                    {
+                        theShareKey.Clear();
+                        theProgram = null;
+                        return;
+                    }
+
+                    myProgramList.Remove(anIt);
+                    break;
+                }
+            }
+
+            /*string anID = theProgram.myProxy.GetId();
+           if (anID.IsEmpty())
+           {
+               myContext.DelayedRelease(theProgram);
+               theProgram = null;
+           }
+           else
+           {
+               theProgram.Nullify();
+               myContext->ReleaseResource(anID, Standard_True);
+           }*/
+        }
+
         Graphic3d_TypeOfShadingModel myShadingModel;       //!< lighting shading model
         OpenGl_ShaderProgramList myProgramList;        //!< The list of shader programs
         OpenGl_SetOfShaderPrograms myLightPrograms;      //!< pointer to active lighting programs matrix
@@ -49,7 +86,7 @@ namespace OCCPort.OpenGL
         OpenGl_WorldViewState myWorldViewState;     //!< State of OCCT world-view  transformation
         //OpenGl_ClippingState myClippingState;      //!< State of OCCT clipping planes
         OpenGl_LightSourceState myLightSourceState;   //!< State of OCCT light sources
-        OpenGl_MaterialState myMaterialState;      //!< State of Front and Back materials
+        OpenGl_MaterialState myMaterialState = new OpenGl_MaterialState();      //!< State of Front and Back materials
         //OpenGl_OitState myOitState;           //!< State of OIT uniforms
 
         gp_XYZ myLocalOrigin;        //!< local camera transformation
@@ -72,7 +109,7 @@ namespace OCCPort.OpenGL
         // function : prepareStdProgramUnlit
         // purpose  :
         // =======================================================================
-        bool prepareStdProgramUnlit(OpenGl_ShaderProgram theProgram,
+        bool prepareStdProgramUnlit(ref OpenGl_ShaderProgram theProgram,
                                                                        int theBits,
                                                                        bool theIsOutline)
         {
@@ -99,7 +136,8 @@ namespace OCCPort.OpenGL
                 OpenGl_ShaderProgram aProgram = myUnlitPrograms.ChangeValue(theBits);
                 if (aProgram == null)
                 {
-                    prepareStdProgramUnlit(aProgram, theBits, false);
+                    prepareStdProgramUnlit(ref aProgram, theBits, false);
+                    myUnlitPrograms.ChangeValue(theBits, aProgram);// not original code
                 }
                 return aProgram;
             }
@@ -107,20 +145,21 @@ namespace OCCPort.OpenGL
                 OpenGl_ShaderProgram aProgram = myLightPrograms.ChangeValue(theShadingModel, theBits);
                 if (aProgram == null)
                 {
-                    prepareStdProgramLight(aProgram, theShadingModel, theBits);
+                    prepareStdProgramLight(ref aProgram, theShadingModel, theBits);
+                    myLightPrograms.ChangeValue(theShadingModel, theBits, aProgram);//not original code
                 }
                 return aProgram;
             }
         }
 
         //! Prepare standard GLSL program with lighting.
-        bool prepareStdProgramLight(OpenGl_ShaderProgram theProgram,
+        bool prepareStdProgramLight(ref OpenGl_ShaderProgram theProgram,
                                                  Graphic3d_TypeOfShadingModel theShadingModel,
                                                  int theBits)
         {
             switch (theShadingModel)
             {
-                case Graphic3d_TypeOfShadingModel.Graphic3d_TypeOfShadingModel_Unlit: return prepareStdProgramUnlit(theProgram, theBits, false);
+                case Graphic3d_TypeOfShadingModel.Graphic3d_TypeOfShadingModel_Unlit: return prepareStdProgramUnlit(ref theProgram, theBits, false);
                 case Graphic3d_TypeOfShadingModel.Graphic3d_TypeOfShadingModel_PhongFacet: return prepareStdProgramPhong(theProgram, theBits, true);
                 case Graphic3d_TypeOfShadingModel.Graphic3d_TypeOfShadingModel_Gouraud: return prepareStdProgramGouraud(theProgram, theBits);
                 case Graphic3d_TypeOfShadingModel.Graphic3d_TypeOfShadingModel_DEFAULT:
@@ -352,6 +391,36 @@ namespace OCCPort.OpenGL
             }
         }
 
+        //! Define clipping planes program bits.
+        int getClipPlaneBits()
+        {
+            int aNbPlanes = myContext.Clipping().NbClippingOrCappingOn();
+            if (aNbPlanes <= 0)
+            {
+                return 0;
+            }
+
+            Graphic3d_ShaderFlags aBits = 0;
+            if (myContext.Clipping().HasClippingChains())
+            {
+                aBits |= Graphic3d_ShaderFlags.Graphic3d_ShaderFlags_ClipChains;
+            }
+
+            if (aNbPlanes == 1)
+            {
+                aBits |= Graphic3d_ShaderFlags.Graphic3d_ShaderFlags_ClipPlanes1;
+            }
+            else if (aNbPlanes == 2)
+            {
+                aBits |= Graphic3d_ShaderFlags.Graphic3d_ShaderFlags_ClipPlanes2;
+            }
+            else
+            {
+                aBits |= Graphic3d_ShaderFlags.Graphic3d_ShaderFlags_ClipPlanesN;
+            }
+            return (int)aBits;
+        }
+
         //! Define program bits.
         int getProgramBits(OpenGl_TextureSet theTextures,
                                    Graphic3d_AlphaMode theAlphaMode,
@@ -360,8 +429,55 @@ namespace OCCPort.OpenGL
                                    bool theEnableEnvMap,
                                    bool theEnableMeshEdges)
         {
-            throw new NotImplementedException();
+            Graphic3d_ShaderFlags aBits = 0;
+            if (theAlphaMode == Graphic3d_AlphaMode.Graphic3d_AlphaMode_Mask
+             || theAlphaMode == Graphic3d_AlphaMode.Graphic3d_AlphaMode_MaskBlend)
+            {
+                aBits |= Graphic3d_ShaderFlags.Graphic3d_ShaderFlags_AlphaTest;
+            }
+
+            aBits |= (Graphic3d_ShaderFlags)getClipPlaneBits();
+            if (theEnableMeshEdges
+             && myContext.hasGeometryStage != OpenGl_FeatureFlag.OpenGl_FeatureNotAvailable)
+            {
+                aBits |= Graphic3d_ShaderFlags.Graphic3d_ShaderFlags_MeshEdges;
+                if (theInteriorStyle == Aspect_InteriorStyle.Aspect_IS_HOLLOW)
+                {
+                    aBits |= Graphic3d_ShaderFlags.Graphic3d_ShaderFlags_AlphaTest;
+                }
+            }
+
+            if (theEnableEnvMap)
+            {
+                // Environment map overwrites material texture
+                aBits |= Graphic3d_ShaderFlags.Graphic3d_ShaderFlags_TextureEnv;
+            }
+            else if (theTextures != null
+                   && theTextures.HasNonPointSprite())
+            {
+                aBits |= Graphic3d_ShaderFlags.Graphic3d_ShaderFlags_TextureRGB;
+                if ((theTextures.TextureSetBits() & (int)Graphic3d_TextureSetBits.Graphic3d_TextureSetBits_Normal) != 0)
+                {
+                    aBits |= Graphic3d_ShaderFlags.Graphic3d_ShaderFlags_TextureNormal;
+                }
+            }
+            if (theHasVertColor
+             && theInteriorStyle != Aspect_InteriorStyle.Aspect_IS_HIDDENLINE)
+            {
+                aBits |= Graphic3d_ShaderFlags.Graphic3d_ShaderFlags_VertColor;
+            }
+
+            if (myOitState.ActiveMode() == Graphic3d_RenderTransparentMethod.Graphic3d_RTM_BLEND_OIT)
+            {
+                aBits |= Graphic3d_ShaderFlags.Graphic3d_ShaderFlags_WriteOit;
+            }
+            else if (myOitState.ActiveMode() == Graphic3d_RenderTransparentMethod.Graphic3d_RTM_DEPTH_PEELING_OIT)
+            {
+                aBits |= Graphic3d_ShaderFlags.Graphic3d_ShaderFlags_OitDepthPeeling;
+            }
+            return (int)aBits;
         }
+        OpenGl_OitState myOitState = new OpenGl_OitState();           //!< State of OIT uniforms
 
         //! Returns list of registered shader programs.
         public override OpenGl_ShaderProgramList ShaderPrograms() { return myProgramList; }

@@ -32,8 +32,8 @@ namespace OCCPort.OpenGL
             //hasUnpackRowLength=(Standard_True),
             //hasHighp=(Standard_True),
             hasUintIndex = (true);
-  //hasTexRGBA8=(Standard_True),
-//
+            //hasTexRGBA8=(Standard_True),
+            //
             /*
              *  mySupportedFormats (new Image_SupportedFormats()),
   myAnisoMax   (1),
@@ -111,13 +111,22 @@ myLineFeather (1.0f),*/
 
 
         }
+
+        public OpenGl_FeatureFlag hasGeometryStage;   //!< Complex flag indicating support of Geometry shader (desktop OpenGL 3.2, OpenGL ES 3.2, GL_EXT_geometry_shader)
+
+        //! @return true if this context is valid (has been initialized)
+        public bool IsValid()
+        {
+            return myIsInitialized;
+        }
+
         public OpenGl_ArbFBO arbFBO;             //!< GL_ARB_framebuffer_object
         public OpenGl_ArbFBOBlit arbFBOBlit;         //!< glBlitFramebuffer function, moved out from OpenGl_ArbFBO structure for compatibility with OpenGL ES 2.0
         bool arbSampleShading;   //!< GL_ARB_sample_shading
         bool arbDepthClamp;      //!< GL_ARB_depth_clamp (on desktop 
         public OpenGl_GlCore11 core11ffp;  //!< OpenGL 1.1 core functionality
                                            //! @name public properties tracking current state
-    public    bool hasUintIndex;       //!< GLuint for index buffer is supported (always available on desktop; on OpenGL ES - since 3.0 or as extension GL_OES_element_index_uint)
+        public bool hasUintIndex;       //!< GLuint for index buffer is supported (always available on desktop; on OpenGL ES - since 3.0 or as extension GL_OES_element_index_uint)
 
         public OpenGl_MatrixState<float> ModelWorldState; //!< state of orientation matrix
         public OpenGl_MatrixState<float> WorldViewState;  //!< state of orientation matrix
@@ -332,10 +341,13 @@ myLineFeather (1.0f),*/
             throw new NotImplementedException();
         }
 
-        internal object Clipping()
+        //! @return tool for management of clippings within this context.
+        internal OpenGl_Clipping Clipping()
         {
-            throw new NotImplementedException();
+            return myClippingState;
         }
+        OpenGl_Clipping myClippingState=new OpenGl_Clipping (); //!< state of clip planes
+
 
         OpenGl_ShaderManager myShaderManager; //! support object for managing shader programs
 
@@ -344,10 +356,12 @@ myLineFeather (1.0f),*/
             return myShaderManager;
         }
 
+        //! Return cached flag indicating writing into color buffer is enabled or disabled (glColorMask).
         internal bool ColorMask()
         {
-            throw new NotImplementedException();
+            return myColorMask.r();
         }
+        NCollection_Vec4<bool> myColorMask = new NCollection_Vec4<bool>();       //!< flag indicating writing into color buffer is enabled or disabled (glColorMask)
 
         internal static bool CheckIsTransparent(OpenGl_Aspects theAspect,
             Graphic3d_PresentationAttributes theHighlight)
@@ -632,4 +646,10 @@ myLineFeather (1.0f),*/
 
 
     }
-}
+    public enum OpenGl_FeatureFlag
+    {
+        OpenGl_FeatureNotAvailable = 0, //!< Feature is not supported by OpenGl implementation.
+        OpenGl_FeatureInExtensions = 1, //!< Feature is supported as extension.
+        OpenGl_FeatureInCore = 2  //!< Feature is supported as part of core profile.
+    };
+    }

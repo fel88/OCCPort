@@ -1,6 +1,6 @@
 ﻿namespace OCCPort
 {
-    internal class OpenGl_Texture
+    public class OpenGl_Texture
     {
     }
 }

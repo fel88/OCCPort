@@ -220,19 +220,26 @@ namespace OCCPort.OpenGL
             myUseDepthWrite = v;
         }
 
+        //! Return TextureSet from set Aspects or Environment texture.
         internal OpenGl_TextureSet TextureSet()
         {
-            throw new NotImplementedException();
+            OpenGl_TextureSet aTextureSet = myAspectsSet.TextureSet(myGlContext, ToHighlight());
+            return aTextureSet != null
+                  || myAspectsSet.Aspect().ToMapTexture()
+                  ? aTextureSet
+                  : myEnvironmentTexture;
         }
+        OpenGl_TextureSet myEnvironmentTexture;
 
         internal OpenGl_TextureSet EnvironmentTexture()
         {
             throw new NotImplementedException();
         }
 
+        //! Return true if following structures should apply highlight color.
         internal bool ToHighlight()
         {
-            throw new NotImplementedException();
+            return myHighlightStyle != null;
         }
 
         OpenGl_View myView;
