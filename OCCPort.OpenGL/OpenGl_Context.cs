@@ -1,4 +1,10 @@
-﻿using OCCPort;
+﻿global using Graphic3d_Vec3d = OCCPort.NCollection_Vec3<double>;
+global using Graphic3d_Vec3 = OCCPort.NCollection_Vec3<float>;
+global using Graphic3d_Vec4d = OCCPort.NCollection_Vec4<double>;
+global using Graphic3d_Vec4 = OCCPort.NCollection_Vec4<float>;
+
+
+using OCCPort;
 using OpenTK.Audio.OpenAL;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
@@ -21,6 +27,13 @@ namespace OCCPort.OpenGL
 
             core11fwd = new _core11fwd();
             core15fwd = new _core15fwd();
+
+            //hasPackRowLength=(Standard_True),
+            //hasUnpackRowLength=(Standard_True),
+            //hasHighp=(Standard_True),
+            hasUintIndex = (true);
+  //hasTexRGBA8=(Standard_True),
+//
             /*
              *  mySupportedFormats (new Image_SupportedFormats()),
   myAnisoMax   (1),
@@ -103,7 +116,8 @@ myLineFeather (1.0f),*/
         bool arbSampleShading;   //!< GL_ARB_sample_shading
         bool arbDepthClamp;      //!< GL_ARB_depth_clamp (on desktop 
         public OpenGl_GlCore11 core11ffp;  //!< OpenGL 1.1 core functionality
-        //! @name public properties tracking current state
+                                           //! @name public properties tracking current state
+    public    bool hasUintIndex;       //!< GLuint for index buffer is supported (always available on desktop; on OpenGL ES - since 3.0 or as extension GL_OES_element_index_uint)
 
         public OpenGl_MatrixState<float> ModelWorldState; //!< state of orientation matrix
         public OpenGl_MatrixState<float> WorldViewState;  //!< state of orientation matrix

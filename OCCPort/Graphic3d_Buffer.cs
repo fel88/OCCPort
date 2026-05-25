@@ -116,7 +116,7 @@ namespace OCCPort
             //return (Graphic3d_Attribute)(myData + mySize);
         }
 
-        internal static NCollection_BaseAllocator DefaultAllocator()
+        public static NCollection_BaseAllocator DefaultAllocator()
         {
             return new NCollection_BaseAllocator();
         }
@@ -130,7 +130,7 @@ namespace OCCPort
         Graphic3d_Attribute[] internalAttrtibutes = null;
         //! Allocates new empty array
 
-        internal bool Init(int theNbElems, Graphic3d_Attribute[] theAttribs, int theNbAttribs)
+        public bool Init(int theNbElems, Graphic3d_Attribute[] theAttribs, int theNbAttribs)
         {
             release();
             int aStride = 0;

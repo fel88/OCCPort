@@ -18,12 +18,13 @@ namespace OCCPort
             return (theMode & (Graphic3d_TransModeFlags.Graphic3d_TMF_ZoomPers | Graphic3d_TransModeFlags.Graphic3d_TMF_RotatePers)) != 0;
         }
         //template<class T>
-        public void Apply(Graphic3d_Camera theCamera,
+        public void Apply<T, MinMax>(Graphic3d_Camera theCamera,
                                              NCollection_Mat4 theProjection,
                                              NCollection_Mat4 theWorldView,
                                              int theViewportWidth,
                                              int theViewportHeight,
-                                           ref  BVH_Box theBoundingBox)
+                                           ref BVH_Box<T, MinMax> theBoundingBox) where T : struct
+            where MinMax : IBoxMinMax<T>,new()
         {
             //NCollection_Mat4<T> aTPers = Compute(theCamera, theProjection, theWorldView, theViewportWidth, theViewportHeight);
             //if (aTPers.IsIdentity()

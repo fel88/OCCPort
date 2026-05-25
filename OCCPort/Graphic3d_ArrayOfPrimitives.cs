@@ -227,7 +227,7 @@ namespace OCCPort
             if (myNormData != null)
             {
                 //Graphic3d_Vec3 aVec = (Graphic3d_Vec3)(myNormData + myNormStride * ((Standard_Size)theIndex - 1));
-                var aVec3 = new Graphic3d_Vec3(myNormData, myNormStride);
+                var aVec3 = BinaryHelper. Get_Vec3(myNormData, myNormStride);
                 aVec3.SetValues((float)(theNX),
                  (float)(theNY),
                  (float)(theNZ));
@@ -268,7 +268,7 @@ namespace OCCPort
         {
             Exceptions.Standard_OutOfRange_Raise_if(theIndex < 1 || theIndex > myAttribs.NbMaxElements(), "BAD VERTEX index");
             //Graphic3d_Vec3 aVec = *reinterpret_cast<Graphic3d_Vec3*>(myAttribs->ChangeData() + myPosStride * ((Standard_Size)theIndex - 1));
-            Graphic3d_Vec3 aVec = new Graphic3d_Vec3(myAttribs.Data(), theIndex * myPosStride);
+            Graphic3d_Vec3 aVec = BinaryHelper.Get_Vec3(myAttribs.Data(), theIndex * myPosStride);
             aVec.SetValues(theX, theY, theZ);
             if (myAttribs.NbElements < theIndex)
             {
@@ -445,14 +445,17 @@ namespace OCCPort
             return true;
         }
 
+        //! Returns vertex attributes buffer (colors, normals, texture coordinates).
         internal Graphic3d_Buffer Attributes()
         {
-            throw new NotImplementedException();
+            return myAttribs;
         }
 
+        //! Returns optional bounds buffer.
         internal Graphic3d_BoundBuffer Bounds()
         {
-            throw new NotImplementedException();
+            return myBounds;
+            
         }
         Graphic3d_TypeOfPrimitiveArray myType;
         //! Returns the type of this primitive

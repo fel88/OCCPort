@@ -97,9 +97,10 @@ namespace OCCPort.OpenGL
             }
         }
 
-        internal OpenGl_GraphicDriver GlDriver()
+        public OpenGl_GraphicDriver GlDriver()
         {
-            throw new NotImplementedException();
+    //return (OpenGl_GraphicDriver* )myGraphicDriver.operator->();
+            return (OpenGl_GraphicDriver)myGraphicDriver;
         }
 
         internal void UpdateStateIfRaytracable(bool v)

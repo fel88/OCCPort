@@ -328,9 +328,38 @@ namespace OCCPort.OpenGL
 
         }
 
-        private void processIndices(OpenGl_Context aCtx)
+        //! Rebuilds the array of vertex attributes so that it can be drawn without indices.
+        private bool processIndices(OpenGl_Context theContext)
         {
-            throw new NotImplementedException();
+            if (myIndices == null
+  || myAttribs == null
+  || theContext.hasUintIndex)
+            {
+                return true;
+            }
+
+            //if (myAttribs.NbElements > std::numeric_limits < GLushort >::max())
+            if (myAttribs.NbElements > ushort.MaxValue)
+            {
+                Graphic3d_Buffer anAttribs = new Graphic3d_Buffer(Graphic3d_Buffer.DefaultAllocator());
+                if (!anAttribs.Init(myIndices.NbElements, myAttribs.AttributesArray(), myAttribs.NbAttributes))
+                {
+                    return false; // failed to initialize attribute array
+                }
+
+                for (int anIdxIdx = 0; anIdxIdx < myIndices.NbElements; ++anIdxIdx)
+                {
+                    int anIndex = myIndices.Index(anIdxIdx);
+                    /*memcpy(anAttribs->ChangeData() + myAttribs->Stride * anIdxIdx,
+                            myAttribs->Data() + myAttribs->Stride * anIndex,
+                            myAttribs->Stride);*/
+                }
+
+                myIndices = null;
+                myAttribs = anAttribs;
+            }
+
+            return true;
         }
 
         private void updateVBO(OpenGl_Context aCtx)
@@ -426,8 +455,18 @@ namespace OCCPort.OpenGL
 
         private void clearMemoryGL(OpenGl_Context theCtx)
         {
-            throw new NotImplementedException();
+            if (myVboIndices != null)
+            {
+                myVboIndices.Release(theGlCtx.operator->());
+                myVboIndices = null;
+            }
+            if (myVboAttribs != null)
+            {
+                //myVboAttribs.Release(theGlCtx.operator->());
+                myVboAttribs = null;
+            }
         }
+
         //! Initialize normal (OpenGL-provided) VBO
         private bool initNormalVbo(OpenGl_Context theCtx)
         {

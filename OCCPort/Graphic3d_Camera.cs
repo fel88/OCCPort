@@ -1,4 +1,5 @@
 ﻿using OCCPort;
+using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -758,19 +759,19 @@ namespace OCCPort
 
             theMatrices.InitOrientation();
 
-            NCollection_Vec3_double anEye = new NCollection_Vec3_double((myEye.X()),
+            Vector3d anEye = new Vector3d((myEye.X()),
                                            (myEye.Y()),
                                            (myEye.Z()));
 
-            NCollection_Vec3_double aViewDir = new NCollection_Vec3_double((myDirection.X()),
+            Vector3d aViewDir = new Vector3d((myDirection.X()),
                                               (myDirection.Y()),
                                               (myDirection.Z()));
 
-            NCollection_Vec3_double anUp = new NCollection_Vec3_double((myUp.X()),
+            Vector3d anUp = new Vector3d((myUp.X()),
                                           (myUp.Y()),
                                           (myUp.Z()));
 
-            NCollection_Vec3_double anAxialScale = new NCollection_Vec3_double((myAxialScale.X()),
+            Vector3d anAxialScale = new Vector3d((myAxialScale.X()),
                                                   (myAxialScale.Y()),
                                                   (myAxialScale.Z()));
 
@@ -780,22 +781,22 @@ namespace OCCPort
 
         }
 
-        private void LookOrientation(NCollection_Vec3_double theEye, NCollection_Vec3_double theFwdDir,
+        private void LookOrientation(Vector3d theEye, Vector3d theFwdDir,
 
-            NCollection_Vec3_double theUpDir, NCollection_Vec3_double theAxialScale,
+            Vector3d theUpDir, Vector3d theAxialScale,
 
             Graphic3d_Mat4d theOutMx)
         {
 
-            NCollection_Vec3_double aForward = theFwdDir;
+            Vector3d aForward = theFwdDir;
             aForward.Normalize();
 
             // side = forward x up
-            NCollection_Vec3_double aSide = NCollection_Vec3_double.Cross(aForward, theUpDir);
+            Vector3d aSide = Vector3d.Cross(aForward, theUpDir);
             aSide.Normalize();
 
             // recompute up as: up = side x forward
-            NCollection_Vec3_double anUp = NCollection_Vec3_double.Cross(aSide, aForward);
+            Vector3d anUp = Vector3d.Cross(aSide, aForward);
 
             NCollection_Mat4 aLookMx = new NCollection_Mat4();
             aLookMx.SetRow(0, aSide);
@@ -807,9 +808,9 @@ namespace OCCPort
             theOutMx.Translate(-theEye);
 
             NCollection_Mat4 anAxialScaleMx = new NCollection_Mat4();
-            anAxialScaleMx.ChangeValue(0, 0, theAxialScale.x());
-            anAxialScaleMx.ChangeValue(1, 1, theAxialScale.y());
-            anAxialScaleMx.ChangeValue(2, 2, theAxialScale.z());
+            anAxialScaleMx.ChangeValue(0, 0, theAxialScale.X);
+            anAxialScaleMx.ChangeValue(1, 1, theAxialScale.Y);
+            anAxialScaleMx.ChangeValue(2, 2, theAxialScale.Z);
 
             theOutMx.Multiply(anAxialScaleMx);
 
@@ -1017,8 +1018,8 @@ namespace OCCPort
                         && aIOD != (0.0))
                         {
                             // X translation to cancel parallax
-                            theProjL.Translate(new NCollection_Vec3_double((0.5) * aIOD, (0.0), (0.0)));
-                            theProjR.Translate(new NCollection_Vec3_double((-0.5) * aIOD, (0.0), (0.0)));
+                            theProjL.Translate(new Vector3d((0.5) * aIOD, (0.0), (0.0)));
+                            theProjR.Translate(new Vector3d((-0.5) * aIOD, (0.0), (0.0)));
                         }
                         break;
                     }

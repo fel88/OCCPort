@@ -1,18 +1,23 @@
 ﻿namespace OCCPort
 {
-    public class NCollection_Vec4_float
+    //! Generic 4-components vector.
+    //! To be used as RGBA color vector or XYZW 3D-point with special W-component
+    //! for operations with projection / model view matrices.
+    //! Use this class for 3D-points carefully because declared W-component may
+    //! results in incorrect results if used without matrices.
+    public struct NCollection_Vec4<Element_t>
     {
-        public NCollection_Vec4_float()
+        public NCollection_Vec4()
         {
-            v = new float[4];
+            v = new Element_t[4];
         }
         //! Per-component constructor.
-        public NCollection_Vec4_float(float theX,
-                            float theY,
-                            float theZ,
-                            float theW)
+        public NCollection_Vec4(Element_t theX,
+                            Element_t theY,
+                            Element_t theZ,
+                            Element_t theW)
         {
-            v = new float[4];
+            v = new Element_t[4];
             v[0] = theX;
             v[1] = theY;
             v[2] = theZ;
@@ -20,30 +25,34 @@
         }
 
 
-        protected float[] v; //!< define the vector as array to avoid structure alignment issues
+        public Element_t X { get => v[0]; set => v[0] = value; }
+        public Element_t Y { get => v[1]; set => v[1] = value; }
+        public Element_t Z { get => v[2]; set => v[2] = value; }
+        public Element_t W { get => v[3]; set => v[3] = value; }
+        public Element_t[] v; //!< define the vector as array to avoid structure alignment issues
                               //! Alias to 1st component as X coordinate in XYZW.
-        public float x() { return v[0]; }
+        public Element_t x() { return v[0]; }
 
         //! Alias to 1st component as RED channel in RGBA.
-        public float r() { return v[0]; }
+        public Element_t r() { return v[0]; }
 
         //! Alias to 2nd component as Y coordinate in XYZW.
-        public float y() { return v[1]; }
+        public Element_t y() { return v[1]; }
 
         //! Alias to 2nd component as GREEN channel in RGBA.
-        public float g() { return v[1]; }
+        public Element_t g() { return v[1]; }
 
         //! Alias to 3rd component as Z coordinate in XYZW.
-        public float z() { return v[2]; }
+        public Element_t z() { return v[2]; }
 
         //! Alias to 3rd component as BLUE channel in RGBA.
-        public float b() { return v[2]; }
+        public Element_t b() { return v[2]; }
 
         //! Alias to 4th component as W coordinate in XYZW.
-        public float w() { return v[3]; }
+        public Element_t w() { return v[3]; }
 
         //! Alias to 4th component as ALPHA channel in RGBA.
-        public float a() { return v[3]; }
+        public Element_t a() { return v[3]; }
 
 
     }

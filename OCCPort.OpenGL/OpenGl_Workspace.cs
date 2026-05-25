@@ -4,6 +4,9 @@ using System.Reflection.Metadata;
 
 namespace OCCPort.OpenGL
 {
+
+    //! Rendering workspace.
+    //! Provides methods to render primitives and maintain GL state.
     public class OpenGl_Workspace
     {
 
@@ -84,7 +87,7 @@ namespace OCCPort.OpenGL
 
         internal OpenGl_Aspects Aspects()
         {
-            throw new NotImplementedException();
+            return myAspectsSet;
         }
 
         internal int RenderFilter()
@@ -132,7 +135,7 @@ namespace OCCPort.OpenGL
 
         internal void SetRenderFilter(int theFilter)
         {
-          myRenderFilter = theFilter;
+            myRenderFilter = theFilter;
 
         }
 
@@ -247,6 +250,15 @@ namespace OCCPort.OpenGL
             myGlContext = (theWindow != null ? theWindow.GetGlContext() : null);
             myUseZBuffer = (true);
             myUseDepthWrite = (true);
+
+            //
+            myAspectsSet = (myDefaultAspects);
+            //
+            myToAllowFaceCulling = (false);
         }
+        OpenGl_Aspects myDefaultAspects = new OpenGl_Aspects();
+
+        bool myToAllowFaceCulling; //!< allow back face culling
+
     }
 }

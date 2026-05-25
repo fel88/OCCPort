@@ -7,14 +7,49 @@ using System.Xml.Linq;
 
 namespace OCCPort
 {
-    public class NCollection_IndexedDataMap<T1, T2, Hasher> : NCollection_BaseMap where Hasher : IEqualityComparer<T1>, new()
+    public class NCollection_IndexedDataMap<TheKeyType, T2, Hasher> : NCollection_BaseMap where Hasher : IEqualityComparer<TheKeyType>, new()
     {
+        public class Iterator
+        {
+            public Iterator(NCollection_IndexedDataMap<TheKeyType, T2, Hasher> aMapOfPCurves)
+            {
+                myMap = aMapOfPCurves;
+                myIndex = (1);
+            }
+            NCollection_IndexedDataMap<TheKeyType, T2, Hasher> myMap;   //!< Pointer to current node
+            int myIndex; //!< Current index
+
+            //! Query if the end of collection is reached by iterator
+            internal bool More()
+            {
+                return (myMap != null) && (myIndex <= myMap.Extent());
+            }
+
+            public TheKeyType Key()
+            {
+                Exceptions.Standard_NoSuchObject_Raise_if(!More(), "NCollection_IndexedDataMap::Iterator::Key");
+                return myMap.FindKey(myIndex);
+            }
+
+            //! Make a step along the collection
+            internal void Next()
+            {
+                ++myIndex;
+            }
+            //! Value access
+            public T2 Value()
+            {
+                Exceptions.Standard_NoSuchObject_Raise_if(!More(), "NCollection_IndexedDataMap::Iterator::Value");
+                return myMap.FindFromIndex(myIndex);
+            }
+
+        }
         public NCollection_IndexedDataMap()
         {
-            dic = new List<KeyValuePair<T1, T2>>();
+            dic = new List<KeyValuePair<TheKeyType, T2>>();
         }
 
-        public List<KeyValuePair<T1, T2>> dic = null;
+        public List<KeyValuePair<TheKeyType, T2>> dic = null;
 
         Hasher hasher = new Hasher();
         public T2 this[int key]
@@ -34,7 +69,7 @@ namespace OCCPort
             //return aNode->Value();
         }
 
-        public T1 FindKey(int theIndex)
+        public TheKeyType FindKey(int theIndex)
         {
             Exceptions.Standard_OutOfRange_Raise_if(theIndex < 1 || theIndex > Extent(), "NCollection_IndexedDataMap::FindKey");
             var aNode = dic[theIndex - 1];
@@ -45,7 +80,7 @@ namespace OCCPort
         //! @param theKey1 Key to search (and to bind, if it was not bound already)
         //! @param theItem Item value to set for newly bound Key; ignored if Key was already bound
         //! @return index of Key
-        public int Add(T1 theKey1, T2 theItem)
+        public int Add(TheKeyType theKey1, T2 theItem)
         {
             for (int i = 0; i < dic.Count; i++)
             {
@@ -53,7 +88,7 @@ namespace OCCPort
                     //if (dic[i].Key.Equals(theKey1))
                     return i;
             }
-            dic.Add(new KeyValuePair<T1, T2>(theKey1, theItem));
+            dic.Add(new KeyValuePair<TheKeyType, T2>(theKey1, theItem));
             return dic.Count;
             //if (Resizable())
             //{
@@ -79,14 +114,14 @@ namespace OCCPort
         }
         //! Substitute
         public void Substitute(int theIndex,
-                     T1 theKey1,
+                     TheKeyType theKey1,
                      T2 theItem)
         {
             Exceptions.Standard_OutOfRange_Raise_if(theIndex < 1 || theIndex > Extent(),
                                           "NCollection_IndexedDataMap::Substitute : " +
                                           "Index is out of range");
 
-            dic[theIndex] = new KeyValuePair<T1, T2>(theKey1, theItem);
+            dic[theIndex] = new KeyValuePair<TheKeyType, T2>(theKey1, theItem);
             // check if theKey1 is not already in the map
             //const Standard_Integer iK1 = Hasher::HashCode(theKey1, NbBuckets());
             //IndexedDataMapNode* p = (IndexedDataMapNode*)myData1[iK1];
@@ -129,7 +164,7 @@ namespace OCCPort
         }
 
         //! FindIndex
-        public int FindIndex(T1 theKey1)
+        public int FindIndex(TheKeyType theKey1)
         {
             if (IsEmpty())
                 return 0;

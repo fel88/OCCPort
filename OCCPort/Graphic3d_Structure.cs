@@ -423,8 +423,8 @@ namespace OCCPort
             {
                 if (myCStructure.Transformation() != null)
                 {
-                    BVH_VecNt minv = aBox.CornerMin();
-                    BVH_VecNt maxv = aBox.CornerMax();
+                    var minv = aBox.CornerMin();
+                    var maxv = aBox.CornerMax();
                     TransformBoundaries(myCStructure.Transformation().Trsf(),
                          ref minv.v[0], ref minv.v[1], ref minv.v[2],
                          ref maxv.v[0], ref maxv.v[1], ref maxv.v[2]);

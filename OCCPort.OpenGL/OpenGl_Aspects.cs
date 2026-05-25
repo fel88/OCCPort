@@ -5,9 +5,22 @@ namespace OCCPort.OpenGL
     internal class OpenGl_Aspects : OpenGl_Element
     {
         //! OpenGl resources
-        OpenGl_AspectsProgram myResProgram;
-        OpenGl_AspectsTextureSet myResTextureSet;
-        OpenGl_AspectsSprite myResSprite;
+        OpenGl_AspectsProgram myResProgram = new OpenGl_AspectsProgram();
+        OpenGl_AspectsTextureSet myResTextureSet = new OpenGl_AspectsTextureSet();
+        OpenGl_AspectsSprite myResSprite = new OpenGl_AspectsSprite();
+        public OpenGl_Aspects()
+
+        {
+            myAspect = (new Graphic3d_Aspects());
+            myShadingModel = Graphic3d_TypeOfShadingModel.Graphic3d_TypeOfShadingModel_Unlit;
+            myAspect.SetInteriorStyle(Enums.Aspect_InteriorStyle.Aspect_IS_SOLID);
+            /*myAspect.SetInteriorColor(Quantity_NOC_WHITE);
+            myAspect.SetEdgeColor(Quantity_NOC_WHITE);
+            myAspect.SetFrontMaterial(THE_DEFAULT_MATERIAL);
+            myAspect.SetBackMaterial(THE_DEFAULT_MATERIAL);
+            myAspect.SetShadingModel(myShadingModel);
+            myAspect.SetHatchStyle(Handle(Graphic3d_HatchStyle)());*/
+        }
 
         public OpenGl_Aspects(Graphic3d_Aspects theAspect)
         {
@@ -24,7 +37,7 @@ namespace OCCPort.OpenGL
 
             Graphic3d_MaterialAspect aMat = theAspect.FrontMaterial();
             myShadingModel = theAspect.ShadingModel() != Graphic3d_TypeOfShadingModel.Graphic3d_TypeOfShadingModel_Unlit
-                    && (aMat.ReflectionMode(Graphic3d_TypeOfReflection. Graphic3d_TOR_AMBIENT)
+                    && (aMat.ReflectionMode(Graphic3d_TypeOfReflection.Graphic3d_TOR_AMBIENT)
                      || aMat.ReflectionMode(Graphic3d_TypeOfReflection.Graphic3d_TOR_DIFFUSE)
                      || aMat.ReflectionMode(Graphic3d_TypeOfReflection.Graphic3d_TOR_SPECULAR)
                      || aMat.ReflectionMode(Graphic3d_TypeOfReflection.Graphic3d_TOR_EMISSION))

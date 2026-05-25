@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 
 namespace OCCPort
 {
+    //! Presentations list sorted within priorities.
     public class Graphic3d_Layer
     {
         // =======================================================================
@@ -39,7 +40,7 @@ namespace OCCPort
                         continue;
                     }
 
-                    BVH_Box aBox = aStructure.BoundingBox();
+                    BVH_Box<Graphic3d_Vec3d, Graphic3d_Vec3d_BoxMinMax> aBox = aStructure.BoundingBox();
                     if (!aBox.IsValid())
                     {
                         continue;

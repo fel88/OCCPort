@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenTK.Mathematics;
+using System;
 
 namespace OCCPort
 {
@@ -41,7 +42,7 @@ namespace OCCPort
 
 		}
 
-		public  void Translate(NCollection_Vec3_double theVec)
+		public  void Translate(Vector3d theVec)
 		{
 			NCollection_Mat4 aTempMat = new NCollection_Mat4();
 			aTempMat.SetColumn(3, theVec);

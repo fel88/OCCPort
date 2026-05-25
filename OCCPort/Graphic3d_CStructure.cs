@@ -86,7 +86,7 @@ namespace OCCPort
             myId = myGraphicDriver.NewIdentification();
         }
 
-        Graphic3d_GraphicDriver myGraphicDriver;
+        protected Graphic3d_GraphicDriver myGraphicDriver;
 
         //! @return bounding box of this presentation
 

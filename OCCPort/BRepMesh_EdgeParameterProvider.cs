@@ -7,7 +7,7 @@ namespace OCCPort
     //! Auxiliary class provides correct parameters 
     //! on curve regarding SameParameter flag.
 
-    public class BRepMesh_EdgeParameterProvider  
+    public class BRepMesh_EdgeParameterProvider
     {
         //! Constructor. Initializes empty provider.
         public BRepMesh_EdgeParameterProvider()
@@ -79,11 +79,11 @@ IMeshData_Face theFace,
         }
 
         //! Initialized provider by the given data.
-    public    void Init(
-    IMeshData_Edge theEdge,
-    TopAbs_Orientation theOrientation,
-    IMeshData_Face theFace,
-    IParametersCollection theParameters)
+        public void Init(
+        IMeshData_Edge theEdge,
+        TopAbs_Orientation theOrientation,
+        IMeshData_Face theFace,
+        IParametersCollection theParameters)
         {
             myParameters = theParameters;
             myIsSameParam = theEdge.GetSameParam();

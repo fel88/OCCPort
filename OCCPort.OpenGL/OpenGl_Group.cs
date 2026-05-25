@@ -101,15 +101,9 @@ namespace OCCPort.OpenGL
         }
 
 
-        private bool IsDeleted()
-        {
-            throw new NotImplementedException();
-        }
+   
 
-        internal Graphic3d_TransformPers TransformPersistence()
-        {
-            throw new NotImplementedException();
-        }
+        
         public bool renderFiltered(OpenGl_Workspace theWorkspace,
                                        OpenGl_Element theElement)
         {
@@ -121,7 +115,7 @@ namespace OCCPort.OpenGL
             theElement.Render(theWorkspace);
             return true;
         }
-        bool myIsClosed;
+        
 
         
         internal void Render(OpenGl_Workspace theWorkspace)
@@ -144,11 +138,23 @@ namespace OCCPort.OpenGL
 
         }
 
-        internal bool IsClosed()
-        {
-            throw new NotImplementedException();
-        }
-
         
+
+        public override void SetPrimitivesAspect(Graphic3d_Aspects theAspect)
+        {
+            if (myAspects == null)
+            {
+                SetGroupPrimitivesAspect(theAspect);
+                return;
+            }
+            else if (IsDeleted())
+            {
+                return;
+            }
+
+            OpenGl_Aspects anAspects = new OpenGl_Aspects(theAspect);
+            AddElement(anAspects);
+            Update();
+        }
     }
 }

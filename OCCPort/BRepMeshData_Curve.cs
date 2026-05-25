@@ -12,7 +12,7 @@
             }
             else if (ParametersNb() > 2)
             {
-                myPoints.erase( 1,  (myPoints.size() - 1));
+                myPoints.erase(1, (myPoints.size() - 1));
                 myParameters.erase(1, (myParameters.size() - 1));
             }
         }
@@ -23,13 +23,13 @@
 
         }
 
-        SequenceOfPnt myPoints;
-        SequenceOfReal myParameters;
+        IMeshData.Model.SequenceOfPnt myPoints;
+        IMeshData.Model.SequenceOfReal myParameters;
 
         public BRepMeshData_Curve()
         {
-            myParameters = new SequenceOfReal();
-            myPoints = new SequenceOfPnt();
+            myParameters = new();
+            myPoints = new();
         }
 
         public gp_Pnt GetPoint(int theIndex)
@@ -52,8 +52,8 @@
 
         public void InsertPoint(int thePosition, gp_Pnt thePoint, double theParamOnPCurve)
         {
-            myPoints.Insert( thePosition, thePoint);
-            myParameters.Insert( thePosition, theParamOnPCurve);
+            myPoints.Insert(thePosition, thePoint);
+            myParameters.Insert(thePosition, theParamOnPCurve);
         }
     }
 }

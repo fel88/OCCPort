@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenTK.Mathematics;
+using System;
 using System.Configuration;
 using System.Diagnostics.Contracts;
 
@@ -209,17 +210,13 @@ namespace OCCPort
 			return NCollection_Mat4.Multiply(mat, theMat);
 		}
 
-		
-
-		
-
-
-		internal void Translate(NCollection_Vec3_double theVec)
+		internal void Translate(Vector3d theVec)
 		{
 			NCollection_Mat4 aTempMat = new NCollection_Mat4();
 			aTempMat.SetColumn(3, theVec);
 			Multiply(aTempMat);
 		}
+
 		double[] MyIdentityArray =
 		 {1, 0, 0, 0,
    0, 1, 0, 0,
@@ -256,11 +253,11 @@ namespace OCCPort
 			}
 		}
 
-		internal void SetRow(int theRow, NCollection_Vec3_double theVec)
+		internal void SetRow(int theRow, Vector3d theVec)
 		{
-			SetValue(theRow, 0, theVec.x());
-			SetValue(theRow, 1, theVec.y());
-			SetValue(theRow, 2, theVec.z());
+			SetValue(theRow, 0, theVec.X);
+			SetValue(theRow, 1, theVec.Y);
+			SetValue(theRow, 2, theVec.Z);
 
 		}
 
@@ -276,12 +273,12 @@ namespace OCCPort
 
 		}
 
-		internal void SetColumn(int theCol, NCollection_Vec3_double theVec)
+		internal void SetColumn(int theCol, Vector3d theVec)
 		{
 
-			SetValue(0, theCol, theVec.x());
-			SetValue(1, theCol, theVec.y());
-			SetValue(2, theCol, theVec.z());
+			SetValue(0, theCol, theVec.X);
+			SetValue(1, theCol, theVec.Y);
+			SetValue(2, theCol, theVec.Z);
 
 		}
 

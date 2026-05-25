@@ -10,12 +10,15 @@ namespace OCCPort
         {
             myInteriorColor = new Quantity_ColorRGBA(new Quantity_Color(Quantity_NameOfColor.Quantity_NOC_CYAN1));
             /*myBackInteriorColor(Quantity_NOC_CYAN1),
-            myEdgeColor(Quantity_NOC_WHITE),
-            myInteriorStyle(Aspect_IS_SOLID),*/
+            myEdgeColor(Quantity_NOC_WHITE),*/
+            myInteriorStyle = Aspect_InteriorStyle.Aspect_IS_SOLID;
             myShadingModel = Graphic3d_TypeOfShadingModel.Graphic3d_TypeOfShadingModel_DEFAULT;
             //myFaceCulling= (Graphic3d_TypeOfBackfacingModel_Auto),
             //myAlphaMode(Graphic3d_AlphaMod*/
         }
+
+        //! Modifies the interior type used for rendering
+       public void SetInteriorStyle( Aspect_InteriorStyle theStyle) { myInteriorStyle = theStyle; }
 
         //! Check for equality with another aspects.
         public bool IsEqual(Graphic3d_Aspects theOther)
@@ -28,8 +31,8 @@ namespace OCCPort
                 && myMarkerImage == theOther.myMarkerImage
                 && myInteriorColor == theOther.myInteriorColor
                 && myBackInteriorColor == theOther.myBackInteriorColor
-              //  && myFrontMaterial == theOther.myFrontMaterial
-             //   && myBackMaterial == theOther.myBackMaterial
+                && myFrontMaterial == theOther.myFrontMaterial
+                && myBackMaterial == theOther.myBackMaterial
              //   && myInteriorStyle == theOther.myInteriorStyle
                 && myShadingModel == theOther.myShadingModel
                 && myFaceCulling == theOther.myFaceCulling
@@ -56,6 +59,10 @@ namespace OCCPort
                 && myToMapTexture == theOther.myToMapTexture
                 && myIsTextZoomable == theOther.myIsTextZoomable;
         }
+
+        Graphic3d_MaterialAspect myFrontMaterial;
+        Graphic3d_MaterialAspect myBackMaterial;
+        Aspect_InteriorStyle myInteriorStyle;
 
         //! Return true if texture mapping is enabled (false by default).
         public bool ToMapTexture() { return myToMapTexture; }
@@ -120,14 +127,16 @@ namespace OCCPort
 
         Graphic3d_AlphaMode myAlphaMode;
 
+        //! Returns the surface material of external faces
         public Graphic3d_MaterialAspect FrontMaterial()
         {
-            throw new NotImplementedException();
+            return myFrontMaterial;
         }
 
+        //! Returns the surface material of internal faces
         public Graphic3d_MaterialAspect BackMaterial()
         {
-            throw new NotImplementedException();
+            return myBackMaterial;
         }
 
 

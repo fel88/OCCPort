@@ -53,10 +53,12 @@ namespace OCCPort.OpenGL
 
         }
 
+        //! Returns unique ID for primitive arrays.
         internal int GetNextPrimitiveArrayUID()
         {
-            throw new NotImplementedException();
+                return myUIDGenerator.Increment();                
         }
+        OpenGl_StateCounter myUIDGenerator=new OpenGl_StateCounter (); //!< Unique ID counter for primitive arrays.
 
         const OpenGl_Context TheNullGlCtx = null;
 

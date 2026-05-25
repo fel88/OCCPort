@@ -43,6 +43,7 @@ namespace OCCPort
 
             return GetDeflection(aVecMin, aVecMax, theDeviationCoefficient);
         }
+
         //! Computes the absolute deflection value based on relative deflection Prs3d_Drawer::DeviationCoefficient().
         //! @param theBndMin [in] bounding box min corner
         //! @param theBndMax [in] bounding box max corner

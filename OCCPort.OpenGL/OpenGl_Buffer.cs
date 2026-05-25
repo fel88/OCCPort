@@ -10,6 +10,25 @@ namespace OCCPort.OpenGL
         {
             myDataType = All.Float;
         }
+        public void Release(OpenGl_Context* theGlCtx)
+        {
+            if (myBufferId == NO_BUFFER)
+            {
+                return;
+            }
+
+            // application can not handle this case by exception - this is bug in code
+            Standard_ASSERT_RETURN(theGlCtx != NULL,
+              "OpenGl_Buffer destroyed without GL context! Possible GPU memory leakage...",);
+
+            if (theGlCtx->IsValid())
+            {
+                theGlCtx->core15fwd->glDeleteBuffers(1, &myBufferId);
+            }
+            myOffset = NULL;
+            myBufferId = NO_BUFFER;
+        }
+
 
         //! @return number of vertex attributes / number of vertices specified within ::Init()
         public int GetElemsNb() { return myElemsNb; }

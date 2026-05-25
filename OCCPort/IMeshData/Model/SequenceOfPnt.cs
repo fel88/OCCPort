@@ -1,6 +1,6 @@
 ﻿namespace OCCPort.IMeshData.Model
 {
-    internal class SequenceOfReal : deque<double>
+    internal class SequenceOfPnt : deque<gp_Pnt>
     {
 
     }
