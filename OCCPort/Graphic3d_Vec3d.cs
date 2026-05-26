@@ -3,6 +3,9 @@ global using Graphic3d_Vec3 = OCCPort.NCollection_Vec3<float>;
 global using Graphic3d_Vec4d = OCCPort.NCollection_Vec4<double>;
 global using Graphic3d_Vec4 = OCCPort.NCollection_Vec4<float>;
 global using BVH_Vec3d  = OCCPort.NCollection_Vec3<double>;
+global using IFacePtr = OCCPort.Interfaces.IMeshData_Face;
+global using IWireHandle = OCCPort.Interfaces.IMeshData_Wire;
+
 
 using OpenTK.Mathematics;
 

@@ -67,13 +67,13 @@ namespace OCCPort
                     continue;
                 }
 
-             //   if (!aMapOfPCurves.Contains(aDFacePtr))
+                if (!aMapOfPCurves.Contains(aDFacePtr))
                 {
-                 //   aMapOfPCurves.Add(aDFacePtr, new ListOfIPCurves());
+                    aMapOfPCurves.Add(aDFacePtr, new ListOfIPCurves());
                 }
 
-              //  ListOfIPCurves aPCurves = aMapOfPCurves.ChangeFromKey(aDFacePtr);
-               // aPCurves.Append(aPCurve);
+                ListOfIPCurves aPCurves = aMapOfPCurves.ChangeFromKey(aDFacePtr);
+                aPCurves.Append(aPCurve);
             }
 
             // Commit polygons related to separate face.

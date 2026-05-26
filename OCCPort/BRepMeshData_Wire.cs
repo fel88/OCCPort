@@ -1,4 +1,5 @@
 ﻿using OCCPort.Interfaces;
+using OpenTK.Graphics.ES20;
 
 namespace OCCPort
 {
@@ -9,7 +10,7 @@ namespace OCCPort
         {
             return myDEdges.Count;
         }
-        public int AddEdge(IMeshData_Edge theDEdge, TopAbs_Orientation theOrientation)
+        public override int AddEdge(IMeshData_Edge theDEdge, TopAbs_Orientation theOrientation)
         {
             int aIndex = EdgesNb();
 

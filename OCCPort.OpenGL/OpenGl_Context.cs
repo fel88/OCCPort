@@ -108,6 +108,7 @@ myLineFeather (1.0f),*/
             myPolygonOffset.Factor = 0.0f;
             myPolygonOffset.Units = 0.0f;*/
             myShaderManager = new OpenGl_ShaderManager(this);
+            mySharedResources = (new OpenGl_ResourcesMap());
 
 
         }
@@ -132,9 +133,23 @@ myLineFeather (1.0f),*/
         public OpenGl_MatrixState<float> WorldViewState;  //!< state of orientation matrix
         public OpenGl_MatrixState<float> ProjectionState; //!< state of projection  matrix
         OpenGl_GlCore32 core32;     //!< OpenGL 3.2 core profile
-        internal bool GetResource<T>(string theShareKey, T theProgram)
+
+        internal bool GetResource<TheHandleType>(string theKey, ref TheHandleType theValue) where TheHandleType : class
         {
-            throw new NotImplementedException();
+            OpenGl_Resource aResource = GetResource(theKey);
+            if (aResource == null)
+            {
+                return false;
+            }
+
+
+            theValue = aResource as TheHandleType;
+            return theValue != null;
+        }
+
+        public OpenGl_Resource GetResource(string theKey)
+        {
+            return mySharedResources.IsBound(theKey) ? mySharedResources.Find(theKey) : null;
         }
 
         //! Return active draw buffer attached to a render target referred by index (layout location).
@@ -346,7 +361,7 @@ myLineFeather (1.0f),*/
         {
             return myClippingState;
         }
-        OpenGl_Clipping myClippingState=new OpenGl_Clipping (); //!< state of clip planes
+        OpenGl_Clipping myClippingState = new OpenGl_Clipping(); //!< state of clip planes
 
 
         OpenGl_ShaderManager myShaderManager; //! support object for managing shader programs
@@ -652,4 +667,4 @@ myLineFeather (1.0f),*/
         OpenGl_FeatureInExtensions = 1, //!< Feature is supported as extension.
         OpenGl_FeatureInCore = 2  //!< Feature is supported as part of core profile.
     };
-    }
+}

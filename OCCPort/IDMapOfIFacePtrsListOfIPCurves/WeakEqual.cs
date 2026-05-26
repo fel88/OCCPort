@@ -1,15 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
-public class WeakEqual<T> : IEqualityComparer<T>
+public class WeakEqual<T> : IEqualityComparer<T> where T: class
 {
-    public bool Equals(T? x, T? y)
+    public bool Equals(T x, T y)
     {
-        throw new System.NotImplementedException();
+        return x == y;        
     }
 
     public int GetHashCode([DisallowNull] T obj)
     {
-        throw new System.NotImplementedException();
+        return obj.GetHashCode();
     }
 }

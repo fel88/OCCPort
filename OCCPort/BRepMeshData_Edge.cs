@@ -72,17 +72,7 @@ namespace OCCPort
             return mySameRange;
         }
 
-        public IMeshData_PCurve GetPCurve(
-  IFacePtr theDFace,
-  TopAbs_Orientation theOrientation)
-        {
-            ListOfInteger aListOfPCurves = myPCurvesMap.Find(theDFace);
-            IMeshData_PCurve aPCurve1 = myPCurves.get(aListOfPCurves.First());
-            return (aPCurve1.GetOrientation() == theOrientation) ?
-              aPCurve1 :
-              myPCurves.get(aListOfPCurves.Last());
-        }
-
+        
         public IMeshData_Curve GetCurve()
         {
             return myCurve;
@@ -92,6 +82,7 @@ namespace OCCPort
         {
             return myPCurves[theIndex];
         }
+        
 
 
         //! Returns pcurve for the specified discrete face.

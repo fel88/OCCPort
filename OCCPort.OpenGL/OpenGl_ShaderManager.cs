@@ -2,6 +2,7 @@
 using OpenTK.Compute.OpenCL;
 using OpenTK.Graphics.OpenGL;
 using System;
+using System.Linq;
 using System.Reflection.Metadata;
 
 namespace OCCPort.OpenGL
@@ -15,6 +16,44 @@ namespace OCCPort.OpenGL
             myContext = theCtx;
         }
 
+        //! Creates new shader program or re-use shared instance.
+        //! @param theProxy    [IN]  program definition
+        //! @param theShareKey [OUT] sharing key
+        //! @param theProgram  [OUT] OpenGL program
+        //! @return true on success
+        public bool Create(Graphic3d_ShaderProgram theProxy,
+                ref string theShareKey,
+                OpenGl_ShaderProgram theProgram)
+        {
+            theProgram = null;
+            if (theProxy == null)
+            {
+                return false;
+            }
+
+            theShareKey = theProxy.GetId();
+            if (myContext.GetResource<OpenGl_ShaderProgram>(theShareKey,  ref theProgram))
+            {
+                if (theProgram.Share())
+                {
+                    myProgramList.Append(theProgram);
+                }
+                return true;
+            }
+
+            theProgram = new OpenGl_ShaderProgram(theProxy);
+            if (!theProgram.Initialize(myContext, theProxy.ShaderObjects()))
+            {
+                theProgram.Release(myContext);
+                theShareKey.Clear();
+                theProgram = null;
+                return false;
+            }
+
+            myProgramList.Append(theProgram);
+            myContext.ShareResource(theShareKey, theProgram);
+            return true;
+        }
 
         // =======================================================================
         // function : Unregister
@@ -77,6 +116,7 @@ namespace OCCPort.OpenGL
         OpenGl_VertexBuffer myBoundBoxVertBuffer; //!< bounding box vertex buffer
 
 
+       
 
         OpenGl_Context myContext;            //!< OpenGL context
 

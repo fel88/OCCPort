@@ -5,7 +5,8 @@
         protected AbstractMeshData_Wire(TopoDS_Shape theShape) : base(theShape)
         {
         }
-       
+
+        public abstract int AddEdge(IMeshData_Edge theDEdge, TopAbs_Orientation theOrientation);
 
         public abstract int EdgesNb();
 

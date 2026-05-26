@@ -47,7 +47,7 @@ namespace OCCPort
                     continue;
                 }
 
-                //aWires[aWireIt] = collectWirePoints(aDWire);// todo: ??
+                aWires[aWireIt] = collectWirePoints(aDWire);// todo: ??
             }
 
             myRangeSplitter.AdjustRange();
@@ -127,11 +127,11 @@ namespace OCCPort
         }
 
         //! Creates collection of points representing discrete wire.
-        OCCPort.IMeshData.Model.SequenceOfPnt2d collectWirePoints(
+        SequenceOfPnt2d collectWirePoints(
     IWireHandle theDWire
     )
         {
-            OCCPort.IMeshData.Model.SequenceOfPnt2d aWirePoints = new OCCPort.IMeshData.Model.SequenceOfPnt2d();
+            SequenceOfPnt2d aWirePoints = new SequenceOfPnt2d();
             for (int aEdgeIt = 0; aEdgeIt < theDWire.EdgesNb(); ++aEdgeIt)
             {
                 var aDEdge = theDWire.GetEdge(aEdgeIt);

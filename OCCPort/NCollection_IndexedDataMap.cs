@@ -48,7 +48,40 @@ namespace OCCPort
         {
             dic = new List<KeyValuePair<TheKeyType, T2>>();
         }
+        internal T2 ChangeFromKey(TheKeyType theKey1)
+        {
+            if (IsEmpty())
+                return default(T2);
+            foreach (var item in dic)
+            {
+                if (hasher.Equals(item.Key, theKey1))
+                    return item.Value;
+            }
+            return default(T2);
+        }
+        //! Contains
+        public bool Contains(TheKeyType theKey1)
+        {
+            if (IsEmpty())
+                return false;
+            foreach (var item in dic)
+            {
+                if (hasher.Equals(item.Key, theKey1))
+                    return true;
+            }
+            return false;
 
+            //Standard_Integer iK1 = Hasher::HashCode(theKey1, NbBuckets());
+            //IndexedDataMapNode* pNode1;
+            //pNode1 = (IndexedDataMapNode*)myData1[iK1];
+            //while (pNode1)
+            //{
+            //    if (Hasher::IsEqual(pNode1->Key1(), theKey1))
+            //        return Standard_True;
+            //    pNode1 = (IndexedDataMapNode*)pNode1->Next();
+            //}
+            //return Standard_False;
+        }
         public List<KeyValuePair<TheKeyType, T2>> dic = null;
 
         Hasher hasher = new Hasher();
