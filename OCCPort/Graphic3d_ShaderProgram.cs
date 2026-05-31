@@ -16,10 +16,20 @@ namespace OCCPort
         //! Default value of THE_NB_FRAG_OUTPUTS macros within GLSL program (see Declarations.glsl).
         public const int THE_NB_FRAG_OUTPUTS = 1;
 
+        //! Setup GLSL header containing language version code and used extensions.
+        //! Will be prepended to the very beginning of the source code.
+        //! Example:
+        //! @code
+        //!   #version 300 es
+        //!   #extension GL_ARB_bindless_texture : require
+        //! @endcode
+      public  void SetHeader( string theHeader) { myHeader = theHeader; }
+
+
         //! Sets unique ID used to manage resource in graphic driver.
         //! WARNING! Graphic3d_ShaderProgram constructor generates a unique id for proper resource management;
         //! however if application overrides it, it is responsibility of application to avoid name collisions.
-      public  void SetId( string theId) { myID = theId; }
+      public void SetId( string theId) { myID = theId; }
 
         string myID;
         //! Returns unique ID used to manage resource in graphic driver.

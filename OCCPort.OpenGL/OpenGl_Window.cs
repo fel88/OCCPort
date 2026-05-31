@@ -79,6 +79,26 @@ namespace OCCPort
             mySizeWindow.Size(out mySize.X, out mySize.Y);
 
             bool isCoreProfile = false;
+            //#elif defined(_WIN32)
+            //HWND aWindow = (HWND)myPlatformWindow.NativeHandle();
+            //HDC aWindowDC = GetDC(aWindow);
+            //HGLRC aGContext = (HGLRC)theGContext;
+
+            //PIXELFORMATDESCRIPTOR aPixelFrmt;
+            //memset(&aPixelFrmt, 0, sizeof(aPixelFrmt));
+            //aPixelFrmt.nSize = sizeof(PIXELFORMATDESCRIPTOR);
+            //aPixelFrmt.nVersion = 1;
+            //aPixelFrmt.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
+            //aPixelFrmt.iPixelType = PFD_TYPE_RGBA;
+            //aPixelFrmt.cColorBits = 24;
+            //aPixelFrmt.cDepthBits = 24;
+            //aPixelFrmt.cStencilBits = 8;
+            //aPixelFrmt.iLayerType = PFD_MAIN_PLANE;
+            //if (theCaps->contextStereo)
+            //{
+            //    aPixelFrmt.dwFlags |= PFD_STEREO;
+            //}
+
         }
         // =======================================================================
         // function : init

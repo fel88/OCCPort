@@ -1,6 +1,7 @@
 ﻿using OCCPort.Enums;
 using OpenTK.Mathematics;
 using System;
+using System.Reflection.Metadata;
 
 namespace OCCPort.OpenGL
 {
@@ -15,6 +16,36 @@ namespace OCCPort.OpenGL
         public bool UnShare()
         {
             return --myShareCount == 0;
+        }
+        //! Specifies the value of the sampler uniform variable.
+        public bool SetSampler(OpenGl_Context theCtx,
+                   string theName,
+                     Graphic3d_TextureUnit theTextureUnit)
+        {
+            return SetSampler(theCtx, GetUniformLocation(theCtx, theName), theTextureUnit);
+        }
+
+        //! Returns location of the specific uniform variable.
+
+        public OpenGl_ShaderUniformLocation GetUniformLocation(OpenGl_Context theCtx,
+                                                                        string theName)
+        {
+            return new OpenGl_ShaderUniformLocation(myProgramID != NO_PROGRAM
+                                               ? theCtx.core20fwd.glGetUniformLocation(myProgramID, theName)
+                                               : INVALID_LOCATION);
+        }
+
+        public bool SetSampler(OpenGl_Context theCtx,
+                                                   int theLocation,
+                                                    Graphic3d_TextureUnit theTextureUnit)
+        {
+            if (myProgramID == NO_PROGRAM || theLocation == INVALID_LOCATION)
+            {
+                return false;
+            }
+
+            theCtx.core20fwd.glUniform1i(theLocation, theTextureUnit);
+            return true;
         }
 
         public OpenGl_ShaderProgram(Graphic3d_ShaderProgram theProxy)

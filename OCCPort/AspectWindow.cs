@@ -3,7 +3,7 @@ using System;
 
 namespace OCCPort
 {
-    public class Aspect_Window
+    public abstract class Aspect_Window
     {
         public int Width = 800;
         public int Height = 600;
@@ -21,5 +21,9 @@ namespace OCCPort
             return aSize;
 
         }
+        //! Returns True if the window <me> is opened
+        //! and False if the window is closed.
+        public abstract bool IsMapped() ;
+
     }
 }

@@ -1,7 +1,7 @@
 ﻿namespace OCCPort.OpenGL
 {
     //! Texture unit.
-    enum Graphic3d_TextureUnit
+    public enum Graphic3d_TextureUnit
     {
         // value as index number
         Graphic3d_TextureUnit_0,

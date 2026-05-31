@@ -1,6 +1,8 @@
 ﻿using OCCPort.Enums;
 using OpenTK.Compute.OpenCL;
+using OpenTK.Graphics.Egl;
 using OpenTK.Graphics.OpenGL;
+using OpenTK.Mathematics;
 using System;
 using System.Linq;
 using System.Reflection.Metadata;
@@ -32,7 +34,7 @@ namespace OCCPort.OpenGL
             }
 
             theShareKey = theProxy.GetId();
-            if (myContext.GetResource<OpenGl_ShaderProgram>(theShareKey,  ref theProgram))
+            if (myContext.GetResource<OpenGl_ShaderProgram>(theShareKey, ref theProgram))
             {
                 if (theProgram.Share())
                 {
@@ -54,6 +56,17 @@ namespace OCCPort.OpenGL
             myContext.ShareResource(theShareKey, theProgram);
             return true;
         }
+
+        //! Generates shader program to render correctly colored quad.
+        public Graphic3d_ShaderProgram GetColoredQuadProgram()
+        {
+            if (myColoredQuadProgram == null)
+            {
+                myColoredQuadProgram = getColoredQuadProgram();
+            }
+            return myColoredQuadProgram;
+        }
+
 
         // =======================================================================
         // function : Unregister
@@ -116,7 +129,7 @@ namespace OCCPort.OpenGL
         OpenGl_VertexBuffer myBoundBoxVertBuffer; //!< bounding box vertex buffer
 
 
-       
+
 
         OpenGl_Context myContext;            //!< OpenGL context
 
@@ -163,6 +176,38 @@ namespace OCCPort.OpenGL
             return true;
         }
 
+        public bool BindFboBlitProgram(int theNbSamples,
+                                                               bool theIsFallback_sRGB)
+        {
+            NCollection_Array1 < OpenGl_ShaderProgram > aList = myBlitPrograms[theIsFallback_sRGB ? 1 : 0];
+            int aNbSamples = Math. Max(theNbSamples, 1);
+            if (aNbSamples > aList.Upper())
+            {
+                aList.Resize(1, aNbSamples, true);
+            }
+
+            OpenGl_ShaderProgram  aProg = aList[aNbSamples];
+            if (aProg!=null)
+            {
+                return myContext.BindProgram(aProg);
+            }
+
+            Graphic3d_ShaderProgram aProgramSrc = getStdProgramFboBlit(aNbSamples, theIsFallback_sRGB);
+            string aKey = "";
+            if (!Create(aProgramSrc, ref aKey, aProg))
+            {
+                aProg = new OpenGl_ShaderProgram(); // just mark as invalid
+                return false;
+            }
+
+            myContext.BindProgram(aProg);
+            aProg.SetSampler(myContext, "uColorSampler",Graphic3d_TextureUnit. Graphic3d_TextureUnit_0);
+            aProg.SetSampler(myContext, "uDepthSampler",Graphic3d_TextureUnit. Graphic3d_TextureUnit_1);
+            return true;
+        }
+
+        NCollection_Array1<OpenGl_ShaderProgram>[]
+                                     myBlitPrograms=new  NCollection_Array1<OpenGl_ShaderProgram> [2];    //!< standard program for FBO blit emulation
 
         //! Prepare standard GLSL program.
         public OpenGl_ShaderProgram getStdProgram(Graphic3d_TypeOfShadingModel theShadingModel,
@@ -412,14 +457,14 @@ namespace OCCPort.OpenGL
                 OpenGl_ShaderUniformLocation aLocViewPort = theProgram.GetStateLocation(OpenGl_StateVariable.OpenGl_OCCT_VIEWPORT);
                 if (aLocViewPort != null)
                 {
-                    //theProgram.SetUniform(myContext, aLocViewPort, OpenGl_Vec4((float)myContext.Viewport()[0], (float)myContext.Viewport()[1],
-                    //                                                            (float)myContext.Viewport()[2], (float)myContext.Viewport()[3]));
+                    theProgram.SetUniform(myContext, aLocViewPort, new Vector4((float)myContext.Viewport()[0], (float)myContext.Viewport()[1],
+                                                                                (float)myContext.Viewport()[2], (float)myContext.Viewport()[3]));
                 }
             }
             else if (myContext.core11ffp != null)
             {
                 // manage FFP lighting
-                //myContext.SetShadeModel(theShadingModel);
+                myContext.SetShadeModel(theShadingModel);
                 if (theShadingModel == Graphic3d_TypeOfShadingModel.Graphic3d_TypeOfShadingModel_Unlit)
                 {
                     myContext.core11fwd.glDisable((int)All.Lighting);

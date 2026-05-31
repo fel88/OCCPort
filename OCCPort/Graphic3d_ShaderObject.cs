@@ -21,13 +21,28 @@ namespace OCCPort
 
         string myID;     //!< the ID of shader object
         string mySource; //!< the source code of shader object
-        //OSD_Path myPath;   //!< the path to shader source (may be empty)
+                         //OSD_Path myPath;   //!< the path to shader source (may be empty)
+
+
+        //! This is a preprocessor for Graphic3d_ShaderObject::CreateFromSource() function.
+        //! Creates a new shader object from specified source according to list of uniforms and in/out variables.
+        //! @param theSource      shader object source code to modify
+        //! @param theType        shader object type to create
+        //! @param theUniforms    list of uniform variables
+        //! @param theStageInOuts list of stage in/out variables
+        //! @param theInName      name of input  variables block;
+        //!                       can be empty for accessing each variable without block prefix
+        //!                       (mandatory for stages accessing both inputs and outputs)
+        //! @param theOutName     name of output variables block;
+        //!                       can be empty for accessing each variable without block prefix
+        //!                       (mandatory for stages accessing both inputs and outputs)
+        //! @param theNbGeomInputVerts number of geometry shader input vertexes
         public static Graphic3d_ShaderObject CreateFromSource(string theSource, Graphic3d_TypeOfShaderObject theType,
             ShaderVariableList theUniforms,
             ShaderVariableList theStageInOuts,
-            string theInName,
-            string theOutName,
-            int theNbGeomInputVerts)
+            string theInName = "",
+            string theOutName = "",
+            int theNbGeomInputVerts = 0)
         {
             if (string.IsNullOrEmpty(theSource))
             {
@@ -38,7 +53,7 @@ namespace OCCPort
             {
                 if ((aVar.Stages & (int)theType) != 0)
                 {
-                    aSrcUniforms += ("\nuniform ") + aVar.Name() + ";";
+                    aSrcUniforms += ("\nuniform ") + aVar.Name + ";";
                 }
             }
             foreach (var aVar in theStageInOuts)
@@ -97,22 +112,22 @@ namespace OCCPort
                 {
                     if (!aSrcInStructs.IsEmpty())
                     {
-                        aSrcInStructs += ("\n  ") + aVar.Name() + ";";
+                        aSrcInStructs += ("\n  ") + aVar.Name + ";";
                     }
                     if (!aSrcOutStructs.IsEmpty())
                     {
-                        aSrcOutStructs += ("\n  ") + aVar.Name() + ";";
+                        aSrcOutStructs += ("\n  ") + aVar.Name + ";";
                     }
                 }
                 else
                 {
                     if ((int)theType == aStageLower)
                     {
-                        aSrcInOuts += ("\nTHE_SHADER_OUT ") + aVar.Name() + ";";
+                        aSrcInOuts += ("\nTHE_SHADER_OUT ") + aVar.Name + ";";
                     }
                     else if ((int)theType == aStageUpper)
                     {
-                        aSrcInOuts += ("\nTHE_SHADER_IN ") + aVar.Name() + ";";
+                        aSrcInOuts += ("\nTHE_SHADER_IN ") + aVar.Name + ";";
                     }
                 }
             }
@@ -171,25 +186,22 @@ namespace OCCPort
 
         public class ShaderVariable
         {
-            private string v;
-            private object graphic3d_TOS_GEOMETRY;
+            
+            
             //! The name of uniform shader variable.
-            string myName;
+          public   string Name;
 
             public int Stages { get; internal set; }
 
-            // =======================================================================
-            // function : Name
-            // purpose  : Returns name of shader variable
-            // =======================================================================
-            public string Name()
+            
+            public ShaderVariable()
             {
-                return myName;
+
             }
-            public ShaderVariable(string v, object graphic3d_TOS_GEOMETRY)
+            public ShaderVariable(string theVarName, Graphic3d_TypeOfShaderObject theShaderStageBits)
             {
-                this.v = v;
-                this.graphic3d_TOS_GEOMETRY = graphic3d_TOS_GEOMETRY;
+                this.Name  = theVarName;
+                this.Stages = (int)theShaderStageBits;
             }
         }
     }

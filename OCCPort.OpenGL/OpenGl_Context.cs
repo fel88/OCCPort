@@ -27,7 +27,7 @@ namespace OCCPort.OpenGL
 
             core11fwd = new _core11fwd();
             core15fwd = new _core15fwd();
-
+            core20fwd = new OpenGl_GlCore20();
             //hasPackRowLength=(Standard_True),
             //hasUnpackRowLength=(Standard_True),
             //hasHighp=(Standard_True),
@@ -112,6 +112,29 @@ myLineFeather (1.0f),*/
 
 
         }
+        //! Returns TRUE if sRGB rendering is supported and permitted.
+        public bool ToRenderSRGB()
+        {
+            return HasSRGB()
+               && !caps.sRGBDisable
+               && !caps.ffpEnable;
+        }
+
+
+        //! Returns cached GL_FRAMEBUFFER_SRGB state.
+        //! If TRUE, GLSL program is expected to write linear RGB color.
+        //! Otherwise, GLSL program might need manually converting result color into sRGB color space.
+       public bool IsFrameBufferSRGB()  { return myIsSRgbActive; }
+
+        //! Returns TRUE if sRGB rendering is supported.
+        public bool HasSRGB()
+        {
+            return hasTexSRGB
+               && hasFboSRGB;
+        }
+
+        bool hasTexSRGB;         //!< sRGB texture    formats (desktop OpenGL 2.1, OpenGL ES 3.0 or OpenGL ES 2.0 + GL_EXT_sRGB)
+        bool hasFboSRGB;         //!< sRGB FBO render targets (desktop OpenGL 2.1, OpenGL ES 3.0)
 
         public OpenGl_FeatureFlag hasGeometryStage;   //!< Complex flag indicating support of Geometry shader (desktop OpenGL 3.2, OpenGL ES 3.2, GL_EXT_geometry_shader)
 
@@ -119,6 +142,22 @@ myLineFeather (1.0f),*/
         public bool IsValid()
         {
             return myIsInitialized;
+        }
+
+        //! Set GL_SHADE_MODEL value.
+        public void SetShadeModel(Graphic3d_TypeOfShadingModel theModel)
+        {
+            if (core11ffp != null)
+            {
+                int aModel = theModel == Graphic3d_TypeOfShadingModel.Graphic3d_TypeOfShadingModel_PhongFacet
+                                            || theModel == Graphic3d_TypeOfShadingModel.Graphic3d_TypeOfShadingModel_PbrFacet ? (int)All.Flat : (int)All.Smooth;
+                if (myShadeModel == aModel)
+                {
+                    return;
+                }
+                myShadeModel = aModel;
+                core11ffp.glShadeModel(aModel);
+            }
         }
 
         public OpenGl_ArbFBO arbFBO;             //!< GL_ARB_framebuffer_object
@@ -627,6 +666,10 @@ myLineFeather (1.0f),*/
             return Quantity_ColorRGBA.Convert_LinearRGB_To_sRGB(theColor);
         }
 
+        internal void SetColorMask(bool v)
+        {
+            
+        }
 
         bool myIsSRgbActive;    //!< flag indicating GL_FRAMEBUFFER_SRGB state
 

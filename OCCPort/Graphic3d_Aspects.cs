@@ -1,5 +1,6 @@
 ﻿using OCCPort.Enums;
 using System;
+using System.Reflection.Metadata;
 
 namespace OCCPort
 {
@@ -18,13 +19,16 @@ namespace OCCPort
         }
 
         //! Modifies the interior type used for rendering
-       public void SetInteriorStyle( Aspect_InteriorStyle theStyle) { myInteriorStyle = theStyle; }
+        public void SetInteriorStyle(Aspect_InteriorStyle theStyle) { myInteriorStyle = theStyle; }
+
+        //! Sets up OpenGL/GLSL shader program.
+        public void SetShaderProgram(Graphic3d_ShaderProgram theProgram) { myProgram = theProgram; }
 
         //! Check for equality with another aspects.
         public bool IsEqual(Graphic3d_Aspects theOther)
         {
             if (this == theOther)
-                return true;            
+                return true;
 
             return myProgram == theOther.myProgram
                 && myTextureSet == theOther.myTextureSet
@@ -33,7 +37,7 @@ namespace OCCPort
                 && myBackInteriorColor == theOther.myBackInteriorColor
                 && myFrontMaterial == theOther.myFrontMaterial
                 && myBackMaterial == theOther.myBackMaterial
-             //   && myInteriorStyle == theOther.myInteriorStyle
+                //   && myInteriorStyle == theOther.myInteriorStyle
                 && myShadingModel == theOther.myShadingModel
                 && myFaceCulling == theOther.myFaceCulling
                 && myAlphaMode == theOther.myAlphaMode
@@ -45,12 +49,12 @@ namespace OCCPort
                 && myLinePattern == theOther.myLinePattern
             //    && myMarkerType == theOther.myMarkerType
                 && myMarkerScale == theOther.myMarkerScale
-               // && myHatchStyle == theOther.myHatchStyle
+                // && myHatchStyle == theOther.myHatchStyle
                 && myTextFont == theOther.myTextFont
                 //&& myPolygonOffset == theOther.myPolygonOffset
-              //  && myTextStyle == theOther.myTextStyle
-             //   && myTextDisplayType == theOther.myTextDisplayType
-              //  && myTextFontAspect == theOther.myTextFontAspect
+                //  && myTextStyle == theOther.myTextStyle
+                //   && myTextDisplayType == theOther.myTextDisplayType
+                //  && myTextFontAspect == theOther.myTextFontAspect
                 && myTextAngle == theOther.myTextAngle
                 && myToSkipFirstEdge == theOther.myToSkipFirstEdge
                 && myToDistinguishMaterials == theOther.myToDistinguishMaterials
@@ -104,7 +108,7 @@ namespace OCCPort
             return 0xFFFF;
         }
 
-        
+
         Aspect_TypeOfLine myLineType;
 
         //! Modifies the line thickness

@@ -156,7 +156,142 @@ namespace OCCPort.OpenGL
             //memset(myGlslExtensions, 0, sizeof(myGlslExtensions));
         }
 
+        //! @return true if detected GL version is greater or equal to requested one.
+        public bool IsGapiGreaterEqual(int theVerMajor,
+                                  int theVerMinor)
+        {
+            return (myGapiVersion[0] > theVerMajor)
+                || (myGapiVersion[0] == theVerMajor && myGapiVersion[1] >= theVerMinor);
+        }
+        Graphic3d_Vec2i myGapiVersion;         //!< GAPI version major/minor number pair
 
+      protected  Graphic3d_ShaderProgram getStdProgramFboBlit(int theNbSamples,
+                                                                               bool theIsFallback_sRGB)
+        {
+            Graphic3d_ShaderObject.ShaderVariableList aUniforms=new Graphic3d_ShaderObject.ShaderVariableList (), aStageInOuts=new Graphic3d_ShaderObject.ShaderVariableList();
+            aStageInOuts.Append(new Graphic3d_ShaderObject.ShaderVariable("vec2 TexCoord", Graphic3d_TypeOfShaderObject.Graphic3d_TOS_VERTEX | Graphic3d_TypeOfShaderObject.Graphic3d_TOS_FRAGMENT));
+
+            string aSrcVert =
+                "void main()"
+      + "{"
+      + "  TexCoord    = occVertex.zw;"
+      + "  gl_Position = vec4(occVertex.x, occVertex.y, 0.0, 1.0);"
+      + "}";
+
+            string aSrcFrag;
+            if (theNbSamples > 1)
+            {
+                if (myGapi == Aspect_GraphicsLibrary.Aspect_GraphicsLibrary_OpenGLES)
+                {
+                    aUniforms.Append(new Graphic3d_ShaderObject.ShaderVariable("highp sampler2DMS uColorSampler", Graphic3d_TypeOfShaderObject.Graphic3d_TOS_FRAGMENT));
+                    aUniforms.Append(new Graphic3d_ShaderObject.ShaderVariable("highp sampler2DMS uDepthSampler", Graphic3d_TypeOfShaderObject.Graphic3d_TOS_FRAGMENT));
+                }
+                else
+                {
+                    aUniforms.Append(new Graphic3d_ShaderObject.ShaderVariable("sampler2DMS uColorSampler", Graphic3d_TypeOfShaderObject.Graphic3d_TOS_FRAGMENT));
+                    aUniforms.Append(new Graphic3d_ShaderObject.ShaderVariable("sampler2DMS uDepthSampler", Graphic3d_TypeOfShaderObject.Graphic3d_TOS_FRAGMENT));
+                }
+
+                aSrcFrag =
+                "#define THE_NUM_SAMPLES " + theNbSamples
+                + (theIsFallback_sRGB ? "#define THE_SHIFT_sRGB" : "")
+    + "void main()"
+               + "{"
+               + "  ivec2 aSize  = textureSize (uColorSampler);"
+               + "  ivec2 anUV   = ivec2 (vec2 (aSize) * TexCoord);"
+               + "  gl_FragDepth = texelFetch (uDepthSampler, anUV, THE_NUM_SAMPLES / 2 - 1).r;"
+               +
+      "  vec4 aColor = vec4 (0.0);"
+                + "  for (int aSample = 0; aSample < THE_NUM_SAMPLES; ++aSample)"
+                + "  {"
+                + "    vec4 aVal = texelFetch (uColorSampler, anUV, aSample);"
+                + "    aColor += aVal;"
+                + "  }"
+                + "  aColor /= float(THE_NUM_SAMPLES);"
+                + "#ifdef THE_SHIFT_sRGB"
+                + "  aColor.rgb = pow (aColor.rgb, vec3 (1.0 / 2.2));"
+                + "#endif"
+                + "  occSetFragColor (aColor);"
+                + "}";
+            }
+            else
+            {
+                aUniforms.Append(new Graphic3d_ShaderObject.ShaderVariable("sampler2D uColorSampler", Graphic3d_TypeOfShaderObject.Graphic3d_TOS_FRAGMENT));
+                aUniforms.Append(new Graphic3d_ShaderObject.ShaderVariable("sampler2D uDepthSampler",Graphic3d_TypeOfShaderObject. Graphic3d_TOS_FRAGMENT));
+                aSrcFrag = 
+                 (theIsFallback_sRGB ? "#define THE_SHIFT_sRGB" : "")
+    +"void main()"
+              +"{"
+              +"  gl_FragDepth = occTexture2D (uDepthSampler, TexCoord).r;"
+              +"  vec4  aColor = occTexture2D (uColorSampler, TexCoord);"
+              +"#ifdef THE_SHIFT_sRGB"
+              +"  aColor.rgb = pow (aColor.rgb, vec3 (1.0 / 2.2));"
+              +"#endif"
+              +"  occSetFragColor (aColor);"
+              +"}";
+            }
+
+            Graphic3d_ShaderProgram aProgramSrc = new Graphic3d_ShaderProgram();
+            switch (myGapi)
+            {
+                case Aspect_GraphicsLibrary.Aspect_GraphicsLibrary_OpenGL:
+                    {
+                        if (IsGapiGreaterEqual(3, 2))
+                        {
+                            aProgramSrc.SetHeader("#version 150");
+                        }
+                        break;
+                    }
+                case Aspect_GraphicsLibrary.Aspect_GraphicsLibrary_OpenGLES:
+                    {
+                        if (IsGapiGreaterEqual(3, 1))
+                        {
+                            // required for MSAA sampler
+                            aProgramSrc.SetHeader("#version 310 es");
+                        }
+                        else if (IsGapiGreaterEqual(3, 0))
+                        {
+                            aProgramSrc.SetHeader("#version 300 es");
+                        }
+                        /*else if (myGlslExtensions[Graphic3d_GlslExtension_GL_EXT_frag_depth])
+                        {
+                            aProgramSrc.SetHeader("#extension GL_EXT_frag_depth : enable"
+
+
+
+                                                    +"#define gl_FragDepth gl_FragDepthEXT");
+                        }*/
+                        else
+                        {
+                            // there is no way to draw into depth buffer
+                            aSrcFrag =
+                              "void main()"
+                            +"{"
+                            +"  occSetFragColor (occTexture2D (uColorSampler, TexCoord));"
+                            +"}";
+                        }
+                        break;
+                    }
+            }
+
+            string anId = "occt_blit";
+            if (theNbSamples > 1)
+            {
+                anId += ("_msaa") + theNbSamples;
+            }
+            if (theIsFallback_sRGB)
+            {
+                anId += "_gamma";
+            }
+            aProgramSrc.SetId(anId);
+            aProgramSrc.SetDefaultSampler(false);
+            aProgramSrc.SetNbLightsMax(0);
+            aProgramSrc.SetNbShadowMaps(0);
+            aProgramSrc.SetNbClipPlanesMax(0);
+            aProgramSrc.AttachShader(Graphic3d_ShaderObject.CreateFromSource(aSrcVert, Graphic3d_TypeOfShaderObject.Graphic3d_TOS_VERTEX, aUniforms, aStageInOuts));
+            aProgramSrc.AttachShader(Graphic3d_ShaderObject.CreateFromSource(aSrcFrag, Graphic3d_TypeOfShaderObject.Graphic3d_TOS_FRAGMENT, aUniforms, aStageInOuts));
+            return aProgramSrc;
+        }
 
         //! Modify color for Wireframe presentation.
         const string THE_FRAG_WIREFRAME_COLOR =
@@ -177,10 +312,10 @@ namespace OCCPort.OpenGL
 
         public virtual OpenGl_ShaderProgramList ShaderPrograms() { return myProgramList; }
 
-        
 
 
-       
+
+
         // =======================================================================
         // function : pointSpriteShadingSrc
         // purpose  :
@@ -214,6 +349,35 @@ namespace OCCPort.OpenGL
             }
 
             return aSrcFragGetColor;
+        }
+
+        protected Graphic3d_ShaderProgram getColoredQuadProgram()
+        {
+            Graphic3d_ShaderProgram aProgSrc = new Graphic3d_ShaderProgram();
+
+            Graphic3d_ShaderObject.ShaderVariableList aUniforms = new Graphic3d_ShaderObject.ShaderVariableList();
+            Graphic3d_ShaderObject.ShaderVariableList aStageInOuts = new Graphic3d_ShaderObject.ShaderVariableList();
+            aStageInOuts.Append(new Graphic3d_ShaderObject.ShaderVariable("vec2 TexCoord", Graphic3d_TypeOfShaderObject.Graphic3d_TOS_VERTEX | Graphic3d_TypeOfShaderObject.Graphic3d_TOS_FRAGMENT));
+            aUniforms.Append(new Graphic3d_ShaderObject.ShaderVariable("vec3 uColor1", Graphic3d_TypeOfShaderObject.Graphic3d_TOS_FRAGMENT));
+            aUniforms.Append(new Graphic3d_ShaderObject.ShaderVariable("vec3 uColor2", Graphic3d_TypeOfShaderObject.Graphic3d_TOS_FRAGMENT));
+
+            string aSrcVert = "void main()" +
+    "{"
+    + "  TexCoord    = occTexCoord.st;"
+    + "  gl_Position = occProjectionMatrix * occWorldViewMatrix * occModelWorldMatrix * occVertex;"
+    + "}";
+
+            string aSrcFrag = "void main()"
+    + "{"
+    + "  vec3 c1 = mix (uColor1, uColor2, TexCoord.x);"
+    + "  occSetFragColor (vec4 (mix (uColor2, c1, TexCoord.y), 1.0));"
+    + "}";
+
+            defaultGlslVersion(aProgSrc, "colored_quad", 0);
+            aProgSrc.AttachShader(Graphic3d_ShaderObject.CreateFromSource(aSrcVert, Graphic3d_TypeOfShaderObject.Graphic3d_TOS_VERTEX, aUniforms, aStageInOuts));
+            aProgSrc.AttachShader(Graphic3d_ShaderObject.CreateFromSource(aSrcFrag, Graphic3d_TypeOfShaderObject.Graphic3d_TOS_FRAGMENT, aUniforms, aStageInOuts));
+
+            return aProgSrc;
         }
 
         string THE_VEC2_glPointCoord = "vec2 (gl_PointCoord.x, 1.0 - gl_PointCoord.y)";
@@ -303,7 +467,7 @@ namespace OCCPort.OpenGL
                         }
                         else
                         {
-                            OCCPort. Message.SendWarning("Warning: ignoring Normal Map texture in GLSL due to hardware capabilities");
+                            OCCPort.Message.SendWarning("Warning: ignoring Normal Map texture in GLSL due to hardware capabilities");
                         }
                     }
                     aProgramSrc.SetTextureSetBits((int)aTextureBits);
@@ -593,7 +757,7 @@ namespace OCCPort.OpenGL
 
                     if (aVarListIter.Stages == (int)(Graphic3d_TypeOfShaderObject.Graphic3d_TOS_VERTEX | Graphic3d_TypeOfShaderObject.Graphic3d_TOS_FRAGMENT))
                     {
-                        string aVarName = aVarListIter.Name().Token(" ", 2);
+                        string aVarName = aVarListIter.Name.Token(" ", 2);
                         if (aVarName.Value(aVarName.Length()) == ']')
                         {
                             // copy the whole array

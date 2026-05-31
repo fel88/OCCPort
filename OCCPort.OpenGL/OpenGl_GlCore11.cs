@@ -25,5 +25,10 @@ namespace OCCPort.OpenGL
         {
             GL.MatrixMode((MatrixMode)projection);
         }
+
+        internal void glShadeModel(int aModel)
+        {
+            GL.ShadeModel((ShadingModel)aModel);
+        }
     }
 }

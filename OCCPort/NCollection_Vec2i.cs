@@ -12,6 +12,10 @@
             v[1] = theY;
         }
 
+        public  int this[int index]
+        {
+            get => v[index];
+        }
         public NCollection_Vec2i(int theXY)
         {
             v[0] = v[1] = theXY;

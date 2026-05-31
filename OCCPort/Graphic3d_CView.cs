@@ -45,6 +45,9 @@ namespace OCCPort
 
         }
 
+        //! Sets gradient background fill colors.
+        public abstract void SetGradientBackground(Aspect_GradientBackground theBackground);
+
         //! Transforms the structure in the view.
         public void SetTransform(Graphic3d_Structure theStructure,
                                      TopLoc_Datum3D theTrsf)
@@ -323,10 +326,8 @@ namespace OCCPort
         protected int myId;
         protected Graphic3d_RenderingParams myRenderParams = new Graphic3d_RenderingParams();
 
-        public virtual bool IsDefined()
-        {
-            return true;
-        }
+        //! Returns True if the window associated to the view is defined.
+        public abstract bool IsDefined();
 
         internal Bnd_Box MinMaxValues()
         {

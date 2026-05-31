@@ -2,6 +2,7 @@
 using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Reflection.Metadata;
 using System.Xml.Linq;
 
@@ -19,6 +20,25 @@ namespace OCCPort.OpenGL
             myZLayers.ChangeLayer(aStruct, anOldLayer, theNewLayerId);
             Update(anOldLayer);
             Update(theNewLayerId);
+        }
+
+        public override void SetGradientBackground(Aspect_GradientBackground theBackground)
+        {
+            Quantity_Color aColor1, aColor2;
+            /*  theBackground.Colors(aColor1, aColor2);
+              myBackgrounds[Graphic3d_TOB_GRADIENT]->SetGradientParameters(aColor1, aColor2, theBackground.BgGradientFillMethod());
+              if (theBackground.BgGradientFillMethod() >= Aspect_GradientFillMethod. Aspect_GradientFillMethod_Corner1
+               && theBackground.BgGradientFillMethod() <= Aspect_GradientFillMethod.Aspect_GradientFillMethod_Corner4)
+              {
+                  var aCtx = myWorkspace.GetGlContext();
+                  if (aCtx != null)
+                  {
+                      myColoredQuadParams.Aspect().SetShaderProgram(aCtx.ShaderManager().GetColoredQuadProgram());
+                      myColoredQuadParams.Aspect().ShaderProgram().PushVariableVec3("uColor1", aColor1.Rgb());
+                      myColoredQuadParams.Aspect().ShaderProgram().PushVariableVec3("uColor2", aColor2.Rgb());
+                  }
+              }*/
+            myBackgroundType = Graphic3d_TypeOfBackground.Graphic3d_TOB_GRADIENT;
         }
 
         public override void InvalidateBVHData(Graphic3d_ZLayerId theLayerId)
@@ -1296,12 +1316,83 @@ namespace OCCPort.OpenGL
                 aCtx.arbFBO.glBindFramebuffer(All.Framebuffer, OpenGl_FrameBuffer.NO_FRAMEBUFFER);
                 aCtx.SetFrameBufferSRGB(false);
             }
+            int[] aViewport = { 0, 0, aDrawSizeX, aDrawSizeY };
+            aCtx.ResizeViewport(aViewport);
 
+          //  aCtx.SetColorMaskRGBA(NCollection_Vec4<bool>(true)); // force writes into all components, including alpha
+            aCtx.core20fwd.glClearDepth(1.0);
+            //aCtx.core20fwd.glClearColor(0.0f, 0.0f, 0.0f, aCtx.caps.buffersOpaqueAlpha ? 1.0f : 0.0f);
+            aCtx.core20fwd.glClear(ClearBufferMask. ColorBufferBit| ClearBufferMask.DepthBufferBit| ClearBufferMask.StencilBufferBit);
+            aCtx.SetColorMask(true); // restore default alpha component write state
+
+            bool toApplyGamma = aCtx.ToRenderSRGB() != aCtx.IsFrameBufferSRGB();
             /*
              more code here
              */
+
+            aCtx.core20fwd.glDepthFunc(DepthFunction.Always);
+            aCtx.core20fwd.glDepthMask(true);
+            // aCtx->core20fwd->glEnable(GL_DEPTH_TEST);
+            //  if (aCtx->GraphicsLibrary() == Aspect_GraphicsLibrary_OpenGLES
+            //   && !aCtx->IsGlGreaterEqual(3, 0)
+            //    && !aCtx->extFragDepth)
+            {
+                //     aCtx->core20fwd->glDisable(GL_DEPTH_TEST);
+            }
+
+            // aCtx->BindTextures(Handle(OpenGl_TextureSet)(), Handle(OpenGl_ShaderProgram)());
+
+            //   const Graphic3d_TypeOfTextureFilter aFilter = (aDrawSizeX == aReadSizeX && aDrawSizeY == aReadSizeY) ? Graphic3d_TOTF_NEAREST : Graphic3d_TOTF_BILINEAR;
+            //    const GLint aFilterGl = aFilter == Graphic3d_TOTF_NEAREST ? GL_NEAREST : GL_LINEAR;
+
+            OpenGl_VertexBuffer aVerts = initBlitQuad(theToFlip);
+            OpenGl_ShaderManager aManager = aCtx.ShaderManager();
+            if (aVerts.IsValid()
+             && aManager.BindFboBlitProgram(theReadFbo != null ? theReadFbo.NbSamples() : 0, toApplyGamma))
+            {
+            }
+            /*
+             code here 
+             */
             return true;
         }
+
+        OpenGl_VertexBuffer initBlitQuad(bool theToFlip)
+        {
+            OpenGl_VertexBuffer aVerts = null;
+            if (!theToFlip)
+            {
+                aVerts = myFullScreenQuad;
+                if (!aVerts.IsValid())
+                {
+                    Vector4[] aQuad =
+                    {
+       new Vector4( 1.0f, -1.0f, 1.0f, 0.0f),
+       new Vector4( 1.0f,  1.0f, 1.0f, 1.0f),
+       new Vector4(-1.0f, -1.0f, 0.0f, 0.0f),
+       new Vector4(-1.0f,  1.0f, 0.0f, 1.0f)
+      };
+                    aVerts.Init(myWorkspace.GetGlContext(), 4, 4, aQuad[0].GetData());
+                }
+            }
+            else
+            {
+                aVerts = myFullScreenQuadFlip;
+                if (!aVerts.IsValid())
+                {
+                    Vector4[] aQuad =
+                    {
+        new Vector4( 1.0f, -1.0f, 1.0f, 1.0f),
+    new     Vector4( 1.0f,  1.0f, 1.0f, 0.0f),
+     new    Vector4(-1.0f, -1.0f, 0.0f, 1.0f),
+       new Vector4(-1.0f,  1.0f, 0.0f, 0.0f)
+      };
+                    aVerts.Init(myWorkspace.GetGlContext(), 4, 4, aQuad[0].GetData());
+                }
+            }
+            return aVerts;
+        }
+
         OpenGl_PBREnvironment myPBREnvironment; //!< manager of IBL maps used in PBR pipeline
         PBREnvironmentState myPBREnvState;    //!< state of PBR environment
                                               //! State of PBR environment.
@@ -1484,6 +1575,14 @@ namespace OCCPort.OpenGL
             }
             return aLayer;
 
+        }
+    }
+
+    public static class Extensions
+    {
+        public static float[] GetData(this Vector4 v)
+        {
+            return new[] { v.X, v.Y, v.Z, v.W };
         }
     }
 }

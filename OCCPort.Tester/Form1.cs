@@ -19,9 +19,9 @@ namespace OCCPort.Tester
 {
     public partial class Form1 : Form
     {
-     
+
         public Form1()
-        {          
+        {
             InitializeComponent();
             //glControl = new GLControl(new OpenTK.Graphics.GraphicsMode(32, 24, 0, 8));
             glControl = new GLControl(new GLControlSettings()
@@ -79,7 +79,7 @@ namespace OCCPort.Tester
                 //V3d_View.CreateView = () => new OpenGL.OpenGl_View();
 
                 GravityViewManager.View = v3d_viewer.CreateView();
-                GravityViewManager.View.SetWindow(new Aspect_Window() { Width = glControl.Width, Height = glControl.Height }, new Aspect_RenderingContext());
+                GravityViewManager.View.SetWindow(new Aspect_NeutralWindow() { Width = glControl.Width, Height = glControl.Height }, new Aspect_RenderingContext());
                 GravityViewManager.View.MustBeResized();
 
             }
@@ -460,13 +460,13 @@ namespace OCCPort.Tester
             TopoDS_Edge e2 = new BRepBuilderAPI_MakeEdge(p2, p3);
             TopoDS_Edge e3 = new BRepBuilderAPI_MakeEdge(p3, p4);
             TopoDS_Edge e4 = new BRepBuilderAPI_MakeEdge(p4, p1);
-          
+
             // Create Wire (Closed Contour)
             BRepBuilderAPI_MakeWire mw = new BRepBuilderAPI_MakeWire();
             mw.Add(e1);
             mw.Add(e2);
             mw.Add(e3);
-            mw.Add(e4);            
+            mw.Add(e4);
             TopoDS_Wire wire = mw.Wire();
 
             // Create Face

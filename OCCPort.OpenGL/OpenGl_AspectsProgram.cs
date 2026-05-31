@@ -18,20 +18,20 @@ namespace OCCPort.OpenGL
             }
 
             // release old shader program resources
-            if (myShaderProgram!=null)
+            if (myShaderProgram != null)
             {
                 theCtx.ShaderManager().Unregister(ref myShaderProgramId, myShaderProgram);
                 myShaderProgramId.Clear();
                 myShaderProgram = null;
             }
-            if (theShader==null)
+            if (theShader == null)
             {
                 return;
             }
 
-            theCtx.ShaderManager().Create(theShader,ref myShaderProgramId, myShaderProgram);
+            theCtx.ShaderManager().Create(theShader, ref myShaderProgramId, myShaderProgram);
         }
-        
+
 
         //! Return shading program.
         public OpenGl_ShaderProgram ShaderProgram(OpenGl_Context theCtx,

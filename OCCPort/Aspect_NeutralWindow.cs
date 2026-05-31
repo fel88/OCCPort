@@ -18,6 +18,11 @@ namespace OCCPort
         int myHeight;
         bool  myIsMapped;
 
+        public override bool IsMapped()
+        {
+            throw new NotImplementedException();
+        }
+
         internal bool SetSize(int theWidth, int theHeight)
         {
             if (myWidth == theWidth

@@ -17,6 +17,12 @@
             myLocation = (INVALID_LOCATION);
         }
 
+        //! Convert operators help silently put object to GL functions like glUniform*.
+        public static implicit operator int(OpenGl_ShaderUniformLocation f)
+        {
+            return f.myLocation;
+        }
+  
         //! Constructor with initialization.
         public OpenGl_ShaderUniformLocation(int theLocation)
         {
