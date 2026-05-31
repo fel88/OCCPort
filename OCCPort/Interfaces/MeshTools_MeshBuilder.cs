@@ -33,16 +33,10 @@ namespace OCCPort.Interfaces
             {
                 if (aContext.DiscretizeEdges())
                 {
-
-                    CheckEdges();
-
                     if (aContext.HealModel())
                     {
                         if (aContext.PreProcessModel())
                         {
-
-                            CheckEdges();
-
                             if (aContext.DiscretizeFaces(aPS.Next(9)))
                             {
                                 if (aContext.PostProcessModel())

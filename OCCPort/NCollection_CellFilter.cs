@@ -282,6 +282,14 @@ namespace OCCPort
                 if (anAction == NCollection_CellFilter_Action.CellFilter_Purge)
                 {
                     //aNode->Object.~Target();
+                    if (aPrev != null)
+                    {
+                        aPrev.Next = aNext;
+                    }
+                    else
+                    {
+                        aMapCell.Objects = aNext;
+                    }
                     //(aPrev ? aPrev->Next : aMapCell.Objects) = aNext;
                     // note that aNode itself need not to be freed, since IncAllocator is used
                 }

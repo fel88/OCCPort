@@ -21,6 +21,10 @@ namespace OCCPort
             return new gp_XY(x / theScalar, y / theScalar);
         }
 
+        public override string ToString()
+        {
+            return $"gp_XY X:{x} Y:{y}";
+        }
         public static gp_XY operator /(gp_XY vv, double theInvFactor)
         {
             return vv.Divided(theInvFactor);

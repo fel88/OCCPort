@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Linq;
+using System.Security.Principal;
 
 namespace OCCPort
 {
@@ -68,6 +69,10 @@ namespace OCCPort
 
         public int[] index = new int[10];
 
+        public override string ToString()
+        {
+            return $"Cell ({index[0]}; {index[1]})";
+        }
 
         /*internal int index(int idim)
         {

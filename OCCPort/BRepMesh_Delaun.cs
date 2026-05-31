@@ -122,7 +122,7 @@ namespace OCCPort
             double[] aSqModulus = new double[3];
 
             double aSqMinDist;
-            int aEdgeOnId=0;
+            int aEdgeOnId = 0;
             aSqMinDist = calculateDist(aVEdges, aPoints, theVertex, aDistance, aSqModulus, ref aEdgeOnId);
             if (aSqMinDist < 0)
                 return false;
@@ -245,9 +245,10 @@ namespace OCCPort
             ListOfInteger aLoopEdges = new ListOfInteger(), anExternalEdges = new ListOfInteger();
             gp_XY aVertexCoord = myMeshData.GetNode(theVertexIndex).Coord();
 
-            foreach (var anEdges in thePoly)
-            {
-                int anEdgeId = anEdges.Key;
+            MapOfIntegerInteger.Iterator anEdges = new MapOfIntegerInteger.Iterator(thePoly);
+            for (; anEdges.More(); anEdges.Next())
+            {                
+                int anEdgeId = anEdges.Key();
                 BRepMesh_Edge anEdge = GetEdge(anEdgeId);
 
                 bool isPositive = thePoly[anEdgeId] != 0;
@@ -312,9 +313,9 @@ namespace OCCPort
                 else
                 {
                     if (isPositive)
-                        aLoopEdges.Append(anEdges.Key);
+                        aLoopEdges.Append(anEdges.Key());
                     else
-                        aLoopEdges.Append(-anEdges.Key);
+                        aLoopEdges.Append(-anEdges.Key());
 
                     if (aFirstLinkDir.SquareModulus() > aLastLinkDir.SquareModulus())
                         anExternalEdges.Append(Math.Abs(anEdgesInfo[0]));
@@ -336,10 +337,10 @@ namespace OCCPort
                 anExternalEdges.RemoveFirst();
             }
 
-            foreach (var anEdges in thePoly)
-            {
-                if (myMeshData.ElementsConnectedTo(anEdges.Key).IsEmpty())
-                    myMeshData.RemoveLink(anEdges.Key);
+            for (anEdges.Initialize(thePoly); anEdges.More(); anEdges.Next())
+            {           
+                if (myMeshData.ElementsConnectedTo(anEdges.Key()).IsEmpty())
+                    myMeshData.RemoveLink(anEdges.Key());
             }
 
             while (!aLoopEdges.IsEmpty())
@@ -432,8 +433,6 @@ namespace OCCPort
         {
             MapOfInteger aFrontier = Frontier();
 
-
-
             VectorOfInteger aFailedFrontiers = new VectorOfInteger(256);
             MapOfIntegerInteger aLoopEdges = new MapOfIntegerInteger(10);
             MapOfInteger aIntFrontierEdges = new MapOfInteger();
@@ -446,7 +445,7 @@ namespace OCCPort
 
 
                 foreach (var aFrontierId in aFrontier)
-                {                    
+                {
                     BRepMesh_PairOfIndex aPair = myMeshData.ElementsConnectedTo(aFrontierId);
                     int aNbElem = aPair.Extent();
                     for (int aElemIt = 1; aElemIt <= aNbElem; ++aElemIt)
