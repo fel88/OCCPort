@@ -165,10 +165,10 @@ namespace OCCPort.OpenGL
         }
         Graphic3d_Vec2i myGapiVersion;         //!< GAPI version major/minor number pair
 
-      protected  Graphic3d_ShaderProgram getStdProgramFboBlit(int theNbSamples,
-                                                                               bool theIsFallback_sRGB)
+        protected Graphic3d_ShaderProgram getStdProgramFboBlit(int theNbSamples,
+                                                                                 bool theIsFallback_sRGB)
         {
-            Graphic3d_ShaderObject.ShaderVariableList aUniforms=new Graphic3d_ShaderObject.ShaderVariableList (), aStageInOuts=new Graphic3d_ShaderObject.ShaderVariableList();
+            Graphic3d_ShaderObject.ShaderVariableList aUniforms = new Graphic3d_ShaderObject.ShaderVariableList(), aStageInOuts = new Graphic3d_ShaderObject.ShaderVariableList();
             aStageInOuts.Append(new Graphic3d_ShaderObject.ShaderVariable("vec2 TexCoord", Graphic3d_TypeOfShaderObject.Graphic3d_TOS_VERTEX | Graphic3d_TypeOfShaderObject.Graphic3d_TOS_FRAGMENT));
 
             string aSrcVert =
@@ -217,18 +217,18 @@ namespace OCCPort.OpenGL
             else
             {
                 aUniforms.Append(new Graphic3d_ShaderObject.ShaderVariable("sampler2D uColorSampler", Graphic3d_TypeOfShaderObject.Graphic3d_TOS_FRAGMENT));
-                aUniforms.Append(new Graphic3d_ShaderObject.ShaderVariable("sampler2D uDepthSampler",Graphic3d_TypeOfShaderObject. Graphic3d_TOS_FRAGMENT));
-                aSrcFrag = 
+                aUniforms.Append(new Graphic3d_ShaderObject.ShaderVariable("sampler2D uDepthSampler", Graphic3d_TypeOfShaderObject.Graphic3d_TOS_FRAGMENT));
+                aSrcFrag =
                  (theIsFallback_sRGB ? "#define THE_SHIFT_sRGB" : "")
-    +"void main()"
-              +"{"
-              +"  gl_FragDepth = occTexture2D (uDepthSampler, TexCoord).r;"
-              +"  vec4  aColor = occTexture2D (uColorSampler, TexCoord);"
-              +"#ifdef THE_SHIFT_sRGB"
-              +"  aColor.rgb = pow (aColor.rgb, vec3 (1.0 / 2.2));"
-              +"#endif"
-              +"  occSetFragColor (aColor);"
-              +"}";
+    + "void main()"
+              + "{"
+              + "  gl_FragDepth = occTexture2D (uDepthSampler, TexCoord).r;"
+              + "  vec4  aColor = occTexture2D (uColorSampler, TexCoord);"
+              + "#ifdef THE_SHIFT_sRGB"
+              + "  aColor.rgb = pow (aColor.rgb, vec3 (1.0 / 2.2));"
+              + "#endif"
+              + "  occSetFragColor (aColor);"
+              + "}";
             }
 
             Graphic3d_ShaderProgram aProgramSrc = new Graphic3d_ShaderProgram();
@@ -266,9 +266,9 @@ namespace OCCPort.OpenGL
                             // there is no way to draw into depth buffer
                             aSrcFrag =
                               "void main()"
-                            +"{"
-                            +"  occSetFragColor (occTexture2D (uColorSampler, TexCoord));"
-                            +"}";
+                            + "{"
+                            + "  occSetFragColor (occTexture2D (uColorSampler, TexCoord));"
+                            + "}";
                         }
                         break;
                     }
@@ -667,6 +667,15 @@ namespace OCCPort.OpenGL
             }
 
 
+
+            aSrcVert =
+                aSrcVertExtraFunc
+              + "void main()"
+      + "{"
+    + aSrcVertExtraMain
+    + THE_VERT_gl_Position
+    + aSrcVertEndMain
+    + "}";
 
             string aSrcGeom = prepareGeomMainSrc(aUniforms, aStageInOuts, theBits);
             aSrcFragGetColor += (theBits & (int)Graphic3d_ShaderFlags.Graphic3d_ShaderFlags_MeshEdges) != 0

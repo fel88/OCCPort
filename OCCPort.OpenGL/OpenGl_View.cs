@@ -474,7 +474,7 @@ namespace OCCPort.OpenGL
         {
             return myWorkspace.FBOCreate(theWidth, theHeight);
         }
-
+        OpenGl_FrameBuffer[] myImmediateSceneFbosOit = new OpenGl_FrameBuffer[2]; //!< Additional buffers for transparency draw of immediate layer.
         public override void Redraw()
         {
             bool wasDisabledMSAA = myToDisableMSAA;
@@ -545,7 +545,35 @@ namespace OCCPort.OpenGL
             {
                 OpenGl_FrameBuffer aMainFbo = myMainSceneFbos[0].IsValid() ? myMainSceneFbos[0] : aFrameBuffer;
                 OpenGl_FrameBuffer aMainFboOit = myMainSceneFbosOit[0].IsValid() ? myMainSceneFbosOit[0] : null;
+                OpenGl_FrameBuffer anImmFbo = aFrameBuffer;
+                OpenGl_FrameBuffer anImmFboOit = null;
+                if (!myTransientDrawToFront)
+                {
+                    anImmFbo = aMainFbo;
+                    anImmFboOit = aMainFboOit;
+                }
+                else if (myImmediateSceneFbos[0].IsValid())
+                {
+                    anImmFbo = myImmediateSceneFbos[0];
+                    anImmFboOit = myImmediateSceneFbosOit[0].IsValid() ? myImmediateSceneFbosOit[0] : null;
+                }
+
+                if (aMainFbo == null)
+                {
+                    aCtx.SetReadDrawBuffer((int)All.Back);
+                }
+                aCtx.SetResolution(myRenderParams.Resolution, myRenderParams.ResolutionRatio(),
+                                     aMainFbo != aFrameBuffer ? myRenderParams.RenderResolutionScale : 1.0f);
+
                 redraw(aProjectType, aMainFbo, aMainFboOit);
+                myBackBufferRestored = true;
+                myIsImmediateDrawn = false;
+                aCtx.SetResolution(myRenderParams.Resolution, myRenderParams.ResolutionRatio(),
+                                     anImmFbo != aFrameBuffer ? myRenderParams.RenderResolutionScale : 1.0f);
+                if (!redrawImmediate(aProjectType, aMainFbo, anImmFbo, anImmFboOit))
+                {
+                    toSwap = false;
+                }
             }
 
             /*
@@ -636,25 +664,25 @@ namespace OCCPort.OpenGL
             }
 
             //// determine multisampling parameters
-            //int aNbSamples = !myToDisableMSAA && aSizeX == aRendSize.x()
-            //                            ? Max(Min(myRenderParams.NbMsaaSamples, aCtx.MaxMsaaSamples()), 0)
-            //                            : 0;
-            //if (aNbSamples != 0)
-            //{
-            //    aNbSamples = OpenGl_Context::GetPowerOfTwo(aNbSamples, aCtx.MaxMsaaSamples());
-            //}
+            int aNbSamples = !myToDisableMSAA && aSizeX == aRendSize.x()
+                                        ? Math.Max(Math.Min(myRenderParams.NbMsaaSamples, aCtx.MaxMsaaSamples()), 0)
+                                        : 0;
+            if (aNbSamples != 0)
+            {
+                aNbSamples = OpenGl_Context.GetPowerOfTwo(aNbSamples, aCtx.MaxMsaaSamples());
+            }
             //// Only MSAA textures can be blit into MSAA target,
             //// while render buffers could be resolved only into non-MSAA targets.
             //// As result, within obsolete OpenGL ES 3.0 context, we may create only one MSAA render buffer for main scene content
             //// and blit it into non-MSAA immediate FBO.
-            //const bool hasTextureMsaa = aCtx.HasTextureMultisampling();
+        //    bool hasTextureMsaa = aCtx.HasTextureMultisampling();
 
             //bool toUseOit = myRenderParams.TransparencyMethod != Graphic3d_RTM_BLEND_UNORDERED
             //             && !myIsSubviewComposer
             //             && checkOitCompatibility(aCtx, aNbSamples > 0);
 
-            //const bool toInitImmediateFbo = myTransientDrawToFront && !myIsSubviewComposer
-            //                             && (!aCtx->caps->useSystemBuffer || (toUseOit && HasImmediateStructures()));
+         //   bool toInitImmediateFbo = myTransientDrawToFront && !myIsSubviewComposer
+                         //               && (!aCtx.caps.useSystemBuffer || (toUseOit && HasImmediateStructures()));
 
             //if (aFrameBuffer == null
             // && !aCtx->DefaultFrameBuffer().IsNull()
@@ -673,27 +701,27 @@ namespace OCCPort.OpenGL
             //    if (myMainSceneFbos[0].GetVPSize() != aRendSize
             //     || myMainSceneFbos[0].NbSamples() != aNbSamples)
             //    {
-            //        if (!myTransientDrawToFront)
-            //        {
-            //            myImmediateSceneFbos[0].Release(aCtx.operator->());
-            //            myImmediateSceneFbos[1].Release(aCtx.operator->());
-            //            myImmediateSceneFbos[0].ChangeViewport(0, 0);
-            //            myImmediateSceneFbos[1].ChangeViewport(0, 0);
-            //        }
+            if (!myTransientDrawToFront)
+            {
+                //myImmediateSceneFbos[0].Release(aCtx);
+              //  myImmediateSceneFbos[1].Release(aCtx);
+                //myImmediateSceneFbos[0].ChangeViewport(0, 0);
+              //  myImmediateSceneFbos[1].ChangeViewport(0, 0);
+            }
 
-            //        // prepare FBOs containing main scene
-            //        // for further blitting and rendering immediate presentations on top
-            //        if (aCtx.core20fwd != null)
-            //        {
-            //            const bool wasFailedMain0 = checkWasFailedFbo(myMainSceneFbos[0], aRendSize.x(), aRendSize.y(), aNbSamples);
-            //            if (!myMainSceneFbos[0]->Init(aCtx, aRendSize, myFboColorFormat, myFboDepthFormat, aNbSamples)
-            //             && !wasFailedMain0)
-            //            {
-            //                string aMsg = "Error! Main FBO "
-            //                                                + printFboFormat(myMainSceneFbos[0]) + " initialization has failed";
-            //                aCtx->PushMessage(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_HIGH, aMsg);
-            //            }
-            //        }
+            // prepare FBOs containing main scene
+            // for further blitting and rendering immediate presentations on top
+            if (aCtx.core20fwd != null)
+            {
+                bool wasFailedMain0 = checkWasFailedFbo(myMainSceneFbos[0], aRendSize.x(), aRendSize.y(), aNbSamples);
+                if (!myMainSceneFbos[0].Init(aCtx, aRendSize, myFboColorFormat, myFboDepthFormat, aNbSamples)
+                 && !wasFailedMain0)
+                {
+                    string aMsg = "Error! Main FBO "
+                                                    + printFboFormat(myMainSceneFbos[0]) + " initialization has failed";
+                    //aCtx.PushMessage(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_HIGH, aMsg);
+                }
+            }
             //    }
 
             //    if (myMainSceneFbos[0]->IsValid() && (toInitImmediateFbo || myImmediateSceneFbos[0]->IsValid()))
@@ -1080,6 +1108,25 @@ namespace OCCPort.OpenGL
 
             return true;
         }
+        //! Return TRUE if Frame Buffer initialized has failed with the same parameters.
+        static bool checkWasFailedFbo(OpenGl_FrameBuffer theFboToCheck,
+                                  OpenGl_FrameBuffer theFboRef)
+        {
+            return checkWasFailedFbo(theFboToCheck, theFboRef.GetVPSizeX(), theFboRef.GetVPSizeY(), theFboRef.NbSamples());
+        }
+
+        //! Return TRUE if Frame Buffer initialized has failed with the same parameters.
+        //! Return TRUE if Frame Buffer initialized has failed with the same parameters.
+        static bool checkWasFailedFbo( OpenGl_FrameBuffer theFboToCheck,
+                                 int theSizeX,
+                                 int theSizeY,
+                                 int theNbSamples)
+  {
+    return !theFboToCheck.IsValid()
+        &&  theFboToCheck.GetInitVPSizeX() == theSizeX
+        &&  theFboToCheck.GetInitVPSizeY() == theSizeY
+        &&  theFboToCheck.NbSamples()      == theNbSamples;
+  }
 
         public override void RedrawImmediate()
         {
@@ -1219,11 +1266,23 @@ namespace OCCPort.OpenGL
             }
         }
 
+        //! Redraws view for the given monographic camera projection, or left/right eye.
+        //!
+        //! Method will blit snapshot containing main scene (myMainSceneFbos or BackBuffer)
+        //! into presentation buffer (myMainSceneFbos -> offscreen FBO or
+        //! myMainSceneFbos -> BackBuffer or BackBuffer -> FrontBuffer),
+        //! and redraw immediate structures on top.
+        //!
+        //! When scene caching is disabled (myTransientDrawToFront, no double buffer in window, etc.),
+        //! the first step (blitting) will be skipped.
+        //!
+        //! @return false if immediate structures has been rendered directly into FrontBuffer
+        //! and Buffer Swap should not be called.
         private bool redrawImmediate(Graphic3d_Camera.Projection theProjection,
                                    OpenGl_FrameBuffer theReadFbo,
                                    OpenGl_FrameBuffer theDrawFbo,
                                    OpenGl_FrameBuffer theOitAccumFbo,
-                                    bool theIsPartialUpdate)
+                                    bool theIsPartialUpdate = false)
         {
             OpenGl_Context aCtx = myWorkspace.GetGlContext();
             bool toCopyBackToFront = false;
@@ -1319,10 +1378,10 @@ namespace OCCPort.OpenGL
             int[] aViewport = { 0, 0, aDrawSizeX, aDrawSizeY };
             aCtx.ResizeViewport(aViewport);
 
-          //  aCtx.SetColorMaskRGBA(NCollection_Vec4<bool>(true)); // force writes into all components, including alpha
+            //  aCtx.SetColorMaskRGBA(NCollection_Vec4<bool>(true)); // force writes into all components, including alpha
             aCtx.core20fwd.glClearDepth(1.0);
             //aCtx.core20fwd.glClearColor(0.0f, 0.0f, 0.0f, aCtx.caps.buffersOpaqueAlpha ? 1.0f : 0.0f);
-            aCtx.core20fwd.glClear(ClearBufferMask. ColorBufferBit| ClearBufferMask.DepthBufferBit| ClearBufferMask.StencilBufferBit);
+            aCtx.core20fwd.glClear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit);
             aCtx.SetColorMask(true); // restore default alpha component write state
 
             bool toApplyGamma = aCtx.ToRenderSRGB() != aCtx.IsFrameBufferSRGB();

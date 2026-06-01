@@ -2,6 +2,7 @@
 using OCCPort.OpenGL;
 using OpenTK.Graphics.ES11;
 using System;
+using System.Linq;
 using System.Reflection.Metadata;
 
 namespace OCCPort
@@ -93,15 +94,36 @@ namespace OCCPort
                                            int theDepthFormat,
                                            int theNbSamples)
         {
-            throw new NotImplementedException();
+
+            /*
+             more code 
+            */
+            // Build FBO and setup it as texture
+            theGlContext.arbFBO.glGenFramebuffers(1, ref myGlFBufferId);
+            theGlContext.arbFBO.glBindFramebuffer(OpenTK.Graphics.OpenGL.All.Framebuffer, myGlFBufferId);
+            /*
+             more code 
+            */
+            return true;
+
         }
+
+
+        public void ChangeViewport(int theVPSizeX,
+                                         int theVPSizeY)
+        {
+            myVPSizeX = theVPSizeX;
+            myVPSizeY = theVPSizeY;
+        }
+
+
 
         int myInitVPSizeX;         //!< viewport width  specified during initialization (kept even on failure)
         int myInitVPSizeY;         //!< viewport height specified during initialization (kept even on failure)
         int myVPSizeX;             //!< viewport width  (should be <= texture width)
         int myVPSizeY;             //!< viewport height (should be <= texture height)
         int myNbSamples;           //!< number of MSAA samples
-        OpenGl_ColorFormats myColorFormats;        //!< sized format for color         texture, GL_RGBA8 by default
+        OpenGl_ColorFormats myColorFormats = new NCollection_Vector<int>();        //!< sized format for color         texture, GL_RGBA8 by default
         int myDepthFormat;         //!< sized format for depth-stencil texture, GL_DEPTH24_STENCIL8 by default
         uint myGlFBufferId;         //!< FBO object ID
         uint myGlColorRBufferId;    //!< color         Render Buffer object (alternative to myColorTexture)
@@ -109,11 +131,27 @@ namespace OCCPort
         bool myIsOwnBuffer;         //!< flag indicating that FBO should be deallocated by this class
         bool myIsOwnColor;          //!< flag indicating that color textures should be deallocated by this class
         bool myIsOwnDepth;          //!< flag indicating that depth texture  should be deallocated by this class
-        OpenGl_TextureArray myColorTextures;       //!< color texture objects
+        OpenGl_TextureArray myColorTextures = new NCollection_Vector<OpenGl_Texture>();       //!< color texture objects
         OpenGl_Texture myDepthStencilTexture; //!< depth-stencil texture object
 
         public OpenGl_FrameBuffer(string theResourceId = null) : base(theResourceId)
         {
+            myInitVPSizeX = (0);
+            myInitVPSizeY = (0);
+            myVPSizeX = (0);
+            myVPSizeY = (0);
+            myNbSamples = (0);
+            myDepthFormat = (int)(All.Depth24Stencil8);
+            myGlFBufferId = (NO_FRAMEBUFFER);
+            myGlColorRBufferId = (NO_RENDERBUFFER);
+            myGlDepthRBufferId = (NO_RENDERBUFFER);
+            myIsOwnBuffer = (false);
+            myIsOwnColor = (false);
+            myIsOwnDepth = (false);
+            myDepthStencilTexture = (new OpenGl_Texture(theResourceId + ":depth_stencil"));
+
+            myColorFormats.Append((int)All.Rgba8);
+            myColorTextures.Append(new OpenGl_Texture(theResourceId + ":color"));
 
         }
     }

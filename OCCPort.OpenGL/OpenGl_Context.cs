@@ -2,6 +2,9 @@
 global using Graphic3d_Vec3 = OCCPort.NCollection_Vec3<float>;
 global using Graphic3d_Vec4d = OCCPort.NCollection_Vec4<double>;
 global using Graphic3d_Vec4 = OCCPort.NCollection_Vec4<float>;
+global using Graphic3d_Vec3i = OCCPort.NCollection_Vec3<int>;
+global using OpenGl_TextureArray = OCCPort.NCollection_Vector<OCCPort.OpenGl_Texture>;
+global using OpenGl_ColorFormats = OCCPort.NCollection_Vector<int>;
 
 
 using OCCPort;
@@ -31,7 +34,7 @@ namespace OCCPort.OpenGL
             //hasPackRowLength=(Standard_True),
             //hasUnpackRowLength=(Standard_True),
             //hasHighp=(Standard_True),
-            hasUintIndex = (true);
+            hasUintIndex = true;
             //hasTexRGBA8=(Standard_True),
             //
             /*
@@ -43,8 +46,8 @@ namespace OCCPort.OpenGL
   myMaxTexUnitsFFP (1),
   myMaxDumpSizeX (1024),
   myMaxDumpSizeY (1024),
-  myMaxClipPlanes (6),
-  myMaxMsaaSamples(0),
+  myMaxClipPlanes (6)*/
+  myMaxMsaaSamples=0;/*
   myMaxDrawBuffers (1),
   myMaxColorAttachments (1),
   myGlVerMajor (0),
@@ -119,12 +122,29 @@ myLineFeather (1.0f),*/
                && !caps.sRGBDisable
                && !caps.ffpEnable;
         }
+        //! @return value for GL_MAX_SAMPLES
+        public int MaxMsaaSamples()  {  return myMaxMsaaSamples; }
 
-
+        //! Function for getting power of to number larger or equal to input number.
+        //! @param theNumber    number to 'power of two'
+        //! @param theThreshold upper threshold
+        //! @return power of two number
+        public static int GetPowerOfTwo(int theNumber,
+                                                 int theThreshold)
+        {
+            for (int p2 = 2; p2 <= theThreshold; p2 <<= 1)
+            {
+                if (theNumber <= p2)
+                {
+                    return p2;
+                }
+            }
+            return theThreshold;
+        }
         //! Returns cached GL_FRAMEBUFFER_SRGB state.
         //! If TRUE, GLSL program is expected to write linear RGB color.
         //! Otherwise, GLSL program might need manually converting result color into sRGB color space.
-       public bool IsFrameBufferSRGB()  { return myIsSRgbActive; }
+        public bool IsFrameBufferSRGB() { return myIsSRgbActive; }
 
         //! Returns TRUE if sRGB rendering is supported.
         public bool HasSRGB()
@@ -186,6 +206,31 @@ myLineFeather (1.0f),*/
             return theValue != null;
         }
 
+        //! Set resolution ratio.
+        //! Note that this method rounds @theRatio to nearest integer.
+        public void SetResolution(uint theResolution,
+                            float theRatio,
+                            float theScale)
+        {
+            myResolution = (uint)(theScale * theResolution + 0.5f);
+            myRenderScale = theScale;
+            myRenderScaleInv = 1.0f / theScale;
+            SetResolutionRatio(theRatio * theScale);
+        }
+
+        //! Set resolution ratio.
+        //! Note that this method rounds @theRatio to nearest integer.
+        public void SetResolutionRatio(float theRatio)
+        {
+            myResolutionRatio = theRatio;
+            myLineWidthScale = (float)Math.Max(1.0f, Math.Floor(theRatio + 0.5f));
+        }
+
+        float myResolutionRatio; //!< scaling factor for parameters like text size
+                                 //!  to be properly displayed on device (screen / printer)
+        float myLineWidthScale;  //!< scaling factor for line width
+
+        uint myResolution;      //!< Pixels density (PPI), defines scaling factor for parameters like text size
         public OpenGl_Resource GetResource(string theKey)
         {
             return mySharedResources.IsBound(theKey) ? mySharedResources.Find(theKey) : null;
@@ -668,7 +713,7 @@ myLineFeather (1.0f),*/
 
         internal void SetColorMask(bool v)
         {
-            
+
         }
 
         bool myIsSRgbActive;    //!< flag indicating GL_FRAMEBUFFER_SRGB state
