@@ -9,14 +9,17 @@ namespace OCCPort
     //! Window properties should be managed by application and assigned to this class as properties.
     public class Aspect_NeutralWindow : Aspect_Window
     {
-        //Aspect_Drawable myHandle;
-      //  Aspect_Drawable myParentHandle;
-       // Aspect_FBConfig myFBConfig;
+        Aspect_Drawable myHandle;
+        Aspect_Drawable myParentHandle;
+        // Aspect_FBConfig myFBConfig;
         int myPosX;
         int myPosY;
         int myWidth;
         int myHeight;
-        bool  myIsMapped;
+        bool myIsMapped;
+
+        //! Return native handle of this drawable.
+        public override Aspect_Drawable NativeHandle() { return myHandle; }
 
         public override bool IsMapped()
         {

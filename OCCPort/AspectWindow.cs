@@ -13,6 +13,9 @@ namespace OCCPort
             y = Height;
         }
 
+        //! Returns native Window handle (HWND on Windows, Window with Xlib, and so on)
+        public abstract Aspect_Drawable NativeHandle();
+
         //! Returns window dimensions.
         public Vector2i Dimensions()
         {

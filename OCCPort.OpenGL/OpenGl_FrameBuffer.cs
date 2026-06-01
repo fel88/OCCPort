@@ -1,6 +1,6 @@
 ﻿using OCCPort;
 using OCCPort.OpenGL;
-using OpenTK.Graphics.ES11;
+using OpenTK.Graphics.OpenGL;
 using System;
 using System.Linq;
 using System.Reflection.Metadata;
@@ -14,23 +14,34 @@ namespace OCCPort
         //! Number of multisampling samples.
         public int NbSamples() { return myNbSamples; }
 
-        internal void BindBuffer(OpenGl_Context aCtx)
+        internal void BindBuffer(OpenGl_Context theGlCtx)
         {
-            throw new NotImplementedException();
+            theGlCtx.arbFBO.glBindFramebuffer(All.Framebuffer, myGlFBufferId);
+            theGlCtx.SetFrameBufferSRGB(true);
         }
         public void SetupViewport(OpenGl_Context theGlCtx)
         {
             int[] aViewport = new int[4] { 0, 0, myVPSizeX, myVPSizeY };
             theGlCtx.ResizeViewport(aViewport);
         }
-        internal void BindDrawBuffer(OpenGl_Context aCtx)
+
+        internal void BindDrawBuffer(OpenGl_Context theGlCtx)
         {
-            throw new NotImplementedException();
+            theGlCtx.arbFBO.glBindFramebuffer(All.DrawFramebuffer, myGlFBufferId);
+            theGlCtx.SetFrameBufferSRGB(true);
         }
 
-        internal void UnbindBuffer(OpenGl_Context aCtx)
+        internal void UnbindBuffer(OpenGl_Context theGlCtx)
         {
-            throw new NotImplementedException();
+            if (theGlCtx.DefaultFrameBuffer() != null && theGlCtx.DefaultFrameBuffer() != this)
+            {
+                theGlCtx.DefaultFrameBuffer().BindBuffer(theGlCtx);
+            }
+            else
+            {
+                theGlCtx.arbFBO.glBindFramebuffer(All.Framebuffer, NO_FRAMEBUFFER);
+                theGlCtx.SetFrameBufferSRGB(false);
+            }
         }
 
 

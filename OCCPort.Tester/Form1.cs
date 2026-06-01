@@ -79,7 +79,7 @@ namespace OCCPort.Tester
                 //V3d_View.CreateView = () => new OpenGL.OpenGl_View();
 
                 GravityViewManager.View = v3d_viewer.CreateView();
-                GravityViewManager.View.SetWindow(new Aspect_NeutralWindow() { Width = glControl.Width, Height = glControl.Height }, new Aspect_RenderingContext());
+                GravityViewManager.View.SetWindow(new Aspect_NeutralWindow() { Width = glControl.Width, Height = glControl.Height }, IntPtr.Zero);
                 GravityViewManager.View.MustBeResized();
 
             }

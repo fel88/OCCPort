@@ -1,11 +1,12 @@
-﻿global using Graphic3d_Vec3d = OCCPort.NCollection_Vec3<double>;
-global using Graphic3d_Vec3 = OCCPort.NCollection_Vec3<float>;
-global using Graphic3d_Vec4d = OCCPort.NCollection_Vec4<double>;
-global using Graphic3d_Vec4 = OCCPort.NCollection_Vec4<float>;
+﻿global using Graphic3d_Vec3 = OCCPort.NCollection_Vec3<float>;
+global using Graphic3d_Vec3d = OCCPort.NCollection_Vec3<double>;
 global using Graphic3d_Vec3i = OCCPort.NCollection_Vec3<int>;
-global using OpenGl_TextureArray = OCCPort.NCollection_Vector<OCCPort.OpenGl_Texture>;
+global using Graphic3d_Vec4 = OCCPort.NCollection_Vec4<float>;
+global using Graphic3d_Vec4d = OCCPort.NCollection_Vec4<double>;
 global using OpenGl_ColorFormats = OCCPort.NCollection_Vector<int>;
-
+global using OpenGl_TextureArray = OCCPort.NCollection_Vector<OCCPort.OpenGl_Texture>;
+global using Aspect_RenderingContext = System.IntPtr;
+global using Aspect_Display = System.IntPtr; /* Display* under UNIX */
 
 using OCCPort;
 using OpenTK.Audio.OpenAL;
@@ -15,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection.Metadata;
+using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Runtime.Intrinsics.Arm;
 using static System.Net.Mime.MediaTypeNames;
@@ -37,8 +39,10 @@ namespace OCCPort.OpenGL
             hasUintIndex = true;
             //hasTexRGBA8=(Standard_True),
             //
+            myFuncs = (new OpenGl_GlFunctions());
+            myGapi = Aspect_GraphicsLibrary.Aspect_GraphicsLibrary_OpenGL;
             /*
-             *  mySupportedFormats (new Image_SupportedFormats()),
+               mySupportedFormats (new Image_SupportedFormats()),
   myAnisoMax   (1),
   myTexClamp   (GL_CLAMP_TO_EDGE),
   myMaxTexDim  (1024),
@@ -47,7 +51,7 @@ namespace OCCPort.OpenGL
   myMaxDumpSizeX (1024),
   myMaxDumpSizeY (1024),
   myMaxClipPlanes (6)*/
-  myMaxMsaaSamples=0;/*
+            myMaxMsaaSamples = 0;/*
   myMaxDrawBuffers (1),
   myMaxColorAttachments (1),
   myGlVerMajor (0),
@@ -77,9 +81,9 @@ myPointSpriteOrig (GL_UPPER_LEFT),*/
             myRenderMode = (int)All.Render;
             myShadeModel = (int)All.Smooth;
             myPolygonMode = (int)All.Fill;
-            /*
-  myFaceCulling (Graphic3d_TypeOfBackfacingModel_DoubleSided),
-  myReadBuffer (0),*/
+
+            myFaceCulling = Graphic3d_TypeOfBackfacingModel.Graphic3d_TypeOfBackfacingModel_DoubleSided;
+            //myReadBuffer (0),*/
             myDrawBuffers = new NCollection_Array1<int>(0, 7);
             /*
 myDefaultVao (0),
@@ -115,6 +119,8 @@ myLineFeather (1.0f),*/
 
 
         }
+        Graphic3d_TypeOfBackfacingModel myFaceCulling;   //!< back face culling mode enabled state (glIsEnabled (GL_CULL_FACE))
+
         //! Returns TRUE if sRGB rendering is supported and permitted.
         public bool ToRenderSRGB()
         {
@@ -123,7 +129,7 @@ myLineFeather (1.0f),*/
                && !caps.ffpEnable;
         }
         //! @return value for GL_MAX_SAMPLES
-        public int MaxMsaaSamples()  {  return myMaxMsaaSamples; }
+        public int MaxMsaaSamples() { return myMaxMsaaSamples; }
 
         //! Function for getting power of to number larger or equal to input number.
         //! @param theNumber    number to 'power of two'
@@ -180,8 +186,8 @@ myLineFeather (1.0f),*/
             }
         }
 
-        public OpenGl_ArbFBO arbFBO;             //!< GL_ARB_framebuffer_object
-        public OpenGl_ArbFBOBlit arbFBOBlit;         //!< glBlitFramebuffer function, moved out from OpenGl_ArbFBO structure for compatibility with OpenGL ES 2.0
+        public OpenGl_GlFunctions /*OpenGl_ArbFBO */arbFBO;             //!< GL_ARB_framebuffer_object
+        public OpenGl_GlFunctions /*OpenGl_ArbFBOBlit */arbFBOBlit;         //!< glBlitFramebuffer function, moved out from OpenGl_ArbFBO structure for compatibility with OpenGL ES 2.0
         bool arbSampleShading;   //!< GL_ARB_sample_shading
         bool arbDepthClamp;      //!< GL_ARB_depth_clamp (on desktop 
         public OpenGl_GlCore11 core11ffp;  //!< OpenGL 1.1 core functionality
@@ -434,12 +440,41 @@ myLineFeather (1.0f),*/
         {
             throw new NotImplementedException();
         }
-
-        internal void SetFrameBufferSRGB(bool v)
+        //! Enables/disables GL_FRAMEBUFFER_SRGB flag.
+        //! This flag can be set to:
+        //! - TRUE when writing into offscreen FBO (always expected to be in sRGB or RGBF formats).
+        //! - TRUE when writing into sRGB-ready window buffer (might require choosing proper pixel format on window creation).
+        //! - FALSE if sRGB rendering is not supported or sRGB-not-ready window buffer is used for drawing.
+        //! @param[in] theIsFbo flag indicating writing into offscreen FBO (always expected sRGB-ready when sRGB FBO is supported)
+        //!                     or into window buffer (FALSE, sRGB-readiness might vary).
+        //! @param[in] theIsFboSRgb flag indicating off-screen FBO is sRGB-ready
+        internal void SetFrameBufferSRGB(bool theIsFbo, bool theIsFboSRgb = true)
         {
-            throw new NotImplementedException();
+            if (!hasFboSRGB)
+            {
+                myIsSRgbActive = false;
+                return;
+            }
+            myIsSRgbActive = ToRenderSRGB()
+                         && (theIsFbo || myIsSRgbWindow)
+                         && theIsFboSRgb;
+            if (!hasSRGBControl)
+            {
+                return;
+            }
+
+            if (myIsSRgbActive)
+            {
+                core11fwd.glEnable(All.FramebufferSrgb);
+            }
+            else
+            {
+                core11fwd.glDisable(All.FramebufferSrgb);
+            }
         }
 
+        bool myIsSRgbWindow;    //!< indicates that window buffer is sRGB-ready
+        bool hasSRGBControl;     //!< sRGB write control (any desktop OpenGL, OpenGL ES + GL_EXT_sRGB_write_control extension)
         //! @return tool for management of clippings within this context.
         internal OpenGl_Clipping Clipping()
         {
@@ -518,6 +553,112 @@ myLineFeather (1.0f),*/
             return true;
         }
 
+        // Import wglGetCurrentContext from opengl32.dll
+        [DllImport("opengl32.dll", ExactSpelling = true, SetLastError = true)]
+        public static extern IntPtr wglGetCurrentContext();
+
+        [DllImport("opengl32.dll", SetLastError = true)]
+        public static extern IntPtr wglGetCurrentDC();
+        //! Initialize class from currently bound OpenGL context. Method should be called only once.
+        //! @return false if no GL context is bound to the current thread
+        public bool Init(bool theIsCoreProfile)
+        {
+            if (myIsInitialized)
+            {
+                return true; ;
+            }
+            myDisplay = wglGetCurrentDC();
+            myGContext = (Aspect_RenderingContext)wglGetCurrentContext();
+
+            if (myGContext == null)
+            {
+                return false;
+            }
+
+            init(theIsCoreProfile);
+            myIsInitialized = true;
+            return true;
+        }
+
+        //! Initialize class from specified surface and rendering context. Method should be called only once.
+        //! The meaning of parameters is platform-specific.
+        //!
+        //! EGL:
+        //! @code
+        //!   Handle(Aspect_Window) theAspWin;
+        //!   EGLSurface theEglSurf = eglCreateWindowSurface (theEglDisp, anEglConfig, (EGLNativeWindowType )theAspWin->NativeHandle(), NULL);
+        //!   EGLDisplay theEglDisp = eglGetDisplay (EGL_DEFAULT_DISPLAY);
+        //!   EGLContext theEglCtx  = eglCreateContext ((EGLDisplay )theEglDisp, anEglConfig, EGL_NO_CONTEXT, anEglCtxAttribs);
+        //!   Handle(OpenGl_Context) aGlCtx = new OpenGl_Context();
+        //!   aGlCtx->Init ((Aspect_Drawable )theEglSurf, (Aspect_Display )theEglDisp,  (Aspect_RenderingContext )theEglCtx);
+        //! @endcode
+        //!
+        //! Windows (Win32):
+        //! @code
+        //!   Handle(WNT_Window) theAspWin;
+        //!   HWND  theWindow   = (HWND )theAspWin->NativeHandle();
+        //!   HDC   theDevCtx   = GetDC(theWindow);
+        //!   HGLRC theGContext = wglCreateContext (theDevCtx);
+        //!   Handle(OpenGl_Context) aGlCtx = new OpenGl_Context();
+        //!   aGlCtx->Init ((Aspect_Drawable )theWindow, (Aspect_Display )theDevCtx, (Aspect_RenderingContext )theGContext);
+        //! @endcode
+        //!
+        //! Linux (Xlib):
+        //! @code
+        //!   Handle(Xw_Window) theAspWin;
+        //!   Window     theXWindow = (Window )theAspWin->NativeHandle();
+        //!   Display*   theXDisp   = (Display* )theAspWin->DisplayConnection()->GetDisplayAspect();
+        //!   GLXContext theGlxCtx  = glXCreateContext (theXDisp, aVis.get(), NULL, GL_TRUE);
+        //!   Handle(OpenGl_Context) aGlCtx = new OpenGl_Context();
+        //!   aGlCtx->Init ((Aspect_Drawable )theXWindow, (Aspect_Display )theXDisp,  (Aspect_RenderingContext )theGlxCtx);
+        //! @endcode
+        //!
+        //! @param theSurface [in] surface / window          (EGLSurface | HWND  | GLXDrawable/Window)
+        //! @param theDisplay [in] display or device context (EGLDisplay | HDC   | Display*)
+        //! @param theContext [in] rendering context         (EGLContext | HGLRC | GLXContext | EAGLContext* | NSOpenGLContext*)
+        //! @param theIsCoreProfile [in] flag indicating that passed GL rendering context has been created with Core Profile
+        //! @return false if OpenGL context can not be bound to specified surface
+        public bool Init(IntPtr theSurface,
+                                       Aspect_Display theDisplay,
+                                       Aspect_RenderingContext theContext,
+                                       bool theIsCoreProfile = false)
+        {
+            Exceptions.Standard_ProgramError_Raise_if(myIsInitialized, "OpenGl_Context::Init() should be called only once!");
+            myWindow = theSurface;
+            myDisplay = theDisplay;
+            myGContext = theContext;
+            if (myGContext == null || !MakeCurrent())
+            {
+                return false;
+            }
+
+            init(theIsCoreProfile);
+            myIsInitialized = true;
+            return true;
+        }
+
+        IntPtr myWindow;   //!< surface           EGLSurface | HWND  | GLXDrawable
+
+
+        public void init(bool theIsCoreProfile)
+        {
+            // read version
+            myGlVerMajor = 0;
+            myGlVerMinor = 0;
+            myHasMsaaTextures = false;
+            myMaxMsaaSamples = 0;
+            myMaxDrawBuffers = 1;
+            myMaxColorAttachments = 1;
+            myDefaultVao = 0;
+            OpenGl_GlFunctions.readGlVersion(ref myGlVerMajor, ref myGlVerMinor);
+            //mySupportedFormats.Clear();
+
+
+
+            myFuncs.load(this, theIsCoreProfile);
+
+        }
+        OpenGl_GlFunctions myFuncs;                //!< mega structure for all GL functions
         internal bool MakeCurrent()
         {
             /*if (myDisplay == null || myGContext == null)
@@ -576,7 +717,7 @@ myLineFeather (1.0f),*/
         internal void BindDefaultVao()
         {
             if (myDefaultVao == 0
-   || core32 == null)
+        || core32 == null)
             {
                 return;
             }
@@ -714,6 +855,17 @@ myLineFeather (1.0f),*/
         internal void SetColorMask(bool v)
         {
 
+        }
+
+        internal void Share(OpenGl_Context theShareCtx)
+        {
+            if (theShareCtx != null)
+            {
+                mySharedResources = theShareCtx.mySharedResources;
+                //myDelayed = theShareCtx.myDelayed;
+                //myUnusedResources = theShareCtx.myUnusedResources;
+                myShaderManager = theShareCtx.myShaderManager;
+            }
         }
 
         bool myIsSRgbActive;    //!< flag indicating GL_FRAMEBUFFER_SRGB state

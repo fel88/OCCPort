@@ -3,17 +3,20 @@ global using Graphic3d_Vec3 = OCCPort.NCollection_Vec3<float>;
 global using Graphic3d_Vec3i = OCCPort.NCollection_Vec3<int>;
 global using Graphic3d_Vec4d = OCCPort.NCollection_Vec4<double>;
 global using Graphic3d_Vec4 = OCCPort.NCollection_Vec4<float>;
-global using BVH_Vec3d  = OCCPort.NCollection_Vec3<double>;
+global using BVH_Vec3d = OCCPort.NCollection_Vec3<double>;
 global using IFacePtr = OCCPort.Interfaces.IMeshData_Face;
 global using IWireHandle = OCCPort.Interfaces.IMeshData_Wire;
+global using Aspect_RenderingContext = System.IntPtr;
+global using Aspect_Display = System.IntPtr; /* Display* under UNIX */
 
+global using Aspect_Drawable = System.IntPtr;	/* HDC under WNT */
 
 
 using OpenTK.Mathematics;
 
 namespace OCCPort
 {
-    
+
     //public class Graphic3d_Vec3d : NCollection_Vec3<double>, IVectorType
     //{
 

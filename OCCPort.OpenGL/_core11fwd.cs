@@ -24,6 +24,11 @@ namespace OCCPort.OpenGL
         {
             GL.Disable((EnableCap)v);
         }
+        internal void glDisable(All v)
+        {
+            GL.Disable((EnableCap)v);
+        }
+
 
         internal void glDrawArrays(int aDrawMode, int aFirstElem, int aNbElemsInGroup)
         {

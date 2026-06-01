@@ -16,6 +16,12 @@ namespace OCCPort
                 throw new Exception(v2);
         }
 
+        public static void Standard_ProgramError_Raise_if(bool v1, string v2)
+        {
+            if (v1)
+                throw new Exception(v2);
+        }
+
         internal static void math_NotSquare_Raise_if(bool v1, string v2)
         {
             if(v1)
