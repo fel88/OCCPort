@@ -1,4 +1,6 @@
-﻿namespace OCCPort
+﻿using TKernel;
+
+namespace OCCPort
 {
     internal class TColgp_Array1OfXYZ : NCollection_Array1<gp_XYZ>
     {

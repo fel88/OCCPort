@@ -1,4 +1,6 @@
-﻿namespace OCCPort
+﻿using TKMath;
+
+namespace OCCPort
 {
     //! The BndLib package provides functions to add a geometric primitive to a bounding box.
     //! Note: these functions work with gp objects, optionally

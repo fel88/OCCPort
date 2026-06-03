@@ -19,7 +19,9 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\delabella\delabella.vcxproj" />
+    <ProjectReference Include="..\OCCPort.Common\OCCPort.Common.csproj" />
     <ProjectReference Include="..\TKernel\TKernel.csproj" />
+    <ProjectReference Include="..\TKMath\TKMath.csproj" />
     <ProjectReference Include="..\Triangle\Triangle.csproj" />
   </ItemGroup>
 </Project>

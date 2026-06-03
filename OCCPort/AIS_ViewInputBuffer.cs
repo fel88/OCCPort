@@ -1,4 +1,6 @@
-﻿namespace OCCPort
+﻿using TKernel;
+
+namespace OCCPort
 {
     public class AIS_ViewInputBuffer
     {

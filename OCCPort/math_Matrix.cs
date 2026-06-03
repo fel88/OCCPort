@@ -1,4 +1,6 @@
-﻿namespace OCCPort
+﻿using OCCPort.Common;
+
+namespace OCCPort
 {
     //! This class implements the real matrix abstract data type.
     //! Matrixes can have an arbitrary range which must be defined

@@ -1,0 +1,22 @@
+﻿using OCCPort;
+using TKG3d;
+
+namespace OCCPort
+{
+	internal class TopoDS_TCompound : TopoDS_TShape
+	{
+		public TopoDS_TCompound()
+		{
+		}
+
+        public override TopoDS_TShape EmptyCopy()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override TopAbs_ShapeEnum ShapeType()
+		{
+			return TopAbs_ShapeEnum.TopAbs_COMPOUND;
+		}
+	}
+}

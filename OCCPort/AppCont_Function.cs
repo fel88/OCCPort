@@ -1,4 +1,7 @@
-﻿namespace OCCPort
+﻿using TKernel;
+using TKMath;
+
+namespace OCCPort
 {
     //! This class must be provided by the user to use the approximation algorithm FittingCurve.
     public abstract class AppCont_Function

@@ -1,4 +1,6 @@
-﻿namespace OCCPort
+﻿using TKMath;
+
+namespace OCCPort
 {
     //! Describes a rational or non-rational Bezier curve
     //! - a non-rational Bezier curve is defined by a table

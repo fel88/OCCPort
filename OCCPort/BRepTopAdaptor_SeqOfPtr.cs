@@ -1,4 +1,6 @@
-﻿namespace OCCPort
+﻿using TKernel;
+
+namespace OCCPort
 {
     internal class BRepTopAdaptor_SeqOfPtr: NCollection_Sequence<object>
     {

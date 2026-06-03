@@ -1,4 +1,6 @@
-﻿namespace OCCPort
+﻿using TKMath;
+
+namespace OCCPort
 {
     //! Describes an infinite line.
     //! A line is defined and positioned in space with an axis

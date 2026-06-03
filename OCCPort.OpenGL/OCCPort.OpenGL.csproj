@@ -8,6 +8,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\OCCPort\OCCPort.csproj" />
+    <ProjectReference Include="..\TKService\TKService.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />

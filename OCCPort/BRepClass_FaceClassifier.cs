@@ -1,4 +1,6 @@
-﻿namespace OCCPort
+﻿using TKMath;
+
+namespace OCCPort
 {
     public class BRepClass_FaceClassifier : BRepClass_FClassifier
     {

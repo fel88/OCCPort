@@ -1,4 +1,6 @@
-﻿namespace OCCPort
+﻿using TKMath;
+
+namespace OCCPort
 {
     internal class Geom2d_Line : Geom2d_Curve
 

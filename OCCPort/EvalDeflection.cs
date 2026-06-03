@@ -1,4 +1,6 @@
-﻿namespace OCCPort
+﻿using TKMath;
+
+namespace OCCPort
 {
     //! Tool to estimate deflection of the given UV point
     //! with regard to its representation in 3D space.

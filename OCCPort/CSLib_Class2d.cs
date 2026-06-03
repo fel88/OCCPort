@@ -1,4 +1,6 @@
-﻿namespace OCCPort
+﻿using TKMath;
+
+namespace OCCPort
 {
     //! *** Class2d    : Low level algorithm for 2d classification
     //! this class was moved from package BRepTopAdaptor
