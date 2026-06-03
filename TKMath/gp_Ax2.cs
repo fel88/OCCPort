@@ -2,7 +2,7 @@
 
 namespace TKMath
 {
-	internal struct gp_Ax2
+	public struct gp_Ax2
 	{
 
 

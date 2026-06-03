@@ -7,6 +7,8 @@ using System;
 using System.Linq;
 using System.Reflection.Metadata;
 using TKernel;
+using TKMath;
+using TKService;
 
 namespace OCCPort.OpenGL
 {

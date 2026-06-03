@@ -1,4 +1,6 @@
-﻿namespace TKMath
+﻿using OCCPort;
+
+namespace TKMath
 {
     //! Defines a non-persistent vector in 2D space.
     public class gp_Vec2d

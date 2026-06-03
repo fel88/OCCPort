@@ -1414,4 +1414,56 @@ namespace TKService
         }
 
     }
+
+    //! Structure defining frustum boundaries.
+    public struct Aspect_FrustumLRBT
+    {
+
+        public Aspect_FrustumLRBT(Aspect_FrustumLRBT theOther)
+        {
+            Left = theOther.Left;
+            Right = theOther.Right;
+            Top = theOther.Top;
+            Bottom = theOther.Bottom;
+        }
+
+
+        public double Right { get; internal set; }
+        public double Top { get; internal set; }
+        public double Left { get; internal set; }
+        public double Bottom { get; internal set; }
+
+
+        //! Return multiplied frustum.
+        public Aspect_FrustumLRBT Multiplied(double theScale)
+        {
+            Aspect_FrustumLRBT aCopy = this;
+            aCopy.Multiply(theScale);
+            return aCopy;
+        }
+
+        private void Multiply(double theScale)
+        {
+
+            Left *= theScale;
+            Right *= theScale;
+            Bottom *= theScale;
+            Top *= theScale;
+
+        }
+    }
+    public static class NCollection_Vec3_Extensions
+    {
+        public static void Normalize(this NCollection_Vec3<double> v)
+        {
+            var aModulus = Math.Sqrt(v.SquareModulus());
+            if (aModulus != (0.0)) // just avoid divide by zero
+            {
+                v[0] = v.x() / aModulus;
+                v[1] = v.y() / aModulus;
+                v[2] = v.z() / aModulus;
+            }
+
+        }
+    }
 }

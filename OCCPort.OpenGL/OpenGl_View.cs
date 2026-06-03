@@ -1,10 +1,12 @@
-﻿using OpenTK.Compute.OpenCL;
+﻿using OCCPort.Common;
+using OpenTK.Compute.OpenCL;
 using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Reflection.Metadata;
 using System.Xml.Linq;
+using TKernel;
 using TKService;
 
 namespace OCCPort.OpenGL

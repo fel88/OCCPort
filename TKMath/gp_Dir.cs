@@ -252,7 +252,7 @@ namespace TKMath
         }
 
         //! Returns True if  the angle between this unit vector and the unit vector theOther is equal to  Pi (opposite).
-        internal bool IsOpposite(gp_Vec theOther, double theAngularTolerance)
+        public bool IsOpposite(gp_Vec theOther, double theAngularTolerance)
         {
             return Math.PI - Angle(new gp_Dir(theOther)) <= theAngularTolerance;
 

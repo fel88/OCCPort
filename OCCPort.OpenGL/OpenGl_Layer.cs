@@ -1,4 +1,7 @@
-﻿namespace OCCPort
+﻿using TKService;
+using TKV3d;
+
+namespace OCCPort
 {
 	public class OpenGl_Layer : Graphic3d_Layer
 	{

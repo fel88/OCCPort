@@ -1,4 +1,6 @@
-﻿namespace OCCPort.Tester
+﻿using TKService;
+
+namespace OCCPort.Tester
 {
     //! Contains points array definition.
     public class Graphic3d_ArrayOfPoints : Graphic3d_ArrayOfPrimitives

@@ -1,4 +1,6 @@
-﻿namespace OCCPort
+﻿using TKG3d;
+
+namespace OCCPort
 {
     //! A  Vertex is a topological  point in  two or three
     //! dimensions.

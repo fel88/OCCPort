@@ -76,7 +76,7 @@
             vydir.Cross(vxdir);
         }
 
-        internal gp_Dir XDirection()
+        public gp_Dir XDirection()
         {
             return vxdir;
         }
@@ -85,7 +85,7 @@
         gp_Dir vydir;
         gp_Dir vxdir;
 
-        internal gp_Dir YDirection()
+        public gp_Dir YDirection()
         {
             return vydir;
         }

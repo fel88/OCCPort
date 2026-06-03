@@ -1,4 +1,6 @@
 ﻿
+using TKService;
+
 namespace OCCPort.OpenGL
 {
     //! Point sprite resource. On modern hardware it will be texture with extra parameters.

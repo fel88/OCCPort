@@ -1,4 +1,6 @@
 ﻿
+global using Graphic3d_Mat4d = TKernel.NCollection_Mat4<double>;
+global using Graphic3d_Mat4 = TKernel.NCollection_Mat4<float>;
 
 global using Graphic3d_Vec3d = TKernel.NCollection_Vec3<double>;
 global using Graphic3d_Vec2 = TKernel.NCollection_Vec2<float>;

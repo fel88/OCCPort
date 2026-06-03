@@ -2,6 +2,7 @@
 using System;
 using System.Reflection.Metadata;
 using System.Runtime.InteropServices;
+using TKernel;
 
 namespace OCCPort
 {//! A graphic attribute manager which governs how

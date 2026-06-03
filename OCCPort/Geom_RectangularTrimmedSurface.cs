@@ -1,4 +1,7 @@
-﻿namespace OCCPort
+﻿using TKG3d;
+using TKMath;
+
+namespace OCCPort
 {
     //! Describes a portion of a surface (a patch) limited
     //! by two values of the u parameter in the u

@@ -392,7 +392,7 @@
         public bool IsNegative() { return (scale < 0.0); }
 
 
-        internal void SetTransformation(gp_Ax3 A3)
+        public void SetTransformation(gp_Ax3 A3)
         {
             shape = gp_TrsfForm.gp_CompoundTrsf;
             scale = 1.0;
@@ -405,7 +405,7 @@
 
         }
 
-        internal gp_GTrsf Inverted()
+        public gp_GTrsf Inverted()
         {
             throw new NotImplementedException();
         }

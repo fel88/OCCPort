@@ -106,7 +106,7 @@ namespace TKernel
             get => y();
             set => v[1] = value;
         }
-        T[] v = new T[2];
+        public T[] v = new T[2];
     }
 
 

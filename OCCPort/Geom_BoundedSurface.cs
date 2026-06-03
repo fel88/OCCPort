@@ -1,4 +1,6 @@
-﻿namespace OCCPort
+﻿using TKG3d;
+
+namespace OCCPort
 {
     //! The root class for bounded surfaces in 3D space. A
     //! bounded surface is defined by a rectangle in its 2D parametric space, i.e.

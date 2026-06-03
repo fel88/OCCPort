@@ -1,4 +1,5 @@
-﻿using TKMath;
+﻿using TKernel;
+using TKMath;
 
 namespace TKService
 {
@@ -449,6 +450,22 @@ namespace TKService
                 //for (Graphic3d_IndexedMapOfStructure::Iterator aStructIter (aStructures); aStructIter.More(); aStructIter.Next())				
             }
         }
+    }
+    public class Graphic3d_IndexedMapOfStructure : NCollection_IndexedMap<Graphic3d_CStructure, NCollection_DefaultHasher<Graphic3d_CStructure>>
+    {
+
+
+
+
+
+
+    }
+
+    public static class Constants
+    {
+        public const int Graphic3d_DisplayPriority_NB = Graphic3d_DisplayPriority.Graphic3d_DisplayPriority_Topmost - Graphic3d_DisplayPriority.Graphic3d_DisplayPriority_Bottom + 1;
+        public const int AIS_RotationMode_LOWER = 0;
+        //public const int AIS_RotationMode_UPPER = (int)AIS_RotationMode.AIS_RotationMode_BndBoxScene;
     }
 
 }

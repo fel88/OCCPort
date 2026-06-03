@@ -10,6 +10,8 @@ using System.Runtime.InteropServices.ComTypes;
 using System.Runtime.Intrinsics.Arm;
 using static System.Net.Mime.MediaTypeNames;
 using TKernel;
+using TKService;
+using OCCPort.Common;
 
 
 namespace OCCPort.OpenGL

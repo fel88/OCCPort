@@ -1,4 +1,6 @@
-﻿using TKMath;
+﻿using OCCPort.Common;
+using TKernel;
+using TKMath;
 
 namespace TKService
 {
@@ -158,5 +160,228 @@ namespace TKService
         Graphic3d_DisplayPriority myPriority;
         Graphic3d_DisplayPriority myPreviousPriority;
 
+
+    }
+    public class Graphic3d_SequenceOfGroup : List<Graphic3d_Group>
+    {
+
+
+        public bool IsEmpty()
+        {
+            return Count == 0;
+        }
+        public void Append(Graphic3d_Group aGroup)
+        {
+            Add(aGroup);
+        }
+
+        internal Graphic3d_Group Last()
+        {
+            return this[this.Count - 1];
+        }
+        //typedef NCollection_Sequence<Handle(Graphic3d_Group)> Graphic3d_SequenceOfGroup;
+    }
+
+    //! Structure display state.
+    public class Graphic3d_ViewAffinity
+    {
+        //! Empty constructor.
+        public Graphic3d_ViewAffinity()
+        {
+            SetVisible(true);
+        }
+
+        //! Return visibility flag.
+        public bool IsVisible(int theViewId)
+        {
+            int aBit = 1 << theViewId;
+            return (myMask & aBit) != 0;
+        }
+
+        public void SetVisible(bool theIsVisible)
+        {
+
+            myMask = (uint)(theIsVisible ? 0xFF : 0x00);
+
+        }
+        uint myMask; //!< affinity mask
+
+    }
+
+    public class Graphic3d_TransformPers
+    {
+        internal bool IsTrihedronOr2d(Graphic3d_TransModeFlags theMode)
+        {
+            return (theMode & (Graphic3d_TransModeFlags.Graphic3d_TMF_TriedronPers | Graphic3d_TransModeFlags.Graphic3d_TMF_2d)) != 0;
+
+        }
+        //! Return true for Graphic3d_TMF_ZoomPers, Graphic3d_TMF_ZoomRotatePers or Graphic3d_TMF_RotatePers modes.
+        public bool IsZoomOrRotate() { return IsZoomOrRotate(myMode); }
+        //! Return true if specified mode is zoom/rotate transformation persistence.
+        public static bool IsZoomOrRotate(Graphic3d_TransModeFlags theMode)
+        {
+            return (theMode & (Graphic3d_TransModeFlags.Graphic3d_TMF_ZoomPers | Graphic3d_TransModeFlags.Graphic3d_TMF_RotatePers)) != 0;
+        }
+        //template<class T>
+        public void Apply<T, MinMax>(Graphic3d_Camera theCamera,
+                                             NCollection_Mat4<double> theProjection,
+                                             NCollection_Mat4<double> theWorldView,
+                                             int theViewportWidth,
+                                             int theViewportHeight,
+                                           ref BVH_Box<T, MinMax> theBoundingBox) where T : struct
+            where MinMax : IBoxMinMax<T>, new()
+        {
+            //NCollection_Mat4<T> aTPers = Compute(theCamera, theProjection, theWorldView, theViewportWidth, theViewportHeight);
+            //if (aTPers.IsIdentity()
+            //|| !theBoundingBox.IsValid())
+            //{
+            //    return;
+            //}
+
+            //const typename BVH_Box<T, 3 >::BVH_VecNt & aMin = theBoundingBox.CornerMin();
+            //const typename BVH_Box<T, 3 >::BVH_VecNt & aMax = theBoundingBox.CornerMax();
+
+            //typename BVH_Box<T, 4 >::BVH_VecNt anArrayOfCorners[8];
+            //anArrayOfCorners[0] = typename BVH_Box < T, 4 >::BVH_VecNt(aMin.x(), aMin.y(), aMin.z(), static_cast<T>(1.0));
+            //anArrayOfCorners[1] = typename BVH_Box < T, 4 >::BVH_VecNt(aMin.x(), aMin.y(), aMax.z(), static_cast<T>(1.0));
+            //anArrayOfCorners[2] = typename BVH_Box < T, 4 >::BVH_VecNt(aMin.x(), aMax.y(), aMin.z(), static_cast<T>(1.0));
+            //anArrayOfCorners[3] = typename BVH_Box < T, 4 >::BVH_VecNt(aMin.x(), aMax.y(), aMax.z(), static_cast<T>(1.0));
+            //anArrayOfCorners[4] = typename BVH_Box < T, 4 >::BVH_VecNt(aMax.x(), aMin.y(), aMin.z(), static_cast<T>(1.0));
+            //anArrayOfCorners[5] = typename BVH_Box < T, 4 >::BVH_VecNt(aMax.x(), aMin.y(), aMax.z(), static_cast<T>(1.0));
+            //anArrayOfCorners[6] = typename BVH_Box < T, 4 >::BVH_VecNt(aMax.x(), aMax.y(), aMin.z(), static_cast<T>(1.0));
+            //anArrayOfCorners[7] = typename BVH_Box < T, 4 >::BVH_VecNt(aMax.x(), aMax.y(), aMax.z(), static_cast<T>(1.0));
+
+            //theBoundingBox.Clear();
+            //for (int anIt = 0; anIt < 8; ++anIt)
+            //{
+            //    typename BVH_Box<T, 4 >::BVH_VecNt & aCorner = anArrayOfCorners[anIt];
+            //    aCorner = aTPers * aCorner;
+            //    aCorner = aCorner / aCorner.w();
+            //    theBoundingBox.Add(typename BVH_Box < T, 3 >::BVH_VecNt(aCorner.x(), aCorner.y(), aCorner.z()));
+            //}
+        }
+
+        //! Return the anchor point for zoom/rotate transformation persistence.
+        public gp_Pnt AnchorPoint()
+        {
+            if (!IsZoomOrRotate())
+            {
+                throw new Standard_ProgramError("Graphic3d_TransformPers::AnchorPoint(), wrong persistence mode.");
+            }
+
+            return new gp_Pnt(myParams.Params3d.PntX, myParams.Params3d.PntY, myParams.Params3d.PntZ);
+        }
+
+        //! 3D anchor point for zoom/rotate transformation persistence.
+        public struct PersParams3d
+        {
+            public double PntX;
+            public double PntY;
+            public double PntZ;
+
+        }
+        public struct PersParams2d
+        {
+            public int OffsetX;
+            public int OffsetY;
+            public Aspect_TypeOfTriedronPosition Corner;
+
+        }
+        //union
+        public class MyParamsUnion
+        {
+            //  {
+            public PersParams3d Params3d;
+            public PersParams2d Params2d;
+            //  }
+        }
+        MyParamsUnion myParams = new MyParamsUnion();
+        Graphic3d_TransModeFlags myMode;  //!< Transformation persistence mode flags
+
+        //! Return true for Graphic3d_TMF_TriedronPers and Graphic3d_TMF_2d modes.
+        public bool IsTrihedronOr2d() { return IsTrihedronOr2d(myMode); }
+    }
+
+    //! Transform Persistence Mode defining whether to lock in object position, rotation and / or zooming relative to camera position.
+    public enum Graphic3d_TransModeFlags
+    {
+        Graphic3d_TMF_None = 0x0000,                  //!< no persistence attributes (normal 3D object)
+        Graphic3d_TMF_ZoomPers = 0x0002,                  //!< object does not resize
+        Graphic3d_TMF_RotatePers = 0x0008,                  //!< object does not rotate;
+        Graphic3d_TMF_TriedronPers = 0x0020,                  //!< object behaves like trihedron - it is fixed at the corner of view and does not resizing (but rotating)
+        Graphic3d_TMF_2d = 0x0040,                  //!< object is defined in 2D screen coordinates (pixels) and does not resize, pan and rotate
+        Graphic3d_TMF_CameraPers = 0x0080,                  //!< object is in front of the camera
+        Graphic3d_TMF_ZoomRotatePers = Graphic3d_TMF_ZoomPers
+                                     | Graphic3d_TMF_RotatePers //!< object doesn't resize and rotate
+    };
+
+
+    internal class Aspect_GenId
+    {
+        int last = 0;
+        internal int Next()
+        {
+            return last++;
+            int aNewId = 0;
+            //if (!Next(aNewId))
+            {
+                throw new Aspect_IdentDefinitionError("Aspect_GenId::Next(), Error: Available == 0");
+            }
+            return aNewId;
+
+        }
+
+        int myFreeCount;
+        int myLength;
+        int myLowerBound;
+        int myUpperBound;
+
+        public Aspect_GenId()
+        {
+
+        }
+
+        public Aspect_GenId(int theLow,
+                            int theUpper)
+        {
+
+            myFreeCount = (theUpper - theLow + 1);
+            myLength = (theUpper - theLow + 1);
+            myLowerBound = (theLow);
+            myUpperBound = (theUpper);
+            if (theLow > theUpper)
+            {
+                throw new Aspect_IdentDefinitionError("GenId Create Error: wrong interval");
+            }
+        }
+
+        List<int> myFreeIds = new List<int>();
+        //bool Next(ref int theId)
+        //{
+        //	if (!myFreeIds.IsEmpty())
+        //	{
+        //		theId = myFreeIds.First();
+        //		myFreeIds.RemoveFirst();
+        //		return true;
+        //	}
+        //	else if (myFreeCount < 1)
+        //	{
+        //		return false;
+        //	}
+
+        //	--myFreeCount;
+        //	theId = myLowerBound + myLength - myFreeCount - 1;
+        //	return Standard_True;
+        //}
+
+ 
+    
+    }
+
+    public class Aspect_DisplayConnection
+    {
     }
 }
+
+
+

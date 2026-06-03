@@ -1,4 +1,7 @@
 ﻿using OCCPort.Tester;
+using TKBRep;
+using TKG3d;
+using TKMath;
 
 namespace OCCPort
 {

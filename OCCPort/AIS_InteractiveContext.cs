@@ -6,6 +6,9 @@ using System.Reflection;
 using System.Reflection.Metadata;
 using System.Runtime.InteropServices;
 using System.Security.Policy;
+using TKernel;
+using TKMath;
+using TKService;
 
 namespace OCCPort
 {

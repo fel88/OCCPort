@@ -1,7 +1,7 @@
 ﻿namespace TKMath
 {
     [Flags]
-    enum MaskFlags
+    public enum MaskFlags
     {
         VoidMask = 0x01,
         XminMask = 0x02,

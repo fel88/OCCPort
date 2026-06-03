@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Reflection.Metadata;
+using TKBRep;
 using TKernel;
+using TKG3d;
 using TKMath;
 using TriangleNet.Topology.DCEL;
 using static OpenTK.Graphics.OpenGL.GL;
@@ -171,17 +173,17 @@ bool IsVerifyTolerance, bool IsMutableInput, BRepTools_ReShape theReshaper)
                             case GeomAbs_SurfaceType.GeomAbs_Cylinder:
                             case GeomAbs_SurfaceType.GeomAbs_Cone:
                                 {
-                                    tol = OCCPort.Precision.Confusion();
+                                    tol = TKMath.Precision.Confusion();
                                     break;
                                 }
                             case GeomAbs_SurfaceType.GeomAbs_Sphere:
                             case GeomAbs_SurfaceType.GeomAbs_Torus:
                                 {
-                                    tol = OCCPort.Precision.Confusion() * 2;
+                                    tol = TKMath.Precision.Confusion() * 2;
                                     break;
                                 }
                             default:
-                                tol = OCCPort.Precision.Confusion() * 4;
+                                tol = TKMath.Precision.Confusion() * 4;
                                 break;
                         }
                         if (!aB.IsWhole())

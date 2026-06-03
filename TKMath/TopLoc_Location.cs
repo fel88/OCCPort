@@ -25,7 +25,7 @@
         }
 
 
-        internal static double ScalePrec()
+        public static double ScalePrec()
         {
 
             return 1e-14;

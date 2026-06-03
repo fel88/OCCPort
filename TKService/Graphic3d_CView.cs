@@ -1,4 +1,6 @@
-﻿using TKernel;
+﻿using System.Drawing;
+using System.Xml.Linq;
+using TKernel;
 using TKMath;
 
 namespace TKService
@@ -226,8 +228,12 @@ namespace TKService
             }
 
             Graphic3d_Camera aCamera = Camera();
-            Graphic3d_Vec2i aWinSize;
-            Window().Size(out aWinSize.X, out aWinSize.Y);
+            Graphic3d_Vec2i aWinSize = new NCollection_Vec2<int>();
+            int x = 0;
+            int y = 0;
+            Window().Size(out x, out y);
+            aWinSize.X = x;
+            aWinSize.Y = y;
 
             double aMaxCoef = 1.0;
             foreach (var aLayer in Layers())
@@ -852,4 +858,266 @@ namespace TKService
             theWindow.SetSize(aViewSize.X, aViewSize.Y);
         }
     }
+
+
+    //! This is an abstract class for managing texture applyable on polygons.
+    public class Graphic3d_TextureMap : Graphic3d_TextureRoot
+
+    {
+        Graphic3d_TextureParams myParams;     //!< associated texture parameters
+        string myTexId;      //!< unique identifier of this resource (for sharing graphic resource); should never be modified outside constructor
+        Image_PixMap myPixMap;     //!< image pixmap - as one of the ways for defining the texture source
+                                   //OSD_Path myPath;       //!< image file path - as one of the ways for defining the texture source
+                                   //Standard_Size myRevision;   //!< image revision - for signaling changes in the texture source (e.g. file update, pixmap update)
+        Graphic3d_TypeOfTexture myType;       //!< texture type
+        bool myIsColorMap; //!< flag indicating color nature of values within the texture
+        bool myIsTopDown;  //!< Stores rows's memory layout
+        bool myHasMipmaps; //!< Indicates whether mipmaps should be generated or not
+
+        //! Returns whether row's memory layout is top-down.
+        public bool IsTopDown() { return myIsTopDown; }
+    }
+
+    public class Graphic3d_TextureRoot
+    {
+    }
+
+    public class Graphic3d_TextureParams
+    {
+        public void SetModulate(bool theToModulate)
+        {
+            myToModulate = theToModulate;
+        }
+
+        public void SetGenMode(Graphic3d_TypeOfTextureMode theMode,
+                                            Graphic3d_Vec4 thePlaneS,
+                                            Graphic3d_Vec4 thePlaneT)
+        {
+            myGenMode = theMode;
+            myGenPlaneS = thePlaneS;
+            myGenPlaneT = thePlaneT;
+        }
+
+        Graphic3d_Vec4 myGenPlaneS;       //!< texture coordinates generation plane S
+        Graphic3d_Vec4 myGenPlaneT;       //!< texture coordinates generation plane T
+        Graphic3d_Vec2 myScale;           //!< texture coordinates scale factor vector; (1,1) by default
+        Graphic3d_Vec2 myTranslation;     //!< texture coordinates translation vector;  (0,0) by default
+        uint mySamplerRevision; //!< modification counter of parameters related to sampler state
+                                //  Graphic3d_TextureUnit myTextureUnit;     //!< default texture unit to bind texture; Graphic3d_TextureUnit_BaseColor by default
+                                // Graphic3d_TypeOfTextureFilter myFilter;          //!< texture filter, Graphic3d_TOTF_NEAREST by default
+                                //   Graphic3d_LevelOfTextureAnisotropy myAnisoLevel;      //!< level of anisotropy filter, Graphic3d_LOTA_OFF by default
+        Graphic3d_TypeOfTextureMode myGenMode;         //!< texture coordinates generation mode, Graphic3d_TOTM_MANUAL by default
+        int myBaseLevel;       //!< base texture mipmap level (0 by default)
+        int myMaxLevel;        //!< maximum texture mipmap array level (1000 by default)
+        float myRotAngle;        //!< texture coordinates rotation angle in degrees, 0 by default
+        bool myToModulate;      //!< flag to modulate texture with material color, FALSE by default
+        bool myToRepeat;        //!< flag to repeat (true) or wrap (false) texture coordinates out of [0,1] range
+
+
+    } //! Type of the texture projection.
+
+    public enum Graphic3d_TypeOfTextureMode
+    {
+        Graphic3d_TOTM_OBJECT,
+        Graphic3d_TOTM_SPHERE,
+        Graphic3d_TOTM_EYE,
+        Graphic3d_TOTM_MANUAL,
+        Graphic3d_TOTM_SPRITE
+    };
+
+    internal class Graphic3d_TypeOfTexture
+    {
+    }
+    public class Image_PixMap
+    {
+    }
+
+    //! Base class for cubemaps.
+    //! It is iterator over cubemap sides.
+
+    public class Graphic3d_CubeMap : Graphic3d_TextureMap
+    {
+        //! Returns whether Z axis is inverted.
+        public bool ZIsInverted()
+        {
+            return myZIsInverted;
+        }
+
+        Graphic3d_CubeMapSide myCurrentSide;  //!< Iterator state
+        bool myEndIsReached; //!< Indicates whether end of iteration has been reached or hasn't
+        bool myZIsInverted;  //!< Indicates whether Z axis is inverted that allows to synchronize vertical flip of cubemap
+
+    }
+    internal class Graphic3d_CubeMapSide
+    {
+    }
+    public class Graphic3d_TextureEnv
+    {
+    }
+
+
+
+    //! Defines the class of a graduated trihedron.
+    //! It contains main style parameters for implementation of graduated trihedron
+    //! @sa OpenGl_GraduatedTrihedron    
+    public class Graphic3d_GraduatedTrihedron
+    {
+    }
+    //! This class allows the definition of a window gradient background.
+    public class Aspect_GradientBackground : Aspect_Background
+    {
+    }
+
+    //! This class allows the definition of
+    //! a window background.
+    public class Aspect_Background
+    {
+    }
+
+    public class Graphic3d_IndexBuffer : Graphic3d_Buffer
+    {  //! Empty constructor.
+        public Graphic3d_IndexBuffer(NCollection_BaseAllocator theAlloc)
+     : base(theAlloc) { }
+
+
+        //! Access index at specified position
+        public int Index(int theIndex)
+        {
+            return Stride == sizeof(ushort)
+                 ? (int)(Value(theIndex))
+                 : (int)(Value(theIndex));
+        }
+        //! Allocates new empty index array
+
+        public float[] DataFloat()
+        {
+            List<float> ret = new List<float>();
+            for (int i = 0; i < myData.Length; i += Stride)
+            {
+                ret.Add(BitConverter.ToSingle(myData, i));
+            }
+            return ret.ToArray();
+        }
+        public bool Init(int sizeOfElement, int theNbElems)
+        {
+            release();
+            Stride = sizeOfElement;
+            if (Stride != sizeof(ushort)
+     && Stride != sizeof(uint))
+            {
+                return false;
+            }
+
+            NbElements = theNbElems;
+            NbAttributes = 0;
+            if (NbElements != 0
+            && !Allocate(Stride * NbElements))
+            {
+                release();
+                return false;
+            }
+            return true;
+        }
+
+
+
+        //! Change index at specified position
+        public void SetIndex(int theIndex, int theValue)
+        {
+            if (Stride == sizeof(ushort))
+            {
+                long offset = Stride * theIndex;
+                var bts = BitConverter.GetBytes((ushort)theValue);
+                for (int i = 0; i < bts.Length; i++)
+                {
+                    myData[i + offset] = bts[i];
+                }
+                //ChangeValue < unsigned short> (theIndex) = (unsigned short )theValue;
+            }
+            else
+            {
+                //ChangeValue < unsigned int> (theIndex) = (unsigned int   )theValue;
+                long offset = Stride * theIndex;
+                var bts = BitConverter.GetBytes((uint)theValue);
+                for (int i = 0; i < bts.Length; i++)
+                {
+                    myData[i + offset] = bts[i];
+                }
+            }
+        }
+
+        internal bool Init(uint theMaxEdges)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+
+
+    //! Vertex attribute definition.
+    public struct Graphic3d_Attribute
+    {
+
+        public Graphic3d_TypeOfAttribute Id;       //!< attribute identifier in vertex shader, 0 is reserved for vertex position
+        public Graphic3d_TypeOfData DataType; //!< vec2,vec3,vec4,vec4ub
+
+
+        public int Stride() { return Stride(DataType); }
+
+        //! @return size of attribute of specified data type
+        public static int Stride(Graphic3d_TypeOfData theType)
+        {
+            switch (theType)
+            {
+                case Graphic3d_TypeOfData.Graphic3d_TOD_USHORT: return sizeof(ushort);
+                case Graphic3d_TypeOfData.Graphic3d_TOD_UINT: return sizeof(uint);
+                case Graphic3d_TypeOfData.Graphic3d_TOD_VEC2: return sizeof(float) * 2;
+                case Graphic3d_TypeOfData.Graphic3d_TOD_VEC3: return sizeof(float) * 3;
+                case Graphic3d_TypeOfData.Graphic3d_TOD_VEC4: return sizeof(float) * 4;
+                //case Graphic3d_TypeOfData.Graphic3d_TOD_VEC4UB: return sizeof(Graphic3d_Vec4ub);
+                case Graphic3d_TypeOfData.Graphic3d_TOD_FLOAT: return sizeof(float);
+            }
+            return 0;
+        }
+
+
+    }
+
+
+    public enum Graphic3d_TypeOfData
+    {
+
+        //Type of the element in Vertex or Index Buffer.
+        //Enumerator
+        Graphic3d_TOD_USHORT,
+
+        //unsigned 16-bit integer
+        Graphic3d_TOD_UINT,
+
+        //unsigned 32-bit integer
+        Graphic3d_TOD_VEC2,
+
+        //2-components float vector
+        Graphic3d_TOD_VEC3,
+
+        //3-components float vector
+        Graphic3d_TOD_VEC4,
+
+        //4-components float vector
+        Graphic3d_TOD_VEC4UB,
+
+        //4-components unsigned byte vector
+        Graphic3d_TOD_FLOAT,
+
+        //float value
+    }
+
+    public enum Graphic3d_TypeOfAttribute
+    {
+        Graphic3d_TOA_POS = 0, Graphic3d_TOA_NORM, Graphic3d_TOA_UV, Graphic3d_TOA_COLOR,
+        Graphic3d_TOA_CUSTOM
+    }
 }
+
+
+

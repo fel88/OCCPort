@@ -16,7 +16,9 @@
 
         //! IsEmpty
         //public virtual bool IsEmpty()
-       // { return mySize == 0; }
+        // { return mySize == 0; }
+
+
 
     }
 }

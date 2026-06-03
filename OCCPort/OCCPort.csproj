@@ -21,7 +21,12 @@
     <ProjectReference Include="..\delabella\delabella.vcxproj" />
     <ProjectReference Include="..\OCCPort.Common\OCCPort.Common.csproj" />
     <ProjectReference Include="..\TKernel\TKernel.csproj" />
+    <ProjectReference Include="..\TKG2d\TKG2d.csproj" />
+    <ProjectReference Include="..\TKG3d\TKG3d.csproj" />
     <ProjectReference Include="..\TKMath\TKMath.csproj" />
+    <ProjectReference Include="..\TKMesh\TKMesh.csproj" />
+    <ProjectReference Include="..\TKService\TKService.csproj" />
+    <ProjectReference Include="..\TKV3d\TKV3d.csproj" />
     <ProjectReference Include="..\Triangle\Triangle.csproj" />
   </ItemGroup>
 </Project>

@@ -1,4 +1,6 @@
-﻿namespace OCCPort.OpenGL
+﻿using TKService;
+
+namespace OCCPort.OpenGL
 {
     //! Class storing the frame statistics.
     public class Graphic3d_FrameStats

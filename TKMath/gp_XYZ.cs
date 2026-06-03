@@ -1,4 +1,6 @@
-﻿namespace TKMath
+﻿using OCCPort.Common;
+
+namespace TKMath
 {
     //! This class describes a cartesian coordinate entity in
     //! 3D space {X,Y,Z}. This entity is used for algebraic
