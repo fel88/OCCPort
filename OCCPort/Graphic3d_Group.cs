@@ -107,7 +107,7 @@ namespace OCCPort
                         for (int aVertIter = 0; aVertIter < aNbVerts; ++aVertIter)
                         {
                             var offset = anAttribStride * aVertIter;
-                            Graphic3d_Vec2 aVert = new Graphic3d_Vec2(aDataPtr, offset);
+                            Graphic3d_Vec2 aVert = new Graphic3d_Vec2(aDataPtr, offset, new FloatExtractor());
 
                             myBounds.Add(new Graphic3d_Vec4(aVert.x(), aVert.y(), 0.0f, 1.0f));
                         }
@@ -169,6 +169,20 @@ namespace OCCPort
         public Graphic3d_BndBox4f BoundingBox()
         {
             return myBounds;
+        }
+    }
+
+    public static class ByteHelper
+    {
+
+    }
+
+    public class FloatExtractor : TKernel.IElementBinaryExtractor<float>
+    {
+        public float Get(byte[] data, int idx)
+        {
+            var offset = idx;//??
+            return BitConverter.ToSingle(data, offset);
         }
     }
 }

@@ -1,13 +1,4 @@
-﻿global using Graphic3d_Vec3 = OCCPort.NCollection_Vec3<float>;
-global using Graphic3d_Vec3d = OCCPort.NCollection_Vec3<double>;
-global using Graphic3d_Vec3i = OCCPort.NCollection_Vec3<int>;
-global using Graphic3d_Vec4 = OCCPort.NCollection_Vec4<float>;
-global using Graphic3d_Vec4d = OCCPort.NCollection_Vec4<double>;
-global using OpenGl_ColorFormats = OCCPort.NCollection_Vector<int>;
-global using OpenGl_TextureArray = OCCPort.NCollection_Vector<OCCPort.OpenGl_Texture>;
-global using Aspect_RenderingContext = System.IntPtr;
-global using Aspect_Display = System.IntPtr; /* Display* under UNIX */
-
+﻿
 using OCCPort;
 using OpenTK.Audio.OpenAL;
 using OpenTK.Graphics.OpenGL;
@@ -20,6 +11,7 @@ using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Runtime.Intrinsics.Arm;
 using static System.Net.Mime.MediaTypeNames;
+using TKernel;
 
 
 namespace OCCPort.OpenGL
@@ -119,6 +111,47 @@ myLineFeather (1.0f),*/
 
 
         }
+
+        public static string FormatGlError(int theGlError)
+        {
+            switch ((All)theGlError)
+            {
+                case All.InvalidEnum: return "GL_INVALID_ENUM";
+                case All.InvalidValue: return "GL_INVALID_VALUE";
+                case All.InvalidOperation: return "GL_INVALID_OPERATION";
+                case All.StackOverflow: return "GL_STACK_OVERFLOW";
+                case All.StackUnderflow: return "GL_STACK_UNDERFLOW";
+                case All.OutOfMemory: return "GL_OUT_OF_MEMORY";
+                case All.InvalidFramebufferOperation: return "GL_INVALID_FRAMEBUFFER_OPERATION";
+            }
+            return FormatGlEnumHex(theGlError);
+        }
+
+        public static string FormatGlError(ErrorCode theGlError)
+        {
+            switch (theGlError)
+            {
+                case ErrorCode.InvalidEnum: return "GL_INVALID_ENUM";
+                case ErrorCode.InvalidValue: return "GL_INVALID_VALUE";
+                case ErrorCode.InvalidOperation: return "GL_INVALID_OPERATION";
+                case ErrorCode.StackOverflow: return "GL_STACK_OVERFLOW";
+                case ErrorCode.StackUnderflow: return "GL_STACK_UNDERFLOW";
+                case ErrorCode.OutOfMemory: return "GL_OUT_OF_MEMORY";
+                case ErrorCode.InvalidFramebufferOperation: return "GL_INVALID_FRAMEBUFFER_OPERATION";
+            }
+            return FormatGlEnumHex((int)theGlError);
+        }
+
+       static  string FormatGlEnumHex(int theGlEnum)
+        {
+            return $"0x{theGlEnum:X}";
+            //char[] aBuff = new char[16];
+            //Sprintf(aBuff, theGlEnum < (int)std::numeric_limits < uint16_t >::max()
+            //              ? "0x%04X"
+            //              : "0x%08X", theGlEnum);
+            //return aBuff;
+        }
+
         Graphic3d_TypeOfBackfacingModel myFaceCulling;   //!< back face culling mode enabled state (glIsEnabled (GL_CULL_FACE))
 
         //! Returns TRUE if sRGB rendering is supported and permitted.
@@ -495,6 +528,7 @@ myLineFeather (1.0f),*/
         {
             return myColorMask.r();
         }
+
         NCollection_Vec4<bool> myColorMask = new NCollection_Vec4<bool>();       //!< flag indicating writing into color buffer is enabled or disabled (glColorMask)
 
         internal static bool CheckIsTransparent(OpenGl_Aspects theAspect,
@@ -704,6 +738,10 @@ myLineFeather (1.0f),*/
         }
 
         internal void PushMessage(All debugSourceApplication, All debugTypePerformance, int v, All debugSeverityLow, string aMsg)
+        {
+            //throw new NotImplementedException();
+        }
+        internal void PushMessage(int debugSourceApplication, int debugTypePerformance, int v, int debugSeverityLow, string aMsg)
         {
             //throw new NotImplementedException();
         }

@@ -17,16 +17,24 @@ namespace OCCPort
         public abstract Aspect_Drawable NativeHandle();
 
         //! Returns window dimensions.
-        public Vector2i Dimensions()
+        public Graphic3d_Vec2i Dimensions()
         {
             Vector2i aSize;
             Size(out aSize.X, out aSize.Y);
-            return aSize;
+            return aSize.ToGraphic3d_Vec2i();
 
         }
         //! Returns True if the window <me> is opened
         //! and False if the window is closed.
         public abstract bool IsMapped() ;
 
+    }
+
+    public static class Vector2iExtensions
+    {
+        public static Graphic3d_Vec2i ToGraphic3d_Vec2i(this Vector2i v)
+        {
+            return new TKernel.NCollection_Vec2<int>(v.X, v.Y);
+        }
     }
 }

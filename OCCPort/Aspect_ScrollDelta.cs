@@ -1,4 +1,6 @@
-﻿namespace OCCPort
+﻿using TKernel;
+
+namespace OCCPort
 {
     //! Parameters for mouse scroll action.
     public struct Aspect_ScrollDelta

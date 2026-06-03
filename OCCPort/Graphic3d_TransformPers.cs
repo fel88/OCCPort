@@ -19,8 +19,8 @@ namespace OCCPort
         }
         //template<class T>
         public void Apply<T, MinMax>(Graphic3d_Camera theCamera,
-                                             NCollection_Mat4 theProjection,
-                                             NCollection_Mat4 theWorldView,
+                                             NCollection_Mat4<double> theProjection,
+                                             NCollection_Mat4<double> theWorldView,
                                              int theViewportWidth,
                                              int theViewportHeight,
                                            ref BVH_Box<T, MinMax> theBoundingBox) where T : struct

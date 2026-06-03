@@ -127,7 +127,11 @@ namespace OCCPort
             myVPSizeY = theVPSizeY;
         }
 
+        internal void BindReadBuffer(OpenGl_Context theGlCtx)
+        {
+            theGlCtx.arbFBO.glBindFramebuffer(All.ReadFramebuffer, myGlFBufferId);
 
+        }
 
         int myInitVPSizeX;         //!< viewport width  specified during initialization (kept even on failure)
         int myInitVPSizeY;         //!< viewport height specified during initialization (kept even on failure)

@@ -45,6 +45,9 @@ namespace OCCPort
 
         }
 
+        //! Return subview top-left position relative to parent view in pixels.
+        public Graphic3d_Vec2i SubviewTopLeft() { return mySubviewTopLeft; }
+
         //! Sets gradient background fill colors.
         public abstract void SetGradientBackground(Aspect_GradientBackground theBackground);
 
@@ -698,7 +701,7 @@ namespace OCCPort
         {
             throw new NotImplementedException();
         }
-        List<Graphic3d_CView> mySubviews; //!< list of child views
+        protected NCollection_Sequence<Graphic3d_CView> mySubviews=new NCollection_Sequence<Graphic3d_CView> (); //!< list of child views
 
         public abstract bool IsInvalidated();
         protected Aspect_XRSession myXRSession;
@@ -761,10 +764,10 @@ namespace OCCPort
             return false;
         }
 
-        Vector2i mySubviewTopLeft;           //!< subview top-left position relative to parent view
-        Vector2i mySubviewMargins;           //!< subview margins in pixels
-        Vector2d mySubviewSize;              //!< subview size
-        Vector2d mySubviewOffset;            //!< subview corner offset within parent view
+        Graphic3d_Vec2i mySubviewTopLeft;           //!< subview top-left position relative to parent view
+        Graphic3d_Vec2i mySubviewMargins;           //!< subview margins in pixels
+        Graphic3d_Vec2d mySubviewSize;              //!< subview size
+        Graphic3d_Vec2d mySubviewOffset;            //!< subview corner offset within parent view
         Aspect_TypeOfTriedronPosition mySubviewCorner;            //!< position within parent view
 
         protected Graphic3d_CView myParentView;               //!< back-pointer to the parent view
@@ -804,46 +807,46 @@ namespace OCCPort
                 return;
             }
 
-            Vector2i aWinSize = myParentView.Window().Dimensions();
-            Vector2i aViewSize = new Vector2i((int)(aWinSize.X * mySubviewSize.X), (int)(aWinSize.Y * mySubviewSize.Y));
-            if (mySubviewSize.X > 1.0)
+            Graphic3d_Vec2i aWinSize = myParentView.Window().Dimensions();
+            Graphic3d_Vec2i aViewSize = new Graphic3d_Vec2i((int)(aWinSize.x() * mySubviewSize.x()), (int)(aWinSize.y() * mySubviewSize.y()));
+            if (mySubviewSize.x() > 1.0)
             {
-                aViewSize.X = (int)mySubviewSize.X;
+                aViewSize.x( (int)mySubviewSize.x());
             }
-            if (mySubviewSize.Y > 1.0)
+            if (mySubviewSize.y() > 1.0)
             {
-                aViewSize.Y = (int)mySubviewSize.Y;
+                aViewSize.y( (int)mySubviewSize.y());
             }
 
-            Vector2i anOffset = new Vector2i(getSubViewOffset(mySubviewOffset.X, aWinSize.X),
-                            getSubViewOffset(mySubviewOffset.Y, aWinSize.Y));
+            Graphic3d_Vec2i anOffset = new Graphic3d_Vec2i(getSubViewOffset(mySubviewOffset.x(), aWinSize.x()),
+                            getSubViewOffset(mySubviewOffset.y(), aWinSize.y()));
             mySubviewTopLeft = (aWinSize - aViewSize) / 2; // Aspect_TOTP_CENTER
             if ((mySubviewCorner & Aspect_TypeOfTriedronPosition.Aspect_TOTP_LEFT) != 0)
             {
-                mySubviewTopLeft.X = anOffset.X;
+                mySubviewTopLeft.x( anOffset.X);
             }
             else if ((mySubviewCorner & Aspect_TypeOfTriedronPosition.Aspect_TOTP_RIGHT) != 0)
             {
-                mySubviewTopLeft.X = Math.Max(aWinSize.X - anOffset.X - aViewSize.X, 0);
+                mySubviewTopLeft.x(Math.Max(aWinSize.X - anOffset.X - aViewSize.X, 0));
             }
 
             if ((mySubviewCorner & Aspect_TypeOfTriedronPosition.Aspect_TOTP_TOP) != 0)
             {
-                mySubviewTopLeft.Y = anOffset.Y;
+                mySubviewTopLeft.y(anOffset.Y);
             }
             else if ((mySubviewCorner & Aspect_TypeOfTriedronPosition.Aspect_TOTP_BOTTOM) != 0)
             {
-                mySubviewTopLeft.Y = Math.Max(aWinSize.Y - anOffset.Y - aViewSize.Y, 0);
+                mySubviewTopLeft.y(Math.Max(aWinSize.Y - anOffset.Y - aViewSize.Y, 0));
             }
 
             mySubviewTopLeft += mySubviewMargins;
             aViewSize -= mySubviewMargins * 2;
 
-            int aRight = Math.Min(mySubviewTopLeft.X + aViewSize.X, aWinSize.X);
-            aViewSize.X = aRight - mySubviewTopLeft.X;
+            int aRight = Math.Min(mySubviewTopLeft.x() + aViewSize.X, aWinSize.X);
+            aViewSize.X = aRight - mySubviewTopLeft.x();
 
-            int aBot = Math.Min(mySubviewTopLeft.Y + aViewSize.Y, aWinSize.Y);
-            aViewSize.Y = aBot - mySubviewTopLeft.Y;
+            int aBot = Math.Min(mySubviewTopLeft.y() + aViewSize.Y, aWinSize.Y);
+            aViewSize.Y = aBot - mySubviewTopLeft.y();
 
             theWindow.SetSize(aViewSize.X, aViewSize.Y);
         }

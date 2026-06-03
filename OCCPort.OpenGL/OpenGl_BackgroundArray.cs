@@ -29,7 +29,7 @@ namespace OCCPort.OpenGL
             OpenGl_Context aCtx = theWorkspace.GetGlContext();
             int aViewSizeX = aCtx.Viewport()[2];
             int aViewSizeY = aCtx.Viewport()[3];
-            NCollection_Vec2i aTileOffset, aTileSize;
+            Graphic3d_Vec2i aTileOffset, aTileSize;
 
             if (aCtx.Camera().Tile().IsValid())
             {

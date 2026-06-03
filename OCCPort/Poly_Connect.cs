@@ -2,6 +2,7 @@
 using System;
 using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
+using TKernel;
 
 namespace OCCPort
 {

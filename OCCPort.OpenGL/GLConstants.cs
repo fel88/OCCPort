@@ -28,5 +28,23 @@
         public const int GL_LEFT = 0x0406;
         public const int GL_RIGHT = 0x0407;
         public const int GL_FRONT_AND_BACK = 0x0408;
+
+
+        public const int GL_DEBUG_SOURCE_THIRD_PARTY    = 0x8249;
+        public const int GL_DEBUG_SOURCE_APPLICATION = 0x824A;
+        public const int GL_DEBUG_SOURCE_OTHER = 0x824B;
+        public const int GL_DEBUG_TYPE_ERROR = 0x824C;
+        public const int GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR = 0x824D;
+        public const int GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR = 0x824E;
+        public const int GL_DEBUG_TYPE_PORTABILITY = 0x824F;
+        public const int GL_DEBUG_TYPE_PERFORMANCE = 0x8250;
+        public const int GL_DEBUG_TYPE_OTHER = 0x8251;
+        public const int GL_MAX_DEBUG_MESSAGE_LENGTH = 0x9143;
+        public const int GL_MAX_DEBUG_LOGGED_MESSAGES = 0x9144;
+        public const int GL_DEBUG_LOGGED_MESSAGES = 0x9145;
+        public const int GL_DEBUG_SEVERITY_HIGH = 0x9146;
+        public const int GL_DEBUG_SEVERITY_MEDIUM = 0x9147;
+        public const int GL_DEBUG_SEVERITY_LOW = 0x9148;
+        public const int GL_DEBUG_TYPE_MARKER = 0x8268;        
     }
 }

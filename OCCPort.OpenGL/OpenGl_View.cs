@@ -675,14 +675,14 @@ namespace OCCPort.OpenGL
             //// while render buffers could be resolved only into non-MSAA targets.
             //// As result, within obsolete OpenGL ES 3.0 context, we may create only one MSAA render buffer for main scene content
             //// and blit it into non-MSAA immediate FBO.
-        //    bool hasTextureMsaa = aCtx.HasTextureMultisampling();
+            //    bool hasTextureMsaa = aCtx.HasTextureMultisampling();
 
             //bool toUseOit = myRenderParams.TransparencyMethod != Graphic3d_RTM_BLEND_UNORDERED
             //             && !myIsSubviewComposer
             //             && checkOitCompatibility(aCtx, aNbSamples > 0);
 
-         //   bool toInitImmediateFbo = myTransientDrawToFront && !myIsSubviewComposer
-                         //               && (!aCtx.caps.useSystemBuffer || (toUseOit && HasImmediateStructures()));
+            //   bool toInitImmediateFbo = myTransientDrawToFront && !myIsSubviewComposer
+            //               && (!aCtx.caps.useSystemBuffer || (toUseOit && HasImmediateStructures()));
 
             //if (aFrameBuffer == null
             // && !aCtx->DefaultFrameBuffer().IsNull()
@@ -704,9 +704,9 @@ namespace OCCPort.OpenGL
             if (!myTransientDrawToFront)
             {
                 //myImmediateSceneFbos[0].Release(aCtx);
-              //  myImmediateSceneFbos[1].Release(aCtx);
+                //  myImmediateSceneFbos[1].Release(aCtx);
                 //myImmediateSceneFbos[0].ChangeViewport(0, 0);
-              //  myImmediateSceneFbos[1].ChangeViewport(0, 0);
+                //  myImmediateSceneFbos[1].ChangeViewport(0, 0);
             }
 
             // prepare FBOs containing main scene
@@ -1117,16 +1117,16 @@ namespace OCCPort.OpenGL
 
         //! Return TRUE if Frame Buffer initialized has failed with the same parameters.
         //! Return TRUE if Frame Buffer initialized has failed with the same parameters.
-        static bool checkWasFailedFbo( OpenGl_FrameBuffer theFboToCheck,
+        static bool checkWasFailedFbo(OpenGl_FrameBuffer theFboToCheck,
                                  int theSizeX,
                                  int theSizeY,
                                  int theNbSamples)
-  {
-    return !theFboToCheck.IsValid()
-        &&  theFboToCheck.GetInitVPSizeX() == theSizeX
-        &&  theFboToCheck.GetInitVPSizeY() == theSizeY
-        &&  theFboToCheck.NbSamples()      == theNbSamples;
-  }
+        {
+            return !theFboToCheck.IsValid()
+                && theFboToCheck.GetInitVPSizeX() == theSizeX
+                && theFboToCheck.GetInitVPSizeY() == theSizeY
+                && theFboToCheck.NbSamples() == theNbSamples;
+        }
 
         public override void RedrawImmediate()
         {
@@ -1471,9 +1471,86 @@ namespace OCCPort.OpenGL
             return myZLayers.NbImmediateStructures() != 0;
         }
 
-        private void blitSubviews(Graphic3d_Camera.Projection theProjection, OpenGl_FrameBuffer theDrawFbo)
+        //! Blit subviews into this view.
+        private bool blitSubviews(Graphic3d_Camera.Projection theProjection, OpenGl_FrameBuffer theDrawFbo)
         {
-            throw new NotImplementedException();
+            OpenGl_Context aCtx = myWorkspace.GetGlContext();
+            if (aCtx.arbFBOBlit == null)
+            {
+                return false;
+            }
+
+            bool isChanged = false;
+            foreach (Graphic3d_CView aChildIter in mySubviews)
+            {
+                OpenGl_View aSubView = (OpenGl_View)(aChildIter);
+                if (!aSubView.IsActive())
+                {
+                    continue;
+                }
+
+                OpenGl_FrameBuffer aChildFbo = aSubView.myImmediateSceneFbos[0] != null
+                                                            ? aSubView.myImmediateSceneFbos[0]
+                                                            : aSubView.myMainSceneFbos[0];
+                if (aChildFbo == null || !aChildFbo.IsValid())
+                {
+                    continue;
+                }
+
+                aChildFbo.BindReadBuffer(aCtx);
+                if (theDrawFbo != null
+                 && theDrawFbo.IsValid())
+                {
+                    theDrawFbo.BindDrawBuffer(aCtx);
+                }
+                else
+                {
+                    aCtx.arbFBO.glBindFramebuffer(All.DrawFramebuffer, OpenGl_FrameBuffer.NO_FRAMEBUFFER);
+                    aCtx.SetFrameBufferSRGB(false);
+                }
+
+                Graphic3d_Vec2i aWinSize = new Graphic3d_Vec2i(aCtx.Viewport()[2], aCtx.Viewport()[3]); //aSubView->GlWindow()->PlatformWindow()->Dimensions();
+                Graphic3d_Vec2i aSubViewSize = aChildFbo.GetVPSize();
+                Graphic3d_Vec2i aSubViewPos = aSubView.SubviewTopLeft();
+                Graphic3d_Vec2i aDestSize = aSubViewSize;
+                if (aSubView.RenderingParams().RenderResolutionScale != 1.0f)
+                {
+                    aDestSize = new Graphic3d_Vec2i(new Graphic3d_Vec2d(aDestSize) / new Graphic3d_Vec2d(aSubView.RenderingParams().RenderResolutionScale));
+                }
+                //aSubViewPos.y() = aWinSize.y() - aDestSize.y() - aSubViewPos.y();
+                aSubViewPos.y( aWinSize.y() - aDestSize.y() - aSubViewPos.y());
+
+                var aFilterGl = aDestSize == aSubViewSize ? BlitFramebufferFilter.Nearest : BlitFramebufferFilter.Linear;
+                aCtx.arbFBOBlit.glBlitFramebuffer(0, 0, aSubViewSize.x(), aSubViewSize.y(),
+                                                     aSubViewPos.x(), aSubViewPos.y(), aSubViewPos.x() + aDestSize.x(), aSubViewPos.y() + aDestSize.y(),
+                                                   ClearBufferMask.ColorBufferBit, aFilterGl);
+                var anErr = aCtx.core11fwd.glGetError();
+                if (anErr != ErrorCode.NoError)
+                {
+                    string aMsg = "FBO blitting has failed [Error " + OpenGl_Context.FormatGlError(anErr) + "]\n"
+                                                    + "  Please check your graphics driver settings or try updating driver.";
+                    if (aChildFbo.NbSamples() != 0)
+                    {
+                        myToDisableMSAA = true;
+                        aMsg += "\n  MSAA settings should not be overridden by driver!";
+                    }
+                    aCtx.PushMessage(GLConstants. GL_DEBUG_SOURCE_APPLICATION, GLConstants.GL_DEBUG_TYPE_ERROR, 0, GLConstants.GL_DEBUG_SEVERITY_HIGH, aMsg);
+                }
+
+                if (theDrawFbo != null
+                 && theDrawFbo.IsValid())
+                {
+                    theDrawFbo.BindBuffer(aCtx);
+                }
+                else
+                {
+                    aCtx.arbFBO.glBindFramebuffer(All.Framebuffer, OpenGl_FrameBuffer.NO_FRAMEBUFFER);
+                    aCtx.SetFrameBufferSRGB(false);
+                }
+                isChanged = true;
+            }
+
+            return isChanged;
         }
 
 

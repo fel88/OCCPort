@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Numerics;
 
 namespace OCCPort
 {
-	internal class TransformMatrices<T>
-	{
+	internal class TransformMatrices<Elem_t> where Elem_t : struct, INumber<Elem_t>, IMultiplyOperators<Elem_t, Elem_t, Elem_t>
+    {
 		public TransformMatrices()
 		{
 			myIsOrientationValid = false;
@@ -40,17 +41,17 @@ namespace OCCPort
 		//! Return true if Projection was not invalidated.
 		public bool IsProjectionValid() { return myIsProjectionValid; }
 
-		public NCollection_Mat4 MProjection;
-		public NCollection_Mat4 LProjection;
-		public NCollection_Mat4 RProjection;
+		public NCollection_Mat4<Elem_t> MProjection;
+		public NCollection_Mat4<Elem_t> LProjection;
+		public NCollection_Mat4<Elem_t> RProjection;
 
 		//! Initialize projection.
 		public void InitProjection()
 		{
 			myIsProjectionValid = true;
-			MProjection = new NCollection_Mat4();
-			LProjection = new NCollection_Mat4();
-			RProjection = new NCollection_Mat4();
+			MProjection = new NCollection_Mat4<Elem_t>();
+			LProjection = new NCollection_Mat4<Elem_t>();
+			RProjection = new NCollection_Mat4<Elem_t>();
 			MProjection.InitIdentity();
 			LProjection.InitIdentity();
 			RProjection.InitIdentity();

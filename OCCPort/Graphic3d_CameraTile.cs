@@ -24,9 +24,10 @@ namespace OCCPort
 
 		}
 
-		public NCollection_Vec2i OffsetLowerLeft()
+        //! Return offset position from lower-left corner.
+        public Graphic3d_Vec2i OffsetLowerLeft()
 		{
-			return new NCollection_Vec2i(Offset.x(),
+			return new Graphic3d_Vec2i(Offset.x(),
 						   !IsTopDown
 						   ? Offset.y()
 						   : TotalSize.y() - Offset.y() - 1);

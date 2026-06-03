@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using TKernel;
 
 namespace OCCPort
 {//! This class allows the definition of an RGB color as triplet of 3 normalized floating point values (red, green, blue).

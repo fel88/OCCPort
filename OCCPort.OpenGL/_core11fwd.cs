@@ -68,6 +68,11 @@ namespace OCCPort.OpenGL
             v = GL.GetBoolean(n);
         }
 
+        internal ErrorCode  glGetError()
+        {
+           return  GL.GetError();
+        }
+
         internal void glGetIntegerv(GetPName drawBuffer, ref int aDrawBuffer)
         {            
             GL.GetInteger(drawBuffer, out aDrawBuffer);

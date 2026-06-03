@@ -19,6 +19,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\delabella\delabella.vcxproj" />
+    <ProjectReference Include="..\TKernel\TKernel.csproj" />
     <ProjectReference Include="..\Triangle\Triangle.csproj" />
   </ItemGroup>
 </Project>

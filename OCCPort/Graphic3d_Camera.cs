@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Runtime.InteropServices.ComTypes;
+using TKernel;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace OCCPort
@@ -271,7 +272,7 @@ namespace OCCPort
         {
             return myZFocusType;
         }
-        public void stereoEyeProj(NCollection_Mat4 theOutMx,
+        public void stereoEyeProj(NCollection_Mat4<double> theOutMx,
 
                                                    Aspect_FrustumLRBT theLRBT,
                                                    double theNear,
@@ -295,7 +296,7 @@ namespace OCCPort
         }
 
 
-        public void orthoProj(NCollection_Mat4 theOutMx,
+        public void orthoProj(NCollection_Mat4<double> theOutMx,
 
                                              Aspect_FrustumLRBT theLRBT,
                                              double theNear,
@@ -337,7 +338,7 @@ namespace OCCPort
 
         }
 
-        public void perspectiveProj(NCollection_Mat4 theOutMx,
+        public void perspectiveProj(NCollection_Mat4<double> theOutMx,
 
                                          Aspect_FrustumLRBT theLRBT,
                                          double theNear,
@@ -745,7 +746,7 @@ namespace OCCPort
         {
             return UpdateOrientation(myMatricesD).Orientation;
         }
-        public NCollection_Mat4 ProjectionMatrix()
+        public NCollection_Mat4<double> ProjectionMatrix()
         {
             return UpdateProjection(myMatricesD).MProjection;
         }
@@ -759,19 +760,19 @@ namespace OCCPort
 
             theMatrices.InitOrientation();
 
-            Vector3d anEye = new Vector3d((myEye.X()),
+            NCollection_Vec3<double> anEye = new NCollection_Vec3<double>((myEye.X()),
                                            (myEye.Y()),
                                            (myEye.Z()));
 
-            Vector3d aViewDir = new Vector3d((myDirection.X()),
+            NCollection_Vec3<double> aViewDir = new NCollection_Vec3<double>((myDirection.X()),
                                               (myDirection.Y()),
                                               (myDirection.Z()));
 
-            Vector3d anUp = new Vector3d((myUp.X()),
+            NCollection_Vec3<double> anUp = new NCollection_Vec3<double>((myUp.X()),
                                           (myUp.Y()),
                                           (myUp.Z()));
 
-            Vector3d anAxialScale = new Vector3d((myAxialScale.X()),
+            NCollection_Vec3<double> anAxialScale = new NCollection_Vec3<double>((myAxialScale.X()),
                                                   (myAxialScale.Y()),
                                                   (myAxialScale.Z()));
 
@@ -781,24 +782,24 @@ namespace OCCPort
 
         }
 
-        private void LookOrientation(Vector3d theEye, Vector3d theFwdDir,
+        private void LookOrientation(NCollection_Vec3<double> theEye, NCollection_Vec3<double> theFwdDir,
 
-            Vector3d theUpDir, Vector3d theAxialScale,
+               NCollection_Vec3<double> theUpDir, NCollection_Vec3<double> theAxialScale,
 
             Graphic3d_Mat4d theOutMx)
         {
 
-            Vector3d aForward = theFwdDir;
+            NCollection_Vec3<double> aForward = theFwdDir;
             aForward.Normalize();
 
             // side = forward x up
-            Vector3d aSide = Vector3d.Cross(aForward, theUpDir);
+            NCollection_Vec3<double> aSide = NCollection_Vec3<double>.Cross(aForward, theUpDir);
             aSide.Normalize();
 
             // recompute up as: up = side x forward
-            Vector3d anUp = Vector3d.Cross(aSide, aForward);
+            NCollection_Vec3<double> anUp = NCollection_Vec3<double>.Cross(aSide, aForward);
 
-            NCollection_Mat4 aLookMx = new NCollection_Mat4();
+            var aLookMx = new NCollection_Mat4<double>();
             aLookMx.SetRow(0, aSide);
             aLookMx.SetRow(1, anUp);
             aLookMx.SetRow(2, -aForward);
@@ -807,7 +808,7 @@ namespace OCCPort
             theOutMx.Multiply(aLookMx);
             theOutMx.Translate(-theEye);
 
-            NCollection_Mat4 anAxialScaleMx = new NCollection_Mat4();
+            var anAxialScaleMx = new NCollection_Mat4<double>();
             anAxialScaleMx.ChangeValue(0, 0, theAxialScale.X);
             anAxialScaleMx.ChangeValue(1, 1, theAxialScale.Y);
             anAxialScaleMx.ChangeValue(2, 2, theAxialScale.Z);
@@ -843,7 +844,7 @@ namespace OCCPort
             Graphic3d_Mat4d aViewMx = OrientationMatrix();
 
             // use compatible type of point
-            NCollection_Vec4 aPnt = safePointCast(thePnt);
+            var aPnt = safePointCast(thePnt);
 
             aPnt = aViewMx * aPnt; // convert to view coordinate space
 
@@ -853,7 +854,7 @@ namespace OCCPort
 
         }
 
-        private NCollection_Vec4 safePointCast(gp_Pnt thePnt)
+        private NCollection_Vec4<double> safePointCast(gp_Pnt thePnt)
         {
             double aLim = 1e15f;
 
@@ -868,7 +869,7 @@ namespace OCCPort
                 aSafePoint.SetZ(aSafePoint.Z() >= 0 ? aBigFloat : -aBigFloat);
 
             // convert point
-            NCollection_Vec4 aPnt = new NCollection_Vec4(aSafePoint.X(), aSafePoint.Y(), aSafePoint.Z(), 1.0);
+            var aPnt = new NCollection_Vec4<double>(aSafePoint.X(), aSafePoint.Y(), aSafePoint.Z(), 1.0);
 
             return aPnt;
 
@@ -889,11 +890,9 @@ namespace OCCPort
             return aLeft.Crossed(aDir);
         }
 
-
-
-        public void computeProjection(NCollection_Mat4 theProjM,
-                                        NCollection_Mat4 theProjL,
-                                        NCollection_Mat4 theProjR,
+        public void computeProjection(NCollection_Mat4<double> theProjM,
+                                        NCollection_Mat4<double> theProjL,
+                                        NCollection_Mat4<double> theProjR,
                                         bool theToAddHeadToEye)
         {
             theProjM.InitIdentity();
@@ -1018,8 +1017,8 @@ namespace OCCPort
                         && aIOD != (0.0))
                         {
                             // X translation to cancel parallax
-                            theProjL.Translate(new Vector3d((0.5) * aIOD, (0.0), (0.0)));
-                            theProjR.Translate(new Vector3d((-0.5) * aIOD, (0.0), (0.0)));
+                            theProjL.Translate(new ((0.5) * aIOD, (0.0), (0.0)));
+                            theProjR.Translate(new ((-0.5) * aIOD, (0.0), (0.0)));
                         }
                         break;
                     }
@@ -1037,7 +1036,7 @@ namespace OCCPort
         //! Compute projection matrices.
         //! @param theMatrices [in] the matrices data container.
 
-        TransformMatrices<T> UpdateProjection<T>(TransformMatrices<T> theMatrices)
+        TransformMatrices<double> UpdateProjection(TransformMatrices<double> theMatrices)
         {
             if (!theMatrices.IsProjectionValid())
             {
@@ -1051,7 +1050,7 @@ namespace OCCPort
         {
             var aProjMx = ProjectionMatrix();
 
-            NCollection_Mat4 aInvProj;
+            NCollection_Mat4<double> aInvProj;
 
             // this case should never happen, but...
             if (!aProjMx.Inverted(out aInvProj))
