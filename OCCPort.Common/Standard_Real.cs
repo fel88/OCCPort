@@ -50,7 +50,7 @@ namespace OCCPort.Common
         public static double RealEpsilon()
         { return double.Epsilon; }
 
-        internal static double RealSmall()
+        public static double RealSmall()
         {
             return double.MinValue;
         }

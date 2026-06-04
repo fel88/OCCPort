@@ -1,6 +1,8 @@
 ﻿using OCCPort;
 using TKBRep;
+using TKernel;
 using TKG3d;
+using TKGeomBase;
 using TKMath;
 using TKService;
 

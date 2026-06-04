@@ -3,9 +3,9 @@ using TKernel;
 
 namespace OCCPort
 {
-    internal class TopTools_MapOfShape : NCollection_Map<TopoDS_Shape>//NCollection_Map<TopoDS_Shape,TopTools_ShapeMapHasher> 
+    public class TopTools_MapOfShape : NCollection_Map<TopoDS_Shape>//NCollection_Map<TopoDS_Shape,TopTools_ShapeMapHasher> 
     {
-        internal int Extent()
+        public int Extent()
         {
             return Count;
         }

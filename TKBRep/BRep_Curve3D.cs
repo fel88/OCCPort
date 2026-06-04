@@ -1,8 +1,12 @@
-﻿using System;
+﻿using OCCPort;
+using OCCPort.Common;
+using System;
 using System.Diagnostics.Contracts;
 using System.Reflection.Metadata;
+using TKG3d;
+using TKMath;
 
-namespace OCCPort
+namespace TKBRep
 {
     //! Representation of a curve by a 3D curve.
 

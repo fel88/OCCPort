@@ -1,4 +1,6 @@
-﻿namespace TKV3d
+﻿using TKernel;
+
+namespace TKV3d
 {
     //!  Represents the state of a given selection mode for a
     //! Selectable Object. Contains all the sensitive entities available for this mode.
@@ -125,4 +127,6 @@
         }
     }
 }
+
+
 

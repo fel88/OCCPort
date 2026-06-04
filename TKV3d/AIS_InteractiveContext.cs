@@ -1,4 +1,5 @@
-﻿using TKernel;
+﻿using OCCPort.Common;
+using TKernel;
 using TKMath;
 using TKService;
 
@@ -695,6 +696,121 @@ namespace TKV3d
             }
             theIObj.SetDisplayMode((int)theMode);
         }
+    }
+
+    internal class AIS_ListOfInteractive
+    {
+        internal class Iterator
+        {
+
+
+            public Iterator(AIS_ListOfInteractive aDisplayedObjects)
+            {
+
+            }
+
+            internal bool More()
+            {
+                throw new NotImplementedException();
+            }
+
+            internal object Next()
+            {
+                throw new NotImplementedException();
+            }
+
+            internal int Value()
+            {
+                throw new NotImplementedException();
+            }
+        }
+    }
+    public enum AIS_StatusOfPick
+    {
+        AIS_SOP_Error,
+        AIS_SOP_NothingSelected,
+        AIS_SOP_Removed,
+        AIS_SOP_OneSelected,
+        AIS_SOP_SeveralSelected
+    }
+
+    //! Type of highlighting to apply specific style.
+    enum Prs3d_TypeOfHighlight
+    {
+        Prs3d_TypeOfHighlight_None = 0,       //!< no highlighting
+        Prs3d_TypeOfHighlight_Selected,       //!< entire object is selected
+        Prs3d_TypeOfHighlight_Dynamic,        //!< entire object is dynamically highlighted
+        Prs3d_TypeOfHighlight_LocalSelected,  //!< part of the object is selected
+        Prs3d_TypeOfHighlight_LocalDynamic,   //!< part of the object is dynamically highlighted
+        Prs3d_TypeOfHighlight_SubIntensity,   //!< sub-intensity style
+        Prs3d_TypeOfHighlight_NB
+    };
+
+
+    //! Stores information about objects in graphic context:
+    public class AIS_GlobalStatus
+    {
+        internal bool AddSelectionMode(int theMode)
+        {
+            if (!mySelModes.Contains(theMode))
+            {
+                mySelModes.Append(theMode);
+                return true;
+            }
+            return false;
+        }
+
+
+        //! Returns active selection modes of the object.
+        public TColStd_ListOfInteger SelectionModes() { return mySelModes; }
+        TColStd_ListOfInteger mySelModes = new TColStd_ListOfInteger();
+
+        internal int DisplayMode()
+        {
+            return myDispMode;
+        }
+
+        internal Prs3d_Drawer HilightStyle()
+        {
+            return myHiStyle;
+        }
+
+        internal bool IsHilighted()
+        {
+            return myIsHilit;
+        }
+        Prs3d_Drawer myHiStyle;
+
+
+        int myDispMode;
+        bool myIsHilit;
+        bool mySubInt;
+        //! Sets display mode.
+        internal void SetDisplayMode(int theMode)
+        {
+            myDispMode = theMode;
+        }
+    }
+
+    //! Class holding the list of selected owners.
+    public class AIS_Selection
+    {
+    }
+    public class AIS_NArray1OfEntityOwner : NCollection_Array1<SelectMgr_EntityOwner>
+    {
+
+    }
+    public enum SelectMgr_PickingStrategy
+    {
+
+        //Enumeration defines picking strategy - which entities detected by picking line will be accepted, considering selection filters.
+
+        SelectMgr_PickingStrategy_FirstAcceptable,
+
+        //the first detected entity passing selection filter is accepted(e.g.any)
+        SelectMgr_PickingStrategy_OnlyTopmost
+
+        //only topmost detected entity passing selection filter is accepted
     }
 }
 

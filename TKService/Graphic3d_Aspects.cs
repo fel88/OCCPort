@@ -191,5 +191,7 @@ namespace TKService
     }//! Definition of the color shading model.
 
 
-
+    internal class Graphic3d_MarkerImage
+    {
+    }
 }

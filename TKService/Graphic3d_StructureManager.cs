@@ -65,7 +65,7 @@ namespace TKService
             aView.ReCompute(theStructure);
         }
 
-        public void RegisterObject(AIS_InteractiveObject theObject,
+        public void RegisterObject(object theObject,
                                                           Graphic3d_ViewAffinity theAffinity)
         {
             Graphic3d_ViewAffinity aResult;

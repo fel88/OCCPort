@@ -2,6 +2,7 @@
 using System;
 using System.Reflection.Metadata;
 using System.Runtime.Intrinsics.X86;
+using TKBRep;
 
 namespace OCCPort
 {

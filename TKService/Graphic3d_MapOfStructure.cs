@@ -1,4 +1,7 @@
-﻿using TKernel;
+﻿global using Prs3d_Presentation = TKService.Graphic3d_Structure;
+
+
+using TKernel;
 
 namespace TKService
 {

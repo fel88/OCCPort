@@ -1,4 +1,5 @@
 ﻿using TKernel;
+using TKMath;
 using TKService;
 
 namespace TKV3d
@@ -594,6 +595,59 @@ namespace TKV3d
                 myPreviousDeviationCoefficient = DeviationCoefficient();
             }
         }
+    }
+
+
+    //! A graphic attribute manager which governs how
+    //! A framework to define the display attributes of isoparameters.
+    //! This framework can be used to modify the default
+    //! setting for isoparameters in Prs3d_Drawer.
+    public class Prs3d_IsoAspect : Prs3d_LineAspect
+    {
+        //! Constructs a framework to define display attributes of isoparameters.
+        //! These include:
+        //! -   the color attribute aColor
+        //! -   the type of line aType
+        //! -   the width value aWidth
+        //! -   aNumber, the number of isoparameters to be   displayed.
+        public Prs3d_IsoAspect(Quantity_Color theColor,
+            Aspect_TypeOfLine theType,
+            double theWidth,
+            int theNumber)
+            : base(theColor, theType, theWidth)
+        {
+
+        }
+
+        //! defines the number of U or V isoparametric curves
+        //! to be drawn for a single face.
+        //! Default value: 10
+        public void SetNumber(int theNumber) { myNumber = theNumber; }
+
+        //! returns the number of U or V isoparametric curves drawn for a single face.
+        public int Number() { return myNumber; }
+        protected int myNumber;
+    }
+    public class Prs3d_LineAspect : Prs3d_BasicAspect
+    {
+        //! Returns the line aspect. This is defined as the set of
+        //! color, type and thickness attributes.
+        public Graphic3d_AspectLine3d Aspect() { return myAspect; }
+        public Graphic3d_AspectLine3d myAspect;
+        public Prs3d_LineAspect(Quantity_Color theColor,
+                                     Aspect_TypeOfLine theType,
+                                     double theWidth)
+
+        {
+            myAspect = new Graphic3d_AspectLine3d(theColor, theType, theWidth);
+        }
+
+
+    }
+    //! All basic Prs3d_xxxAspect must inherits from this class
+    //! The aspect classes qualifies how to represent a given kind of object.
+    public class Prs3d_BasicAspect
+    {
     }
 }
 

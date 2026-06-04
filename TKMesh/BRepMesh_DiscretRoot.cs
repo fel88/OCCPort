@@ -1,0 +1,31 @@
+﻿using OCCPort;
+using TKernel;
+
+namespace TKMesh
+{
+    //! This is a common interface for meshing algorithms 
+    //! instantiated by Mesh Factory and implemented by plugins.
+    public abstract class BRepMesh_DiscretRoot
+    {
+        //! Compute triangulation for set shape.
+        public abstract void Perform(Message_ProgressRange theRange = null);
+        //! Set the shape to triangulate.
+        public void SetShape(TopoDS_Shape theShape)
+        {
+            myShape = theShape;
+        }
+        TopoDS_Shape myShape;
+        bool myIsDone;
+        //! Sets IsDone flag.
+        public void setDone()
+        {
+            myIsDone = true;
+        }
+        public TopoDS_Shape Shape()
+        {
+            return myShape;
+        }
+    }
+
+}
+

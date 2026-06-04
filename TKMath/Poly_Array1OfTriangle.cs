@@ -1,8 +1,10 @@
 ﻿using TKernel;
 
+
+
 namespace TKMath
 {
-    public class Poly_Array1OfTriangle:NCollection_Array1<Poly_Triangle>
+    public class Poly_Array1OfTriangle : NCollection_Array1<Poly_Triangle>
     {
         //public Poly_Triangle[] triangles;
 

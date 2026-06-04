@@ -3,26 +3,26 @@ using TKBRep;
 
 namespace OCCPort
 {
-    internal class TopTools_ListIteratorOfListOfShape
+    public class TopTools_ListIteratorOfListOfShape
     {
         TopTools_ListOfShape list;
-        internal void Initialize(TopTools_ListOfShape l)
+        public void Initialize(TopTools_ListOfShape l)
         {
             list = l;
         }
 
         int index = 0;
-        internal bool More()
+        public bool More()
         {
             return index < list.Count;
         }
 
-        internal void Next()
+        public  void Next()
         {
             index++;
         }
 
-        internal TopoDS_Shape Value()
+        public TopoDS_Shape Value()
         {
             return list[index];
         }

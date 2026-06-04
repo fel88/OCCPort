@@ -46,5 +46,4 @@ namespace TKernel
             return Count;
         }        
     }
-
 }

@@ -1,11 +1,18 @@
-﻿using System;
+﻿using OCCPort.Common;
+using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Xml.Linq;
 
 namespace TKernel
 {
     public class NCollection_Sequence<T> : List<T>
     {
-
+        
+        public int Length()
+        {
+            return Count;
+        }
         public bool IsEmpty()
         {
             return Count == 0;
@@ -13,6 +20,17 @@ namespace TKernel
         public T ChangeValue(int i)
         {
             return this[i - 1];
+        }
+
+        //! Constant item access by theIndex
+        public T Value(int theIndex)
+        {
+            Exceptions.Standard_OutOfRange_Raise_if(theIndex <= 0 || theIndex > Count, "NCollection_Sequence::Value");
+            return this[theIndex - 1];
+            //NCollection_Sequence * const aLocalTHIS = (NCollection_Sequence*)this;
+            //aLocalTHIS->myCurrentItem = Find(theIndex);
+            //aLocalTHIS->myCurrentIndex = theIndex;
+            //return ((const Node*) myCurrentItem) -> Value();
         }
 
         public void ChangeValue(int i, T thePnt)
@@ -69,7 +87,7 @@ namespace TKernel
             return this[Lower()];
         }
 
-        internal void Remove(int v)
+        public void Remove(int v)
         {
             RemoveAt(v - 1);
         }

@@ -3,7 +3,7 @@ using System;
 
 namespace OCCPort
 {
-    internal class BRep_TEdge : TopoDS_TEdge
+    public class BRep_TEdge : TopoDS_TEdge
     {//=======================================================================
         public bool Degenerated()
         {

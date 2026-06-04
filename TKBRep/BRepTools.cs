@@ -1,0 +1,314 @@
+﻿using TKBRep;
+using TKG3d;
+using TKMath;
+
+namespace OCCPort
+{
+    //! The BRepTools package provides  utilities for BRep
+    //! data structures.
+    //!
+    //! * WireExplorer : A tool to explore the topology of
+    //! a wire in the order of the edges.
+    //!
+    //! * ShapeSet :  Tools used for  dumping, writing and
+    //! reading.
+    //!
+    //! * UVBounds : Methods to compute the  limits of the
+    //! boundary  of a  face,  a wire or   an edge in  the
+    //! parametric space of a face.
+    //!
+    //! *  Update : Methods  to call when   a topology has
+    //! been created to compute all missing data.
+    //!
+    //! * UpdateFaceUVPoints: Method to update the UV points
+    //! stored with the edges on a face.
+    //!
+    //! * Compare : Method to compare two vertices.
+    //!
+    //! * Compare : Method to compare two edges.
+    //!
+    //! * OuterWire : A method to find the outer wire of a
+    //! face.
+    //!
+    //! * Map3DEdges : A method to map all the 3D Edges of
+    //! a Shape.
+    //!
+    //! * Dump : A method to dump a BRep object.
+    public class BRepTools
+    {
+        public static void Update(TopoDS_Edge e)
+        {
+
+        }
+
+        //! Removes all cached polygonal representation of the shape,
+        //! i.e. the triangulations of the faces of <S> and polygons on
+        //! triangulations and polygons 3d of the edges.
+        //! In case polygonal representation is the only available representation
+        //! for the shape (shape does not have geometry) it is not removed.
+        //! @param theShape  [in] the shape to clean
+        //! @param theForce  [in] allows removing all polygonal representations from the shape,
+        //!                       including polygons on triangulations irrelevant for the faces of the given shape.
+        public static void Clean(TopoDS_Shape theShape, bool theForce = false)
+        {
+            if (theShape.IsNull())
+                return;
+
+            BRep_Builder aBuilder = new BRep_Builder();
+            Poly_Triangulation aNullTriangulation = null;
+            Poly_PolygonOnTriangulation aNullPoly;
+
+            TopTools_MapOfShape aShapeMap = new TopTools_MapOfShape();
+            TopLoc_Location anEmptyLoc = new TopLoc_Location();
+
+            TopExp_Explorer aFaceIt = new TopExp_Explorer(theShape, TopAbs_ShapeEnum.TopAbs_FACE);
+            for (; aFaceIt.More(); aFaceIt.Next())
+            {
+                TopoDS_Shape aFaceNoLoc = aFaceIt.Value();
+                aFaceNoLoc.Location(anEmptyLoc);
+                if (!aShapeMap.Add(aFaceNoLoc))
+                {
+                    // the face has already been processed
+                    continue;
+                }
+
+                TopoDS_Face aFace = TopoDS.Face(aFaceIt.Current());
+                if (!BRep_Tool.IsGeometric(aFace))
+                {
+                    // Do not remove triangulation as there is no surface to recompute it.
+                    continue;
+                }
+
+
+                TopLoc_Location aLoc = null;
+                Poly_Triangulation aTriangulation =
+                  BRep_Tool.Triangulation(aFace, ref aLoc);
+
+                if (aTriangulation == null)
+                    continue;
+
+                // Nullify edges
+                // Theoretically, the edges on the face (with surface) may have no geometry
+                // (no curve 3d or 2d or both). Such faces should be considered as invalid and
+                // are not supported by current implementation. So, both triangulation of the face
+                // and polygon on triangulation of the edges are removed unconditionally.
+                TopExp_Explorer aEdgeIt = new TopExp_Explorer(aFace, TopAbs_ShapeEnum.TopAbs_EDGE);
+                for (; aEdgeIt.More(); aEdgeIt.Next())
+                {
+                    TopoDS_Edge anEdge = TopoDS.Edge(aEdgeIt.Current());
+                    //aBuilder.UpdateEdge(anEdge, aNullPoly, aTriangulation, aLoc);
+                }
+
+                aBuilder.UpdateFace(aFace, aNullTriangulation);
+            }
+        }
+
+
+        //=======================================================================
+        //function : UVBounds
+        //purpose  : 
+        //=======================================================================
+        public static void UVBounds(TopoDS_Face F,
+                         ref double UMin, ref double UMax,
+                         ref double VMin, ref double VMax)
+        {
+            Bnd_Box2d B = new Bnd_Box2d();
+            AddUVBounds(F, B);
+            if (!B.IsVoid())
+            {
+                B.Get(ref UMin, ref VMin, ref UMax, ref VMax);
+            }
+            else
+            {
+                UMin = UMax = VMin = VMax = 0.0;
+            }
+        }
+
+
+        public static void AddUVBounds(TopoDS_Face FF, Bnd_Box2d B)
+        {
+            TopoDS_Face F = FF;
+            F.Orientation(TopAbs_Orientation.TopAbs_FORWARD);
+            TopExp_Explorer ex = new TopExp_Explorer(F, TopAbs_ShapeEnum.TopAbs_EDGE);
+
+            // fill box for the given face
+            Bnd_Box2d aBox = new Bnd_Box2d();
+            for (; ex.More(); ex.Next())
+            {
+                BRepTools.AddUVBounds(F, TopoDS.Edge(ex.Current()), aBox);
+            }
+
+            // if the box is empty (face without edges or without pcurves),
+            // get natural bounds
+            if (aBox.IsVoid())
+            {
+                double UMin = 0, UMax = 0, VMin = 0, VMax = 0;
+                TopLoc_Location L;
+                Geom_Surface aSurf = BRep_Tool.Surface(F, out L);
+                if (aSurf == null)
+                {
+                    return;
+                }
+
+                aSurf.Bounds(out UMin, out UMax, out VMin, out VMax);
+                aBox.Update(UMin, VMin, UMax, VMax);
+            }
+
+            // add face box to result
+            B.Add(aBox);
+        }
+
+        //=======================================================================
+        //function : AddUVBounds
+        //purpose  : 
+        //=======================================================================
+        static void AddUVBounds(TopoDS_Face aF,
+                             TopoDS_Edge aE,
+                            Bnd_Box2d aB)
+        {
+            double aT1, aT2, aXmin = 0.0, aYmin = 0.0, aXmax = 0.0, aYmax = 0.0;
+            double aUmin, aUmax, aVmin, aVmax;
+            Bnd_Box2d aBoxC, aBoxS;
+            TopLoc_Location aLoc;
+            /*Geom2d_Curve aC2D = BRep_Tool.CurveOnSurface(aE, aF, aT1, aT2);
+            if (aC2D == null)
+            {
+                return;
+            }*/
+        }
+
+        //=======================================================================
+        //function : AddUVBounds
+        //purpose  : s
+        //=======================================================================
+        static void AddUVBounds(TopoDS_Face F,
+                                TopoDS_Wire W,
+                               Bnd_Box2d B)
+        {
+            TopExp_Explorer ex = new TopExp_Explorer();
+            for (ex.Init(W, TopAbs_ShapeEnum.TopAbs_EDGE); ex.More(); ex.Next())
+            {
+                BRepTools.AddUVBounds(F, TopoDS.Edge(ex.Current()), B);
+            }
+        }
+
+        public static bool Triangulation(TopoDS_Shape theShape,
+                                                    double theLinDefl,
+                                                    bool theToCheckFreeEdges)
+        {
+            TopExp_Explorer anEdgeIter = new TopExp_Explorer();
+            TopLoc_Location aDummyLoc = new TopLoc_Location();
+            for (TopExp_Explorer aFaceIter = new TopExp_Explorer(theShape, TopAbs_ShapeEnum.TopAbs_FACE); aFaceIter.More(); aFaceIter.Next())
+            {
+                TopoDS_Face aFace = TopoDS.Face(aFaceIter.Current());
+                Poly_Triangulation aTri = BRep_Tool.Triangulation(aFace, ref aDummyLoc);
+                if (aTri == null
+                 || aTri.Deflection() > theLinDefl)
+                {
+                    return false;
+                }
+
+                for (anEdgeIter.Init(aFace, TopAbs_ShapeEnum.TopAbs_EDGE); anEdgeIter.More(); anEdgeIter.Next())
+                {
+                    TopoDS_Edge anEdge = TopoDS.Edge(anEdgeIter.Current());
+                    Poly_PolygonOnTriangulation aPoly = BRep_Tool.PolygonOnTriangulation(anEdge, aTri, aDummyLoc);
+                    if (aPoly == null)
+                    {
+                        return false;
+                    }
+                }
+            }
+            if (!theToCheckFreeEdges)
+            {
+                return true;
+            }
+
+            Poly_Triangulation anEdgeTri = null;
+            //for (anEdgeIter.Init(theShape, TopAbs_ShapeEnum.TopAbs_EDGE, TopAbs_ShapeEnum.TopAbs_FACE); anEdgeIter.More(); anEdgeIter.Next())
+            //{
+            //    TopoDS_Edge anEdge = TopoDS.Edge(anEdgeIter.Current());
+            //    Poly_Polygon3D aPolygon = BRep_Tool.Polygon3D(anEdge, aDummyLoc);
+            //    if (aPolygon != null)
+            //    {
+            //        if (aPolygon.Deflection() > theLinDefl)
+            //        {
+            //            return false;
+            //        }
+            //    }
+            //    else
+            //    {
+            //        Poly_PolygonOnTriangulation aPoly = BRep_Tool.PolygonOnTriangulation(anEdge, anEdgeTri, aDummyLoc);
+            //        if (aPoly == null
+            //         || anEdgeTri == null
+            //         || anEdgeTri.Deflection() > theLinDefl)
+            //        {
+            //            return false;
+            //        }
+            //    }
+            //}
+
+            return true;
+        }
+
+        public static void Update(TopoDS_Face F)
+        {
+            if (!F.Checked())
+            {
+                UpdateFaceUVPoints(F);
+                F.TShape().Checked(true);
+            }
+        }
+
+        private static void UpdateFaceUVPoints(TopoDS_Face theF)
+        {
+            // For each edge of the face <F> reset the UV points to the bounding
+            // points of the parametric curve of the edge on the face.
+
+            // Get surface of the face
+            TopLoc_Location aLoc;
+            Geom_Surface aSurf = BRep_Tool.Surface(theF, out aLoc);
+            // Iterate on edges and reset UV points
+            TopExp_Explorer anExpE = new TopExp_Explorer(theF, TopAbs_ShapeEnum.TopAbs_EDGE);
+            for (; anExpE.More(); anExpE.Next())
+            {
+                TopoDS_Edge aE = TopoDS.Edge(anExpE.Current());
+
+                BRep_TEdge TE = (BRep_TEdge)aE.TShape();
+                if (TE.Locked())
+                    return;
+
+                TopLoc_Location aELoc = aLoc.Predivided(aE.Location());
+                // Edge representations
+                BRep_ListOfCurveRepresentation aLCR = TE.ChangeCurves();
+                BRep_ListIteratorOfListOfCurveRepresentation itLCR = new BRep_ListIteratorOfListOfCurveRepresentation(aLCR);
+                for (; itLCR.More(); itLCR.Next())
+                {
+                    BRep_GCurve GC = (itLCR.Value()) as BRep_GCurve;
+
+                    if (GC != null && GC.IsCurveOnSurface(aSurf, aELoc))
+                    {
+                        // Update UV points
+                        GC.Update();
+                        break;
+                    }
+                }
+            }
+
+        }
+
+        public static void Update(TopoDS_Shell s)
+        {
+            TopExp_Explorer ex = new TopExp_Explorer(s, TopAbs_ShapeEnum.TopAbs_FACE);
+            while (ex.More())
+            {
+                Update(TopoDS.Face(ex.Current()));
+                ex.Next();
+            }
+        }
+
+        public static void Update(TopoDS_Wire w)
+        {
+
+        }
+    }
+}

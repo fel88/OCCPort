@@ -1,4 +1,5 @@
-﻿using OCCPort.Common;
+﻿using OCCPort;
+using OCCPort.Common;
 using OCCPort.Tester;
 using System;
 using System.Collections.Generic;
@@ -9,14 +10,13 @@ using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Security.Policy;
 using System.Threading;
-using TKBRep;
 using TKernel;
 using TKG2d;
 using TKG3d;
 using TKGeomBase;
 using TKMath;
 
-namespace OCCPort
+namespace TKBRep
 {
     public static class BRep_Tool
     {
@@ -30,7 +30,7 @@ namespace OCCPort
                                  TopoDS_Face F)
         {
             TopLoc_Location L;
-            Geom_Surface S = BRep_Tool.Surface(F, out L);
+            Geom_Surface S = Surface(F, out L);
             L = L.Predivided(V.Location());
             BRep_TVertex TV = (BRep_TVertex)V.TShape();
             // It is checked if there is PointRepresentation (case non Manifold)
@@ -54,7 +54,7 @@ namespace OCCPort
             {
                 E = TopoDS.Edge(exp.Current());
                 TopExp.Vertices(E, ref Vf, ref Vl);
-                if ((V.IsSame(Vf)) || (V.IsSame(Vl)))
+                if (V.IsSame(Vf) || V.IsSame(Vl))
                 {
                     gp_Pnt2d Pf = new gp_Pnt2d(), Pl = new gp_Pnt2d();
                     UVPoints(E, F, ref Pf, ref Pl);
@@ -73,7 +73,7 @@ namespace OCCPort
                           ref gp_Pnt2d PLast)
         {
             TopLoc_Location L;
-            Geom_Surface S = BRep_Tool.Surface(F, out L);
+            Geom_Surface S = Surface(F, out L);
             TopoDS_Edge aLocalEdge = E;
             if (F.Orientation() == TopAbs_Orientation.TopAbs_REVERSED)
             {
@@ -92,7 +92,7 @@ namespace OCCPort
                           ref gp_Pnt2d PLast)
         {
             TopLoc_Location l = L.Predivided(E.Location());
-            bool Eisreversed = (E.Orientation() == TopAbs_Orientation.TopAbs_REVERSED);
+            bool Eisreversed = E.Orientation() == TopAbs_Orientation.TopAbs_REVERSED;
 
             // find the representation
             BRep_TEdge TE = (BRep_TEdge)E.TShape();
@@ -144,7 +144,7 @@ namespace OCCPort
                 u = v = 0.0;
                 if (!Vf.IsNull())
                 {
-                    gp_Pnt PF = BRep_Tool.Pnt(Vf);
+                    gp_Pnt PF = Pnt(Vf);
                     ElSLib.Parameters(pln, PF, ref u, ref v);
                 }
                 PFirst.SetCoord(u, v);
@@ -152,7 +152,7 @@ namespace OCCPort
                 u = v = 0.0;
                 if (!Vl.IsNull())
                 {
-                    gp_Pnt PL = BRep_Tool.Pnt(Vl);
+                    gp_Pnt PL = Pnt(Vl);
                     ElSLib.Parameters(pln, PL, ref u, ref v);
                 }
                 PLast.SetCoord(u, v);
@@ -176,14 +176,14 @@ namespace OCCPort
                        out double Last)
         {
             //  set the range to all the representations
-            BRep_TEdge TE = (BRep_TEdge)(E.TShape());
+            BRep_TEdge TE = (BRep_TEdge)E.TShape();
             foreach (var cr in TE.Curves())
             {
 
 
                 if (cr.IsCurve3D())
                 {
-                    BRep_Curve3D CR = (BRep_Curve3D)(cr);
+                    BRep_Curve3D CR = (BRep_Curve3D)cr;
                     if (CR.Curve3D() != null)
                     {
                         First = CR.First();
@@ -218,7 +218,7 @@ namespace OCCPort
             // and is degenerated use the vertex orientation
             // RLE, june 94
 
-            if (!itv.More() && BRep_Tool.Degenerated(theE))
+            if (!itv.More() && Degenerated(theE))
             {
                 orient = theV.Orientation();
             }
@@ -250,24 +250,24 @@ namespace OCCPort
 
             if (orient == TopAbs_Orientation.TopAbs_FORWARD)
             {
-                BRep_Tool.Range(theE, out f, out l);
-                theParam = (rev) ? l : f;
+                Range(theE, out f, out l);
+                theParam = rev ? l : f;
                 return true;
             }
 
             else if (orient == TopAbs_Orientation.TopAbs_REVERSED)
             {
-                BRep_Tool.Range(theE, out f, out l);
-                theParam = (rev) ? f : l;
+                Range(theE, out f, out l);
+                theParam = rev ? f : l;
                 return true;
             }
 
             else
             {
                 TopLoc_Location L;
-                Geom_Curve C = BRep_Tool.Curve(theE, out L, out f, out l);
+                Geom_Curve C = Curve(theE, out L, out f, out l);
                 L = L.Predivided(theV.Location());
-                if (C != null || BRep_Tool.Degenerated(theE))
+                if (C != null || Degenerated(theE))
                 {
                     //const BRep_TVertex* TV = static_cast <const BRep_TVertex*> (theV.TShape().get());
                     //BRep_ListIteratorOfListOfPointRepresentation itpr(TV->Points());
@@ -358,13 +358,13 @@ namespace OCCPort
             First = 0;
             Last = 0;
             // find the representation
-            BRep_TEdge TE = (BRep_TEdge)(E.TShape());
+            BRep_TEdge TE = (BRep_TEdge)E.TShape();
 
             foreach (var cr in TE.Curves())
             {
                 if (cr.IsCurve3D())
                 {
-                    BRep_Curve3D GC = (BRep_Curve3D)(cr);
+                    BRep_Curve3D GC = (BRep_Curve3D)cr;
                     L = E.Location() * GC.Location();
                     GC.Range(ref First, ref Last);
                     return GC.Curve3D();
@@ -389,7 +389,7 @@ namespace OCCPort
 
             int i = 0;
             // find the representation
-            BRep_TEdge TE = (BRep_TEdge)(E.TShape());
+            BRep_TEdge TE = (BRep_TEdge)E.TShape();
             //BRep_ListIteratorOfListOfCurveRepresentation itcr(TE->Curves());
             //for (; itcr.More(); itcr.Next())
             foreach (var cr in TE.Curves())
@@ -402,7 +402,7 @@ namespace OCCPort
                     // closed surfaces there are two PCurves
                     if (i == Index)
                         C = GC.PCurve();
-                    else if (GC.IsCurveOnClosedSurface() && (++i == Index))
+                    else if (GC.IsCurveOnClosedSurface() && ++i == Index)
                         C = GC.PCurve2();
                     else
                         continue;
@@ -450,7 +450,7 @@ namespace OCCPort
                                                ref bool? theIsStored)
         {
             TopLoc_Location l;
-            Geom_Surface S = BRep_Tool.Surface(F, out l);
+            Geom_Surface S = Surface(F, out l);
             TopoDS_Edge aLocalEdge = E;
             if (F.Orientation() == TopAbs_Orientation.TopAbs_REVERSED)
             {
@@ -474,19 +474,19 @@ namespace OCCPort
                                                ref bool? theIsStored)
         {
             TopLoc_Location loc = L.Predivided(E.Location());
-            bool Eisreversed = (E.Orientation() == TopAbs_Orientation.TopAbs_REVERSED);
+            bool Eisreversed = E.Orientation() == TopAbs_Orientation.TopAbs_REVERSED;
             if (theIsStored.HasValue)//??
                 theIsStored = true;//??
 
             // find the representation
-            BRep_TEdge TE = (BRep_TEdge)(E.TShape());
+            BRep_TEdge TE = (BRep_TEdge)E.TShape();
 
             foreach (var cr in TE.Curves())
             {
 
                 if (cr.IsCurveOnSurface(S, loc))
                 {
-                    BRep_GCurve GC = (BRep_GCurve)(cr);
+                    BRep_GCurve GC = (BRep_GCurve)cr;
                     GC.Range(ref First, ref Last);
                     if (GC.IsCurveOnClosedSurface() && Eisreversed)
                         return GC.PCurve2();
@@ -514,13 +514,13 @@ namespace OCCPort
                                    ref double Last)
         {
             // find the representation
-            BRep_TEdge TE = (BRep_TEdge)(E.TShape());
+            BRep_TEdge TE = (BRep_TEdge)E.TShape();
             foreach (var cr in TE.Curves())
             {
 
                 if (cr.IsCurveOnSurface())
                 {
-                    BRep_GCurve GC = (BRep_GCurve)(cr);
+                    BRep_GCurve GC = (BRep_GCurve)cr;
                     C = GC.PCurve();
                     S = GC.Surface();//strange code here??
                     L = E.Location() * GC.Location();
@@ -544,7 +544,7 @@ namespace OCCPort
                                            bool? theIsStored = null)
         {
             TopLoc_Location loc = L.Predivided(E.Location());
-            bool Eisreversed = (E.Orientation() == TopAbs_Orientation.TopAbs_REVERSED);
+            bool Eisreversed = E.Orientation() == TopAbs_Orientation.TopAbs_REVERSED;
             if (theIsStored.HasValue)
                 theIsStored = true;
 
@@ -587,7 +587,7 @@ namespace OCCPort
                                                ref bool theIsStored)
         {
             TopLoc_Location l;
-            Geom_Surface S = BRep_Tool.Surface(F, out l);
+            Geom_Surface S = Surface(F, out l);
             TopoDS_Edge aLocalEdge = E;
             if (F.Orientation() == TopAbs_Orientation.TopAbs_REVERSED)
             {
@@ -628,7 +628,7 @@ namespace OCCPort
             // Check existence of 3d curve in edge
             double f = 0, l = 0;
             TopLoc_Location aCurveLocation = new TopLoc_Location();
-            Geom_Curve C3D = BRep_Tool.Curve(E, out aCurveLocation, out f, out l);
+            Geom_Curve C3D = Curve(E, out aCurveLocation, out f, out l);
 
             if (C3D == null)
                 // no 3d curve
@@ -689,7 +689,7 @@ namespace OCCPort
         public static bool IsGeometric(TopoDS_Edge E)
         {
             // find the representation
-            BRep_TEdge TE = (BRep_TEdge)(E.TShape());
+            BRep_TEdge TE = (BRep_TEdge)E.TShape();
 
             foreach (var cr in TE.Curves())
             {
@@ -707,7 +707,7 @@ namespace OCCPort
 
         public static gp_Pnt Pnt(TopoDS_Vertex V)
         {
-            BRep_TVertex TV = (V.TShape()) as BRep_TVertex;
+            BRep_TVertex TV = V.TShape() as BRep_TVertex;
 
             if (TV == null)
             {
@@ -750,7 +750,7 @@ namespace OCCPort
 
         public static double Tolerance(TopoDS_Edge E)
         {
-            BRep_TEdge TE = (BRep_TEdge)(E.TShape());
+            BRep_TEdge TE = (BRep_TEdge)E.TShape();
             double p = TE.Tolerance();
             double pMin = Precision.Confusion();
             if (p > pMin)
@@ -762,7 +762,7 @@ namespace OCCPort
 
         public static double Tolerance(TopoDS_Vertex V)
         {
-            BRep_TVertex aTVert = (V.TShape()) as BRep_TVertex;
+            BRep_TVertex aTVert = V.TShape() as BRep_TVertex;
 
             if (aTVert == null)
             {
@@ -782,7 +782,7 @@ namespace OCCPort
 
         public static double Tolerance(TopoDS_Face F)
         {
-            BRep_TFace TF = (BRep_TFace)(F.TShape());
+            BRep_TFace TF = (BRep_TFace)F.TShape();
             double p = TF.Tolerance();
             double pMin = Precision.Confusion();
             if (p > pMin)
@@ -803,11 +803,11 @@ namespace OCCPort
         public static bool IsClosed(TopoDS_Edge E, TopoDS_Face F)
         {
             TopLoc_Location l;
-            Geom_Surface S = BRep_Tool.Surface(F, out l);
+            Geom_Surface S = Surface(F, out l);
             if (IsClosed(E, S, l))
                 return true;
 
-            Poly_Triangulation T = BRep_Tool.Triangulation(F, ref l);
+            Poly_Triangulation T = Triangulation(F, ref l);
             return IsClosed(E, T, l);
         }
 
@@ -875,11 +875,11 @@ namespace OCCPort
             //
             if (aGOFS != null)
             {
-                aGP = (Geom_Plane)(aGOFS.BasisSurface());
+                aGP = (Geom_Plane)aGOFS.BasisSurface();
             }
             else if (aGRTS != null)
             {
-                aGP = (Geom_Plane)(aGRTS.BasisSurface());
+                aGP = (Geom_Plane)aGRTS.BasisSurface();
             }
 
             else
@@ -903,7 +903,7 @@ namespace OCCPort
                 for (; exp.More(); exp.Next())
                 {
                     TopoDS_Edge E = TopoDS.Edge(exp.Current());
-                    if (BRep_Tool.Degenerated(E) || E.Orientation() == TopAbs_Orientation.TopAbs_INTERNAL || E.Orientation() == TopAbs_Orientation.TopAbs_EXTERNAL)
+                    if (Degenerated(E) || E.Orientation() == TopAbs_Orientation.TopAbs_INTERNAL || E.Orientation() == TopAbs_Orientation.TopAbs_EXTERNAL)
                         continue;
                     hasBound = true;
                     if (!aMap.Add(E))
@@ -938,7 +938,7 @@ namespace OCCPort
         }
         public static bool SameRange(TopoDS_Edge E)
         {
-            BRep_TEdge TE = (BRep_TEdge)(E.TShape());
+            BRep_TEdge TE = (BRep_TEdge)E.TShape();
             return TE.SameRange();
         }
 
@@ -950,19 +950,18 @@ namespace OCCPort
             return TE.Degenerated();
         }
 
-
-
         //! Returns the geometric surface of the face. Returns
         //! in <L> the location for the surface.
-        internal static Geom_Surface Surface(TopoDS_Face F, out TopLoc_Location L)
+        public static Geom_Surface Surface(TopoDS_Face F, out TopLoc_Location L)
         {
-            BRep_TFace TF = (BRep_TFace)(F.TShape());
+            BRep_TFace TF = (BRep_TFace)F.TShape();
             L = F.Location() * TF.Location();
             return TF.Surface();
         }
+
         public static Geom_Surface Surface(TopoDS_Face F)
         {
-            BRep_TFace TF = (BRep_TFace)(F.TShape());
+            BRep_TFace TF = (BRep_TFace)F.TShape();
             Geom_Surface S = TF.Surface();
 
             if (S == null)
@@ -972,7 +971,7 @@ namespace OCCPort
             if (!L.IsIdentity())
             {
                 Geom_Geometry aCopy = S.Transformed(L.Transformation());
-                Geom_Surface aGS = (Geom_Surface)(aCopy);
+                Geom_Surface aGS = (Geom_Surface)aCopy;
                 return aGS;
             }
             return S;
@@ -987,7 +986,7 @@ namespace OCCPort
                                                            ref TopLoc_Location theLocation)
         {
             theLocation = theFace.Location();
-            BRep_TFace aTFace = (BRep_TFace)(theFace.TShape());
+            BRep_TFace aTFace = (BRep_TFace)theFace.TShape();
             return aTFace.Triangulations();
         }
 
@@ -1008,14 +1007,14 @@ namespace OCCPort
         public static void PolygonOnTriangulation(TopoDS_Edge E, ref Poly_PolygonOnTriangulation P, ref Poly_Triangulation T, TopLoc_Location L)
         {
             // find the representation
-            BRep_TEdge TE = (BRep_TEdge)(E.TShape());
+            BRep_TEdge TE = (BRep_TEdge)E.TShape();
             foreach (var item in TE.Curves())
             {
                 BRep_CurveRepresentation cr = item;
                 if (cr.IsPolygonOnTriangulation())
                 {
                     BRep_PolygonOnTriangulation PT =
-                        (BRep_PolygonOnTriangulation)(cr);
+                        (BRep_PolygonOnTriangulation)cr;
                     P = PT.PolygonOnTriangulation();
                     T = PT.Triangulation();
                     L = E.Location() * PT.Location();
@@ -1032,14 +1031,14 @@ namespace OCCPort
         //! Returns the polygon associated to the  edge in  the
         //! parametric  space of  the  face.  Returns   a NULL
         //! handle  if this polygon  does not exist.
-        internal static Poly_PolygonOnTriangulation PolygonOnTriangulation(TopoDS_Edge E,
+        public static Poly_PolygonOnTriangulation PolygonOnTriangulation(TopoDS_Edge E,
             Poly_Triangulation T, TopLoc_Location L)
         {
             TopLoc_Location l = L.Predivided(E.Location());
-            bool Eisreversed = (E.Orientation() == TopAbs_Orientation.TopAbs_REVERSED);
+            bool Eisreversed = E.Orientation() == TopAbs_Orientation.TopAbs_REVERSED;
 
             // find the representation
-            BRep_TEdge TE = (BRep_TEdge)(E.TShape());
+            BRep_TEdge TE = (BRep_TEdge)E.TShape();
 
             foreach (var cr in TE.Curves())
             {
@@ -1055,7 +1054,7 @@ namespace OCCPort
             return null;
         }
 
-        internal static GeomAbs_Shape MaxContinuity(TopoDS_Edge theEdge)
+        public static GeomAbs_Shape MaxContinuity(TopoDS_Edge theEdge)
         {
             GeomAbs_Shape aMaxCont = GeomAbs_Shape.GeomAbs_C0;
             var curves = ((BRep_TEdge)theEdge.TShape()).ChangeCurves();
@@ -1076,10 +1075,10 @@ namespace OCCPort
             return aMaxCont;
         }
 
-        internal static bool SameParameter(TopoDS_Edge E)
+        public static bool SameParameter(TopoDS_Edge E)
         {
 
-            BRep_TEdge TE = (BRep_TEdge)(E.TShape());
+            BRep_TEdge TE = (BRep_TEdge)E.TShape();
             return TE.SameParameter();
 
         }

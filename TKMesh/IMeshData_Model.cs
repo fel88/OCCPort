@@ -1,0 +1,20 @@
+﻿using OCCPort;
+using TKBRep;
+
+namespace TKMesh
+{
+    public interface IMeshData_Model : IMeshData_Shape
+    {
+        //=======================================================================
+        int FacesNb();
+        IMeshData_Edge AddEdge(TopoDS_Edge theEdge);
+        int EdgesNb();
+        IMeshData_Face AddFace(TopoDS_Face theFace);
+        IMeshData_Face GetFace(int theFaceIndex);
+        IMeshData_Edge GetEdge(int v);
+
+        //! Returns maximum size of shape model.
+        double GetMaxSize();
+    }
+}
+

@@ -13,6 +13,46 @@ namespace TKService
         {
         }
 
+        //! Returns the last created group or creates new one if list is empty.
+        public Graphic3d_Group CurrentGroup()
+        {
+            if (Groups().IsEmpty())
+            {
+                return NewGroup();
+            }
+            return Groups().Last();
+        }
+
+
+
+        public void Network(Graphic3d_Structure theStructure,
+
+                                Graphic3d_TypeOfConnection theType,
+                               List<Graphic3d_Structure> theSet)
+        {
+
+            theSet.Add(theStructure);
+            //switch (theType)
+            //{
+            //    case Graphic3d_TOC_DESCENDANT:
+            //        {
+            //            for (NCollection_IndexedMap<Graphic3d_Structure*>::Iterator anIter (theStructure->myDescendants); anIter.More(); anIter.Next())
+            //            {
+            //                Graphic3d_Structure.Network(anIter.Value(), theType, theSet);
+            //            }
+            //            break;
+            //        }
+            //    case Graphic3d_TOC_ANCESTOR:
+            //        {
+            //            for (NCollection_IndexedMap<Graphic3d_Structure*>::Iterator anIter (theStructure->myAncestors); anIter.More(); anIter.Next())
+            //            {
+            //                Graphic3d_Structure.Network(anIter.Value(), theType, theSet);
+            //            }
+            //            break;
+            //        }
+            //}
+
+        }
         public void SetTransformPersistence(Graphic3d_TransformPers theTrsfPers)
         {
             if (IsDeleted())
@@ -542,7 +582,7 @@ namespace TKService
             return myCStructure == null;
         }
 
-        internal bool IsVisible()
+        public bool IsVisible()
         {
             return myCStructure != null && myCStructure.visible != 0;
         }
@@ -573,7 +613,7 @@ namespace TKService
             return myCStructure.NewGroup(this);
         }
 
-        internal void SetInfiniteState(bool v)
+        public void SetInfiniteState(bool v)
         {
             throw new NotImplementedException();
         }
@@ -671,5 +711,13 @@ namespace TKService
         {
             throw new NotImplementedException();
         }
+    }
+
+    //! This class defines graphic attributes for opaque 3d primitives (polygons, triangles, quadrilaterals).
+    public class Graphic3d_AspectFillArea3d : Graphic3d_Aspects
+    {
+
+
+
     }
 }

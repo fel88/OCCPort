@@ -173,7 +173,7 @@ namespace TKMath
 
 
         //! Returns TRUE if triangulation has some geometry.
-        internal bool HasGeometry()
+        public bool HasGeometry()
         {
             return !myNodes.IsEmpty() && !myTriangles.IsEmpty();
         }
@@ -251,7 +251,7 @@ namespace TKMath
         //! @return 2D point defining UV coordinates
         public gp_Pnt2d UVNode(int theIndex) { return myUVNodes.Value(theIndex - 1); }
 
-        internal void ComputeNormals()
+        public void ComputeNormals()
         {
             // zero values
             AddNormals();

@@ -41,7 +41,7 @@ namespace TKG2d
         public abstract Geom2d_BSplineCurve BSpline();
         public abstract Geom2d_BezierCurve Bezier();
 
-        internal Adaptor2d_Curve2d Trim(double myFirst, double myLast, double v)
+        public Adaptor2d_Curve2d Trim(double myFirst, double myLast, double v)
         {
             throw new NotImplementedException();
         }

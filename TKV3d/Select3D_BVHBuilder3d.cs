@@ -1,10 +1,3 @@
-﻿namespace TKV3d
-{
-    public class Select3D_BVHBuilder3d : BVH_Builder
-    {
+﻿global using Select3D_BVHBuilder3d = TKMath.BVH_Builder;
 
-
-
-    }
-}
 

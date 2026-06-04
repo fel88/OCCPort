@@ -29,4 +29,7 @@ namespace TKService
         bool myIsImmediate;           //!< immediate layer will be drawn after all normal layers
 
     }
+    internal class Graphic3d_PolygonOffset
+    {
+    }
 }

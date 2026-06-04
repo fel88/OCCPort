@@ -2,7 +2,5 @@
 
 namespace OCCPort
 {
-    public class TColStd_ListOfInteger: List<int>
-    {
-    }
+  
 }

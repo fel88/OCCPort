@@ -38,10 +38,10 @@ namespace TKMath
         //          this.Add(p);
         //      }
 
-        //      public void Set(int index,Poly_Triangulation p)
-        //      {
-        //          this[index] = p; 
-        //      }
+        public void Set(int index, Poly_Triangulation p)
+        {
+            this[index] = p;
+        }
 
         //      public bool IsEmpty()
         //{

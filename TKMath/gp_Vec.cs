@@ -195,7 +195,7 @@
             coord.Divide(aD);
         }
         //! Computes the square magnitude of this vector.
-        internal double SquareMagnitude() => coord.SquareModulus();
+        public double SquareMagnitude() => coord.SquareModulus();
 
         public gp_Vec(gp_Dir theV)
         {

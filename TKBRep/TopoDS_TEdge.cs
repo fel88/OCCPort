@@ -2,7 +2,7 @@
 
 namespace OCCPort
 {
-    internal abstract class TopoDS_TEdge : TopoDS_TShape
+    public abstract class TopoDS_TEdge : TopoDS_TShape
     {
       
 

@@ -6,7 +6,7 @@ namespace TKernel
 {
     public class NCollection_Map<T>:List<T>
     {
-        internal new  bool Add(T e)
+        public new  bool Add(T e)
         {
             if (Contains(e))
             {

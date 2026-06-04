@@ -29,27 +29,28 @@ namespace TKBRep
 
         //! Append another list at the end.
         //! After this operation, theOther list will be cleared.
-        internal void Append(TopTools_ListOfShape anc)
+        public void Append(TopTools_ListOfShape anc)
         {
             AddRange(anc);
             anc.Clear();
         }
-        internal void Append(TopoDS_Shape anc)
+
+        public void Append(TopoDS_Shape anc)
         {
             Add(anc);
         }
 
-        internal int Extent()
+        public int Extent()
         {
             return Count; 
         }
 
-        internal void RemoveFirst()
+        public void RemoveFirst()
         {
             RemoveAt(0);
         }
 
-        internal TopoDS_Shape First()
+        public TopoDS_Shape First()
         {
             return this[0];
         }

@@ -148,7 +148,7 @@ namespace TKService
             return myStructure == null || myStructure.IsDeleted();
         }
 
-        internal void AddPrimitiveArray(Graphic3d_ArrayOfPrimitives thePrim, bool theToEvalMinMax = true)
+        public void AddPrimitiveArray(Graphic3d_ArrayOfPrimitives thePrim, bool theToEvalMinMax = true)
         {
             if (IsDeleted() || !thePrim.IsValid())
                 return;
@@ -994,9 +994,7 @@ namespace TKService
         V3d_PHONG = Graphic3d_TOSM_FRAGMENT
     }
 
-    internal class Graphic3d_TextureSet
-    {
-    }
+    
 
     public enum Graphic3d_AlphaMode
     {

@@ -33,6 +33,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TKG2d", "TKG2d\TKG2d.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TKGeomBase", "TKGeomBase\TKGeomBase.csproj", "{7993D736-688D-44C3-9801-B014AA304534}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TKTopAlgo", "TKTopAlgo\TKTopAlgo.csproj", "{B9607BBF-9B8A-465C-A4D2-CE0F1423DD70}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -223,6 +225,18 @@ Global
 		{7993D736-688D-44C3-9801-B014AA304534}.Release|x64.Build.0 = Release|Any CPU
 		{7993D736-688D-44C3-9801-B014AA304534}.Release|x86.ActiveCfg = Release|Any CPU
 		{7993D736-688D-44C3-9801-B014AA304534}.Release|x86.Build.0 = Release|Any CPU
+		{B9607BBF-9B8A-465C-A4D2-CE0F1423DD70}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B9607BBF-9B8A-465C-A4D2-CE0F1423DD70}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B9607BBF-9B8A-465C-A4D2-CE0F1423DD70}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B9607BBF-9B8A-465C-A4D2-CE0F1423DD70}.Debug|x64.Build.0 = Debug|Any CPU
+		{B9607BBF-9B8A-465C-A4D2-CE0F1423DD70}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B9607BBF-9B8A-465C-A4D2-CE0F1423DD70}.Debug|x86.Build.0 = Debug|Any CPU
+		{B9607BBF-9B8A-465C-A4D2-CE0F1423DD70}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B9607BBF-9B8A-465C-A4D2-CE0F1423DD70}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B9607BBF-9B8A-465C-A4D2-CE0F1423DD70}.Release|x64.ActiveCfg = Release|Any CPU
+		{B9607BBF-9B8A-465C-A4D2-CE0F1423DD70}.Release|x64.Build.0 = Release|Any CPU
+		{B9607BBF-9B8A-465C-A4D2-CE0F1423DD70}.Release|x86.ActiveCfg = Release|Any CPU
+		{B9607BBF-9B8A-465C-A4D2-CE0F1423DD70}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

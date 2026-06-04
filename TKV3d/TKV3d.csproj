@@ -8,7 +8,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TKBRep\TKBRep.csproj" />
+    <ProjectReference Include="..\TKMesh\TKMesh.csproj" />
     <ProjectReference Include="..\TKService\TKService.csproj" />
+    <ProjectReference Include="..\TKTopAlgo\TKTopAlgo.csproj" />
   </ItemGroup>
 
 </Project>

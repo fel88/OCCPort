@@ -1,6 +1,0 @@
-﻿namespace OCCPort
-{
-    //public class BVH_Vec3d: NCollection_Vec3<double>
-    //{
-    //}
-}

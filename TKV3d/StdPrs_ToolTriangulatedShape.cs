@@ -2,6 +2,9 @@
 using TKBRep;
 using TKG3d;
 using TKMath;
+using TKMesh;
+using TKService;
+using TKTopAlgo;
 
 namespace TKV3d
 {

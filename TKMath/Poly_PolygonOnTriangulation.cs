@@ -55,14 +55,14 @@ namespace TKMath
         public TColStd_Array1OfInteger Nodes() { return myNodes; }
 
         //! Returns true if parameters are associated with the nodes in this polygon.
-        internal bool HasParameters()
+        public bool HasParameters()
         {
 
             return myParameters != null;
 
         }
 
-        internal int Node(int aNodeIt)
+        public int Node(int aNodeIt)
         {
             throw new NotImplementedException();
         }

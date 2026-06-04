@@ -2,7 +2,7 @@
 
 namespace OCCPort
 {
-    internal class BRep_ListIteratorOfListOfCurveRepresentation
+    public class BRep_ListIteratorOfListOfCurveRepresentation
     {
 
         BRep_ListOfCurveRepresentation list;
@@ -11,19 +11,20 @@ namespace OCCPort
             list = lcr;
         }
 
-        internal bool More()
+        public bool More()
         {
             return index < list.Count ;
         }
 
-        internal void Next()
+        public void Next()
         {
             index++;
         }
         int index = 0;
-        internal BRep_CurveRepresentation Value()
+        public BRep_CurveRepresentation Value()
         {
             return list[index];
         }
     }
 }
+

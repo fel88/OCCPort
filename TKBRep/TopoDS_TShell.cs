@@ -1,4 +1,6 @@
-﻿namespace OCCPort
+﻿using TKG3d;
+
+namespace OCCPort
 {
     internal class TopoDS_TShell : TopoDS_TShape
     {

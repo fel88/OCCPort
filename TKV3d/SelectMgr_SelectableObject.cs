@@ -167,5 +167,26 @@
 
 
     }
+
+    public class SelectMgr_SequenceOfSelection : List<SelectMgr_Selection>
+    {
+        public void Append(SelectMgr_Selection aNewSel)
+        {
+            Add(aNewSel);
+        }
+    }
+    public enum SelectMgr_TypeOfUpdate
+    {
+
+        //		Provides values for types of update, including.
+        //full
+        //partial
+        //none.
+        //Enumerator
+
+        SelectMgr_TOU_Full,
+        SelectMgr_TOU_Partial,
+        SelectMgr_TOU_None
+    }
 }
 

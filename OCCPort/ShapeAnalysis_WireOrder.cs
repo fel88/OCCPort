@@ -1,10 +1,10 @@
-﻿using System;
+﻿using OCCPort.Common;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Metadata;
 using TKernel;
 using TKMath;
-using static OCCPort.Graphic3d_Camera;
 
 namespace OCCPort
 {

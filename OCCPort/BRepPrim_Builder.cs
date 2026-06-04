@@ -1,4 +1,7 @@
 ﻿using System;
+using TKBRep;
+using TKG2d;
+using TKG3d;
 using TKMath;
 
 namespace OCCPort
@@ -46,24 +49,24 @@ namespace OCCPort
             myBuilder.Add(S, F);
         }
 
-        internal void SetPCurve(TopoDS_Edge E, 
+        public void SetPCurve(TopoDS_Edge E, 
             TopoDS_Face F, gp_Lin2d L)
         {
             myBuilder.UpdateEdge(E, new Geom2d_Line(L), F, Precision.Confusion());
         }
 
-        internal void CompleteFace(TopoDS_Face F)
+        public void CompleteFace(TopoDS_Face F)
         {
             BRepTools.Update(F);
         }
 
-        internal void CompleteWire(TopoDS_Wire W)
+        public void CompleteWire(TopoDS_Wire W)
         {
             W.Closed(BRep_Tool.IsClosed(W));
             BRepTools.Update(W);
         }
 
-        internal void AddWireEdge(TopoDS_Wire W, TopoDS_Edge E, bool direct)
+        public void AddWireEdge(TopoDS_Wire W, TopoDS_Edge E, bool direct)
         {
             TopoDS_Edge EE = new TopoDS_Edge( E);
             if (!direct)
@@ -71,7 +74,7 @@ namespace OCCPort
             myBuilder.Add(W, EE);
         }
 
-        internal void MakeWire(TopoDS_Wire W)
+        public void MakeWire(TopoDS_Wire W)
         {
             myBuilder.MakeWire(W);
         }
@@ -89,17 +92,17 @@ namespace OCCPort
         }
 
 
-        internal void MakeEdge(TopoDS_Edge E, gp_Lin L)
+        public void MakeEdge(TopoDS_Edge E, gp_Lin L)
         {
             myBuilder.MakeEdge(E, new Geom_Line(L), Precision.Confusion());
         }
 
-        internal void CompleteEdge(TopoDS_Edge E)
+        public void CompleteEdge(TopoDS_Edge E)
         {
             BRepTools.Update(E);
         }
 
-        internal void MakeVertex(TopoDS_Vertex V,
+        public void MakeVertex(TopoDS_Vertex V,
             gp_Pnt P)
         {
             myBuilder.MakeVertex(V, P, Precision.Confusion());

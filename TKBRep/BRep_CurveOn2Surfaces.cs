@@ -1,4 +1,6 @@
-﻿namespace OCCPort
+﻿using TKMath;
+
+namespace OCCPort
 {
     //! Defines a continuity between two surfaces.
     public class BRep_CurveOn2Surfaces : BRep_CurveRepresentation

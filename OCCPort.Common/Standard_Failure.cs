@@ -21,7 +21,7 @@ namespace OCCPort.Common
         {
         }
 
-        internal static void Raise(string v)
+        public static void Raise(string v)
         {
             throw new Exception(v);
         }
