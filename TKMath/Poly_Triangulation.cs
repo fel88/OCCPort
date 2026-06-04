@@ -258,7 +258,7 @@ namespace TKMath
             myNormals.Init(new gp_Vec3f(0.0f));
 
             int[] anElem = { 0, 0, 0 };
-            foreach (var aTriIter in myTriangles.triangles)
+            foreach (var aTriIter in myTriangles.list)
             {
                 aTriIter.Get(ref anElem[0], ref anElem[1], ref anElem[2]);
                 gp_Pnt aNode0 = myNodes.Value<gp_Pnt>(anElem[0] - 1);
@@ -287,5 +287,7 @@ namespace TKMath
 
 
 
+ 
+    
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace OCCPort
+﻿using TKG3d;
+
+namespace OCCPort
 {
 	//! A set of edges connected by their vertices.
 

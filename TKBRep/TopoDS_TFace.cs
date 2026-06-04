@@ -1,4 +1,6 @@
-﻿namespace OCCPort
+﻿using TKG3d;
+
+namespace OCCPort
 {
 	//! A  topological part  of a surface   or  of the  2D
 	//! space.  The  boundary  is  a   set of  wires   and

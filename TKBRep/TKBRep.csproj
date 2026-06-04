@@ -7,7 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\TKG2d\TKG2d.csproj" />
     <ProjectReference Include="..\TKG3d\TKG3d.csproj" />
+    <ProjectReference Include="..\TKGeomBase\TKGeomBase.csproj" />
     <ProjectReference Include="..\TKMath\TKMath.csproj" />
   </ItemGroup>
 

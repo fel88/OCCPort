@@ -94,9 +94,7 @@
             throw new NotImplementedException();
         }
 
-
-
-        internal TopLoc_Location Inverted()
+        public TopLoc_Location Inverted()
         {
 
             //

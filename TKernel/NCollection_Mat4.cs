@@ -8,19 +8,20 @@ namespace TKernel
  //! To be used in conjunction with NCollection_Vec4 entities.
  //! Originally introduced for 3D space projection and orientation operations.
  //! Warning, empty constructor returns an identity matrix.
-    public class NCollection_Mat4<Element_t> where Element_t : struct, INumber<Element_t>, IMultiplyOperators<Element_t, Element_t, Element_t>
+    public struct NCollection_Mat4<Element_t> where Element_t : struct, INumber<Element_t>, IMultiplyOperators<Element_t, Element_t, Element_t>
     {
         public NCollection_Mat4()
         {
             InitIdentity();
 
         }
+      
 
         //! Compute matrix multiplication product: A * B.
         //! @param theMatA [in] the matrix "A".
         //! @param theMatB [in] the matrix "B".
-      public  static NCollection_Mat4<Element_t> Multiply(NCollection_Mat4<Element_t> theMatA,
-                                     NCollection_Mat4<Element_t> theMatB)
+        public static NCollection_Mat4<Element_t> Multiply(NCollection_Mat4<Element_t> theMatA,
+                                       NCollection_Mat4<Element_t> theMatB)
         {
             NCollection_Mat4<Element_t> aMatRes = new NCollection_Mat4<Element_t>();
 
@@ -167,13 +168,13 @@ namespace TKernel
 
                  m[3] * inv[12];
 
-                        
+
             if (theDet == Element_t.Zero)
             {
                 return false;
             }
 
-            
+
             Element_t aDiv = Element_t.One / theDet;
             for (int i = 0; i < 16; ++i)
             {
@@ -193,13 +194,14 @@ namespace TKernel
             return anInv;
         }
 
-        internal void Multiply(NCollection_Mat4<Element_t> theMat)
+        //! Compute matrix multiplication.
+        //! @param theMat [in] the matrix to multiply.
+        public void Multiply(NCollection_Mat4<Element_t> theMat)
         {
-
             var r = Multiply(this, theMat);
             Array.Copy(r.myMat, r.myMat, 16);
-
         }
+
         //! Multiply by the vector (M * V).
         //! @param theVec [in] the vector to multiply.
         public static NCollection_Vec4<Element_t> operator *(NCollection_Mat4<Element_t> mat, NCollection_Vec4<Element_t> theVec)
@@ -261,7 +263,7 @@ namespace TKernel
 
         public void SetRow(int theRow, NCollection_Vec3<Element_t> theVec)
         {
-            
+
             SetValue(theRow, 0, theVec.X);
             SetValue(theRow, 1, theVec.Y);
             SetValue(theRow, 2, theVec.Z);

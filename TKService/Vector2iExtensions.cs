@@ -1,4 +1,6 @@
-﻿namespace TKService
+﻿using OpenTK.Mathematics;
+
+namespace TKService
 {
     public static class Vector2iExtensions
     {

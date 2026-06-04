@@ -1,4 +1,5 @@
-﻿using OCCPort.Tester;
+﻿using OCCPort.Common;
+using OCCPort.Tester;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -10,7 +11,9 @@ using System.Security.Policy;
 using System.Threading;
 using TKBRep;
 using TKernel;
+using TKG2d;
 using TKG3d;
+using TKGeomBase;
 using TKMath;
 
 namespace OCCPort

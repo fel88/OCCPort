@@ -1,4 +1,6 @@
-﻿namespace TKMath
+﻿using TKernel;
+
+namespace TKMath
 {
     //! This class Provides a polygon in 3D space. It is generally an approximate representation of a curve.
     //! A Polygon3D is defined by a table of nodes. Each node is

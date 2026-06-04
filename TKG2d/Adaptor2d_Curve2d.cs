@@ -1,0 +1,49 @@
+﻿using OCCPort;
+using TKMath;
+
+namespace TKG2d
+{
+    //! Root class for 2D curves on which geometric
+    //! algorithms work.
+    //! An adapted curve is an interface between the
+    //! services provided by a curve, and those required of
+    //! the curve by algorithms, which use it.
+    //! A derived concrete class is provided:
+    //! Geom2dAdaptor_Curve for a curve from the Geom2d package.
+    //!
+    //! Polynomial coefficients of BSpline curves used for their evaluation are
+    //! cached for better performance. Therefore these evaluations are not
+    //! thread-safe and parallel evaluations need to be prevented.
+    public abstract class Adaptor2d_Curve2d
+    {
+        public abstract bool IsPeriodic();
+
+        //! Computes the point of parameter U on the curve.
+        public abstract void D0(double U, ref gp_Pnt2d P);
+        public abstract double Resolution(double u);
+
+        public abstract int Degree();
+        //! Computes the point of parameter U on the curve with its
+        //! first derivative.
+        //! Raised if the continuity of the current interval
+        //! is not C1.
+        public abstract void D1(double U, out gp_Pnt2d P, out gp_Vec2d V);
+        public abstract int NbKnots();
+
+        public abstract GeomAbs_CurveType _GetType();
+        public abstract gp_Lin2d Line();
+        public abstract double FirstParameter();
+        public virtual int NbSamples()
+        {
+            return 20;
+        }
+        public abstract double LastParameter();
+        public abstract Geom2d_BSplineCurve BSpline();
+        public abstract Geom2d_BezierCurve Bezier();
+
+        internal Adaptor2d_Curve2d Trim(double myFirst, double myLast, double v)
+        {
+            throw new NotImplementedException();
+        }
+    }
+}

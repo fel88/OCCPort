@@ -1,6 +1,9 @@
 ﻿using OCCPort;
+using OCCPort.Common;
 using System.Reflection.Metadata;
-using TriangleNet.Topology;
+using TKG2d;
+using TKG3d;
+using TKMath;
 
 namespace OCCPort
 {

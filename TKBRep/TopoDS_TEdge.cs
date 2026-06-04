@@ -1,4 +1,6 @@
-﻿namespace OCCPort
+﻿using TKG3d;
+
+namespace OCCPort
 {
     internal abstract class TopoDS_TEdge : TopoDS_TShape
     {

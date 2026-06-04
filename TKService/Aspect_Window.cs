@@ -1,4 +1,6 @@
-﻿namespace TKService
+﻿using OpenTK.Mathematics;
+
+namespace TKService
 {
     public abstract class Aspect_Window
     {
@@ -16,8 +18,7 @@
         //! Returns window dimensions.
         public Graphic3d_Vec2i Dimensions()
         {
-            
-            Vector2i aSize;
+            Vector2i aSize = new Vector2i();
             Size(out aSize.X, out aSize.Y);
             return aSize.ToGraphic3d_Vec2i();
 
