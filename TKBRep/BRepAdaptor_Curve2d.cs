@@ -1,10 +1,8 @@
-﻿using System.Reflection.Metadata;
-using TKBRep;
+﻿using TKBRep;
 using TKG2d;
 
 namespace OCCPort
 {
-
     //! The Curve2d from BRepAdaptor allows to use an Edge
     //! on   a Face like   a  2d   curve. (curve  in   the
     //! parametric space).
@@ -15,7 +13,7 @@ namespace OCCPort
     //! It  is created or  initialized with a  Face and an
     //! Edge.  The methods are  inherited from  Curve from
     //! Geom2dAdaptor.
-    internal class BRepAdaptor_Curve2d : Geom2dAdaptor_Curve
+    public class BRepAdaptor_Curve2d : Geom2dAdaptor_Curve
     {
 
         TopoDS_Edge myEdge;

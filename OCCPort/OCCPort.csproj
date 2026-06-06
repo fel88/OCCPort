@@ -7,7 +7,6 @@
     <None Remove="Shaders\PhongShading.fs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Quantity_ColorTable.pxx" />
     <EmbeddedResource Include="Shaders\PhongShading.vs" />
     <EmbeddedResource Include="Shaders\PhongShading.fs" />
   </ItemGroup>
@@ -23,6 +22,7 @@
     <ProjectReference Include="..\TKernel\TKernel.csproj" />
     <ProjectReference Include="..\TKG2d\TKG2d.csproj" />
     <ProjectReference Include="..\TKG3d\TKG3d.csproj" />
+    <ProjectReference Include="..\TKGeomAlgo\TKGeomAlgo.csproj" />
     <ProjectReference Include="..\TKMath\TKMath.csproj" />
     <ProjectReference Include="..\TKMesh\TKMesh.csproj" />
     <ProjectReference Include="..\TKService\TKService.csproj" />

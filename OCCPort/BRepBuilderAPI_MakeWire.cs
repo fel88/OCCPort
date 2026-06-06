@@ -66,9 +66,8 @@ namespace OCCPort
         public TopoDS_Wire Wire()
         {
             return myMakeWire.Wire();
-
         }
-        BRepLib_MakeWire myMakeWire = new BRepLib_MakeWire();
 
+        BRepLib_MakeWire myMakeWire = new BRepLib_MakeWire();
     }
 }

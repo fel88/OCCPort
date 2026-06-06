@@ -8,9 +8,9 @@ namespace OCCPort.OpenGL
   typedef NCollection_Shared< NCollection_DataMap<TCollection_AsciiString, Handle(OpenGl_Resource)> > OpenGl_ResourcesMap;
 
      */
-    internal class OpenGl_ResourcesMap : NCollection_DataMap<string, OpenGl_Resource>
+    public class OpenGl_ResourcesMap : NCollection_DataMap<string, OpenGl_Resource>
     {
-        internal bool Bind(string theKey, OpenGl_ShaderProgram theResource)
+        public bool Bind(string theKey, OpenGl_ShaderProgram theResource)
         {
             if (ContainsKey(theKey))
             {

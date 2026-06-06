@@ -1,4 +1,6 @@
-﻿namespace OCCPort
+﻿using TKG3d;
+
+namespace OCCPort
 {
     //=======================================================================
     //class : Approx_CurveOnSurface_Eval3d

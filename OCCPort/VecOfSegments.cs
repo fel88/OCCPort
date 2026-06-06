@@ -1,3 +1,0 @@
-﻿namespace OCCPort.Tester
-{
-}

@@ -1,4 +1,7 @@
-﻿namespace OCCPort
+﻿using OCCPort.Common;
+using TKMath;
+
+namespace TKGeomBase
 {
     // Stockage des matrices de resolution d approxiamtion continue.
     // La classe est limitee a 26 pour MMatrix et InvMMatrix, (pas de contraintes)
@@ -1210,10 +1213,7 @@
 
 };
 
-
-
-
-
+        
         public static void VBernstein(int classe,
 
           int nbpoints,
@@ -1243,3 +1243,5 @@
 
     }
 }
+
+

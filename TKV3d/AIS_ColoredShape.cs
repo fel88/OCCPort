@@ -120,5 +120,21 @@ namespace TKV3d
     internal class AIS_ColoredDrawer
     {
     }
+    internal class DataMapOfDrawerCompd
+    {
+    }
+
+    public struct _orientation
+    {
+        public bool ToFitAll;         //!< perform FitAll operation
+        public bool ToSetViewOrient;  //!< set new view orientation
+        public V3d_TypeOfOrientation ViewOrient;       //!< new view orientation
+
+        public _orientation()
+        {
+            //ToFitAll(false), ToSetViewOrient(false),
+            ViewOrient = V3d_TypeOfOrientation.V3d_Xpos;
+        }
+    }
 }
 

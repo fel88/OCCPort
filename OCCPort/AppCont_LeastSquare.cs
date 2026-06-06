@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.Intrinsics.X86;
 using TKernel;
+using TKGeomBase;
 using TKMath;
 
 namespace OCCPort

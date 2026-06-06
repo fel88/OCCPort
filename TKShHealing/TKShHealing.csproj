@@ -8,6 +8,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TKBRep\TKBRep.csproj" />
+    <ProjectReference Include="..\TKGeomAlgo\TKGeomAlgo.csproj" />
+    <ProjectReference Include="..\TKTopAlgo\TKTopAlgo.csproj" />
   </ItemGroup>
 
 </Project>

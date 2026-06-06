@@ -1,9 +1,7 @@
-﻿using System;
-
-namespace OCCPort
+﻿namespace OCCPort.Common
 {
     [Serializable]
-    internal class Standard_DimensionError : Exception
+    public class Standard_DimensionError : Exception
     {
         public Standard_DimensionError()
         {

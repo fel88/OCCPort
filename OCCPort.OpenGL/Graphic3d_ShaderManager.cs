@@ -469,7 +469,7 @@ namespace OCCPort.OpenGL
                         }
                         else
                         {
-                            OCCPort.Message.SendWarning("Warning: ignoring Normal Map texture in GLSL due to hardware capabilities");
+                            Message.SendWarning("Warning: ignoring Normal Map texture in GLSL due to hardware capabilities");
                         }
                     }
                     aProgramSrc.SetTextureSetBits((int)aTextureBits);

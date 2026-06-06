@@ -1,4 +1,6 @@
-﻿using OCCPort;
+﻿global using Select3D_BVHBuilder3d = TKMath.BVH_Builder;
+
+using OCCPort;
 using OCCPort.OpenGL;
 using System;
 using System.Collections.Generic;

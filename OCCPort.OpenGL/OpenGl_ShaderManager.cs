@@ -50,7 +50,7 @@ namespace OCCPort.OpenGL
             if (!theProgram.Initialize(myContext, theProxy.ShaderObjects()))
             {
                 theProgram.Release(myContext);
-                theShareKey.Clear();
+                theShareKey = string.Empty;                //theShareKey.Clear();
                 theProgram = null;
                 return false;
             }
@@ -85,7 +85,7 @@ namespace OCCPort.OpenGL
                 {
                     if (!theProgram.UnShare())
                     {
-                        theShareKey.Clear();
+                        theShareKey = string.Empty; //theShareKey.Clear();
                         theProgram = null;
                         return;
                     }
@@ -182,15 +182,15 @@ namespace OCCPort.OpenGL
         public bool BindFboBlitProgram(int theNbSamples,
                                                                bool theIsFallback_sRGB)
         {
-            NCollection_Array1 < OpenGl_ShaderProgram > aList = myBlitPrograms[theIsFallback_sRGB ? 1 : 0];
-            int aNbSamples = Math. Max(theNbSamples, 1);
+            NCollection_Array1<OpenGl_ShaderProgram> aList = myBlitPrograms[theIsFallback_sRGB ? 1 : 0];
+            int aNbSamples = Math.Max(theNbSamples, 1);
             if (aNbSamples > aList.Upper())
             {
                 aList.Resize(1, aNbSamples, true);
             }
 
-            OpenGl_ShaderProgram  aProg = aList[aNbSamples];
-            if (aProg!=null)
+            OpenGl_ShaderProgram aProg = aList[aNbSamples];
+            if (aProg != null)
             {
                 return myContext.BindProgram(aProg);
             }
@@ -204,13 +204,13 @@ namespace OCCPort.OpenGL
             }
 
             myContext.BindProgram(aProg);
-            aProg.SetSampler(myContext, "uColorSampler",Graphic3d_TextureUnit. Graphic3d_TextureUnit_0);
-            aProg.SetSampler(myContext, "uDepthSampler",Graphic3d_TextureUnit. Graphic3d_TextureUnit_1);
+            aProg.SetSampler(myContext, "uColorSampler", Graphic3d_TextureUnit.Graphic3d_TextureUnit_0);
+            aProg.SetSampler(myContext, "uDepthSampler", Graphic3d_TextureUnit.Graphic3d_TextureUnit_1);
             return true;
         }
 
         NCollection_Array1<OpenGl_ShaderProgram>[]
-                                     myBlitPrograms=new  NCollection_Array1<OpenGl_ShaderProgram> [2];    //!< standard program for FBO blit emulation
+                                     myBlitPrograms = new NCollection_Array1<OpenGl_ShaderProgram>[2];    //!< standard program for FBO blit emulation
 
         //! Prepare standard GLSL program.
         public OpenGl_ShaderProgram getStdProgram(Graphic3d_TypeOfShadingModel theShadingModel,

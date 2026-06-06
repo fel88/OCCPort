@@ -7,6 +7,7 @@
     <PackageReference Include="OpenTK" Version="4.9.4" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\OCCPort.Common\OCCPort.Common.csproj" />
     <ProjectReference Include="..\OCCPort\OCCPort.csproj" />
     <ProjectReference Include="..\TKService\TKService.csproj" />
   </ItemGroup>

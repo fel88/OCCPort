@@ -22,7 +22,8 @@ namespace OCCPort.OpenGL
             if (myShaderProgram != null)
             {
                 theCtx.ShaderManager().Unregister(ref myShaderProgramId, myShaderProgram);
-                myShaderProgramId.Clear();
+                //myShaderProgramId.Clear();
+                myShaderProgramId = string.Empty;
                 myShaderProgram = null;
             }
             if (theShader == null)

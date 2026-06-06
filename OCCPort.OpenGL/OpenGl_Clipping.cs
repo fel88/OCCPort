@@ -1,4 +1,6 @@
 ﻿using System;
+using TKernel;
+using TKService;
 
 namespace OCCPort.OpenGL
 {

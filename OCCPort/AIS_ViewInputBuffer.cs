@@ -1,4 +1,5 @@
 ﻿using TKernel;
+using TKV3d;
 
 namespace OCCPort
 {
@@ -58,18 +59,7 @@ namespace OCCPort
 
         public _draggingParams Dragging;
 
-        public struct _orientation
-        {
-            public bool ToFitAll;         //!< perform FitAll operation
-            public bool ToSetViewOrient;  //!< set new view orientation
-            public V3d_TypeOfOrientation ViewOrient;       //!< new view orientation
-
-            public _orientation()
-            {
-                //ToFitAll(false), ToSetViewOrient(false),
-                ViewOrient = V3d_TypeOfOrientation.V3d_Xpos;
-            }
-        }
+      
         public _orientation Orientation;
 
         //! Reset events buffer.

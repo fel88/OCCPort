@@ -818,8 +818,7 @@ namespace TKV3d
         public SelectMgr_AndOrFilter(SelectMgr_FilterType selectMgr_FilterType_OR)
         {
         }
-    }
-    public enum SelectMgr_FilterType
+    }public enum SelectMgr_FilterType
     {
 
         //Enumeration defines the filter type.
@@ -830,6 +829,11 @@ namespace TKV3d
         SelectMgr_FilterType_OR
 
         //an object should be suitable at least one filter. 
+    }
+
+    //! A framework to define sensitive 3D points.
+    public class Select3D_SensitivePoint : Select3D_SensitiveEntity
+    {
     }
 }
 

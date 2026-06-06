@@ -23,10 +23,25 @@ namespace OCCPort
     public class NCollection_DataMap<T1, T2> : NCollection_DataMap<T1, T2, NCollection_DefaultHasher<T1>>
     {
 
-    }       
+    }
 
-    public class NCollection_DataMap<T1, T2, T3> : Dictionary<T1, T2> where T3 : IEqualityComparer<T1>, new()        
+    public class NCollection_DataMap<T1, T2, T3> : Dictionary<T1, T2> where T3 : IEqualityComparer<T1>, new()
     {
+
+        public bool IsEmpty()
+        {
+            return Count == 0;
+        }
+
+        public T2 Find(T1 theObject  )
+        {
+            if (ContainsKey(theObject))
+            {
+                return this[theObject];
+                
+            }
+            return  default;            
+        }
 
         public bool Find(T1 theObject, out T2 aResult)
         {
@@ -42,6 +57,11 @@ namespace OCCPort
         public NCollection_DataMap() : base(new T3())
         {
 
+        }
+
+        public bool IsBound(T1 key)
+        {
+            return ContainsKey(key);
         }
 
         public bool Bind(T1 aFreeEdgeId, T2 v)

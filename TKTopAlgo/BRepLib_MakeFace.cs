@@ -1,4 +1,5 @@
 ﻿using OCCPort;
+using OCCPort.Common;
 using TKBRep;
 using TKG2d;
 using TKG3d;
@@ -540,7 +541,7 @@ namespace TKTopAlgo
             Done();
         }
 
-        internal TopoDS_Face Face()
+        public TopoDS_Face Face()
         {
             return TopoDS.Face(myShape);
 
@@ -549,4 +550,88 @@ namespace TKTopAlgo
         BRepLib_FaceError myError;
 
     }
+
+    //! This    is  the  root     class for     all  shape
+    //! constructions.  It stores the result.
+    //!
+    //! It  provides deferred methods to trace the history
+    //! of sub-shapes.
+    public class BRepLib_MakeShape : BRepLib_Command
+    {
+        public TopoDS_Shape Shape()
+        {
+            if (!IsDone())
+            {
+                // the following is const cast away
+                Build();
+                Check();
+            }
+            return myShape;
+        }
+
+        public virtual void Build()
+        {
+
+        }
+
+        protected TopoDS_Shape myShape = new TopoDS_Shape();
+        protected TopTools_ListOfShape myGenFaces = new TopTools_ListOfShape();
+        protected TopTools_ListOfShape myNewFaces = new TopTools_ListOfShape();
+        protected TopTools_ListOfShape myEdgFaces = new TopTools_ListOfShape();
+
+ 
+    
+    }
+
+
+    //! Root class for all commands in BRepLib.
+    //!
+    //! Provides :
+    //!
+    //! * Managements of the notDone flag.
+    //!
+    //! * Catching of exceptions (not implemented).
+    //!
+    //! * Logging (not implemented).
+    public class BRepLib_Command
+    {
+        public bool IsDone()
+        {
+            return myDone;
+        }
+
+        public void Check()
+        {
+            if (!myDone)
+                throw new StdFail_NotDone("BRep_API: command not done");
+        }
+        public void NotDone()
+        {
+            myDone = false;
+        }
+
+
+
+
+
+        public void Done()
+        {
+            myDone = true;
+        }
+
+
+        bool myDone;
+    }
+
+    //! Errors that can occur at face construction.
+    //! no error
+    //! not initialised
+    enum BRepLib_FaceError
+    {
+        BRepLib_FaceDone,
+        BRepLib_NoFace,
+        BRepLib_NotPlanar,
+        BRepLib_CurveProjectionFailed,
+        BRepLib_ParametersOutOfRange
+    };
 }

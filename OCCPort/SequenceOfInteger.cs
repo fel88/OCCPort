@@ -1,7 +1,0 @@
-﻿using TKernel;
-
-namespace OCCPort
-{
-   
-   
-}

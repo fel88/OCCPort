@@ -1056,14 +1056,12 @@ namespace TKV3d
                  || myView.IsInvalidated();
         }
 
-        internal bool ComputedMode()
+        public bool ComputedMode()
         {
-
             return myView.ComputedMode();
-
         }
 
-        internal void Update()
+        public void Update()
         {
             if (!myView.IsDefined()
    || !myView.IsActive())

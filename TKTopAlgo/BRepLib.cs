@@ -4,6 +4,7 @@ using TKBRep;
 using TKernel;
 using TKG2d;
 using TKG3d;
+using TKGeomAlgo;
 using TKGeomBase;
 using TKMath;
 
@@ -1611,15 +1612,23 @@ bool IsVerifyTolerance, bool IsMutableInput, BRepTools_ReShape theReshaper)
 
     }
 
-    internal class TColgp_SequenceOfPnt2d : List<gp_Pnt2d>
+    public class TColgp_SequenceOfPnt2d : List<gp_Pnt2d>
     {
         public void Append(gp_Pnt2d item)
         {
             Add(item);
         }
     }
-    internal class TColStd_SequenceOfInteger : NCollection_Sequence<int>
+    public class TColStd_SequenceOfInteger : NCollection_Sequence<int>
     {
 
+
+    }
+    internal class BRepTopAdaptor_SeqOfPtr : NCollection_Sequence<object>
+    {
+        public int Length()
+        {
+            return base.Count;
+        }
     }
 }
