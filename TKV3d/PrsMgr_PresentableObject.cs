@@ -60,6 +60,21 @@ namespace TKV3d
         //! is applied within Local Coordinate system defined by this Persistence.
         public TopLoc_Datum3D LocalTransformationGeom() { return myLocalTransformation; }
 
+        //! Return the transformation taking into account transformation of parent object(s).
+        //! Note that the local transformation of the object having Transformation Persistence
+        //! is applied within Local Coordinate system defined by this Persistence.
+        public gp_Trsf Transformation()
+        {
+            return myTransformation != null
+                                                      ? myTransformation.Trsf()
+                                                      : getIdentityTrsf();
+        }
+
+        gp_Trsf getIdentityTrsf()
+        {
+            return new gp_Trsf();            
+        }
+
         //! Sets the display mode for the interactive object.
         //! An object can have its own temporary display mode, which is different from that proposed by the interactive context.
         //! @sa AcceptDisplayMode()
@@ -258,45 +273,6 @@ namespace TKV3d
         //! @sa Graphic3d_TransformPers class description
         public Graphic3d_TransformPers TransformPersistence() { return myTransformPersistence; }
 
-    }
-    public class PrsMgr_ListOfPresentableObjects : List<PrsMgr_PresentableObject>
-    {
-
-
-        internal void Append(PrsMgr_PresentableObject theObject)
-        {
-            base.Add(theObject);
-        }
-
-        internal void Remove(PrsMgr_ListOfPresentableObjectsIter anIter)
-        {
-            base.Remove(anIter.Value());
-        }
-    }
-    internal class PrsMgr_ListOfPresentableObjectsIter
-    {
-        public PrsMgr_ListOfPresentableObjectsIter(PrsMgr_ListOfPresentableObjects v)
-        {
-            list = v;
-        }
-        PrsMgr_ListOfPresentableObjects list;
-
-
-        int index = 0;
-        internal bool More()
-        {
-            return index < list.Count - 1;
-        }
-
-        internal void Next()
-        {
-            index++;
-        }
-
-        internal PrsMgr_PresentableObject Value()
-        {
-            return list[index];
-        }
     }
 }
 

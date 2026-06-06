@@ -1,4 +1,7 @@
-﻿namespace OCCPort.Tester
+﻿using TKBRep;
+using TKTopAlgo;
+
+namespace OCCPort.Tester
 {
     //! Provides methods to build faces.
     //!

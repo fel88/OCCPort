@@ -1,4 +1,6 @@
-﻿namespace TKMath
+﻿using OCCPort.Common;
+
+namespace TKMath
 {
     public struct gp_Vec
     {
@@ -69,6 +71,10 @@
             aT.SetRotation(theA1, theAng);
             coord.Multiply(aT.VectorialPart());
         }
+
+        //! Multiplies a vector by a scalar
+        public void Multiply(double theScalar) { coord.Multiply(theScalar); }
+
 
         //! Returns True if Angle(<me>, theOther) <= theAngularTolerance or
         //! PI - Angle(<me>, theOther) <= theAngularTolerance

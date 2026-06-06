@@ -42,7 +42,7 @@ namespace TKGeomBase
         //      {
 
         //      }
-        internal TColgp_SequenceOfPnt ChangeSequence()
+        public TColgp_SequenceOfPnt ChangeSequence()
         {
             return this;
         }

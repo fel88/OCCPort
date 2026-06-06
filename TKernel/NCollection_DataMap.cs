@@ -1,4 +1,6 @@
-﻿namespace OCCPort
+﻿using TKernel;
+
+namespace OCCPort
 {
     /**
    * Purpose:     The DataMap is a Map to store keys with associated
@@ -17,6 +19,11 @@
    *              can  be done only  if aKey was previously bound to
    *              an item in the map.
 */
+
+    public class NCollection_DataMap<T1, T2> : NCollection_DataMap<T1, T2, NCollection_DefaultHasher<T1>>
+    {
+
+    }       
 
     public class NCollection_DataMap<T1, T2, T3> : Dictionary<T1, T2> where T3 : IEqualityComparer<T1>, new()        
     {

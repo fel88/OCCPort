@@ -1,8 +1,8 @@
 ﻿global using Graphic3d_Mat4d = TKernel.NCollection_Mat4<double>;
 global using Graphic3d_Mat4 = TKernel.NCollection_Mat4<float>;
 
-global using IFacePtr = OCCPort.Interfaces.IMeshData_Face;
-global using IWireHandle = OCCPort.Interfaces.IMeshData_Wire;
+global using IFacePtr = TKMesh.IMeshData_Face;
+global using IWireHandle = TKMesh.IMeshData_Wire;
 global using Aspect_RenderingContext = System.IntPtr;
 global using Aspect_Display = System.IntPtr; /* Display* under UNIX */
 

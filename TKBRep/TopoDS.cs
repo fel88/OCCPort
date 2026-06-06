@@ -62,7 +62,7 @@ namespace TKBRep
 			throw new NotImplementedException();
 		}
 
-		internal static TopoDS_Shell Shell(TopoDS_Shape S)
+		public static TopoDS_Shell Shell(TopoDS_Shape S)
 		{
 			if (S is TopoDS_Shell)
 			{

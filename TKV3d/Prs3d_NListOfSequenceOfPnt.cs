@@ -1,4 +1,5 @@
 ﻿using TKernel;
+using TKGeomBase;
 
 namespace TKV3d
 {

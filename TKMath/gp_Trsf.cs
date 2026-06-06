@@ -191,7 +191,7 @@
             return aTresult;
         }
 
-        internal void Multiply(gp_Trsf T)
+        public void Multiply(gp_Trsf T)
         {
             if (T.shape == gp_TrsfForm.gp_Identity) { }
             else if (shape == gp_TrsfForm.gp_Identity)
@@ -371,7 +371,7 @@
             theCoord.Add(loc);
         }
 
-        internal void SetTranslation(gp_Vec theV)
+        public void SetTranslation(gp_Vec theV)
         {
             shape = gp_TrsfForm.gp_Translation;
             scale = 1.0;
@@ -425,7 +425,7 @@
             return M;
         }
 
-        internal void Invert()
+        public void Invert()
         {
             //                                    -1
             //  X' = scale * R * X + T  =>  X = (R  / scale)  * ( X' - T)

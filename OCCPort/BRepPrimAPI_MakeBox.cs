@@ -1,5 +1,7 @@
 ﻿using System;
 using TKBRep;
+using TKMath;
+using TKTopAlgo;
 
 namespace OCCPort.Tester
 {
@@ -77,16 +79,5 @@ namespace OCCPort.Tester
     }
 
 
-    //! Describes functions to build cylinders or portions of  cylinders.
-    //! A MakeCylinder object provides a framework for:
-    //! -   defining the construction of a cylinder,
-    //! -   implementing the construction algorithm, and
-    //! -   consulting the result.
-    public class BRepPrimAPI_MakeCylinder : BRepPrimAPI_MakeOneAxis
-    {
-
-        BRepPrim_Cylinder myCylinder;
-
-
-    }
+  
 }

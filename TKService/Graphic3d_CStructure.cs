@@ -90,7 +90,7 @@ namespace TKService
 
         //! @return bounding box of this presentation
 
-        internal Graphic3d_BndBox3d BoundingBox()
+        public Graphic3d_BndBox3d BoundingBox()
         {
             return myBndBox;
         }

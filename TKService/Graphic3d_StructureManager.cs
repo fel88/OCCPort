@@ -149,7 +149,7 @@ namespace TKService
             }
         }
 
-        internal void RecomputeStructures()
+        public void RecomputeStructures()
         {
             myDeviceLostFlag = false;
 

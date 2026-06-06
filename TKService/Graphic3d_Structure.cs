@@ -572,7 +572,7 @@ namespace TKService
         }
 
         //! Returns Standard_True if the structure <me> is infinite.
-        internal bool IsInfinite()
+        public bool IsInfinite()
         {
             return IsDeleted() || myCStructure.IsInfinite;
         }

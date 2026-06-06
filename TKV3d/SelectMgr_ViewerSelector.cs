@@ -1,6 +1,7 @@
 ﻿using OCCPort.Common;
 using TKernel;
 using TKMath;
+using TKService;
 
 namespace TKV3d
 {
@@ -211,5 +212,388 @@ namespace TKV3d
 
         }
     }
+    public abstract class SelectMgr_SelectingVolumeManager
+    {
+
+        SelectMgr_BaseIntersector myActiveSelectingVolume;
+        Graphic3d_SequenceOfHClipPlane myViewClipPlanes;                  //!< view clipping planes
+        Graphic3d_SequenceOfHClipPlane myObjectClipPlanes;                //!< object clipping planes
+        SelectMgr_ViewClipRange myViewClipRange;
+        bool myToAllowOverlap;                  //!< Defines if partially overlapped entities will me detected or not
+
+        //=======================================================================
+        // function : AllowOverlapDetection
+        // purpose  : If theIsToAllow is false, only fully included sensitives will
+        //            be detected, otherwise the algorithm will mark both included
+        //            and overlapped entities as matched
+        internal void AllowOverlapDetection(bool theIsToAllow)
+        {
+            myToAllowOverlap = theIsToAllow;
+        }
+
+        public void InitBoxSelectingVolume(gp_Pnt2d theMinPt,
+                                                                gp_Pnt2d theMaxPt)
+        {
+            SelectMgr_RectangularFrustum aBoxVolume = (SelectMgr_RectangularFrustum)myActiveSelectingVolume;
+            if (aBoxVolume == null)
+            {
+                aBoxVolume = new SelectMgr_RectangularFrustum();
+            }
+            aBoxVolume.Init(theMinPt, theMaxPt);
+            myActiveSelectingVolume = aBoxVolume;
+        }
+
+        //! Calculates the point on a view ray that was detected during the run of selection algo by given depth.
+        //! Throws exception if active selection type is not Point.
+        //public abstract gp_Pnt DetectedPoint(double theDepth);
+        // =======================================================================
+        // function : DetectedPoint
+        // purpose  : Calculates the point on a view ray that was detected during
+        //            the run of selection algo by given depth. Is valid for point
+        //            selection only
+        // =======================================================================
+        public gp_Pnt DetectedPoint(double theDepth)
+        {
+            Standard_ASSERT_RAISE(myActiveSelectingVolume != null,
+              "SelectMgr_SelectingVolumeManager::DetectedPoint() should be called after initialization of selection volume");
+            return myActiveSelectingVolume.DetectedPoint(theDepth);
+        }
+
+        private void Standard_ASSERT_RAISE(bool cond, string v)
+        {
+            if (!cond)
+                throw new Standard_ASSERT_RAISE(v);
+        }
+
+        internal Graphic3d_Camera Camera()
+        {
+            if (myActiveSelectingVolume == null)
+            {
+                Graphic3d_Camera anEmptyCamera = new Graphic3d_Camera();
+                return anEmptyCamera;
+            }
+            return myActiveSelectingVolume.Camera();
+
+        }
+
+        internal void InitPointSelectingVolume(gp_Pnt2d aMousePos)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void SetCamera(Graphic3d_Camera graphic3d_Camera)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void SetPixelTolerance(object value)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void SetWindowSize(int aWidth, int aHeight)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void WindowSize(ref int xx, ref int yy)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+
+    //! This class contains representation of rectangular selecting frustum, created in case
+    //! of point and box selection, and algorithms for overlap detection between selecting
+    //! frustum and sensitive entities. The principle of frustum calculation:
+    //! - for point selection: on a near view frustum plane rectangular neighborhood of
+    //!                        user-picked point is created according to the pixel tolerance
+    //!                        given and then this rectangle is projected onto far view frustum
+    //!                        plane. This rectangles define the parallel bases of selecting frustum;
+    //! - for box selection: box points are projected onto near and far view frustum planes.
+    //!                      These 2 projected rectangles define parallel bases of selecting frustum.
+    //! Overlap detection tests are implemented according to the terms of separating axis
+    //! theorem (SAT).
+    public class SelectMgr_RectangularFrustum : SelectMgr_Frustum //<4>
+
+    {
+        //! Auxiliary structure to define selection primitive (point or box)
+        //! In case of point selection min and max points are identical.
+        public struct SelectionRectangle
+        {
+            public SelectionRectangle()
+            {
+                //: myMinPnt(gp_Pnt2d(RealLast(), RealLast())),
+                //   myMaxPnt(gp_Pnt2d(RealLast(), RealLast())) 
+            }
+
+            public gp_Pnt2d MousePos() { return myMinPnt; }
+            public void SetMousePos(gp_Pnt2d thePos) { myMinPnt = thePos; myMaxPnt = thePos; }
+
+            public gp_Pnt2d MinPnt() { return myMinPnt; }
+            public void SetMinPnt(gp_Pnt2d theMinPnt) { myMinPnt = theMinPnt; }
+
+            public gp_Pnt2d MaxPnt() { return myMaxPnt; }
+            public void SetMaxPnt(gp_Pnt2d theMaxPnt) { myMaxPnt = theMaxPnt; }
+
+
+            gp_Pnt2d myMinPnt;
+            gp_Pnt2d myMaxPnt;
+        }
+
+        public void Init(gp_Pnt2d theMinPnt,
+                                                 gp_Pnt2d theMaxPnt)
+        {
+            mySelectionType = SelectMgr_SelectionType.SelectMgr_SelectionType_Box;
+            mySelRectangle.SetMinPnt(theMinPnt);
+            mySelRectangle.SetMaxPnt(theMaxPnt);
+        }
+        SelectionRectangle mySelRectangle;              //!< parameters for selection by point or box (it is used to build frustum)
+        gp_Pnt myNearPickedPnt;             //!< 3d projection of user-picked selection point onto near view plane
+        gp_Pnt myFarPickedPnt;              //!< 3d projection of user-picked selection point onto far view plane
+        gp_Dir myViewRayDir;                //!< view ray direction
+        double myScale;                     //!< Scale factor of applied transformation, if there was any
+
+
+    }
+    public enum SelectMgr_SelectionType
+    {
+
+        //	Possible selection types.
+        //Enumerator
+        SelectMgr_SelectionType_Unknown,
+
+        //undefined selection type
+        SelectMgr_SelectionType_Point,
+
+        //selection by point(frustum with some tolerance or axis)
+        SelectMgr_SelectionType_Box,
+
+        //rectangle selection
+        SelectMgr_SelectionType_Polyline,
+
+        //polygonal selection
+    }
+
+    //! This is an internal class containing representation of rectangular selecting frustum, created in case
+    //! of point and box selection, and algorithms for overlap detection between selecting
+    //! frustum and sensitive entities. The principle of frustum calculation:
+    //! - for point selection: on a near view frustum plane rectangular neighborhood of
+    //!                        user-picked point is created according to the pixel tolerance
+    //!                        given and then this rectangle is projected onto far view frustum
+    //!                        plane. This rectangles define the parallel bases of selecting frustum;
+    //! - for box selection: box points are projected onto near and far view frustum planes.
+    //!                      These 2 projected rectangles define parallel bases of selecting frustum.
+    //! Overlap detection tests are implemented according to the terms of separating axis
+    //! theorem (SAT).
+    //! Vertex order:
+    //! - for triangular frustum: V0_Near, V1_Near, V2_Near,
+    //!                           V0_Far, V1_Far, V2_Far;
+    //! - for rectangular frustum: LeftTopNear, LeftTopFar,
+    //!                            LeftBottomNear,LeftBottomFar,
+    //!                            RightTopNear, RightTopFar,
+    //!                            RightBottomNear, RightBottomFar.
+    //! Plane order in array:
+    //! - for triangular frustum: V0V1, V1V2, V0V2, Near, Far;
+    //! - for rectangular frustum: Top, Bottom, Left, Right, Near, Far.
+    //! Uncollinear edge directions order:
+    //! - for rectangular frustum: Horizontal, Vertical,
+    //!                            LeftLower, RightLower,
+    //!                            LeftUpper, RightUpper;
+    //! - for triangular frustum: V0_Near - V0_Far, V1_Near - V1_Far, V2_Near - V2_Far,
+    //!                           V1_Near - V0_Near, V2_Near - V1_Near, V2_Near - V0_Near.
+    public class SelectMgr_Frustum : SelectMgr_BaseFrustum
+    {
+    }
+
+    //! This class is an interface for different types of selecting frustums,
+    //! defining different selection types, like point, box or polyline
+    //! selection. It contains signatures of functions for detection of
+    //! overlap by sensitive entity and initializes some data for building
+    //! the selecting frustum
+    public class SelectMgr_BaseFrustum : SelectMgr_BaseIntersector
+    {
+    }
+
+    //! This class is an interface for different types of selecting intersector,
+    //! defining different selection types, like point, box or polyline
+    //! selection. It contains signatures of functions for detection of
+    //! overlap by sensitive entity and initializes some data for building
+    //! the selecting intersector
+    public class SelectMgr_BaseIntersector
+    {
+        //! Return camera definition.
+        public Graphic3d_Camera Camera() { return myCamera; }
+
+        //! Calculates the point on a view ray that was detected during the run of selection algo by given depth.
+        //! It makes sense only for intersectors built on a single point.
+        //! This method returns infinite point for the base class.
+        public gp_Pnt DetectedPoint(double theDepth)
+        {
+            return new gp_Pnt(RealLast(), RealLast(), RealLast());
+        }
+
+        private double RealLast()
+        {
+            return double.MaxValue;
+        }
+
+        protected Graphic3d_Camera myCamera;        //!< camera definition (if builder isn't NULL it is the same as its camera)
+        protected SelectMgr_SelectionType mySelectionType; //!< type of selection
+
+    }
+    //! An internal class for calculation of current largest tolerance value which will be applied for creation of selecting frustum by default.
+    //! Each time the selection set is deactivated, maximum tolerance value will be recalculated.
+    //! If a user enables custom precision using StdSelect_ViewerSelector3d::SetPixelTolerance, it will be applied to all sensitive entities without any checks.
+    public class SelectMgr_ToleranceMap
+    {
+        internal object Tolerance()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    //! This class provides data and criterion for sorting candidate
+    //! entities in the process of interactive selection by mouse click
+    public class SelectMgr_SortCriterion
+    {
+        public Select3D_SensitiveEntity Entity; //!< detected entity
+        public gp_Pnt Point;           //!< 3D point
+        public Graphic3d_Vec3 Normal;          //!< surface normal or 0 vector if undefined
+        public double Depth;           //!< distance from the view plane to the entity
+        public double MinDist;         //!< distance from the clicked point to the entity on the view plane
+        public double Tolerance;       //!< tolerance used for selecting candidates
+        public int Priority;        //!< selection priority
+        public int ZLayerPosition;  //!< ZLayer rendering order index, stronger than a depth
+        public int NbOwnerMatches;  //!< overall number of entities collected for the same owner
+    }
+    public class SelectMgr_ViewClipRange
+    {
+    }
+
+    public class SelectMgr_SelectableObjectSet
+    {
+        public SelectMgr_SelectableObjectSet()
+        {
+            for (int i = 0; i < myObjects.Length; i++)
+            {
+                myObjects[i] = new List<SelectMgr_SelectableObject>();
+            }
+        }
+        //! is represented directly in eye space coordinates.
+        //! This subset uses linear BVH builder with 32 levels of depth and 1 element per leaf.
+        enum BVHSubset
+        {
+            BVHSubset_3d,
+            BVHSubset_3dPersistent,
+            BVHSubset_2dPersistent,
+            BVHSubsetNb
+        };
+
+        Graphic3d_Vec2i myLastWinSize;          //!< Last viewport's (window's) width used for construction of BVH
+        bool[] myIsDirty = new bool[(int)BVHSubset.BVHSubsetNb]; //!< Dirty flag for each subset
+
+        internal void MarkDirty()
+        {
+
+            myIsDirty[(int)BVHSubset.BVHSubset_3d] = true;
+            myIsDirty[(int)BVHSubset.BVHSubset_3dPersistent] = true;
+            myIsDirty[(int)BVHSubset.BVHSubset_2dPersistent] = true;
+
+        }
+
+        internal void UpdateBVH(Graphic3d_Camera theCam, Graphic3d_Vec2i theWinSize)
+        {
+            //// -----------------------------------------
+            //// check and update 3D BVH tree if necessary
+            //// -----------------------------------------
+            //if (!IsEmpty(BVHSubset_3d) && myIsDirty[BVHSubset_3d])
+            //{
+            //	// construct adaptor over private fields to provide direct access for the BVH builder
+            //	BVHBuilderAdaptorRegular anAdaptor(myObjects[BVHSubset_3d]);
+
+            //	// update corresponding BVH tree data structure
+            //	myBuilder[BVHSubset_3d]->Build(&anAdaptor, myBVH[BVHSubset_3d].get(), anAdaptor.Box());
+
+            //	// release dirty state
+            //	myIsDirty[BVHSubset_3d] = Standard_False;
+            //}
+
+            //if (!theCam.IsNull())
+            //{
+            //	 bool isWinSizeChanged = myLastWinSize != theWinSize;
+            //	 Graphic3d_Mat4d aProjMat = theCam.ProjectionMatrix();
+            //	 Graphic3d_Mat4d aWorldViewMat = theCam.OrientationMatrix();
+            //	 Graphic3d_WorldViewProjState aViewState = theCam.WorldViewProjState();
+
+            //	// -----------------------------------------------------
+            //	// check and update 3D persistence BVH tree if necessary
+            //	// -----------------------------------------------------
+            //	if (!IsEmpty(BVHSubset_3dPersistent)
+            //	 && (myIsDirty[BVHSubset_3dPersistent]
+            //	  || myLastViewState.IsChanged(aViewState)
+            //	  || isWinSizeChanged))
+            //	{
+            //		// construct adaptor over private fields to provide direct access for the BVH builder
+            //		BVHBuilderAdaptorPersistent anAdaptor(myObjects[BVHSubset_3dPersistent],
+            //											   theCam, aProjMat, aWorldViewMat, theWinSize);
+
+            //		// update corresponding BVH tree data structure
+            //		myBuilder[BVHSubset_3dPersistent]->Build(&anAdaptor, myBVH[BVHSubset_3dPersistent].get(), anAdaptor.Box());
+            //	}
+
+            //	// -----------------------------------------------------
+            //	// check and update 2D persistence BVH tree if necessary
+            //	// -----------------------------------------------------
+            //	if (!IsEmpty(BVHSubset_2dPersistent)
+            //	 && (myIsDirty[BVHSubset_2dPersistent]
+            //	  || myLastViewState.IsProjectionChanged(aViewState)
+            //	  || isWinSizeChanged))
+            //	{
+            //		// construct adaptor over private fields to provide direct access for the BVH builder
+            //		BVHBuilderAdaptorPersistent anAdaptor(myObjects[BVHSubset_2dPersistent],
+            //											   theCam, aProjMat, SelectMgr_SelectableObjectSet_THE_IDENTITY_MAT, theWinSize);
+
+            //		// update corresponding BVH tree data structure
+            //		myBuilder[BVHSubset_2dPersistent]->Build(&anAdaptor, myBVH[BVHSubset_2dPersistent].get(), anAdaptor.Box());
+            //	}
+
+            //	// release dirty state for every subset
+            //	myIsDirty[BVHSubset_3dPersistent] = Standard_False;
+            //	myIsDirty[BVHSubset_2dPersistent] = Standard_False;
+
+            //	// keep last view state
+            //	myLastViewState = aViewState;
+            //}
+
+            //// keep last window state
+            //myLastWinSize = theWinSize;
+
+        }
+
+        List<SelectMgr_SelectableObject>[] myObjects = new List<SelectMgr_SelectableObject>[(int)BVHSubset.BVHSubsetNb]; //!< Map of objects for each subset
+
+        internal bool Contains(SelectMgr_SelectableObject theObject)
+        {
+
+            return myObjects[(int)BVHSubset.BVHSubset_3d].Contains(theObject)
+                || myObjects[(int)BVHSubset.BVHSubset_3dPersistent].Contains(theObject)
+                || myObjects[(int)BVHSubset.BVHSubset_2dPersistent].Contains(theObject);
+
+        }
+
+        internal void Append(SelectMgr_SelectableObject theObject)
+        {
+
+        }
+    }
+    internal class SelectMgr_IndexedDataMapOfOwnerCriterion : NCollection_IndexedDataMap<SelectMgr_EntityOwner, SelectMgr_SortCriterion, TColStd_MapTransientHasher>
+    {
+
+    }
+    internal class TColStd_MapTransientHasher : NCollection_DefaultHasher<object>
+    {
+    }
 }
+
 

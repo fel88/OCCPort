@@ -265,7 +265,7 @@ namespace TKMesh
         //! is not Free.
         internal void RemoveNode(int theIndex, bool isForce = false)
         {
-            if (isForce || myNodes.FindKey(theIndex).Movability() == Enums.BRepMesh_DegreeOfFreedom.BRepMesh_Free)
+            if (isForce || myNodes.FindKey(theIndex).Movability() == BRepMesh_DegreeOfFreedom.BRepMesh_Free)
             {
                 if (LinksConnectedTo(theIndex).Extent() == 0)
                     myNodes.DeleteVertex(theIndex);
@@ -291,6 +291,52 @@ namespace TKMesh
             myDelLinks = new ListOfInteger(myAllocator);
             myElements = new VectorOfElements(theReservedNodeSize * 2, myAllocator);
 
+        }
+    }
+    public class VectorOfElements : List<BRepMesh_Triangle>
+    {
+        public VectorOfElements(int capacity, NCollection_IncAllocator myAllocator) : base(capacity)
+        {
+        }
+
+        internal void Append(BRepMesh_Triangle theElement)
+        {
+            Add(theElement);
+        }
+
+        internal int Size()
+        {
+            return Count;
+        }
+    }
+    internal class DMapOfIntegerListOfInteger
+    //typedef NCollection_Shared<NCollection_DataMap<Standard_Integer, ListOfInteger> >                             DMapOfIntegerListOfInteger;
+    {
+        public Dictionary<int, ListOfInteger> map = new Dictionary<int, ListOfInteger>();
+
+        public DMapOfIntegerListOfInteger(int v, NCollection_IncAllocator myAllocator)
+        {
+        }
+
+        internal void Bind(int aNodeId, ListOfInteger value)
+        {
+            map.Add(aNodeId, value);
+        }
+
+        internal ListOfInteger Find(int theIndex)
+        {
+            return map[theIndex];
+        }
+
+        internal bool IsBound(int aNodeId)
+        {
+            return map.ContainsKey(aNodeId);
+        }
+    }
+    internal class IDMapOfLink : NCollection_IndexedDataMap<BRepMesh_Edge, BRepMesh_PairOfIndex, NCollection_DefaultHasher<object>>
+    {
+        public IDMapOfLink(int v, NCollection_IncAllocator myAllocator)
+        {
         }
     }
 }

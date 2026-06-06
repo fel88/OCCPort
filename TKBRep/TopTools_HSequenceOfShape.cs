@@ -2,7 +2,7 @@
 
 namespace OCCPort
 {
-    internal class TopTools_HSequenceOfShape : List<TopoDS_Shape>
+    public class TopTools_HSequenceOfShape : List<TopoDS_Shape>
     {
         public void Prepend(TopoDS_Shape shape)
         {

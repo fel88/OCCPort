@@ -135,7 +135,7 @@
             myItems.Clear();
         }
 
-        internal bool IsEqual(TopLoc_Location Other)
+        public bool IsEqual(TopLoc_Location Other)
         {
             if (myItems == Other.myItems)
             {

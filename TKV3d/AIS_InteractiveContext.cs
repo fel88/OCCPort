@@ -812,5 +812,24 @@ namespace TKV3d
 
         //only topmost detected entity passing selection filter is accepted
     }
+
+    public class SelectMgr_AndOrFilter
+    {
+        public SelectMgr_AndOrFilter(SelectMgr_FilterType selectMgr_FilterType_OR)
+        {
+        }
+    }
+    public enum SelectMgr_FilterType
+    {
+
+        //Enumeration defines the filter type.
+
+        SelectMgr_FilterType_AND,
+
+        //an object should be suitable for all filters.
+        SelectMgr_FilterType_OR
+
+        //an object should be suitable at least one filter. 
+    }
 }
 

@@ -20,7 +20,7 @@ namespace TKernel
 
             //
         }
-        internal T First()
+        public T First()
         {
             return this[myLowerBound];
         }

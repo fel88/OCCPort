@@ -207,16 +207,14 @@ namespace TKMath
 
         Poly_ArrayOfUVNodes myUVNodes = new Poly_ArrayOfUVNodes();
 
-        internal void AddUVNodes()
+        public void AddUVNodes()
         {
-
             if (myUVNodes.IsEmpty() || myUVNodes.Size() != myNodes.Size())
             {
                 myUVNodes.Resize(myNodes.Size(), false);
             }
-
-
         }
+
         //! If an array for normals is not allocated yet, do it now.
         public void AddNormals()
         {
@@ -230,7 +228,7 @@ namespace TKMath
         //! Method resizing internal arrays of nodes (synchronously for all attributes).
         //! @param theNbNodes   [in] new number of nodes
         //! @param theToCopyOld [in] copy old nodes into the new array
-        internal void ResizeNodes(int theNbNodes, bool theToCopyOld)
+        public void ResizeNodes(int theNbNodes, bool theToCopyOld)
         {
             myNodes.Resize(theNbNodes, theToCopyOld);
             if (!myUVNodes.IsEmpty())

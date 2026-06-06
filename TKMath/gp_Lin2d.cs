@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OCCPort.Common;
+using System;
 using TKMath;
 
 namespace OCCPort
@@ -24,7 +25,7 @@ namespace OCCPort
         public gp_Pnt2d Location() { return pos.Location(); }
 
         //! Computes the distance between <me> and the point <theP>.
-        internal double Distance(gp_Pnt2d theP)
+        public double Distance(gp_Pnt2d theP)
         {
             gp_XY aCoord = theP.XY();
             aCoord.Subtract((pos.Location()).XY());

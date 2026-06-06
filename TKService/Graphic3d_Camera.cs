@@ -517,7 +517,7 @@ namespace TKService
             return (myProjType == Projection.Projection_Orthographic);
         }
 
-        internal gp_XYZ ViewDimensions()
+        public gp_XYZ ViewDimensions()
         {
             return ViewDimensions(Distance());
         }
@@ -546,7 +546,7 @@ namespace TKService
             return new gp_XYZ(aSizeX, aSizeY, myZFar - myZNear);
         }
 
-        internal gp_Pnt Project(gp_Pnt thePnt)
+        public gp_Pnt Project(gp_Pnt thePnt)
         {
             Graphic3d_Mat4d aViewMx = OrientationMatrix();
             var aProjMx = ProjectionMatrix();
@@ -563,7 +563,7 @@ namespace TKService
 
         }
 
-        internal void Transform(gp_Trsf theTrsf)
+        public void Transform(gp_Trsf theTrsf)
         {
             if (theTrsf.Form() == gp_TrsfForm.gp_Identity)
             {
@@ -576,12 +576,12 @@ namespace TKService
             InvalidateOrientation();
         }
 
-        internal gp_Dir Direction()
+        public gp_Dir Direction()
         {
             return myDirection;
         }
 
-        internal gp_Pnt Eye()
+        public gp_Pnt Eye()
         {
             return myEye;
         }
@@ -619,7 +619,7 @@ namespace TKService
             //myWorldViewProjState.WorldViewState() = (Standard_Size)Standard_Atomic_Increment(&THE_STATE_COUNTER);
         }
 
-        internal void SetDirectionFromEye(gp_Dir theDir)
+        public void SetDirectionFromEye(gp_Dir theDir)
         {
             if (myDirection.IsEqual(theDir, 0.0))
             {
@@ -648,7 +648,7 @@ namespace TKService
             InvalidateOrientation();
         }
 
-        internal void SetEye(gp_Pnt theEye)
+        public void SetEye(gp_Pnt theEye)
         {
             if (Eye().IsEqual(theEye, 0.0))
             {
@@ -665,7 +665,7 @@ namespace TKService
             InvalidateOrientation();
         }
 
-        internal void SetCenter(gp_Pnt theCenter)
+        public void SetCenter(gp_Pnt theCenter)
         {
             double aDistance = myEye.Distance(theCenter);
             if (myDistance == aDistance)
@@ -833,12 +833,12 @@ namespace TKService
 
         }
 
-        internal double Aspect()
+        public double Aspect()
         {
             return myAspect;
 
         }
-        internal gp_Pnt ConvertWorld2View(gp_Pnt thePnt)
+        public gp_Pnt ConvertWorld2View(gp_Pnt thePnt)
         {
             Graphic3d_Mat4d aViewMx = OrientationMatrix();
 
@@ -874,13 +874,13 @@ namespace TKService
 
         }
 
-        internal void OrthogonalizeUp()
+        public void OrthogonalizeUp()
         {
 
             SetUp(OrthogonalizedUp());
 
         }
-        gp_Dir OrthogonalizedUp()
+        public gp_Dir OrthogonalizedUp()
         {
             gp_Dir aDir = Direction();
             gp_Dir aLeft = aDir.Crossed(Up());
@@ -1140,7 +1140,7 @@ namespace TKService
             return myProjType;
         }
 
-        internal void SetAspect(double theAspect)
+        public void SetAspect(double theAspect)
         {
             if (Aspect() == theAspect)
             {
@@ -1452,5 +1452,14 @@ namespace TKService
 
         }
     }
-   
+
+    public enum Aspect_TypeOfFacingModel
+    {
+
+        Aspect_TOFM_BOTH_SIDE,
+        Aspect_TOFM_BACK_SIDE,
+
+
+        Aspect_TOFM_FRONT_SIDE
+    }
 }

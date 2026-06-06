@@ -49,7 +49,8 @@ namespace TKernel
         {
             dic = new List<KeyValuePair<TheKeyType, T2>>();
         }
-        internal T2 ChangeFromKey(TheKeyType theKey1)
+
+        public T2 ChangeFromKey(TheKeyType theKey1)
         {
             if (IsEmpty())
                 return default;
@@ -60,6 +61,7 @@ namespace TKernel
             }
             return default;
         }
+
         //! Contains
         public bool Contains(TheKeyType theKey1)
         {

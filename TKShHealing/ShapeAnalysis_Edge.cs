@@ -1,17 +1,18 @@
-﻿using OpenTK.Compute.OpenCL;
-using System.Reflection.Metadata;
+﻿using OCCPort;
 using TKBRep;
+using TKG2d;
+using TKG3d;
+using TKMath;
 
-namespace OCCPort
+namespace TKShHealing
 {
-
     //! Tool for analyzing the edge.
     //! Queries geometrical representations of the edge (3d curve, pcurve
     //! on the given face or surface) and topological sub-shapes (bounding
     //! vertices).
     //! Provides methods for analyzing geometry and topology consistency
     //! (3d and pcurve(s) consistency, their adjacency to the vertices).
-    internal class ShapeAnalysis_Edge
+    public class ShapeAnalysis_Edge
     {
         //! Returns start vertex of the edge (taking edge orientation
         //! into account).
@@ -31,7 +32,7 @@ namespace OCCPort
         }
 
         public bool Curve3d(TopoDS_Edge edge,
-                        out  Geom_Curve C3d,
+                        out Geom_Curve C3d,
                           ref double cf, ref double cl,
                            bool orient)
         {

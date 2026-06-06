@@ -178,5 +178,57 @@ namespace TKV3d
         }
 
     }
+    //! Defines the type of projection of the view.
+    public enum V3d_TypeOfView
+    {
+        V3d_ORTHOGRAPHIC,
+        V3d_PERSPECTIVE
+
+
+    };
+
+    public class V3d_ListOfViewIterator
+    {
+        V3d_ListOfView list;
+        public V3d_ListOfViewIterator(V3d_ListOfView myActiveViews)
+        {
+            list = myActiveViews;
+        }
+
+        internal bool More()
+        {
+            throw new NotImplementedException();
+        }
+    }
+    internal class V3d_RectangularGrid : Aspect_RectangularGrid
+    {
+        public V3d_RectangularGrid(V3d_Viewer aViewer, Quantity_Color quantity_Color1, Quantity_Color quantity_Color2)
+            : base(1.0, 1.0)
+        {
+            myViewer = (aViewer);
+
+        }
+
+        Graphic3d_Structure myStructure;
+        Graphic3d_Group myGroup;
+        gp_Ax3 myCurViewPlane;
+        V3d_Viewer myViewer;
+    }
+    public class V3d_CircularGrid : Aspect_CircularGrid
+    {
+        public V3d_CircularGrid(V3d_Viewer aViewer, Quantity_Color aColor, Quantity_Color aTenthColor)
+            : base(1.0, 8)
+        {
+            /*myViewer = (aViewer);
+			myCurAreDefined = (false);
+  myToComputePrs(Standard_False),
+  myCurDrawMode(Aspect_GDM_Lines),
+  myCurXo(0.0),
+  myCurYo(0.0),
+  myCurAngle(0.0),*/
+
+        }
+    }
 }
+
 

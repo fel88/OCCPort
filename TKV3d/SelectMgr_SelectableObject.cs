@@ -1,4 +1,6 @@
-﻿namespace TKV3d
+﻿using OCCPort;
+
+namespace TKV3d
 {
     public abstract class SelectMgr_SelectableObject : PrsMgr_PresentableObject
     {
@@ -188,5 +190,27 @@
         SelectMgr_TOU_Partial,
         SelectMgr_TOU_None
     }
+
+    public class SelectMgr_MapOfObjectSensitives : NCollection_DataMap<SelectMgr_SelectableObject, SelectMgr_SensitiveEntitySet>
+    {
+        internal void Bind(SelectMgr_SelectableObject theObject, SelectMgr_SensitiveEntitySet anEntitySet)
+        {
+            map.Add(theObject, anEntitySet);
+        }
+
+        Dictionary<SelectMgr_SelectableObject, SelectMgr_SensitiveEntitySet> map = new Dictionary<SelectMgr_SelectableObject, SelectMgr_SensitiveEntitySet>();
+        internal bool IsBound(SelectMgr_SelectableObject theObject)
+        {
+            return map.ContainsKey(theObject);
+        }
+    }
+
+    public class SelectMgr_SensitiveEntitySet
+    {
+        public SelectMgr_SensitiveEntitySet(Select3D_BVHBuilder3d myEntitySetBuilder)
+        {
+        }
+    }
 }
+
 

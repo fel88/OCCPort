@@ -1,0 +1,177 @@
+﻿using OCCPort;
+using OCCPort.Common;
+using TKBRep;
+using TKG3d;
+
+namespace TKMesh
+{
+    //! Default implementation of edge data model entity.
+    public class BRepMeshData_Edge : AbstractMeshData_TessellatedShape, IMeshData_Edge
+    {
+        DMapOfIFacePtrsListOfInteger myPCurvesMap;
+        VectorOfIPCurveHandles myPCurves;
+        bool mySameParam;
+        bool mySameRange;
+        //! Sets 3d curve associated with current edge.
+        public void SetCurve(IMeshData_Curve theCurve)
+        {
+            myCurve = theCurve;
+        }
+        bool myDegenerated;
+        //! Updates same range flag.
+        public void SetSameRange(bool theValue)
+        {
+            mySameRange = theValue;
+        }
+
+
+        //! Updates degenerative flag.
+        public void SetDegenerated(bool theValue)
+        {
+            myDegenerated = theValue;
+        }
+        //! Updates same param flag.
+        public void SetSameParam(bool theValue)
+        {
+            mySameParam = theValue;
+        }
+
+
+        //! Returns degenerative flag.
+        //! By default equals to flag stored in topological shape.
+        public bool GetDegenerated()
+        {
+            return myDegenerated;
+        }
+
+        //! Gets value of angular deflection for the discrete model.
+        public double GetAngularDeflection()
+        {
+            return myAngDeflection;
+        }
+        double myAngDeflection;
+        IMeshData_Curve myCurve;
+
+        //! Returns true in case if the edge is free one, i.e. it does not have pcurves.
+        public bool IsFree()
+        {
+            return (PCurvesNb() == 0);
+        }
+        //! By default equals to flag stored in topological shape.
+        public bool GetSameParam()
+        {
+            return mySameParam;
+        }
+
+        //! Sets value of angular deflection for the discrete model.
+        public void SetAngularDeflection(double theValue)
+        {
+            myAngDeflection = theValue;
+        }
+
+        //! Returns same range flag.
+        //! By default equals to flag stored in topological shape.
+        public bool GetSameRange()
+        {
+            return mySameRange;
+        }
+
+
+        public IMeshData_Curve GetCurve()
+        {
+            return myCurve;
+        }
+        public IMeshData_PCurve GetPCurve(
+  int theIndex)
+        {
+            return myPCurves[theIndex];
+        }
+
+
+
+        //! Returns pcurve for the specified discrete face.
+        public IMeshData_PCurve GetPCurve(IMeshData_Face theDFace, TopAbs_Orientation theOrientation)
+        {
+            ListOfInteger aListOfPCurves = myPCurvesMap.Find(theDFace);
+            var aPCurve1 = myPCurves.get(aListOfPCurves.First());
+            return (aPCurve1.GetOrientation() == theOrientation) ?
+    aPCurve1 : myPCurves.get(aListOfPCurves.Last());
+        }
+
+        public int PCurvesNb()
+        {
+            return myPCurves.Size();
+        }
+
+        public IMeshData_PCurve AddPCurve(IMeshData_Face theDFace, TopAbs_Orientation theOrientation)
+        {
+
+            int aPCurveIndex = PCurvesNb();
+            // Add pcurve to list of pcurves
+            IMeshData_PCurve aPCurve = new BRepMeshData_PCurve(theDFace, theOrientation);
+            myPCurves.Append(aPCurve);
+
+            // Map pcurve to faces.
+            if (!myPCurvesMap.IsBound(theDFace))
+            {
+                myPCurvesMap.Bind(theDFace, new ListOfInteger());
+
+            }
+
+            ListOfInteger aListOfPCurves = myPCurvesMap.ChangeFind(theDFace);
+            aListOfPCurves.Append(aPCurveIndex);
+
+            return GetPCurve(aPCurveIndex);
+
+        }
+
+
+        public BRepMeshData_Edge(TopoDS_Edge theEdge) : base(theEdge)
+        {
+            mySameParam = BRep_Tool.SameParameter(theEdge);
+            mySameRange = BRep_Tool.SameRange(theEdge);
+            myDegenerated = BRep_Tool.Degenerated(theEdge);
+            myAngDeflection = Standard_Real.RealLast();
+
+            myPCurves = new VectorOfIPCurveHandles(256);
+            myPCurvesMap = new DMapOfIFacePtrsListOfInteger(1);
+            SetCurve(new BRepMeshData_Curve());
+
+        }
+    }
+
+    internal class VectorOfIPCurveHandles
+    {
+        List<IMeshData_PCurve> list = new List<IMeshData_PCurve>();
+        public VectorOfIPCurveHandles(int capacity)
+        {
+
+        }
+
+        public IMeshData_PCurve this[int key]
+        {
+            get => list[key];
+            set => list[key] = value;
+        }
+
+        public void Append(IMeshData_PCurve d)
+        {
+            list.Add(d);
+        }
+        internal IMeshData_PCurve get(int v)
+        {
+            return this[v];
+        }
+
+        internal int Size()
+        {
+            return list.Count;
+        }
+
+
+    }
+}
+
+
+
+

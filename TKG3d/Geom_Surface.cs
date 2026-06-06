@@ -26,7 +26,7 @@ namespace TKG3d
     //! surfaces with null areas, or surfaces which self-intersect.
     public abstract class Geom_Surface : Geom_Geometry
     {
-        internal Type DynamicType()
+        public Type DynamicType()
         {
             return GetType();
         }

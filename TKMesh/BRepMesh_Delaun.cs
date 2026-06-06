@@ -762,11 +762,8 @@ namespace TKMesh
 
                 foreach (var aFreeEdgeId in aFreeEdges)
                 {
-
-
-
                     BRepMesh_Edge anEdge = GetEdge(aFreeEdgeId);
-                    if (anEdge.Movability() == Enums.BRepMesh_DegreeOfFreedom.BRepMesh_Frontier)
+                    if (anEdge.Movability() == BRepMesh_DegreeOfFreedom.BRepMesh_Frontier)
                         continue;
 
                     BRepMesh_PairOfIndex aPair =
@@ -2349,6 +2346,108 @@ namespace TKMesh
             theCellsCountU = Math.Max(theCellsCountU, 2);
             theCellsCountV = Math.Max(theCellsCountV, 2);
         }
+
+    }
+    public abstract class AbstractRangeSplitter// originally was template parameter
+    {
+        public abstract (double, double) GetRangeU();
+        //! Returns True if computed range is valid.
+        public abstract bool IsValid();
+        //! Scales the given point from real parametric space 
+        //! to face basis and otherwise.
+        //! @param thePoint point to be scaled.
+        //! @param isToFaceBasis if TRUE converts point to face basis,
+        //! otherwise performs reverse conversion.
+        //! @return scaled point.
+        public abstract gp_Pnt2d Scale(gp_Pnt2d thePoint,
+                                 bool isToFaceBasis);
+
+        //! Returns V range.
+        public abstract (double, double) GetRangeV();
+        public abstract gp_Pnt Point(gp_Pnt2d thePoint2d);
+        public abstract void AdjustRange();
+        public abstract (double, double) GetToleranceUV();
+        public abstract void AddPoint(gp_Pnt2d thePoint);
+
+        //! Returns delta.
+        public abstract (double, double) GetDelta();
+        public abstract void Reset(IMeshData_Face theDFace,
+                                    IMeshTools_Parameters theParameters);
+        public abstract ListOfPnt2d GenerateSurfaceNodes(IMeshTools_Parameters theParameters);
+    }
+    public class ListOfPnt2d : List<gp_Pnt2d>
+    {
+        public bool IsEmpty()
+        {
+            return Count == 0;
+        }
+        public int Size()
+        {
+            return Count;
+        }
+
+    }
+    public class IteratorOfMapOfInteger
+    {
+
+        MapOfInteger list;
+        public IteratorOfMapOfInteger(MapOfInteger aTriangles)
+        {
+            list = aTriangles;
+        }
+
+        /*internal int Key()
+        {
+            return list[index];
+        }*/
+        int index = 0;
+        internal bool More()
+        {
+            return index < list.Count - 1;
+        }
+
+        internal void Next()
+        {
+            index++;
+        }
+    }
+
+    public class BRepMesh_SelectorOfDataStructureOfDelaun
+    {
+        public BRepMesh_SelectorOfDataStructureOfDelaun(BRepMesh_DataStructureOfDelaun myMeshData)
+        {
+            myMesh = myMeshData;
+        }
+        //! Returns number of links.
+        public int NbElements()
+        {
+            return myElements.Size();
+        }
+
+        //! Returns selected elements.
+        public MapOfInteger Elements()
+        {
+            return myElements;
+        }
+
+        BRepMesh_DataStructureOfDelaun myMesh;
+        MapOfInteger myElements = new MapOfInteger();
+
+        internal void NeighboursOfNode(int theNodeIndex)
+        {
+            foreach (var aLinkIt in myMesh.LinksConnectedTo(theNodeIndex))
+            {
+                elementsOfLink(aLinkIt);
+            }
+        }
+
+        public void elementsOfLink(int theIndex)
+        {
+            BRepMesh_PairOfIndex aPair = myMesh.ElementsConnectedTo(theIndex);
+            for (int j = 1, jn = aPair.Extent(); j <= jn; ++j)
+                myElements.Add(aPair.Index(j));
+        }
+
     }
 } 
 

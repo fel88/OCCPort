@@ -8,7 +8,7 @@ namespace TKBRep
 {
     public class TopTools_ListOfShape : List<TopoDS_Shape>
     {
-        internal NCollection_BaseAllocator Allocator()
+        public NCollection_BaseAllocator Allocator()
         {
             return myAllocator;
         }

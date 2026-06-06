@@ -2,6 +2,7 @@
 using TKBRep;
 using TKG3d;
 using TKMath;
+using TKShHealing;
 
 namespace TKMesh
 {

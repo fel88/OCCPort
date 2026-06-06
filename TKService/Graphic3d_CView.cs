@@ -319,7 +319,7 @@ namespace TKService
 
         public List<Graphic3d_MapOfStructure> Items = new List<Graphic3d_MapOfStructure>();
 
-        internal void DisplayedStructures(out Graphic3d_MapOfStructure[] aSetOfStructures)
+        public void DisplayedStructures(out Graphic3d_MapOfStructure[] aSetOfStructures)
         {
             aSetOfStructures = Items.ToArray();
         }
@@ -339,7 +339,7 @@ namespace TKService
         //! Returns True if the window associated to the view is defined.
         public abstract bool IsDefined();
 
-        internal Bnd_Box MinMaxValues()
+        public Bnd_Box MinMaxValues()
         {
             return new Bnd_Box();
         }
@@ -628,12 +628,12 @@ namespace TKService
 
 
         //! Returns true if the view was removed.
-        internal bool IsRemoved()
+        public bool IsRemoved()
         {
             return myIsRemoved;
         }
 
-        internal void Activate()
+        public void Activate()
         {
 
             if (!IsActive())
@@ -716,13 +716,13 @@ namespace TKService
         public bool IsActiveXR() => myXRSession != null
                  && myXRSession.IsOpen();
         //! Returns the computed HLR mode state
-        internal bool ComputedMode()
+        public bool ComputedMode()
         {
 
             return myIsInComputedMode;
         }
 
-        internal void Compute()
+        public void Compute()
         {
 
 
@@ -1116,6 +1116,56 @@ namespace TKService
     {
         Graphic3d_TOA_POS = 0, Graphic3d_TOA_NORM, Graphic3d_TOA_UV, Graphic3d_TOA_COLOR,
         Graphic3d_TOA_CUSTOM
+    }
+
+    public class Aspect_CircularGrid : Aspect_Grid
+    {  //! creates a new grid. By default this grid is not
+       //! active.
+        public Aspect_CircularGrid(double aRadiusStep, int aDivisionNumber, double anXOrigin = 0, double anYOrigin = 0, double aRotationAngle = 0)
+            : base(anXOrigin, anYOrigin, aRotationAngle)
+        {
+            myRadiusStep = (aRadiusStep);
+            myDivisionNumber = aDivisionNumber;
+        }
+
+        double myRadiusStep;
+        int myDivisionNumber;
+        double myAlpha;
+        double myA1;
+        double myB1;
+
+    }
+
+    public class Graphic3d_Vertex
+    {
+
+
+        float[] xyz = new float[3];
+
+
+        //! Returns the X coordinates.
+        public float X() { return xyz[0]; }
+
+        //! Returns the Y coordinate.
+        public float Y() { return xyz[1]; }
+
+        //! Returns the Z coordinate.
+        public float Z() { return xyz[2]; }
+
+
+        public void SetCoord(float x, float y, float z)
+        {
+            xyz[0] = x;
+            xyz[1] = y;
+            xyz[2] = z;
+        }
+
+        public void SetCoord(double x, double y, double z)
+        {
+            xyz[0] = (float)x;
+            xyz[1] = (float)y;
+            xyz[2] = (float)z;
+        }
     }
 }
 
