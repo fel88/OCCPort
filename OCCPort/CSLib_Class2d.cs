@@ -1,6 +1,0 @@
-﻿using TKMath;
-
-namespace OCCPort
-{
-   
-}

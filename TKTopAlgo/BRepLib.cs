@@ -1618,4 +1618,8 @@ bool IsVerifyTolerance, bool IsMutableInput, BRepTools_ReShape theReshaper)
             Add(item);
         }
     }
+    internal class TColStd_SequenceOfInteger : NCollection_Sequence<int>
+    {
+
+    }
 }
