@@ -130,7 +130,7 @@ namespace TKTopAlgo
                     Poly_Triangle aTriangle = aPT.Triangle(aTriIt);
 
                     int[] aNode = new int[3];
-                    aTriangle.Get(ref aNode[0], ref aNode[1], ref aNode[2]);
+                    aTriangle.Get(out aNode[0], out aNode[1], out aNode[2]);
                     if (aDegNodes.Contains(aNode[0]) ||
                         aDegNodes.Contains(aNode[1]) ||
                         aDegNodes.Contains(aNode[2]))

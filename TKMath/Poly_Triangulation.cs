@@ -258,7 +258,7 @@ namespace TKMath
             int[] anElem = { 0, 0, 0 };
             foreach (var aTriIter in myTriangles.list)
             {
-                aTriIter.Get(ref anElem[0], ref anElem[1], ref anElem[2]);
+                aTriIter.Get(out anElem[0], out anElem[1], out anElem[2]);
                 gp_Pnt aNode0 = myNodes.Value<gp_Pnt>(anElem[0] - 1);
                 gp_Pnt aNode1 = myNodes.Value<gp_Pnt>(anElem[1] - 1);
                 gp_Pnt aNode2 = myNodes.Value<gp_Pnt>(anElem[2] - 1);

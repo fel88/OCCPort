@@ -227,7 +227,7 @@ namespace TKMath
             {
                 int i;
                 int[] no = new int[3];
-                myTriangulation.Triangle(myfirst).Get(ref no[0], ref no[1], ref no[2]);
+                myTriangulation.Triangle(myfirst).Get(out no[0], out no[1], out no[2]);
                 for (i = 0; i < 3; i++)
                     if (no[i] == mynode)
                         break;
@@ -274,7 +274,7 @@ namespace TKMath
                 {
                     if (t[i] != 0)
                     {
-                        myTriangulation.Triangle(t[i]).Get(ref n[0], ref n[1], ref n[2]);
+                        myTriangulation.Triangle(t[i]).Get(out n[0], out n[1], out n[2]);
                         for (j = 0; j < 3; j++)
                         {
                             if ((n[j] == mynode) && (n[(j + 1) % 3] == myothernode))
@@ -289,7 +289,7 @@ namespace TKMath
                     }
                 }
                 // sinon, depart vers la gauche.
-                myTriangulation.Triangle(myfirst).Get(ref n[0], ref n[1], ref n[2]);
+                myTriangulation.Triangle(myfirst).Get(out n[0], out n[1], out n[2]);
                 for (i = 0; i < 3; i++)
                     if (n[i] == mynode)
                         break;
@@ -305,7 +305,7 @@ namespace TKMath
                 {
                     if (t[i] != 0)
                     {
-                        myTriangulation.Triangle(t[i]).Get(ref n[0], ref n[1], ref n[2]);
+                        myTriangulation.Triangle(t[i]).Get(out n[0], out n[1], out n[2]);
                         for (j = 0; j < 3; j++)
                         {
                             if ((n[j] == mynode) && (n[(j + 2) % 3] == myothernode))

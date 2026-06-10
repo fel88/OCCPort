@@ -2,6 +2,52 @@
 {//! Generic matrix of 4 x 4 elements.
     public class NCollection_List<T> : List<T>
     {
+        public NCollection_List() { }
+
+        //! Copy constructor
+        public NCollection_List(NCollection_List<T> copy)
+        {
+            Assign(copy);
+        }
+
+        //! Replace this list by the items of another list (theOther parameter).
+        //! This method does not change the internal allocator.
+        public NCollection_List<T> Assign(NCollection_List<T> theOther)
+        {
+            if (this != theOther)
+            {
+                Clear();
+                //appendList(theOther.PFirst());
+                AddRange(theOther);
+            }
+            return this;
+        }
+
+
+        public class Iterator
+        {
+
+
+            public Iterator(NCollection_List<T> aDisplayedObjects)
+            {
+
+            }
+
+            public bool More()
+            {
+                throw new NotImplementedException();
+            }
+
+            public object Next()
+            {
+                throw new NotImplementedException();
+            }
+
+            public T Value()
+            {
+                throw new NotImplementedException();
+            }
+        }
         public void Append(T aPoints)
         {
             Add(aPoints);
@@ -24,5 +70,7 @@
         {
             return Count;
         }
+
+       
     }
 }

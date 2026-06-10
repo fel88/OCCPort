@@ -1,4 +1,5 @@
-﻿namespace TKernel
+﻿
+namespace TKernel
 {
     //! Class NCollection_Vector (dynamic array of objects)
     //!
@@ -63,7 +64,27 @@
             return Count - 1;
         }
 
+        public class Iterator
+        {
+            public Iterator(NCollection_Vector<T> selectMgr_SensitiveEntities)
+            {
 
- 
+            }
+
+            public bool More()
+            {
+                throw new NotImplementedException();
+            }
+
+            public object Next()
+            {
+                throw new NotImplementedException();
+            }
+
+            public T Value()
+            {
+                throw new NotImplementedException();
+            }
+        }
     }
 }

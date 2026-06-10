@@ -1,4 +1,8 @@
-﻿using OCCPort.Common;
+﻿global using TColStd_ListIteratorOfListOfInteger = TKernel.NCollection_List<int>.Iterator;
+global using TColStd_ListOfInteger = TKernel.NCollection_List<int>;
+
+using OCCPort.Common;
+using System.Reflection.Metadata;
 using TKernel;
 using TKMath;
 using TKService;
@@ -553,8 +557,8 @@ namespace TKV3d
         // ============================================================================
         public void Deactivate()
         {
-            AIS_ListOfInteractive aDisplayedObjects;
-            DisplayedObjects(out aDisplayedObjects);
+            AIS_ListOfInteractive aDisplayedObjects = new();
+            DisplayedObjects(aDisplayedObjects);
 
             for (AIS_ListOfInteractive.Iterator anIter = new AIS_ListOfInteractive.Iterator(aDisplayedObjects); anIter.More(); anIter.Next())
             {
@@ -562,27 +566,162 @@ namespace TKV3d
             }
         }
 
+        //! Deactivates all the activated selection modes of an object.
+        public void Deactivate(AIS_InteractiveObject theObj)
+        {
+            SetSelectionModeActive(theObj, -1, false, AIS_SelectionModesConcurrency.AIS_SelectionModesConcurrency_Single);
+        }
+
+
+        //! Deactivates all the activated selection modes of the interactive object anIobj with a given selection mode aMode.
+        public void Deactivate(AIS_InteractiveObject theObj, int theMode)
+        {
+            SetSelectionModeActive(theObj, theMode, false);
+        }
 
         // ============================================================================
         public void Deactivate(int theMode)
         {
-            AIS_ListOfInteractive aDisplayedObjects;
-            DisplayedObjects(out aDisplayedObjects);
+            AIS_ListOfInteractive aDisplayedObjects = new();
+            DisplayedObjects(aDisplayedObjects);
             for (AIS_ListOfInteractive.Iterator anIter = new AIS_ListOfInteractive.Iterator(aDisplayedObjects); anIter.More(); anIter.Next())
             {
                 Deactivate(anIter.Value(), theMode);
             }
         }
 
-        // ============================================================================
-        // function : Activate
-        // purpose  :
-        // ============================================================================
-        public void Activate(int theMode,
-                                        bool theIsForce)
+        //! Activates or deactivates the selection mode for specified object.
+        //! Has no effect if selection mode was already active/deactivated.
+        //! @param theObj         object to activate/deactivate selection mode
+        //! @param theMode        selection mode to activate/deactivate;
+        //!                       deactivation of -1 selection mode will effectively deactivate all selection modes;
+        //!                       activation of -1 selection mode with AIS_SelectionModesConcurrency_Single
+        //!                       will deactivate all selection modes, and will has no effect otherwise
+        //! @param theToActivate  activation/deactivation flag
+        //! @param theConcurrency specifies how to handle already activated selection modes;
+        //!                       default value (AIS_SelectionModesConcurrency_Multiple) means active selection modes should be left as is,
+        //!                       AIS_SelectionModesConcurrency_Single can be used if only one selection mode is expected to be active
+        //!                       and AIS_SelectionModesConcurrency_GlobalOrLocal can be used if either AIS_InteractiveObject::GlobalSelectionMode()
+        //!                       or any combination of Local selection modes is acceptable;
+        //!                       this value is considered only if theToActivate set to TRUE
+        //! @param theIsForce     when set to TRUE, the display status will be ignored while activating selection mode
+        public void SetSelectionModeActive(AIS_InteractiveObject theObj,
+                                               int theMode,
+                                               bool theIsActive,
+                                               AIS_SelectionModesConcurrency theActiveFilter = AIS_SelectionModesConcurrency.AIS_SelectionModesConcurrency_Multiple,
+                                               bool theIsForce = false)
         {
-            AIS_ListOfInteractive aDisplayedObjects;
-            DisplayedObjects(out aDisplayedObjects);
+            if (theObj == null)
+                return;
+
+            AIS_GlobalStatus aStat = myObjects.Seek(theObj);
+            if (aStat == null)
+                return;
+
+
+            if (!theIsActive
+             || (theMode == -1
+              && theActiveFilter == AIS_SelectionModesConcurrency.AIS_SelectionModesConcurrency_Single))
+            {
+                if (theObj.DisplayStatus() == PrsMgr_DisplayStatus.PrsMgr_DisplayStatus_Displayed
+                 || theIsForce)
+                {
+                    if (theMode == -1)
+                    {
+                        for (TColStd_ListIteratorOfListOfInteger aModeIter = new TColStd_ListIteratorOfListOfInteger(aStat.SelectionModes()); aModeIter.More(); aModeIter.Next())
+                        {
+                            mgrSelector.Deactivate(theObj, aModeIter.Value());
+                        }
+                    }
+                    else
+                    {
+                        mgrSelector.Deactivate(theObj, theMode);
+                    }
+                }
+
+                if (theMode == -1)
+                {
+                    aStat.ClearSelectionModes();
+                }
+                else
+                {
+                    aStat.RemoveSelectionMode(theMode);
+                }
+                return;
+            }
+            else if (theMode == -1)
+            {
+                return;
+            }
+
+            //  if ((*aStat)->SelectionModes().Size() == 1
+            //    && (*aStat)->SelectionModes().First() == theMode)
+            //  {
+            //      return;
+            // }
+
+            if (theObj.DisplayStatus() == PrsMgr_DisplayStatus.PrsMgr_DisplayStatus_Displayed
+             || theIsForce)
+            {
+                switch (theActiveFilter)
+                {
+                    case AIS_SelectionModesConcurrency.AIS_SelectionModesConcurrency_Single:
+                        {
+                            //   for (TColStd_ListIteratorOfListOfInteger aModeIter ((*aStat)->SelectionModes()); aModeIter.More(); aModeIter.Next())
+                            {
+                                //    mgrSelector->Deactivate(theObj, aModeIter.Value());
+                            }
+                            //    (*aStat)->ClearSelectionModes();
+                            break;
+                        }
+                    case AIS_SelectionModesConcurrency.AIS_SelectionModesConcurrency_GlobalOrLocal:
+                        {
+                            int aGlobSelMode = theObj.GlobalSelectionMode();
+                            TColStd_ListOfInteger aRemovedModes = new TColStd_ListOfInteger();
+                            //for (TColStd_ListIteratorOfListOfInteger aModeIter ((*aStat)->SelectionModes()); aModeIter.More(); aModeIter.Next())
+                            //{
+                            //    if ((theMode == aGlobSelMode && aModeIter.Value() != aGlobSelMode)
+                            //     || (theMode != aGlobSelMode && aModeIter.Value() == aGlobSelMode))
+                            //    {
+                            //        mgrSelector.Deactivate(theObj, aModeIter.Value());
+                            //        aRemovedModes.Append(aModeIter.Value());
+                            //    }
+                            //}
+                            //if (aRemovedModes.Size() == (*aStat)->SelectionModes().Size())
+                            //{
+                            //    (*aStat)->ClearSelectionModes();
+                            //}
+                            //else
+                            //{
+                            //    for (TColStd_ListIteratorOfListOfInteger aModeIter (aRemovedModes); aModeIter.More(); aModeIter.Next())
+                            //    {
+                            //        (*aStat)->RemoveSelectionMode(aModeIter.Value());
+                            //    }
+                            //}
+                            break;
+                        }
+                    case AIS_SelectionModesConcurrency.AIS_SelectionModesConcurrency_Multiple:
+                        {
+                            break;
+                        }
+                }
+                mgrSelector.Activate(theObj, theMode);
+            }
+            aStat.AddSelectionMode(theMode);
+        }
+
+        //! Activates the selection mode aMode whose index is given, for the given interactive entity anIobj.
+        public void Activate(AIS_InteractiveObject theObj, int theMode = 0, bool theIsForce = false)
+        {
+            SetSelectionModeActive(theObj, theMode, true, AIS_SelectionModesConcurrency.AIS_SelectionModesConcurrency_GlobalOrLocal, theIsForce);
+        }
+
+        //! Activates the given selection mode for the all displayed objects.
+        public void Activate(int theMode,
+                                        bool theIsForce = false)
+        {
+            AIS_ListOfInteractive aDisplayedObjects = new();
+            DisplayedObjects(aDisplayedObjects);
             for (AIS_ListOfInteractive.Iterator anIter = new AIS_ListOfInteractive.Iterator(aDisplayedObjects); anIter.More(); anIter.Next())
             {
                 Load(anIter.Value(), -1);
@@ -636,10 +775,43 @@ namespace TKV3d
             throw new NotImplementedException();
         }
 
-        private void DisplayedObjects(out AIS_ListOfInteractive aDisplayedObjects)
+
+        //! Returns the list of displayed objects of a particular Type WhichKind and Signature WhichSignature.
+        //! By Default, WhichSignature equals -1. This means that there is a check on type only.
+        public void DisplayedObjects(AIS_ListOfInteractive theListOfIO)
         {
-            throw new NotImplementedException();
+            for (AIS_DataMapIteratorOfDataMapOfIOStatus anObjIter = new AIS_DataMapIteratorOfDataMapOfIOStatus(myObjects); anObjIter.More(); anObjIter.Next())
+            {
+                if (anObjIter.Key().DisplayStatus() == PrsMgr_DisplayStatus.PrsMgr_DisplayStatus_Displayed)
+                {
+                    theListOfIO.Append(anObjIter.Key());
+                }
+            }
         }
+
+        //! Returns the list theListOfIO of erased objects (hidden objects) particular Type WhichKind and Signature WhichSignature.
+        //! By Default, WhichSignature equals 1. This means that there is a check on type only.
+        public void ErasedObjects(AIS_ListOfInteractive theListOfIO)
+        {
+            ObjectsByDisplayStatus(PrsMgr_DisplayStatus.PrsMgr_DisplayStatus_Erased, theListOfIO);
+
+        }
+
+
+        //! Returns the list theListOfIO of objects with indicated display status particular Type WhichKind and Signature WhichSignature.
+        //! By Default, WhichSignature equals 1. This means that there is a check on type only.
+        public void ObjectsByDisplayStatus(PrsMgr_DisplayStatus theStatus, AIS_ListOfInteractive theListOfIO)
+        {
+            for (AIS_DataMapIteratorOfDataMapOfIOStatus anObjIter = new AIS_DataMapIteratorOfDataMapOfIOStatus(myObjects); anObjIter.More(); anObjIter.Next())
+            {
+                if (anObjIter.Key().DisplayStatus() == theStatus)
+                {
+                    theListOfIO.Append(anObjIter.Key());
+                }
+            }
+        }
+
+
 
         private AIS_StatusOfPick Select(AIS_NArray1OfEntityOwner aPickedOwners, AIS_SelectionScheme theSelScheme)
         {
@@ -698,33 +870,7 @@ namespace TKV3d
         }
     }
 
-    internal class AIS_ListOfInteractive
-    {
-        internal class Iterator
-        {
 
-
-            public Iterator(AIS_ListOfInteractive aDisplayedObjects)
-            {
-
-            }
-
-            internal bool More()
-            {
-                throw new NotImplementedException();
-            }
-
-            internal object Next()
-            {
-                throw new NotImplementedException();
-            }
-
-            internal int Value()
-            {
-                throw new NotImplementedException();
-            }
-        }
-    }
     public enum AIS_StatusOfPick
     {
         AIS_SOP_Error,
@@ -745,52 +891,6 @@ namespace TKV3d
         Prs3d_TypeOfHighlight_SubIntensity,   //!< sub-intensity style
         Prs3d_TypeOfHighlight_NB
     };
-
-
-    //! Stores information about objects in graphic context:
-    public class AIS_GlobalStatus
-    {
-        internal bool AddSelectionMode(int theMode)
-        {
-            if (!mySelModes.Contains(theMode))
-            {
-                mySelModes.Append(theMode);
-                return true;
-            }
-            return false;
-        }
-
-
-        //! Returns active selection modes of the object.
-        public TColStd_ListOfInteger SelectionModes() { return mySelModes; }
-        TColStd_ListOfInteger mySelModes = new TColStd_ListOfInteger();
-
-        internal int DisplayMode()
-        {
-            return myDispMode;
-        }
-
-        internal Prs3d_Drawer HilightStyle()
-        {
-            return myHiStyle;
-        }
-
-        internal bool IsHilighted()
-        {
-            return myIsHilit;
-        }
-        Prs3d_Drawer myHiStyle;
-
-
-        int myDispMode;
-        bool myIsHilit;
-        bool mySubInt;
-        //! Sets display mode.
-        internal void SetDisplayMode(int theMode)
-        {
-            myDispMode = theMode;
-        }
-    }
 
     //! Class holding the list of selected owners.
     public class AIS_Selection
@@ -818,7 +918,8 @@ namespace TKV3d
         public SelectMgr_AndOrFilter(SelectMgr_FilterType selectMgr_FilterType_OR)
         {
         }
-    }public enum SelectMgr_FilterType
+    }
+    public enum SelectMgr_FilterType
     {
 
         //Enumeration defines the filter type.

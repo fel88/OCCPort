@@ -383,7 +383,7 @@ Enumerator*/
                     for (int aTriIter = 1; aTriIter <= theTriangulation.NbTriangles(); ++aTriIter)
                     {
                         int[] aNodeIdxs = new int[3];
-                        theTriangulation.Triangle(aTriIter).Get(ref aNodeIdxs[0], ref aNodeIdxs[1], ref aNodeIdxs[2]);
+                        theTriangulation.Triangle(aTriIter).Get(out aNodeIdxs[0], out aNodeIdxs[1], out aNodeIdxs[2]);
                         gp_Pnt[] aNodesXYZ = { theTriangulation.Node (aNodeIdxs[0]),
                                       theTriangulation.Node (aNodeIdxs[1]),
                                       theTriangulation.Node (aNodeIdxs[2]) };

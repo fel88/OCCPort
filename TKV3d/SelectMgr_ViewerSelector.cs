@@ -1,4 +1,5 @@
 ﻿using OCCPort.Common;
+using System.Reflection.Metadata;
 using TKernel;
 using TKMath;
 using TKService;
@@ -38,6 +39,20 @@ namespace TKV3d
     public class SelectMgr_ViewerSelector//typedef SelectMgr_ViewerSelector StdSelect_ViewerSelector3d;
     {
 
+        public void Deactivate(SelectMgr_Selection theSelection)
+        {
+            for (NCollection_Vector<SelectMgr_SensitiveEntity>.Iterator aSelEntIter = new NCollection_Vector<SelectMgr_SensitiveEntity>.Iterator(theSelection.Entities()); aSelEntIter.More(); aSelEntIter.Next())
+            {
+                aSelEntIter.Value().ResetSelectionActiveStatus();
+            }
+
+            if (theSelection.GetSelectionState() == SelectMgr_StateOfSelection.SelectMgr_SOS_Activated)
+            {
+                theSelection.SetSelectionState(SelectMgr_StateOfSelection.SelectMgr_SOS_Deactivated);
+
+                myTolerances.Decrement(theSelection.Sensitivity());
+            }
+        }
 
         //=======================================================================
         //function : AllowOverlapDetection
@@ -447,9 +462,45 @@ namespace TKV3d
     //! If a user enables custom precision using StdSelect_ViewerSelector3d::SetPixelTolerance, it will be applied to all sensitive entities without any checks.
     public class SelectMgr_ToleranceMap
     {
-        internal object Tolerance()
+        //! Decrements a counter of the tolerance given, checks if the current tolerance value
+        //! should be recalculated
+        public void Decrement(int theTolerance)
         {
-            throw new NotImplementedException();
+            int? aFreq = myTolerances.ChangeSeek(theTolerance);
+            if (aFreq == null)
+            {
+                return;
+            }
+
+            Exceptions.Standard_ProgramError_Raise_if(aFreq.Value == 0, "SelectMgr_ToleranceMap::Decrement() - internal error");
+            //--(*aFreq);// todo: make return ref-pointers to use
+
+            if (theTolerance == myLargestKey
+            && aFreq.Value == 0)
+            {
+                myLargestKey = -1;
+                for (NCollection_DataMap<int, int>.Iterator anIter = new(myTolerances); anIter.More(); anIter.Next())
+                {
+                    if (anIter.Value() != 0)
+                    {
+                        myLargestKey = Math.Max(myLargestKey, anIter.Key());
+                    }
+                }
+            }
+        }
+        NCollection_DataMap<int, int> myTolerances = new NCollection_DataMap<int, int>();
+        int myLargestKey;
+        int myCustomTolerance;
+        //! Returns a current tolerance that must be applied
+        public int Tolerance()
+        {
+            if (myLargestKey < 0)
+            {
+                return 2; // default tolerance value
+            }
+            return myCustomTolerance < 0
+                 ? myLargestKey
+                 : myLargestKey + myCustomTolerance;
         }
     }
 
@@ -591,9 +642,7 @@ namespace TKV3d
     {
 
     }
-    internal class TColStd_MapTransientHasher : NCollection_DefaultHasher<object>
-    {
-    }
+
 }
 
 

@@ -58,7 +58,7 @@ namespace TKTopAlgo
                     gp_XYZ eqPlan = new gp_XYZ(0.0, 0.0, 0.0);
                     for (thePolyConnect.Initialize(aNodeIter); thePolyConnect.More(); thePolyConnect.Next())
                     {
-                        theTris.Triangle(thePolyConnect.Value()).Get(ref aTri[0], ref aTri[1], ref aTri[2]);
+                        theTris.Triangle(thePolyConnect.Value()).Get(out aTri[0], out aTri[1], out aTri[2]);
                         gp_XYZ v1 = new gp_XYZ(theTris.Node(aTri[1]).Coord() - theTris.Node(aTri[0]).Coord());
                         gp_XYZ v2 = new gp_XYZ(theTris.Node(aTri[2]).Coord() - theTris.Node(aTri[1]).Coord());
                         gp_XYZ vv = v1 ^ v2;

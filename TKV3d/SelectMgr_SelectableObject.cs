@@ -1,4 +1,6 @@
-﻿using OCCPort;
+﻿using OCCPort.Common;
+using System.Reflection.Metadata;
+using TKernel;
 
 namespace TKV3d
 {
@@ -10,6 +12,25 @@ namespace TKV3d
 
             myGlobalSelMode = (0);
             myAutoHilight = (true);
+        }
+
+        //! Returns the selection having specified selection mode or NULL.
+        public SelectMgr_Selection Selection(int theMode)
+        {
+            if (theMode == -1)
+            {
+                return null;
+            }
+
+            for (SelectMgr_SequenceOfSelection.Iterator aSelIter = new(myselections); aSelIter.More(); aSelIter.Next())
+            {
+                SelectMgr_Selection aSel = aSelIter.Value();
+                if (aSel.Mode() == theMode)
+                {
+                    return aSel;
+                }
+            }
+            return null;
         }
 
         public void ErasePresentations(bool theToRemove)
@@ -170,13 +191,7 @@ namespace TKV3d
 
     }
 
-    public class SelectMgr_SequenceOfSelection : List<SelectMgr_Selection>
-    {
-        public void Append(SelectMgr_Selection aNewSel)
-        {
-            Add(aNewSel);
-        }
-    }
+
     public enum SelectMgr_TypeOfUpdate
     {
 

@@ -18,10 +18,10 @@
     {
         public AIS_InteractiveObject(PrsMgr_TypeOfPresentation3d aTypeOfPresentation3d = PrsMgr_TypeOfPresentation3d.PrsMgr_TOP_AllView)
             : base(aTypeOfPresentation3d)
-        {
-
+        {            
             myCTXPtr = null;
         }
+
         AIS_InteractiveContext myCTXPtr; //!< pointer to Interactive Context, where object is currently displayed; @sa SetContext()
         object myOwner;  //!< application-specific owner object
 

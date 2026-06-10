@@ -91,5 +91,27 @@ namespace TKernel
         {
             RemoveAt(v - 1);
         }
+
+        public class Iterator
+        {
+            public Iterator(NCollection_Sequence<T> list)
+            {
+            }
+
+            public bool More()
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Next()
+            {
+                throw new NotImplementedException();
+            }
+
+            public T Value()
+            {
+                throw new NotImplementedException();
+            }
+        }
     }
 }

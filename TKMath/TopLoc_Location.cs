@@ -18,12 +18,13 @@
         {
             myItems = new TopLoc_SListOfItemLocation();
         }
+
         public TopLoc_Location(gp_Trsf T)
         {
             TopLoc_Datum3D D = new TopLoc_Datum3D(T);
             myItems.Construct(new TopLoc_ItemLocation(D, 1));
         }
-
+        
 
         public static double ScalePrec()
         {

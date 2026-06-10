@@ -1,4 +1,8 @@
-﻿using OCCPort.Common;
+﻿
+global using SelectMgr_SequenceOfSelection = TKernel.NCollection_Sequence<TKV3d.SelectMgr_Selection>;
+
+using OCCPort.Common;
+using System.Reflection.Metadata;
 
 namespace TKV3d
 {
@@ -10,6 +14,39 @@ namespace TKV3d
         public SelectMgr_SelectionManager(SelectMgr_ViewerSelector theSelector)
         {
             mySelector = (theSelector);
+        }
+
+        //! Deactivates mode theMode of theObject in theSelector. If theMode value is set to default (-1), all
+        //! active selection modes will be deactivated. Likewise, if theSelector value is set to default (NULL), theMode
+        //! will be deactivated in all viewer selectors.
+        public void Deactivate(SelectMgr_SelectableObject theObject,
+                                   int theMode = -1)
+        {
+            for (PrsMgr_ListOfPresentableObjectsIter anChildrenIter = new PrsMgr_ListOfPresentableObjectsIter(theObject.Children()); anChildrenIter.More(); anChildrenIter.Next())
+            {
+                Deactivate((SelectMgr_SelectableObject)(anChildrenIter.Value()), theMode);
+            }
+            if (!theObject.HasOwnPresentations())
+            {
+                return;
+            }
+            if (!myGlobal.Contains(theObject))
+            {
+                return;
+            }
+
+            SelectMgr_Selection aSel = theObject.Selection(theMode);
+            if (theMode == -1)
+            {
+                for (SelectMgr_SequenceOfSelection.Iterator aSelIter = new(theObject.Selections()); aSelIter.More(); aSelIter.Next())
+                {
+                    mySelector.Deactivate(aSelIter.Value());
+                }
+            }
+            else if (aSel != null)
+            {
+                mySelector.Deactivate(aSel);
+            }
         }
 
         //=======================================================================

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection.Metadata;
 using System.Runtime.InteropServices;
+using TKernel;
 using TKService;
 
 namespace OCCPort.OpenGL

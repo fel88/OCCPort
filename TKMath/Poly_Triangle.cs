@@ -20,12 +20,13 @@
 
 
         //! Returns the node indices of this triangle.
-        public void Get(ref int theN1, ref int theN2, ref int theN3)
+        public void Get(out int theN1, out int theN2, out int theN3)
         {
             theN1 = myNodes[0];
             theN2 = myNodes[1];
             theN3 = myNodes[2];
         }
+
         public int[] Get()
         {
             return myNodes.ToArray();

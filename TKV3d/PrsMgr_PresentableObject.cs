@@ -72,7 +72,7 @@ namespace TKV3d
 
         gp_Trsf getIdentityTrsf()
         {
-            return new gp_Trsf();            
+            return new gp_Trsf();
         }
 
         //! Sets the display mode for the interactive object.
@@ -247,6 +247,17 @@ namespace TKV3d
             }
 
 
+        }
+
+
+        //! Return the local transformation.
+        //! Note that the local transformation of the object having Transformation Persistence
+        //! is applied within Local Coordinate system defined by this Persistence.
+        public gp_Trsf LocalTransformation()
+        {
+            return myLocalTransformation != null
+                                                           ? myLocalTransformation.Trsf()
+                                                           : getIdentityTrsf();
         }
 
         public abstract void Compute(PrsMgr_PresentationManager myPresentationManager,

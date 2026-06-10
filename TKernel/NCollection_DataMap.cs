@@ -1,6 +1,6 @@
-﻿using TKernel;
+﻿using System.Data;
 
-namespace OCCPort
+namespace TKernel
 {
     /**
    * Purpose:     The DataMap is a Map to store keys with associated
@@ -27,20 +27,57 @@ namespace OCCPort
 
     public class NCollection_DataMap<T1, T2, T3> : Dictionary<T1, T2> where T3 : IEqualityComparer<T1>, new()
     {
+        public   T2 ChangeSeek(T1 theIObj)
+        {
+            throw new NotImplementedException();
+        }
 
+        public class Iterator
+        {
+            NCollection_DataMap<T1, T2, T3> collection;
+            public Iterator(NCollection_DataMap<T1, T2, T3> _collection)
+            {
+                collection = _collection;
+            }
+
+            public T1 Key()
+            {
+                throw new NotImplementedException();
+            }
+
+            public bool More()
+            {
+                throw new NotImplementedException();
+            }
+
+            public object Next()
+            {
+                throw new NotImplementedException();
+            }
+
+            public T2 Value()
+            {
+                throw new NotImplementedException();
+            }
+        }
         public bool IsEmpty()
         {
             return Count == 0;
         }
 
-        public T2 Find(T1 theObject  )
+        public void UnBind(T1 theIObj)
+        {
+            Remove(theIObj);
+        }
+
+        public T2 Find(T1 theObject)
         {
             if (ContainsKey(theObject))
             {
                 return this[theObject];
-                
+
             }
-            return  default;            
+            return default;
         }
 
         public bool Find(T1 theObject, out T2 aResult)

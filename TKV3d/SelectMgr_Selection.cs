@@ -1,4 +1,5 @@
-﻿using TKernel;
+﻿using OCCPort.Common;
+using TKernel;
 
 namespace TKV3d
 {
@@ -39,6 +40,15 @@ namespace TKV3d
     //! -   mode 6 :   selection of the constituent solids.
     public class SelectMgr_Selection
     {
+
+        //! Returns sensitivity of the selection
+        public int  Sensitivity() { return mySensFactor; }
+
+        //! Sets status of selection
+        public void SetSelectionState(SelectMgr_StateOfSelection theState) { mySelectionState = theState; }
+
+        //! Returns status of selection
+        public SelectMgr_StateOfSelection GetSelectionState() { return mySelectionState; }
 
         public SelectMgr_Selection(int theModeIdx = 0)
         {

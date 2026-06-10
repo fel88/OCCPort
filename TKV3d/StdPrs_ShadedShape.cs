@@ -239,11 +239,11 @@ namespace TKV3d
                 {
                     if ((aFace.Orientation() == TopAbs_Orientation.TopAbs_REVERSED))
                     {
-                        aT.Triangle(aTriIter).Get(ref anIndex[0], ref anIndex[2], ref anIndex[1]);
+                        aT.Triangle(aTriIter).Get(out anIndex[0], out anIndex[2], out anIndex[1]);
                     }
                     else
                     {
-                        aT.Triangle(aTriIter).Get(ref anIndex[0], ref anIndex[1], ref anIndex[2]);
+                        aT.Triangle(aTriIter).Get(out anIndex[0], out anIndex[1], out anIndex[2]);
                     }
 
                     gp_Pnt aP1 = aT.Node(anIndex[0]);
