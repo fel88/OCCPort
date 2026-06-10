@@ -5,7 +5,7 @@ using System.Security.Cryptography;
 using TKG3d;
 using TKMath;
 
-namespace OCCPort
+namespace TKBRep
 {
     public class TopoDS_Shape
     {
@@ -40,11 +40,11 @@ namespace OCCPort
         //! and no sub-shapes.
         public TopoDS_Shape EmptyCopied()
         {
-            var aShape = Activator.CreateInstance(this.GetType()) as TopoDS_Shape;
+            var aShape = Activator.CreateInstance(GetType()) as TopoDS_Shape;
 
-            aShape.myOrient = this.myOrient;
-            aShape.myTShape = this.myTShape;
-            aShape.myLocation = this.myLocation;//clone ?
+            aShape.myOrient = myOrient;
+            aShape.myTShape = myTShape;
+            aShape.myLocation = myLocation;//clone ?
 
             //TopoDS_Shape aShape(*this);
             aShape.EmptyCopy();
@@ -84,11 +84,11 @@ namespace OCCPort
         //! coordinate system set to <Loc>.
         public TopoDS_Shape Located(TopLoc_Location theLoc, bool theRaiseExc = true)
         {
-            var aShape = Activator.CreateInstance(this.GetType()) as TopoDS_Shape;
+            var aShape = Activator.CreateInstance(GetType()) as TopoDS_Shape;
             //TopoDS_Shape aShape = (TopoDS_Shape)MemberwiseClone();
-            aShape.myOrient = this.myOrient;
-            aShape.myTShape = this.myTShape;
-            aShape.myLocation = this.myLocation;//clone ?
+            aShape.myOrient = myOrient;
+            aShape.myTShape = myTShape;
+            aShape.myLocation = myLocation;//clone ?
 
 
             aShape.Location(theLoc, theRaiseExc);
@@ -195,11 +195,11 @@ namespace OCCPort
         //! orientation set to <Or>.
         public virtual TopoDS_Shape Oriented(TopAbs_Orientation theOrient)
         {
-            var aShape = Activator.CreateInstance(this.GetType()) as TopoDS_Shape;
+            var aShape = Activator.CreateInstance(GetType()) as TopoDS_Shape;
             //TopoDS_Shape aShape = (TopoDS_Shape)MemberwiseClone();
-            aShape.myOrient = this.myOrient;
-            aShape.myTShape = this.myTShape;
-            aShape.myLocation = this.myLocation;//clone ?
+            aShape.myOrient = myOrient;
+            aShape.myTShape = myTShape;
+            aShape.myLocation = myLocation;//clone ?
 
             aShape.Orientation(theOrient);
             return aShape;

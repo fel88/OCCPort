@@ -1,5 +1,6 @@
 ﻿using OCCPort;
 using OCCPort.Common;
+using OpenTK.Mathematics;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -43,11 +44,16 @@ namespace TKernel
                 Exceptions.Standard_NoSuchObject_Raise_if(!More(), "NCollection_IndexedDataMap::Iterator::Value");
                 return myMap.FindFromIndex(myIndex);
             }
-
         }
+
         public NCollection_IndexedDataMap()
         {
             dic = new List<KeyValuePair<TheKeyType, T2>>();
+        }
+
+        public void Clear()
+        {
+            dic.Clear();
         }
 
         public T2 ChangeFromKey(TheKeyType theKey1)

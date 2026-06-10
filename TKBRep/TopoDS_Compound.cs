@@ -1,4 +1,6 @@
-﻿namespace OCCPort
+﻿using TKBRep;
+
+namespace OCCPort
 {
 	public class TopoDS_Compound: TopoDS_Shape
 	{
