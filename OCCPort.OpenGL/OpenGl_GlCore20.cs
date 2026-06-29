@@ -73,6 +73,11 @@ namespace OCCPort.OpenGL
             GL.GetProgram(myProgramID, status, out aStatus);
         }
 
+        internal void glGetShaderInfoLog(int myShaderID, int bufSize, ref int len, ref string aLog)
+        {
+            GL.GetShaderInfoLog(myShaderID, bufSize, out len, out aLog);
+        }
+
         internal void glGetShaderiv(int myShaderID, ShaderParameter param, ref int v)
         {
             GL.GetShader(myShaderID, param, out v);
@@ -83,10 +88,10 @@ namespace OCCPort.OpenGL
             GL.LinkProgram(myProgramID);
         }
 
-        internal void glShaderSource(int myShaderID, int v, string[] aLines, out int len)
+        internal void glShaderSource(int myShaderID, int v, string code, out int len)
         {
             len = 0;
-            GL.ShaderSource(myShaderID, v, aLines, ref len);
+            GL.ShaderSource(myShaderID,  code);
         }
 
         internal void glUniform1i(int theLocation, Graphic3d_TextureUnit theTextureUnit)

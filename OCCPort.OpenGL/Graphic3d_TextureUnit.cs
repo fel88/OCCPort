@@ -22,6 +22,7 @@
         Graphic3d_TextureUnit_15,
 
         // aliases
+        Graphic3d_TextureUnit_NB = Graphic3d_TextureUnit_15 + 1,
 
         //! sampler2D occSamplerBaseColor.
         //! RGB(A) base color of the material and alpha mask/opacity.

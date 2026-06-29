@@ -31,7 +31,7 @@ namespace OCCPort.OpenGL
                 return;
             }
 
-            theCtx.ShaderManager().Create(theShader, ref myShaderProgramId, myShaderProgram);
+            theCtx.ShaderManager().Create(theShader, ref myShaderProgramId, ref myShaderProgram);
         }
 
 

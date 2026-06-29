@@ -324,10 +324,7 @@ namespace OCCPort.OpenGL
                                      : null;
 
                 drawArray(theWorkspace, aFaceColors, hasColorAttrib);
-
             }
-
-
         }
 
         //! Rebuilds the array of vertex attributes so that it can be drawn without indices.

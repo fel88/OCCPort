@@ -2,7 +2,7 @@
 
 namespace OCCPort.OpenGL
 {
-    internal class OpenGl_MaterialState
+    public class OpenGl_MaterialState
     {
         //! Return TRUE if alpha test should be enabled.
         internal bool HasAlphaCutoff()

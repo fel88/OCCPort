@@ -9,6 +9,10 @@
          *
          * OFF by default.
          */
+
+        //! Print GLSL program compilation/linkage warnings, if any. OFF by default.
+        public bool glslWarnings;
+
         public bool buffersNoSwap;
         public bool sRGBDisable;       //!< Disables sRGB rendering (OFF by default)
         public bool compressedTexturesDisable; //!< Disables uploading of compressed texture formats native to GPU (OFF by default)

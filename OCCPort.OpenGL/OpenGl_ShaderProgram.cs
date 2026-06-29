@@ -1,29 +1,73 @@
 ﻿//! List of shader objects.
-global using Graphic3d_ShaderObjectList = TKernel.NCollection_Sequence<TKService.Graphic3d_ShaderObject>;
-global using OpenGl_ShaderList = TKernel.NCollection_Sequence<OCCPort.OpenGL.OpenGl_ShaderObject>;
 global using Graphic3d_ShaderAttributeList = TKernel.NCollection_Sequence<TKService.Graphic3d_ShaderAttribute>;
-using System;
+global using Graphic3d_ShaderObjectList = TKernel.NCollection_Sequence<TKService.Graphic3d_ShaderObject>;
+//! List of custom uniform shader variables.
+global using Graphic3d_ShaderVariableList = TKernel.NCollection_Sequence<TKService.Graphic3d_ShaderVariable>;
+//! List of shader variable setters.
+global using OpenGl_SetterList = TKernel.NCollection_DataMap<int, OpenGl_SetterInterface>;
+global using OpenGl_ShaderList = TKernel.NCollection_Sequence<OCCPort.OpenGL.OpenGl_ShaderObject>;
 //! List of custom vertex shader attributes
 
 
 
 using OCCPort.Common;
 using OCCPort.Enums;
+using OCCPort.OpenGL;
 using OpenTK.Graphics.ES11;
 using OpenTK.Mathematics;
 using System;
+using System;
 using System.Net.NetworkInformation;
 using System.Reflection.Metadata;
+using System.Reflection.Metadata;
+using System.Threading;
 using TKService;
+
+
+//! Interface for generic setter of user-defined uniform variables.
+public abstract class OpenGl_SetterInterface
+{
+    //! Sets user-defined uniform variable to specified program.
+    public abstract void Set(OpenGl_Context theCtx,
+                     Graphic3d_ShaderVariable theVariable,
+                     OpenGl_ShaderProgram theProgram);
+
+    ////! Destructor
+    //virtual ~OpenGl_SetterInterface() { }
+};
 
 
 
 namespace OCCPort.OpenGL
 {
     public class OpenGl_ShaderProgram : OpenGl_NamedResource
-    {
-        public OpenGl_ShaderProgram(Graphic3d_ShaderProgram theProxy)
+    { //! Creates uninitialized shader program.
+      //!
+      //! WARNING! This constructor is not intended to be called anywhere but from OpenGl_ShaderManager::Create().
+      //! Manager has been designed to synchronize camera position, lights definition and other aspects of the program implicitly,
+      //! as well as sharing same program across rendering groups.
+      //!
+      //! Program created outside the manager will be left detached from these routines,
+      //! and them should be performed manually by caller.
+      //!
+      //! This constructor has been made public to provide more flexibility to re-use OCCT OpenGL classes without OCCT Viewer itself.
+      //! If this is not the case - create the program using shared OpenGl_ShaderManager instance instead.
+        public OpenGl_ShaderProgram(Graphic3d_ShaderProgram theProxy = null, string theId = "") : base(theProxy != null ? theProxy.GetId() : theId)
         {
+
+            myProgramID = (NO_PROGRAM);
+            myProxy = theProxy;
+            myShareCount = 1;
+            myNbLightsMax = 0;
+            myNbShadowMaps = 0;
+            myNbClipPlanesMax = 0;
+            myNbFragOutputs = 1;
+            myTextureSetBits = (int)Graphic3d_TextureSetBits.Graphic3d_TextureSetBits_NONE;
+            myOitOutput = Graphic3d_RenderTransparentMethod.Graphic3d_RTM_BLEND_UNORDERED;
+            myHasAlphaTest = false;
+            myHasTessShader = false;
+
+            //memset(myCurrentState, 0, sizeof(myCurrentState));
         }
         public OpenGl_ShaderProgram()
         {
@@ -557,9 +601,9 @@ namespace OCCPort.OpenGL
                 }
 
                 string aHeaderConstants = "";
-                //myNbLightsMax = myProxy != null ? myProxy.NbLightsMax() : 0;
-                //myNbShadowMaps = myProxy != null ? myProxy.NbShadowMaps() : 0;
-                //myNbClipPlanesMax = myProxy != null ? myProxy.NbClipPlanesMax() : 0;
+                myNbLightsMax = myProxy != null ? myProxy.NbLightsMax() : 0;
+                myNbShadowMaps = myProxy != null ? myProxy.NbShadowMaps() : 0;
+                myNbClipPlanesMax = myProxy != null ? myProxy.NbClipPlanesMax() : 0;
                 aHeaderConstants += ("#define THE_MAX_LIGHTS ") + myNbLightsMax + "\n";
                 aHeaderConstants += ("#define THE_MAX_CLIP_PLANES ") + myNbClipPlanesMax + "\n";
                 aHeaderConstants += ("#define THE_NB_FRAG_OUTPUTS ") + myNbFragOutputs + "\n";
@@ -611,10 +655,10 @@ namespace OCCPort.OpenGL
                                                      + aPrecisionHeader               // precision  - default precision qualifiers, should be before any code
                                                      + aHeaderType                    // auxiliary macros defining a shader stage (type)
                                                      + aHeaderConstants
-                                                  //    + Shaders_Declarations_glsl      // common declarations (global constants and Vertex Shader inputs)
-                                                  //    + Shaders_DeclarationsImpl_glsl
-                                                  //   + anIter.Value()->Source();      // the source code itself (defining main() function)
-                                                  ;
+                                                      + ShadersConstants.Shaders_Declarations_glsl      // common declarations (global constants and Vertex Shader inputs)
+                                                      + ShadersConstants.Shaders_DeclarationsImpl_glsl
+                                                     + anIter.Value().Source();      // the source code itself (defining main() function)
+                ;
                 if (!aShader.LoadAndCompile(theCtx, myResourceId, aSource))
                 {
                     //aShader.Release(theCtx.operator->());
@@ -653,11 +697,11 @@ namespace OCCPort.OpenGL
             // bind custom Vertex Attributes
             if (myProxy != null)
             {
-                //for (Graphic3d_ShaderAttributeList.Iterator anAttribIter = new Graphic3d_ShaderAttributeList.Iterator(myProxy.VertexAttributes());
-                //     anAttribIter.More(); anAttribIter.Next())
-                //{
-                //    SetAttributeName(theCtx, anAttribIter.Value()->Location(), anAttribIter.Value()->Name().ToCString());
-                //}
+                for (Graphic3d_ShaderAttributeList.Iterator anAttribIter = new Graphic3d_ShaderAttributeList.Iterator(myProxy.VertexAttributes());
+                     anAttribIter.More(); anAttribIter.Next())
+                {
+                    SetAttributeName(theCtx, anAttribIter.Value().Location(), anAttribIter.Value().Name());
+                }
             }
 
             if (!Link(theCtx))
@@ -668,25 +712,29 @@ namespace OCCPort.OpenGL
             // set uniform defaults
             OpenGl_ShaderProgram anOldProgram = theCtx.ActiveProgram();
             theCtx.core20fwd.glUseProgram(myProgramID);
-            //          if (OpenGl_ShaderUniformLocation aLocTexEnable = GetStateLocation(OpenGl_OCCT_TEXTURE_ENABLE))
-            //{
-            //              SetUniform(theCtx, aLocTexEnable, 0); // Off
-            //          }
-            //          if (OpenGl_ShaderUniformLocation aLocSampler = GetUniformLocation(theCtx, "occActiveSampler"))
-            //{
-            //              SetUniform(theCtx, aLocSampler, GLint(Graphic3d_TextureUnit_0));
-            //          }
-            //          if (OpenGl_ShaderUniformLocation aLocSampler = GetUniformLocation(theCtx, "occSamplerBaseColor"))
-            //{
-            //              myTextureSetBits |= Graphic3d_TextureSetBits_BaseColor;
-            //              SetUniform(theCtx, aLocSampler, GLint(Graphic3d_TextureUnit_BaseColor));
-            //          }
-            //          if (OpenGl_ShaderUniformLocation aLocSampler = GetUniformLocation(theCtx, "occSamplerPointSprite"))
-            //{
-            //              // Graphic3d_TextureUnit_PointSprite
-            //              //myTextureSetBits |= Graphic3d_TextureSetBits_PointSprite;
-            //              SetUniform(theCtx, aLocSampler, GLint(theCtx->SpriteTextureUnit()));
-            //          }
+            OpenGl_ShaderUniformLocation aLocTexEnable = GetStateLocation(OpenGl_StateVariable.OpenGl_OCCT_TEXTURE_ENABLE);
+            if (aLocTexEnable != null)
+            {
+                SetUniform(theCtx, aLocTexEnable, 0); // Off
+            }
+            OpenGl_ShaderUniformLocation aLocSampler = GetUniformLocation(theCtx, "occActiveSampler");
+            if (aLocSampler != null)
+            {
+                SetUniform(theCtx, aLocSampler, (int)Graphic3d_TextureUnit.Graphic3d_TextureUnit_0);
+            }
+            aLocSampler = GetUniformLocation(theCtx, "occSamplerBaseColor");
+            if (aLocSampler != null)
+            {
+                myTextureSetBits |= (int)Graphic3d_TextureSetBits.Graphic3d_TextureSetBits_BaseColor;
+                SetUniform(theCtx, aLocSampler, (int)(Graphic3d_TextureUnit.Graphic3d_TextureUnit_BaseColor));
+            }
+            aLocSampler = GetUniformLocation(theCtx, "occSamplerPointSprite");
+            if (aLocSampler != null)
+            {
+                // Graphic3d_TextureUnit_PointSprite
+                //myTextureSetBits |= Graphic3d_TextureSetBits_PointSprite;
+                SetUniform(theCtx, aLocSampler, (int)(theCtx.SpriteTextureUnit()));
+            }
             //          if (OpenGl_ShaderUniformLocation aLocSampler = GetUniformLocation(theCtx, "occSamplerMetallicRoughness"))
             //{
             //              myTextureSetBits |= Graphic3d_TextureSetBits_MetallicRoughness;
@@ -740,16 +788,16 @@ namespace OCCPort.OpenGL
             //          }
 
             string aSamplerNamePrefix = ("occSampler");
-            //int aNbUnitsMax = Math.Max(theCtx.MaxCombinedTextureUnits(), Graphic3d_TextureUnit_NB);
-            //for (int aUnitIter = 0; aUnitIter < aNbUnitsMax; ++aUnitIter)
-            //{
-            //    string aName = aSamplerNamePrefix + aUnitIter;
-            //    OpenGl_ShaderUniformLocation aLocSampler = GetUniformLocation(theCtx, aName);
-            //    if (aLocSampler != null)
-            //    {
-            //        SetUniform(theCtx, aLocSampler, aUnitIter);
-            //    }
-            //}
+            int aNbUnitsMax = Math.Max(theCtx.MaxCombinedTextureUnits(), (int)Graphic3d_TextureUnit. Graphic3d_TextureUnit_NB);
+            for (int aUnitIter = 0; aUnitIter < aNbUnitsMax; ++aUnitIter)
+            {
+                string aName = aSamplerNamePrefix + aUnitIter;
+                 aLocSampler = GetUniformLocation(theCtx, aName);
+                if (aLocSampler != null)
+                {
+                    SetUniform(theCtx, aLocSampler, aUnitIter);
+                }
+            }
 
             theCtx.core20fwd.glUseProgram(anOldProgram != null ? anOldProgram.ProgramId() : OpenGl_ShaderProgram.NO_PROGRAM);
             return true;
@@ -808,14 +856,31 @@ namespace OCCPort.OpenGL
             myProgramID = NO_PROGRAM;
         }
 
-        internal bool Share()
+
+        //! Increments counter of users.
+        //! Used by OpenGl_ShaderManager.
+        //! @return true when resource has been restored from delayed release queue
+        public bool Share()
         {
-            throw new NotImplementedException();
+            return ++myShareCount == 1;
         }
 
-        internal void ApplyVariables(OpenGl_Context myContext)
+        static OpenGl_VariableSetterSelector mySetterSelector = new OpenGl_VariableSetterSelector();
+
+        public bool ApplyVariables(OpenGl_Context theCtx)
         {
-            throw new NotImplementedException();
+            if (myProxy == null || myProxy.Variables().IsEmpty())
+            {
+                return false;
+            }
+
+            for (Graphic3d_ShaderVariableList.Iterator anIter = new Graphic3d_ShaderVariableList.Iterator(myProxy.Variables()); anIter.More(); anIter.Next())
+            {
+                mySetterSelector.Set(theCtx, anIter.Value(), this);
+            }
+
+            myProxy.ClearVariables();
+            return true;
         }
 
 

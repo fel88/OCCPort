@@ -1,6 +1,8 @@
 ﻿//! List of shader objects.
-global using Graphic3d_ShaderObjectList = TKernel.NCollection_Sequence<TKService.Graphic3d_ShaderObject>;
 global using Graphic3d_ShaderAttributeList = TKernel.NCollection_Sequence<TKService.Graphic3d_ShaderAttribute>;
+global using Graphic3d_ShaderObjectList = TKernel.NCollection_Sequence<TKService.Graphic3d_ShaderObject>;
+//! List of custom uniform shader variables.
+global using Graphic3d_ShaderVariableList = TKernel.NCollection_Sequence<TKService.Graphic3d_ShaderVariable>;
 
 using OCCPort.Common;
 using System.Linq;
@@ -9,6 +11,24 @@ namespace TKService
 {
     public class Graphic3d_ShaderProgram
     {
+
+        //! The list of currently pushed but not applied custom uniform variables.
+        //! This list is automatically cleared after applying to GLSL program.
+        public Graphic3d_ShaderVariableList Variables() { return myVariables; }
+
+        //! Return the list of custom vertex attributes.
+        public  Graphic3d_ShaderAttributeList VertexAttributes() { return myAttributes; }
+
+
+        // =======================================================================
+        // function : ClearVariables
+        // purpose  : Removes all custom uniform variables from the program
+        // =======================================================================
+        public void ClearVariables()
+        {
+            myVariables.Clear();
+        }
+
         // =======================================================================
         // function : AttachShader
         // purpose  : Attaches shader object to the program object
@@ -66,7 +86,7 @@ namespace TKService
         string myID;
         //! Returns unique ID used to manage resource in graphic driver.
         public string GetId() { return myID; }
-        
+
 
 
         //! Specify the length of array of light sources (THE_MAX_LIGHTS).
@@ -119,8 +139,8 @@ namespace TKService
 
 
         Graphic3d_ShaderObjectList myShaderObjects = new Graphic3d_ShaderObjectList(); //!< the list of attached shader objects
-        Graphic3d_ShaderVariableList myVariables;     //!< the list of custom uniform variables
-        Graphic3d_ShaderAttributeList myAttributes;    //!< the list of custom vertex attributes
+        Graphic3d_ShaderVariableList myVariables = new Graphic3d_ShaderVariableList();     //!< the list of custom uniform variables
+        Graphic3d_ShaderAttributeList myAttributes = new Graphic3d_ShaderAttributeList();    //!< the list of custom vertex attributes
         string myHeader;        //!< GLSL header with version code and used extensions
 
         bool PushVariable<T>(string theName,
@@ -160,6 +180,22 @@ namespace TKService
         {
             throw new NotImplementedException();
         }
+
+
+        //! Return the length of array of light sources (THE_MAX_LIGHTS),
+        //! to be used for initialization occLightSources.
+        //! Default value is THE_MAX_LIGHTS_DEFAULT.
+        public int NbLightsMax() { return myNbLightsMax; }
+
+        //! Return the length of array of shadow maps (THE_NB_SHADOWMAPS); 0 by default.
+        public int NbShadowMaps() { return myNbShadowMaps; }
+
+        //! Return the length of array of clipping planes (THE_MAX_CLIP_PLANES),
+        //! to be used for initialization occClipPlaneEquations.
+        //! Default value is THE_MAX_CLIP_PLANES_DEFAULT.
+        public int NbClipPlanesMax() { return myNbClipPlanesMax; }
+
+
     }
     //! Enumerates transparency rendering methods supported by rasterization mode.
     public enum Graphic3d_RenderTransparentMethod
@@ -170,11 +206,11 @@ namespace TKService
     };
 
 
-    internal class Graphic3d_ShaderVariableList : List<Graphic3d_ShaderVariable>
+    /*internal class Graphic3d_ShaderVariableList : List<Graphic3d_ShaderVariable>
     {
         internal void Append(Graphic3d_ShaderVariable aVariable)
         {
             Add(aVariable);
         }
-    }
+    }*/
 }

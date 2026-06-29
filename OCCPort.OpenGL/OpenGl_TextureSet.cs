@@ -2,7 +2,7 @@
 
 namespace OCCPort.OpenGL
 {
-    internal class OpenGl_TextureSet
+    public class OpenGl_TextureSet
     {
         internal bool HasNonPointSprite()
         {

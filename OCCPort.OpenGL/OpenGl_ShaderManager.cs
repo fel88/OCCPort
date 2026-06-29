@@ -1,4 +1,7 @@
-﻿using OCCPort.Common;
+﻿//! List of shader programs.
+global using OpenGl_ShaderProgramList = TKernel.NCollection_Sequence<OCCPort.OpenGL.OpenGl_ShaderProgram>;
+
+using OCCPort.Common;
 using OCCPort.Enums;
 using OpenTK.Compute.OpenCL;
 using OpenTK.Graphics.Egl;
@@ -13,13 +16,8 @@ using TKService;
 
 namespace OCCPort.OpenGL
 {
-    internal class OpenGl_ShaderManager : Graphic3d_ShaderManager
-
+    public class OpenGl_ShaderManager : Graphic3d_ShaderManager
     {
-
-      
-     
-
         //! Overwrites context
         public void SetContext(OpenGl_Context theCtx)
         {
@@ -33,7 +31,7 @@ namespace OCCPort.OpenGL
         //! @return true on success
         public bool Create(Graphic3d_ShaderProgram theProxy,
                 ref string theShareKey,
-                OpenGl_ShaderProgram theProgram)
+              ref OpenGl_ShaderProgram theProgram)
         {
             theProgram = null;
             if (theProxy == null)
@@ -114,7 +112,7 @@ namespace OCCPort.OpenGL
         }
 
         Graphic3d_TypeOfShadingModel myShadingModel;       //!< lighting shading model
-        OpenGl_ShaderProgramList myProgramList;        //!< The list of shader programs
+        OpenGl_ShaderProgramList myProgramList = new OpenGl_ShaderProgramList();        //!< The list of shader programs
         OpenGl_SetOfShaderPrograms myLightPrograms;      //!< pointer to active lighting programs matrix
         OpenGl_SetOfPrograms myUnlitPrograms;      //!< programs matrix without lighting
         OpenGl_SetOfPrograms myOutlinePrograms;    //!< programs matrix without lighting for outline presentation
@@ -142,7 +140,7 @@ namespace OCCPort.OpenGL
         OpenGl_Context myContext;            //!< OpenGL context
 
 
-        OpenGl_ProjectionState myProjectionState;    //!< State of OCCT projection  transformation
+        OpenGl_ProjectionState myProjectionState = new OpenGl_ProjectionState();    //!< State of OCCT projection  transformation
         OpenGl_ModelWorldState myModelWorldState;    //!< State of OCCT model-world transformation
         OpenGl_WorldViewState myWorldViewState;     //!< State of OCCT world-view  transformation
         //OpenGl_ClippingState myClippingState;      //!< State of OCCT clipping planes
@@ -176,7 +174,7 @@ namespace OCCPort.OpenGL
         {
             Graphic3d_ShaderProgram aProgramSrc = getStdProgramUnlit(theBits, theIsOutline);
             string aKey = "";
-            if (!Create(aProgramSrc, ref aKey, theProgram))
+            if (!Create(aProgramSrc, ref aKey, ref theProgram))
             {
                 theProgram = new OpenGl_ShaderProgram(); // just mark as invalid
                 return false;
@@ -202,7 +200,7 @@ namespace OCCPort.OpenGL
 
             Graphic3d_ShaderProgram aProgramSrc = getStdProgramFboBlit(aNbSamples, theIsFallback_sRGB);
             string aKey = "";
-            if (!Create(aProgramSrc, ref aKey, aProg))
+            if (!Create(aProgramSrc, ref aKey, ref aProg))
             {
                 aProg = new OpenGl_ShaderProgram(); // just mark as invalid
                 return false;
@@ -282,7 +280,7 @@ namespace OCCPort.OpenGL
                                            : 0;
             Graphic3d_ShaderProgram aProgramSrc = getStdProgramPhong(myLightSourceState.LightSources(), theBits, theIsFlatNormal, theIsPBR, aNbShadowMaps);
             string aKey = "";
-            if (!Create(aProgramSrc, ref aKey, theProgram))
+            if (!Create(aProgramSrc, ref aKey, ref theProgram))
             {
                 theProgram = new OpenGl_ShaderProgram(); // just mark as invalid
                 return false;
@@ -359,6 +357,7 @@ namespace OCCPort.OpenGL
             return BindFaceProgram(theTextures, theShadingModel, theAlphaMode, Aspect_InteriorStyle.Aspect_IS_SOLID,
                                     theHasVertColor, theEnableEnvMap, false, theCustomProgram);
         }
+
         //! Bind program for filled primitives rendering
         public bool BindFaceProgram(OpenGl_TextureSet theTextures,
                                      Graphic3d_TypeOfShadingModel theShadingModel,

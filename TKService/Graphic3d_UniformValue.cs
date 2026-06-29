@@ -10,5 +10,9 @@
             this.theValue = theValue;
         }
 
+        public override int TypeID()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

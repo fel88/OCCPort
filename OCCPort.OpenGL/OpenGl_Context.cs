@@ -43,27 +43,29 @@ namespace OCCPort.OpenGL
   myMaxDumpSizeX (1024),
   myMaxDumpSizeY (1024),
   myMaxClipPlanes (6)*/
-            myMaxMsaaSamples = 0;/*
-  myMaxDrawBuffers (1),
-  myMaxColorAttachments (1),
-  myGlVerMajor (0),
-  myGlVerMinor (0),
-  myIsInitialized (Standard_False),
-  myIsStereoBuffers (Standard_False),
-  myHasMsaaTextures (Standard_False),
-  myIsGlNormalizeEnabled (Standard_False),
-  mySpriteTexUnit (Graphic3d_TextureUnit_PointSprite),
-  myHasRayTracing (Standard_False),
-  myHasRayTracingTextures (Standard_False),
-  myHasRayTracingAdaptiveSampling (Standard_False),
-  myHasRayTracingAdaptiveSamplingAtomic (Standard_False),
-  myHasPBR (Standard_False),
-  myPBREnvLUTTexUnit       (Graphic3d_TextureUnit_PbrEnvironmentLUT),
-  myPBRDiffIBLMapSHTexUnit (Graphic3d_TextureUnit_PbrIblDiffuseSH),
-  myPBRSpecIBLMapTexUnit   (Graphic3d_TextureUnit_PbrIblSpecular),
-  myShadowMapTexUnit       (Graphic3d_TextureUnit_ShadowMap),
-  myDepthPeelingDepthTexUnit (Graphic3d_TextureUnit_DepthPeelingDepth),
-  myDepthPeelingFrontColorTexUnit (Graphic3d_TextureUnit_DepthPeelingFrontColor),*/
+            myMaxMsaaSamples = 0;
+            myMaxDrawBuffers = 1;
+            myMaxColorAttachments = (1);
+            myGlVerMajor = (0);
+            myGlVerMinor = (0);
+            myIsInitialized = (false);
+            myIsStereoBuffers = (false);
+            myHasMsaaTextures = (false);
+            //myIsGlNormalizeEnabled = (false);
+            mySpriteTexUnit = Graphic3d_TextureUnit.Graphic3d_TextureUnit_PointSprite;
+            //myHasRayTracing = (false);
+
+            //myHasRayTracingTextures = (false);
+            //myHasRayTracingAdaptiveSampling = (false);
+            //myHasRayTracingAdaptiveSamplingAtomic = false;
+            //myHasPBR = (false);
+            /*
+myPBREnvLUTTexUnit       (Graphic3d_TextureUnit_PbrEnvironmentLUT),
+myPBRDiffIBLMapSHTexUnit (Graphic3d_TextureUnit_PbrIblDiffuseSH),
+myPBRSpecIBLMapTexUnit   (Graphic3d_TextureUnit_PbrIblSpecular),
+myShadowMapTexUnit       (Graphic3d_TextureUnit_ShadowMap),
+myDepthPeelingDepthTexUnit (Graphic3d_TextureUnit_DepthPeelingDepth),
+myDepthPeelingFrontColorTexUnit (Graphic3d_TextureUnit_DepthPeelingFrontColor),*/
             myFrameStats = new OpenGl_FrameStats();
             /*
 myActiveMockTextures (0),
@@ -111,6 +113,15 @@ myLineFeather (1.0f),*/
 
 
         }
+
+        //! @return value for GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS
+        public int MaxCombinedTextureUnits() { return myMaxTexCombined; }
+
+        Graphic3d_TextureUnit mySpriteTexUnit;   //!< sampler2D occSamplerPointSprite, texture unit for point sprite texture
+
+        //! Return texture unit to be used for sprites (Graphic3d_TextureUnit_PointSprite by default).
+        public Graphic3d_TextureUnit SpriteTextureUnit() { return mySpriteTexUnit; }
+
 
         //! @return true if detected GL version is greater or equal to requested one.
         public bool IsGlGreaterEqual(int theVerMajor,

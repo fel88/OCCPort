@@ -22,6 +22,8 @@ namespace OCCPort.OpenGL
 
             return myShaderID != NO_SHADER;
         }
+        string mySource; //!< the source code of shader object
+
 
         //! Creates uninitialized shader object.
         public OpenGl_ShaderObject(GLenum theType)
@@ -55,7 +57,35 @@ namespace OCCPort.OpenGL
             }
 
             string aLines = theSource;
-            theCtx.core20fwd.glShaderSource(myShaderID, 1, [aLines], out int len);
+            theCtx.core20fwd.glShaderSource(myShaderID, 1, aLines, out int len);
+            return true;
+        }
+
+        // =======================================================================
+        // function : FetchInfoLog
+        // purpose  : Fetches information log of the last compile operation
+        // =======================================================================
+        public bool FetchInfoLog(OpenGl_Context theCtx,
+                                                    ref string theLog)
+        {
+            if (myShaderID == NO_SHADER)
+            {
+                return false;
+            }
+
+            // Load information log of the compiler
+            GLint aLength = 0;
+            theCtx.core20fwd.glGetShaderiv(myShaderID, OpenTK.Graphics.OpenGL.ShaderParameter.InfoLogLength, ref aLength);
+            if (aLength > 0)
+            {
+                string aLog = "";
+                //GLchar* aLog = (GLchar*)alloca(aLength);
+                //memset(aLog, 0, aLength);
+                int len = 0;
+                theCtx.core20fwd.glGetShaderInfoLog(myShaderID, aLength, ref len, ref aLog);
+                theLog = aLog;
+            }
+
             return true;
         }
 
@@ -94,17 +124,17 @@ namespace OCCPort.OpenGL
                 {
                     //theCtx->PushMessage(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_HIGH, putLineNumbers(theSource));
                 }
-                string aLog;
-                //    FetchInfoLog(theCtx, aLog);
-                // if (aLog.IsEmpty())
+                string aLog = "";
+                FetchInfoLog(theCtx, ref aLog);
+                if (string.IsNullOrEmpty(aLog))
                 {
-                    //     aLog = "Compilation log is empty.";
+                    aLog = "Compilation log is empty.";
                 }
                 //    theCtx->PushMessage(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_HIGH,
                 //                       ("Failed to compile ") + getShaderTypeString(myType) + " [" + theId + "]. Compilation log:\n" + aLog);
                 return false;
             }
-            //else if (theCtx.caps.glslWarnings)
+            else if (theCtx.caps.glslWarnings)
             {
                 string aLog;
                 //   FetchInfoLog(theCtx, aLog);

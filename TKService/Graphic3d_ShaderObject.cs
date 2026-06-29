@@ -189,6 +189,8 @@ namespace TKService
         {
             return !mySource.IsEmpty();
         }
+        //! Returns the source code of the shader object.
+        public string Source() { return mySource; }
 
         public class ShaderVariableList : List<ShaderVariable>
         {
