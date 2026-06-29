@@ -12,7 +12,14 @@ namespace OCCPort.OpenGL
 {
     //! This class is responsible for generation of shader programs.
     public class Graphic3d_ShaderManager
-    {  //! Number specifying maximum number of light sources to prepare a GLSL program with unrolled loop.
+    {     //! Return GAPI version major number.
+        public void SetGapiVersion(int theVerMajor,
+                              int theVerMinor)
+        {
+            myGapiVersion.SetValues(theVerMajor, theVerMinor);
+        }
+
+        //! Number specifying maximum number of light sources to prepare a GLSL program with unrolled loop.
         static int THE_NB_UNROLLED_LIGHTS_MAX = 32;
         // This file has been automatically generated from resource file src/Shaders/TangentSpaceNormal.glsl
 
@@ -134,7 +141,7 @@ namespace OCCPort.OpenGL
 + Environment.NewLine + "  vec4  anOutlinePos  = occVertex + vec4 (occNormal * (occSilhouetteThickness * anOutlineDisp), 0.0);"
 + Environment.NewLine + "  gl_Position = occProjectionMatrix * occWorldViewMatrix * occModelWorldMatrix * anOutlinePos;";
 
-        //bool myGlslExtensions[Graphic3d_GlslExtension_NB];
+        bool[] myGlslExtensions = new bool[(int)Graphic3d_GlslExtension.Graphic3d_GlslExtension_NB];
         bool myHasFlatShading;      //!< flag indicating flat shading usage
         bool myToReverseDFdxSign;   //!< flag to reverse flat shading normal (workaround)
         bool mySetPointSize;        //!< always set gl_PointSize variable
@@ -157,6 +164,8 @@ namespace OCCPort.OpenGL
 
             //memset(myGlslExtensions, 0, sizeof(myGlslExtensions));
         }
+        //! Set if depth clamping should be emulated by GLSL program.
+        public void SetEmulateDepthClamp(bool theToEmulate) { myToEmulateDepthClamp = theToEmulate; }
 
         //! @return true if detected GL version is greater or equal to requested one.
         public bool IsGapiGreaterEqual(int theVerMajor,
@@ -165,11 +174,11 @@ namespace OCCPort.OpenGL
             return (myGapiVersion[0] > theVerMajor)
                 || (myGapiVersion[0] == theVerMajor && myGapiVersion[1] >= theVerMinor);
         }
-        Graphic3d_Vec2i myGapiVersion;         //!< GAPI version major/minor number pair
+   protected     Graphic3d_Vec2i myGapiVersion=new TKernel.NCollection_Vec2<int> ();         //!< GAPI version major/minor number pair
 
         protected Graphic3d_ShaderProgram getStdProgramFboBlit(int theNbSamples,
                                                                                  bool theIsFallback_sRGB)
-        {
+        {   
             Graphic3d_ShaderObject.ShaderVariableList aUniforms = new Graphic3d_ShaderObject.ShaderVariableList(), aStageInOuts = new Graphic3d_ShaderObject.ShaderVariableList();
             aStageInOuts.Append(new Graphic3d_ShaderObject.ShaderVariable("vec2 TexCoord", Graphic3d_TypeOfShaderObject.Graphic3d_TOS_VERTEX | Graphic3d_TypeOfShaderObject.Graphic3d_TOS_FRAGMENT));
 
@@ -813,6 +822,54 @@ namespace OCCPort.OpenGL
                                                  int theBits,
                                                  bool theUsesDerivates = false)
         {
+            int aBits = theBits;
+            bool toUseDerivates = theUsesDerivates
+                                    || (theBits & (int)Graphic3d_ShaderFlags.Graphic3d_ShaderFlags_StippleLine) != 0
+                                    || (theBits & (int)Graphic3d_ShaderFlags.Graphic3d_ShaderFlags_HasTextures) == (int)Graphic3d_ShaderFlags.Graphic3d_ShaderFlags_TextureNormal;
+            switch (myGapi)
+            {
+                case Aspect_GraphicsLibrary.Aspect_GraphicsLibrary_OpenGL:
+                    if (IsGapiGreaterEqual(3, 2))
+                    {
+                        theProgram.SetHeader("#version 150");
+                    }
+                    else
+                    {
+                        // TangentSpaceNormal() function uses mat2x3 type
+                        bool toUseMat2x3 = (theBits & (int)Graphic3d_ShaderFlags.Graphic3d_ShaderFlags_HasTextures) == (int)Graphic3d_ShaderFlags.Graphic3d_ShaderFlags_TextureNormal;
+                        // gl_PointCoord has been added since GLSL 1.2
+                        bool toUsePointCoord = (theBits & (int)Graphic3d_ShaderFlags.Graphic3d_ShaderFlags_PointSprite) != 0;
+                        if (toUseMat2x3 || toUsePointCoord)
+                        {
+                            if (IsGapiGreaterEqual(2, 1))
+                            {
+                                theProgram.SetHeader("#version 120");
+                            }
+                        }
+                        if ((theBits & (int)Graphic3d_ShaderFlags.Graphic3d_ShaderFlags_StippleLine) != 0
+                         || theProgram.IsPBR())
+                        {
+                            if (IsGapiGreaterEqual(3, 0))
+                            {
+                                theProgram.SetHeader("#version 130");
+                            }
+                            else if (myGlslExtensions[(int)Graphic3d_GlslExtension.Graphic3d_GlslExtension_GL_EXT_gpu_shader4])
+                            {
+                                // GL_EXT_gpu_shader4 defines GLSL type "unsigned int", while core GLSL specs define type "uint"
+                                theProgram.SetHeader("#extension GL_EXT_gpu_shader4 : enable\n" +
+
+                                                       "#define uint unsigned int");
+                            }
+                        }
+                    }
+                    //(void)toUseDerivates;
+                    break;
+            }
+
+            // should fit Graphic3d_ShaderFlags_NB
+            string aBitsStr = aBits.ToString("X04");
+            theProgram.SetId("occt_" + theName + aBitsStr);
+
             return -1;
         }
 
@@ -822,5 +879,15 @@ namespace OCCPort.OpenGL
     // {
     //   Graphic3d_TextureUnit_NB = Graphic3d_TextureUnit_15 + 1,
     //  };
+    //! GLSL syntax extensions.
+    enum Graphic3d_GlslExtension
+    {
+        Graphic3d_GlslExtension_GL_OES_standard_derivatives, //!< OpenGL ES 2.0 extension GL_OES_standard_derivatives
+        Graphic3d_GlslExtension_GL_EXT_shader_texture_lod,   //!< OpenGL ES 2.0 extension GL_EXT_shader_texture_lod
+        Graphic3d_GlslExtension_GL_EXT_frag_depth,           //!< OpenGL ES 2.0 extension GL_EXT_frag_depth
+        Graphic3d_GlslExtension_GL_EXT_gpu_shader4,          //!< OpenGL 2.0 extension GL_EXT_gpu_shader4
+
+        Graphic3d_GlslExtension_NB = Graphic3d_GlslExtension_GL_EXT_gpu_shader4 + 1
+    };
 
 }

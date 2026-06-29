@@ -177,6 +177,19 @@ namespace TKService
             return aShader;
         }
 
+
+        //! Returns type of the shader object.
+        public Graphic3d_TypeOfShaderObject Type() { return myType; }
+
+        // =======================================================================
+        // function : IsDone
+        // purpose  : Checks if the shader object is valid or not
+        // =======================================================================
+        public bool IsDone()
+        {
+            return !mySource.IsEmpty();
+        }
+
         public class ShaderVariableList : List<ShaderVariable>
         {
         }

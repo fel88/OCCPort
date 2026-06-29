@@ -1,9 +1,34 @@
-﻿using System.Linq;
+﻿//! List of shader objects.
+global using Graphic3d_ShaderObjectList = TKernel.NCollection_Sequence<TKService.Graphic3d_ShaderObject>;
+global using Graphic3d_ShaderAttributeList = TKernel.NCollection_Sequence<TKService.Graphic3d_ShaderAttribute>;
+
+using OCCPort.Common;
+using System.Linq;
 
 namespace TKService
 {
     public class Graphic3d_ShaderProgram
     {
+        // =======================================================================
+        // function : AttachShader
+        // purpose  : Attaches shader object to the program object
+        // =======================================================================
+        public bool AttachShader(Graphic3d_ShaderObject theShader)
+        {
+            if (theShader == null)
+            {
+                return false;
+            }
+
+            for (Graphic3d_ShaderObjectList.Iterator anIt = new TKernel.NCollection_Sequence<Graphic3d_ShaderObject>.Iterator(myShaderObjects); anIt.More(); anIt.Next())
+            {
+                if (anIt.Value() == theShader)
+                    return false;
+            }
+
+            myShaderObjects.Append(theShader);
+            return true;
+        }
 
         //! Default value of THE_MAX_LIGHTS macros within GLSL program (see Declarations.glsl).
         public const int THE_MAX_LIGHTS_DEFAULT = 8;
@@ -14,6 +39,9 @@ namespace TKService
         //! Default value of THE_NB_FRAG_OUTPUTS macros within GLSL program (see Declarations.glsl).
         public const int THE_NB_FRAG_OUTPUTS = 1;
 
+        //! Returns GLSL header (version code and extensions).
+        public string Header() { return myHeader; }
+
         //! Setup GLSL header containing language version code and used extensions.
         //! Will be prepended to the very beginning of the source code.
         //! Example:
@@ -22,6 +50,12 @@ namespace TKService
         //!   #extension GL_ARB_bindless_texture : require
         //! @endcode
         public void SetHeader(string theHeader) { myHeader = theHeader; }
+        //! Return texture units declared within the program, @sa Graphic3d_TextureSetBits.
+        public int TextureSetBits() { return myTextureSetBits; }
+
+        //! Return TRUE if standard program header should define functions and variables used in PBR pipeline.
+        //! FALSE by default.
+        public bool IsPBR() { return myIsPBR; }
 
 
         //! Sets unique ID used to manage resource in graphic driver.
@@ -32,25 +66,7 @@ namespace TKService
         string myID;
         //! Returns unique ID used to manage resource in graphic driver.
         public string GetId() { return myID; }
-        //! Attaches shader object to the program object.
-        public bool AttachShader(Graphic3d_ShaderObject theShader)
-        {
-            if (theShader == null)
-            {
-                return false;
-            }
-
-            //for (Graphic3d_ShaderObjectList::Iterator anIt (myShaderObjects); anIt.More(); anIt.Next())
-            foreach (var anIt in myShaderObjects)
-            {
-                if (anIt == theShader)
-                    return false;
-            }
-
-            myShaderObjects.Append(theShader);
-            return true;
-        }
-
+        
 
 
         //! Specify the length of array of light sources (THE_MAX_LIGHTS).
@@ -89,7 +105,7 @@ namespace TKService
         }
 
         //! Returns list of attached shader objects.
-        public object ShaderObjects()
+        public Graphic3d_ShaderObjectList ShaderObjects()
         {
             return myShaderObjects;
         }
@@ -160,8 +176,5 @@ namespace TKService
         {
             Add(aVariable);
         }
-    }
-    internal class Graphic3d_ShaderAttributeList
-    {
     }
 }

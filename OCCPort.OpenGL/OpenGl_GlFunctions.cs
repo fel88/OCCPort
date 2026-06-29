@@ -6,10 +6,28 @@ namespace OCCPort.OpenGL
     //! Mega structure defines the complete list of OpenGL functions.
     public class OpenGl_GlFunctions
     {
-        internal static void readGlVersion(ref int myGlVerMajor, ref int myGlVerMinor)
+        internal static void readGlVersion(ref int theGlVerMajor, ref int theGlVerMinor)
         {
-            
+            // reset values
+            theGlVerMajor = 0;
+            theGlVerMinor = 0;
+            bool toCheckVer3 = true;
+
+            // Available since OpenGL 3.0 and OpenGL ES 3.0.
+            if (toCheckVer3)
+            {
+                int aMajor = 0, aMinor = 0;
+                GL.GetInteger(GetPName.MajorVersion, out aMajor);
+                GL.GetInteger(GetPName.MinorVersion, out aMinor);
+
+            }
+            if (theGlVerMajor <= 0)
+            {
+                theGlVerMajor = 0;
+                theGlVerMinor = 0;
+            }
         }
+
         public void glBindFramebuffer(All framebuffer, int v)
         {
             GL.BindFramebuffer((FramebufferTarget)framebuffer, v);

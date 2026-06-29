@@ -1,4 +1,5 @@
-﻿using OCCPort.Enums;
+﻿using OCCPort.Common;
+using OCCPort.Enums;
 using OpenTK.Compute.OpenCL;
 using OpenTK.Graphics.Egl;
 using OpenTK.Graphics.OpenGL;
@@ -15,6 +16,10 @@ namespace OCCPort.OpenGL
     internal class OpenGl_ShaderManager : Graphic3d_ShaderManager
 
     {
+
+      
+     
+
         //! Overwrites context
         public void SetContext(OpenGl_Context theCtx)
         {

@@ -11,14 +11,14 @@ namespace OCCPort.OpenGL
      */
     public class OpenGl_ResourcesMap : NCollection_DataMap<string, OpenGl_Resource>
     {
-        public bool Bind(string theKey, OpenGl_ShaderProgram theResource)
-        {
-            if (ContainsKey(theKey))
-            {
-                return false;
-            }
-            Add(theKey, theResource);
-            return true;
-        }
+        //public bool Bind(string theKey, OpenGl_ShaderProgram theResource)
+        //{
+        //    if (ContainsKey(theKey))
+        //    {
+        //        return false;
+        //    }
+        //    Add(theKey, theResource);
+        //    return true;
+        //}
     }
 }

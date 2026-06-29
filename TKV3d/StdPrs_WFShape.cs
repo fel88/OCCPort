@@ -1,4 +1,6 @@
-﻿using OCCPort;
+﻿global using TColgp_SequenceOfPnt=TKernel.NCollection_Sequence<TKMath.gp_Pnt> ;
+
+using OCCPort;
 using TKBRep;
 using TKernel;
 using TKG3d;

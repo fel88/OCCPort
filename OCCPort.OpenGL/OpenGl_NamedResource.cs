@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using OCCPort.OpenGL;
+using System.Threading;
 
 namespace OCCPort
 {
@@ -15,7 +16,7 @@ namespace OCCPort
         }  //! Return resource name.
         public string ResourceId() { return myResourceId; }
 
-        string myResourceId; //!< resource name
+      public   string myResourceId; //!< resource name
 
     }
 }

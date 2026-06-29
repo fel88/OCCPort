@@ -15,6 +15,14 @@ namespace TKernel
             v[0] = theX;
             v[1] = theY;
         }
+        //! Assign new values to the vector.
+        public void SetValues(T theX,
+                   T theY)
+        {
+            v[0] = theX;
+            v[1] = theY;
+        }
+
         public NCollection_Vec2(byte[] data, int offset, IElementBinaryExtractor<T> extractor)
         {
 

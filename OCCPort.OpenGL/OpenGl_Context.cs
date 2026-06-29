@@ -112,6 +112,15 @@ myLineFeather (1.0f),*/
 
         }
 
+        //! @return true if detected GL version is greater or equal to requested one.
+        public bool IsGlGreaterEqual(int theVerMajor,
+                                             int theVerMinor)
+        {
+            return (myGlVerMajor > theVerMajor)
+                || (myGlVerMajor == theVerMajor && myGlVerMinor >= theVerMinor);
+        }
+
+
         public static string FormatGlError(int theGlError)
         {
             switch ((All)theGlError)
@@ -142,7 +151,7 @@ myLineFeather (1.0f),*/
             return FormatGlEnumHex((int)theGlError);
         }
 
-       static  string FormatGlEnumHex(int theGlEnum)
+        static string FormatGlEnumHex(int theGlEnum)
         {
             return $"0x{theGlEnum:X}";
             //char[] aBuff = new char[16];
@@ -349,7 +358,7 @@ myLineFeather (1.0f),*/
 
         NCollection_Array1<int> myDrawBuffers = new();     //!< current draw buffers
         internal bool ShareResource(string theKey,
-                OpenGl_ShaderProgram theResource)
+                OpenGl_Resource theResource)
         {
             if (theKey.IsEmpty() || theResource == null)
             {
@@ -593,9 +602,10 @@ myLineFeather (1.0f),*/
 
         [DllImport("opengl32.dll", SetLastError = true)]
         public static extern IntPtr wglGetCurrentDC();
+
         //! Initialize class from currently bound OpenGL context. Method should be called only once.
         //! @return false if no GL context is bound to the current thread
-        public bool Init(bool theIsCoreProfile)
+        public bool Init(bool theIsCoreProfile = false)
         {
             if (myIsInitialized)
             {
@@ -673,7 +683,7 @@ myLineFeather (1.0f),*/
 
         IntPtr myWindow;   //!< surface           EGLSurface | HWND  | GLXDrawable
 
-
+        //! Private initialization function that should be called only once.
         public void init(bool theIsCoreProfile)
         {
             // read version
@@ -687,6 +697,10 @@ myLineFeather (1.0f),*/
             OpenGl_GlFunctions.readGlVersion(ref myGlVerMajor, ref myGlVerMinor);
             //mySupportedFormats.Clear();
 
+
+            // setup shader generator
+            myShaderManager.SetGapiVersion(myGlVerMajor, myGlVerMinor);
+            myShaderManager.SetEmulateDepthClamp(!arbDepthClamp);
 
 
             myFuncs.load(this, theIsCoreProfile);
