@@ -520,7 +520,7 @@ namespace OCCPort.OpenGL
             {
                 case 2:
                     {
-                        isOk = myVboIndices.Init(theCtx, 1, aNbIndexes, myIndices.DataFloat());
+                        isOk = myVboIndices.Init(theCtx, 1, aNbIndexes, myIndices.Data());
                         myVboIndices.SetElemsNb(myIndices.NbElements);
                         myIndices.Validate();
                         break;

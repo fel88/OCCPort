@@ -96,6 +96,8 @@ namespace OCCPort.Tester
             {
 
 			}*/
+            //glControl.SwapBuffers();
+
             Redraw();
         }
 

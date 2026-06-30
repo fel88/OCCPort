@@ -15,28 +15,8 @@
 
         }
 
-        Graphic3d_IndexBuffer myIndices;
-
-        public int AddEdge(int theVertexIndex)
-        {
-            //Standard_OutOfRange_Raise_if(myIndices.IsNull() || myIndices->NbElements >= myIndices->NbMaxElements(), "TOO many EDGE");
-            //Standard_OutOfRange_Raise_if(theVertexIndex < 1 || theVertexIndex > myAttribs->NbElements, "BAD VERTEX index");
-            int aVertIndex = theVertexIndex - 1;
-            myIndices.SetIndex(myIndices.NbElements, aVertIndex);
-            return ++myIndices.NbElements;
-        }
 
 
-    }
-    public enum Aspect_TypeOfHighlightMethod
-    {
-
-        //	Definition of a highlight method.
-
-        //TOHM_COLOR drawn in the highlight color(default white) TOHM_BOUNDBOX enclosed by the boundary box(default white)
-
-        Aspect_TOHM_COLOR,
-        Aspect_TOHM_BOUNDBOX
     }
 
 }

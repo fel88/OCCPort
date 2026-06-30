@@ -1,6 +1,7 @@
 ﻿using OCCPort.Common;
 using OpenTK.Graphics.OpenGL;
 using System.Reflection.Metadata;
+using TKMath;
 
 namespace OCCPort.OpenGL
 {
@@ -26,7 +27,7 @@ namespace OCCPort.OpenGL
             {
                 theGlCtx.core15fwd.glDeleteBuffers(1, ref myBufferId);
             }
-            myOffset = null;
+            myOffset = 0;
             myBufferId = NO_BUFFER;
         }
 
@@ -37,7 +38,7 @@ namespace OCCPort.OpenGL
         //! Return buffer target.
         public abstract BufferTarget GetTarget();
         //! @return offset to data, NULL by default
-        public int GetDataOffset() { return myOffset.Value; }
+        public int GetDataOffset() { return myOffset; }
 
         //! Unbind this buffer object.
         public virtual void Unbind(OpenGl_Context theGlCtx)
@@ -49,7 +50,7 @@ namespace OCCPort.OpenGL
         //! Helpful constants
         const uint NO_BUFFER = 0;
 
-        int? myOffset;       //!< offset to data
+        int myOffset;       //!< offset to data
         uint myBufferId;     //!< VBO name (index)
         uint myComponentsNb; //!< Number of components per generic vertex attribute, must be 1, 2, 3, or 4
         int myElemsNb;      //!< Number of vertex attributes / number of vertices
@@ -68,6 +69,43 @@ namespace OCCPort.OpenGL
         // function : init
         // purpose  :
         // =======================================================================
+        public bool Init(OpenGl_Context theGlCtx,
+                        uint theComponentsNb,
+                        int theElemsNb,
+                        byte[] theData)
+        {
+            return init(theGlCtx, theComponentsNb, theElemsNb, theData, (int)All.UnsignedShort);
+
+        }
+        int sizeOfGlType(int theType)
+        {
+            switch (theType)
+            {
+                case (int)All.Byte:
+             //   case GL_UNSIGNED_BYTE: return sizeof(Standard_Byte);
+                //case GL_SHORT:
+                case (int)All.UnsignedShort: return sizeof(ushort);
+//# ifdef GL_INT
+//                case GL_INT:
+//#endif
+//                case GL_UNSIGNED_INT: return sizeof(unsigned int);
+//                case GL_FLOAT: return sizeof(float);
+//# ifdef GL_DOUBLE
+//                case GL_DOUBLE: return sizeof(double);
+//#endif
+                default: return 0;
+            }
+        }
+        //! Initialize buffer with new data.
+        bool init(OpenGl_Context theGlCtx,
+              uint theComponentsNb,
+              int theElemsNb,
+              byte[] theData,
+               int theDataType)
+        {
+            return init(theGlCtx, theComponentsNb, theElemsNb, theData, (All)theDataType,
+                         (int)(theComponentsNb) * (int)(sizeOfGlType(theDataType)));
+        }
 
         public bool Init(OpenGl_Context theGlCtx,
                           uint theComponentsNb,

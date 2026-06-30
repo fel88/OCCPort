@@ -85,7 +85,7 @@ namespace TKernel
         }
         public int Upper()
         {
-            return Count - 1;
+            return Count;
         }
         //! Method for consisten
         internal T First()

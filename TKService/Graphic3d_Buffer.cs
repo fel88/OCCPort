@@ -2,6 +2,7 @@
 
 namespace TKService
 {
+    //! Buffer of vertex attributes.
     public class Graphic3d_Buffer : NCollection_Buffer
     {  //! Empty constructor.
         public Graphic3d_Buffer(NCollection_BaseAllocator theAlloc) : base(theAlloc)
@@ -159,9 +160,13 @@ namespace TKService
             return true;
 
         }
-        protected bool Allocate(int v)
+
+        //! Allocate the buffer.
+        //! @param theSize buffer length in bytes
+        protected bool Allocate(int theSize)
         {
-            myData = new byte[v];
+            mySize = theSize;
+            myData = new byte[theSize];
             return true;
         }
 
