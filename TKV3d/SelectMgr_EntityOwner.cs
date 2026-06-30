@@ -15,6 +15,19 @@
             }
         }
 
+        //! Returns TRUE if this owner points to a part of object and FALSE for entire object.
+        public bool ComesFromDecomposition()  { return myFromDecomposition; }
+
+        //! @return Standard_True if the owner is selected.
+        public bool IsSelected()  { return myIsSelected; }
+
+        //! Returns true if there is a selectable object to serve as an owner.
+        public bool HasSelectable()  { return mySelectable != null; }
+
+        //! if this method returns TRUE the owner will always call method Hilight for SelectableObject when the owner is detected.
+        //! By default it always return FALSE.
+        public virtual bool IsForcedHilight()  { return false; }
+  
         //! Returns a selectable object detected in the working context.
         public SelectMgr_SelectableObject Selectable() { return mySelectable; }
 

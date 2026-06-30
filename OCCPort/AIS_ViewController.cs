@@ -1,4 +1,5 @@
 ﻿using OCCPort;
+using OCCPort.Common;
 using System;
 using System.Linq;
 using System.Reflection.Metadata;
@@ -272,51 +273,51 @@ namespace OCCPort
             flushBuffers(theCtx, theView);
             flushGestures(theCtx, theView);
 
-            //if (theView.IsSubview())
-            //{
-            //    // move input coordinates inside the view
-            //    const Graphic3d_Vec2i aDelta = theView->View()->SubviewTopLeft();
-            //    if (myGL.MoveTo.ToHilight || myGL.Dragging.ToStart)
-            //    {
-            //        myGL.MoveTo.Point -= aDelta;
-            //    }
-            //    if (myGL.Panning.ToStart)
-            //    {
-            //        myGL.Panning.PointStart -= aDelta;
-            //    }
-            //    if (myGL.Dragging.ToStart)
-            //    {
-            //        myGL.Dragging.PointStart -= aDelta;
-            //    }
-            //    if (myGL.Dragging.ToMove)
-            //    {
-            //        myGL.Dragging.PointTo -= aDelta;
-            //    }
-            //    if (myGL.OrbitRotation.ToStart)
-            //    {
-            //        myGL.OrbitRotation.PointStart -= Graphic3d_Vec2d(aDelta);
-            //    }
-            //    if (myGL.OrbitRotation.ToRotate)
-            //    {
-            //        myGL.OrbitRotation.PointTo -= Graphic3d_Vec2d(aDelta);
-            //    }
-            //    if (myGL.ViewRotation.ToStart)
-            //    {
-            //        myGL.ViewRotation.PointStart -= Graphic3d_Vec2d(aDelta);
-            //    }
-            //    if (myGL.ViewRotation.ToRotate)
-            //    {
-            //        myGL.ViewRotation.PointTo -= Graphic3d_Vec2d(aDelta);
-            //    }
-            //    for (Graphic3d_Vec2i & aPntIter : myGL.Selection.Points)
-            //    {
-            //        aPntIter -= aDelta;
-            //    }
-            //    for (Aspect_ScrollDelta & aZoomIter : myGL.ZoomActions)
-            //    {
-            //        aZoomIter.Point -= aDelta;
-            //    }
-            //}
+            if (theView.IsSubview())
+            {
+                // move input coordinates inside the view
+                Graphic3d_Vec2i aDelta = theView.View().SubviewTopLeft();
+                //    if (myGL.MoveTo.ToHilight || myGL.Dragging.ToStart)
+                //    {
+                //        myGL.MoveTo.Point -= aDelta;
+                //    }
+                //    if (myGL.Panning.ToStart)
+                //    {
+                //        myGL.Panning.PointStart -= aDelta;
+                //    }
+                //    if (myGL.Dragging.ToStart)
+                //    {
+                //        myGL.Dragging.PointStart -= aDelta;
+                //    }
+                //    if (myGL.Dragging.ToMove)
+                //    {
+                //        myGL.Dragging.PointTo -= aDelta;
+                //    }
+                //    if (myGL.OrbitRotation.ToStart)
+                //    {
+                //        myGL.OrbitRotation.PointStart -= Graphic3d_Vec2d(aDelta);
+                //    }
+                //    if (myGL.OrbitRotation.ToRotate)
+                //    {
+                //        myGL.OrbitRotation.PointTo -= Graphic3d_Vec2d(aDelta);
+                //    }
+                //    if (myGL.ViewRotation.ToStart)
+                //    {
+                //        myGL.ViewRotation.PointStart -= Graphic3d_Vec2d(aDelta);
+                //    }
+                //    if (myGL.ViewRotation.ToRotate)
+                //    {
+                //        myGL.ViewRotation.PointTo -= Graphic3d_Vec2d(aDelta);
+                //    }
+                for (int i = 0; i < myGL.Selection.Points.Count; i++)
+                {
+                    myGL.Selection.Points[i] -= aDelta;
+                }
+                //    for (Aspect_ScrollDelta & aZoomIter : myGL.ZoomActions)
+                //    {
+                //        aZoomIter.Point -= aDelta;
+                //    }
+            }
 
             if (theToHandle)
             {
@@ -336,34 +337,34 @@ namespace OCCPort
 
 
             V3d_View aPickedView;
-            //if (theView.IsSubview()
-            //   || !theView.Subviews().IsEmpty())
-            //{
-            //    // activate another subview on mouse click
-            //    bool toPickSubview = false;
-            //    Graphic3d_Vec2i aClickPoint;
-            //    if (myGL.Selection.Tool == AIS_ViewSelectionTool_Picking
-            //    && !myGL.Selection.Points.IsEmpty())
-            //    {
-            //        aClickPoint = myGL.Selection.Points.Last();
-            //        toPickSubview = true;
-            //    }
-            //    else if (!myGL.ZoomActions.IsEmpty())
-            //    {
-            //        //aClickPoint = myGL.ZoomActions.Last().Point;
-            //        //toPickSubview = true;
-            //    }
+            if (theView.IsSubview()
+               || !theView.Subviews().IsEmpty())
+            {
+                // activate another subview on mouse click
+                bool toPickSubview = false;
+                Graphic3d_Vec2i aClickPoint = new TKernel.NCollection_Vec2<int>();
+                if (myGL.Selection.Tool == AIS_ViewSelectionTool.AIS_ViewSelectionTool_Picking
+                && !myGL.Selection.Points.IsEmpty())
+                {
+                    aClickPoint = myGL.Selection.Points.Last();
+                    toPickSubview = true;
+                }
+                //else if (!myGL.ZoomActions.IsEmpty())
+                {
+                    //aClickPoint = myGL.ZoomActions.Last().Point;
+                    //toPickSubview = true;
+                }
 
-            //    if (toPickSubview)
-            //    {
-            //        if (theView->IsSubview())
-            //        {
-            //            aClickPoint += theView->View()->SubviewTopLeft();
-            //        }
-            //        Handle(V3d_View) aParent = !theView->IsSubview() ? theView : theView->ParentView();
-            //        aPickedView = aParent->PickSubview(aClickPoint);
-            //    }
-            //}
+                if (toPickSubview)
+                {
+                    if (theView.IsSubview())
+                    {
+                        aClickPoint += theView.View().SubviewTopLeft();
+                    }
+                    V3d_View aParent = !theView.IsSubview() ? theView : theView.ParentView();
+                    aPickedView = aParent.PickSubview(aClickPoint);
+                }
+            }
 
             //handleViewOrientationKeys(theCtx, theView);
             AIS_WalkDelta aWalk = handleNavigationKeys(theCtx, theView);
@@ -372,7 +373,7 @@ namespace OCCPort
             //{
             //    theView->View()->SetupXRPosedCamera();
             //}
-            //handleMoveTo(theCtx, theView);
+            handleMoveTo(theCtx, theView);
             handleCameraActions(theCtx, theView, aWalk);
             //theView->View()->SynchronizeXRPosedToBaseCamera(); // handleCameraActions() may modify posed camera position - copy this modifications also to the base camera
             //handleXRPresentations(theCtx, theView);
@@ -412,6 +413,107 @@ namespace OCCPort
              */
 
             return new AIS_WalkDelta();
+        }
+        //! Return TRUE if previous position of MoveTo has been defined.
+        public bool HasPreviousMoveTo() { return myPrevMoveTo != new Graphic3d_Vec2i(-1); }
+
+        // =======================================================================
+        // function : handleSelectionPick
+        // purpose  :
+        // =======================================================================
+        void handleSelectionPick(AIS_InteractiveContext theCtx,
+                                               V3d_View theView)
+        {
+            if (myGL.Selection.Tool == AIS_ViewSelectionTool.AIS_ViewSelectionTool_Picking
+            && !myGL.Selection.Points.IsEmpty())
+            {
+                //for (NCollection_Sequence<Graphic3d_Vec2i>.Iterator aPntIter (myGL.Selection.Points); aPntIter.More(); aPntIter.Next())
+                foreach (var aPntIter in myGL.Selection.Points)
+                {
+
+                    bool hadPrevMoveTo = HasPreviousMoveTo();
+                    contextLazyMoveTo(theCtx, theView, aPntIter);
+                    if (!hadPrevMoveTo)
+                    {
+                        ResetPreviousMoveTo();
+                    }
+
+                    theCtx.SelectDetected(myGL.Selection.Scheme);
+
+                    // selection affects all Views
+                    theView.Viewer().Invalidate();
+
+                    OnSelectionChanged(theCtx, theView);
+                }
+
+                myGL.Selection.Points.Clear();
+            }
+        }
+        void OnSelectionChanged(AIS_InteractiveContext c,
+                                              V3d_View v)
+        {
+            //
+        }
+        //! Lazy AIS_InteractiveContext::MoveTo() with myPrevMoveTo check.
+        public virtual void contextLazyMoveTo(AIS_InteractiveContext theCtx,
+                                                   V3d_View theView,
+                                                   Graphic3d_Vec2i thePnt)
+        {
+            if (myPrevMoveTo == thePnt
+   || myHasHlrOnBeforeRotation) // ignore highlighting in-between rotation of HLR view
+            {
+                return;
+            }
+            myPrevMoveTo = thePnt;
+
+            SelectMgr_EntityOwner aLastPicked = theCtx.DetectedOwner();
+
+            // Picking relies on the camera frustum (including Z-range) - so make temporary AutoZFit()
+            // and then restore previous frustum to avoid immediate layer rendering issues if View has not been invalidated.
+            double aZNear = theView.Camera().ZNear(), aZFar = theView.Camera().ZFar();
+            theView.AutoZFit();
+            theCtx.MoveTo(thePnt.x(), thePnt.y(), theView, false);
+            theView.Camera().SetZRange(aZNear, aZFar);
+
+            SelectMgr_EntityOwner aNewPicked = theCtx.DetectedOwner();
+
+            //if (theView.Viewer().IsGridActive()
+            // && theView.Viewer().GridEcho())
+            //{
+            //    if (aNewPicked == null)
+            //    {
+            //        Graphic3d_Vec3d aPnt3d;
+            //        //theView.ConvertToGrid(thePnt.x(), thePnt.y(), aPnt3d[0], aPnt3d[1], aPnt3d[2]);
+            //      //  theView.Viewer().ShowGridEcho(theView, new Graphic3d_Vertex(aPnt3d[0], aPnt3d[1], aPnt3d[2]));
+            //        theView.InvalidateImmediate();
+            //    }
+            //    else
+            //    {
+            //        theView.Viewer().HideGridEcho(theView);
+            //        theView.InvalidateImmediate();
+            //    }
+            //}
+
+            if (aLastPicked != aNewPicked
+             || (aNewPicked != null && aNewPicked.IsForcedHilight()))
+            {
+                // dynamic highlight affects all Views
+                for (V3d_ListOfViewIterator aViewIter = new V3d_ListOfViewIterator(theView.Viewer().ActiveViewIterator()); aViewIter.More(); aViewIter.Next())
+                {
+                    V3d_View aView = aViewIter.Value();
+                    aView.InvalidateImmediate();
+                }
+            }
+        }
+
+        //! Perform moveto/selection/dragging.
+        //! This method is expected to be called from rendering thread.
+        void handleMoveTo(AIS_InteractiveContext theCtx,
+                                        V3d_View theView)
+        {
+            handleSelectionPick(theCtx, theView);
+            //handleDynamicHighlight(theCtx, theView);
+            //handleSelectionPoly(theCtx, theView);
         }
 
         AIS_WalkDelta FetchNavigationKeys(double theCrouchRatio,

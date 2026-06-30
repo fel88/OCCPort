@@ -9,6 +9,26 @@ namespace OCCPort
         public bool IsNewGesture;     //!< transition from one action to another
 
         public NCollection_Sequence<Aspect_ScrollDelta> ZoomActions = new NCollection_Sequence<Aspect_ScrollDelta>(); //!< the queue with zoom actions
+
+
+        public struct _selection
+        {
+            public AIS_ViewSelectionTool Tool;          //!< perform selection
+            public AIS_SelectionScheme Scheme;        //!< selection scheme
+            public NCollection_Sequence<Graphic3d_Vec2i> Points;        //!< the points for selection
+            public bool ToApplyTool;   //!< apply rubber-band selection tool
+
+            public _selection()
+            {
+                Tool = AIS_ViewSelectionTool.AIS_ViewSelectionTool_Picking;
+                Scheme = AIS_SelectionScheme.AIS_SelectionScheme_UNKNOWN;
+                ToApplyTool = (false); 
+                Points = new NCollection_Sequence<NCollection_Vec2<int>>();
+            }
+        }
+
+        public _selection Selection = new _selection();
+
         public struct _panningParams
         {
             public bool ToStart;    //!< start panning
@@ -59,7 +79,7 @@ namespace OCCPort
 
         public _draggingParams Dragging;
 
-      
+
         public _orientation Orientation;
 
         //! Reset events buffer.

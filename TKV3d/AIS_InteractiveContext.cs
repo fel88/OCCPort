@@ -1,11 +1,23 @@
-﻿global using TColStd_ListIteratorOfListOfInteger = TKernel.NCollection_List<int>.Iterator;
+﻿global using AIS_NArray1OfEntityOwner = TKernel.NCollection_Array1<TKV3d.SelectMgr_EntityOwner>;
+global using Graphic3d_NMapOfTransient = TKernel.NCollection_Map<object>;
+global using SelectMgr_ListOfFilter = TKernel.NCollection_List<TKV3d.SelectMgr_Filter>;
+global using TColStd_ListIteratorOfListOfInteger = TKernel.NCollection_List<int>.Iterator;
 global using TColStd_ListOfInteger = TKernel.NCollection_List<int>;
+global using TColStd_SequenceOfInteger = TKernel.NCollection_Sequence<int>;
+global using SelectMgr_ListIteratorOfListOfFilter = TKernel.NCollection_List<TKV3d.SelectMgr_Filter>.Iterator;
+
+
+
 
 using OCCPort.Common;
+using System.Net.NetworkInformation;
 using System.Reflection.Metadata;
+using System.Runtime.InteropServices.JavaScript;
 using TKernel;
 using TKMath;
 using TKService;
+using TKTopAlgo;
+using TKV3d;
 
 namespace TKV3d
 {
@@ -82,7 +94,315 @@ namespace TKV3d
             InitAttributes();
         }
 
+        //! Select and hilights the previous detected via AIS_InteractiveContext::MoveTo() method;
+        //! unhilights the previous picked.
+        //! Viewer should be explicitly redrawn after selection.
+        //! @param theSelScheme [in] selection scheme
+        //! @return picking status
+        //!
+        //! @sa HighlightStyle() defining default highlight styles of selected owners (Prs3d_TypeOfHighlight_Selected and Prs3d_TypeOfHighlight_LocalSelected)
+        //! @sa PrsMgr_PresentableObject::HilightAttributes() defining per-object highlight style of selected owners (overrides defaults)
+        public AIS_StatusOfPick SelectDetected(AIS_SelectionScheme theSelScheme = AIS_SelectionScheme.AIS_SelectionScheme_Replace)
 
+        {
+            if (theSelScheme == AIS_SelectionScheme.AIS_SelectionScheme_Replace && myLastPicked != null)
+            {
+                Graphic3d_Vec2i aMousePos = new NCollection_Vec2<int>(-1, -1);
+                gp_Pnt2d aMouseRealPos = MainSelector().GetManager().GetMousePosition();
+                if (!Precision.IsInfinite(aMouseRealPos.X()) &&
+                    !Precision.IsInfinite(aMouseRealPos.Y()))
+                {
+                    aMousePos.SetValues((int)aMouseRealPos.X(), (int)aMouseRealPos.Y());
+                }
+                //if (myLastPicked.HandleMouseClick(aMousePos, Aspect_VKeyMouse_LeftButton, Aspect_VKeyFlags_NONE, false))
+                {
+                    //    return  AIS_StatusOfPick.AIS_SOP_NothingSelected;
+                }
+            }
+
+            AIS_NArray1OfEntityOwner aPickedOwners = new AIS_NArray1OfEntityOwner(1, 1);
+            aPickedOwners.SetValue(1, myLastPicked);
+            return Select(aPickedOwners, theSelScheme);
+        }
+
+
+
+
+        //! Relays mouse position in pixels theXPix and theYPix to the interactive context selectors.
+        //! This is done by the view theView passing this position to the main viewer and updating it.
+        //! If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object.
+        //! @sa PickingStrategy()
+        //! @sa HighlightStyle() defining default dynamic highlight styles of detected owners
+        //!                      (Prs3d_TypeOfHighlight_Dynamic and Prs3d_TypeOfHighlight_LocalDynamic)
+        //! @sa PrsMgr_PresentableObject::DynamicHilightAttributes() defining per-object dynamic highlight style of detected owners (overrides defaults)
+        public AIS_StatusOfDetection MoveTo(int theXPix,
+                                                 int theYPix,
+                                                 V3d_View theView,
+                                                 bool theToRedrawOnUpdate)
+        {
+            if (theView.Viewer() != myMainVwr)
+            {
+                throw new Standard_ProgramError("AIS_InteractiveContext::MoveTo() - invalid argument");
+            }
+            MainSelector().Pick(theXPix, theYPix, theView);
+            return moveTo(theView, theToRedrawOnUpdate);
+        }
+
+        //! Return display mode for highlighting.
+        int getHilightMode(AIS_InteractiveObject theObj,
+                                    Prs3d_Drawer theStyle,
+                                    int theDispMode)
+        {
+            if (theStyle != null
+             && theStyle.DisplayMode() != -1
+             && theObj.AcceptDisplayMode(theStyle.DisplayMode()))
+            {
+                return theStyle.DisplayMode();
+            }
+            else if (theDispMode != -1)
+            {
+                return theDispMode;
+            }
+            else if (theObj.HasDisplayMode())
+            {
+                return theObj.DisplayMode();
+            }
+            return myDefaultDrawer.DisplayMode();
+        }
+
+        //=======================================================================
+        //function : HilightWithColor
+        //purpose  : 
+        //=======================================================================
+        public void HilightWithColor(AIS_InteractiveObject theObj,
+                                               Prs3d_Drawer theStyle,
+                                               bool theIsToUpdate)
+        {
+            if (theObj == null)
+            {
+                return;
+            }
+
+            setContextToObject(theObj);
+            if (!myObjects.IsBound(theObj))
+            {
+                return;
+            }
+
+            AIS_GlobalStatus aStatus = myObjects[theObj];
+            aStatus.SetHilightStatus(true);
+
+            if (theObj.DisplayStatus() == PrsMgr_DisplayStatus.PrsMgr_DisplayStatus_Displayed)
+            {
+                highlightGlobal(theObj, theStyle, aStatus.DisplayMode());
+                aStatus.SetHilightStyle(theStyle);
+            }
+
+            if (theIsToUpdate)
+            {
+                myMainVwr.Update();
+            }
+        }
+
+
+        //=======================================================================
+        //function : highlightWithColor
+        //purpose  :
+        //=======================================================================
+        void highlightWithColor(SelectMgr_EntityOwner theOwner,
+                                                  V3d_Viewer theViewer)
+        {
+            AIS_InteractiveObject anObj = (AIS_InteractiveObject)(theOwner.Selectable());
+            if (anObj == null)
+            {
+                return;
+            }
+
+            Prs3d_Drawer aStyle = getHiStyle(anObj, theOwner);
+            int aHiMode = getHilightMode(anObj, aStyle, -1);
+
+            myMainPM.BeginImmediateDraw();
+            //theOwner.HilightWithColor(myMainPM, aStyle, aHiMode);
+            myMainPM.EndImmediateDraw(theViewer == null ? myMainVwr : theViewer);
+        }
+
+        AIS_StatusOfDetection moveTo(V3d_View theView,
+                                                       bool theToRedrawOnUpdate)
+        {
+            myCurDetected = 0;
+            myCurHighlighted = 0;
+            //myDetectedSeq.Clear();
+            myLastActiveView = theView;
+
+            // preliminaries
+            AIS_StatusOfDetection aStatus = AIS_StatusOfDetection.AIS_SOD_Nothing;
+            bool toUpdateViewer = false;
+
+            // filling of myAISDetectedSeq sequence storing information about detected AIS objects
+            // (the objects must be AIS_Shapes)
+            int aDetectedNb = MainSelector().NbPicked();
+            int aNewDetected = 0;
+            bool toIgnoreDetTop = false;
+            for (int aDetIter = 1; aDetIter <= aDetectedNb; ++aDetIter)
+            {
+                SelectMgr_EntityOwner anOwner = MainSelector().Picked(aDetIter);
+                if (anOwner == null
+                 || !myFilters.IsOk(anOwner))
+                {
+                    if (myPickingStrategy == SelectMgr_PickingStrategy.SelectMgr_PickingStrategy_OnlyTopmost)
+                    {
+                        toIgnoreDetTop = true;
+                    }
+                    continue;
+                }
+
+                if (aNewDetected < 1
+                && !toIgnoreDetTop)
+                {
+                    aNewDetected = aDetIter;
+                }
+
+                myDetectedSeq.Append(aDetIter);
+            }
+
+            if (aNewDetected >= 1)
+            {
+                myCurHighlighted = myDetectedSeq.Lower();
+
+                // Does nothing if previously detected object is equal to the current one.
+                // However in advanced selection modes the owners comparison
+                // is not effective because in that case only one owner manage the
+                // selection in current selection mode. It is necessary to check the current detected
+                // entity and hilight it only if the detected entity is not the same as
+                // previous detected (IsForcedHilight call)
+                SelectMgr_EntityOwner aNewPickedOwner = MainSelector().Picked(aNewDetected);
+                if (aNewPickedOwner == myLastPicked && !aNewPickedOwner.IsForcedHilight())
+                {
+                    return myLastPicked.IsSelected()
+                         ? AIS_StatusOfDetection.AIS_SOD_Selected
+                         : AIS_StatusOfDetection.AIS_SOD_OnlyOneDetected;
+                }
+
+                // Previously detected object is unhilighted if it is not selected or hilighted
+                // with selection color if it is selected. Such highlighting with selection color
+                // is needed only if myToHilightSelected flag is true. In this case previously detected
+                // object has been already highlighted with myHilightColor during previous MoveTo()
+                // method call. As result it is necessary to rehighligt it with mySelectionColor.
+                if (myLastPicked != null && myLastPicked.HasSelectable())
+                {
+                    if (isSlowHiStyle(myLastPicked, theView.Viewer()))
+                    {
+                        theView.Viewer().Invalidate();
+                    }
+
+                    clearDynamicHighlight();
+                    toUpdateViewer = true;
+                }
+
+                // initialize myLastPicked field with currently detected object
+                myLastPicked = aNewPickedOwner;
+
+                // highlight detected object if it is not selected or myToHilightSelected flag is true
+                if (myLastPicked.HasSelectable())
+                {
+                    if (myAutoHilight
+                     && (!myLastPicked.IsSelected()
+                       || myToHilightSelected))
+                    {
+                        if (isSlowHiStyle(myLastPicked, theView.Viewer()))
+                        {
+                            theView.Viewer().Invalidate();
+                        }
+
+                        highlightWithColor(myLastPicked, theView.Viewer());
+                        toUpdateViewer = true;
+                    }
+
+                    aStatus = myLastPicked.IsSelected()
+                            ? AIS_StatusOfDetection.AIS_SOD_Selected
+                            : AIS_StatusOfDetection.AIS_SOD_OnlyOneDetected;
+                }
+            }
+            else
+            {
+                // previously detected object is unhilighted if it is not selected or hilighted
+                // with selection color if it is selected
+                aStatus = AIS_StatusOfDetection.AIS_SOD_Nothing;
+                if (myAutoHilight
+                && myLastPicked != null
+                 && myLastPicked.HasSelectable())
+                {
+                    if (isSlowHiStyle(myLastPicked, theView.Viewer()))
+                    {
+                        theView.Viewer().Invalidate();
+                    }
+
+                    clearDynamicHighlight();
+                    toUpdateViewer = true;
+                }
+
+                myLastPicked = null;
+            }
+
+            if (toUpdateViewer
+             && theToRedrawOnUpdate)
+            {
+                if (theView.ComputedMode())
+                {
+                    theView.Viewer().Update();
+                }
+                else
+                {
+                    if (theView.IsInvalidated())
+                    {
+                        theView.Viewer().Redraw();
+                    }
+                    else
+                    {
+                        theView.Viewer().RedrawImmediate();
+                    }
+                }
+            }
+
+            return aStatus;
+        }
+        //! Helper function that returns correct dynamic highlight style for the object:
+        //! if custom style is defined via object's highlight drawer, it will be used. Otherwise,
+        //! dynamic highlight style of interactive context will be returned.
+        //! @param theObj [in] the object to check
+        Prs3d_Drawer getHiStyle(AIS_InteractiveObject theObj,
+                                          SelectMgr_EntityOwner theOwner)
+        {
+            Prs3d_Drawer aHiDrawer = theObj.DynamicHilightAttributes();
+            if (aHiDrawer != null)
+            {
+                return aHiDrawer;
+            }
+
+            if (theOwner != null)
+                return myStyles[(int)(theOwner.ComesFromDecomposition() ? Prs3d_TypeOfHighlight.Prs3d_TypeOfHighlight_LocalDynamic : Prs3d_TypeOfHighlight.Prs3d_TypeOfHighlight_Dynamic)];
+
+            return myStyles[0];
+        }
+
+        //! Return TRUE if highlight style of owner requires full viewer redraw.
+        private bool isSlowHiStyle(SelectMgr_EntityOwner theOwner, V3d_Viewer theViewer)
+        {
+            AIS_InteractiveObject anObj = (AIS_InteractiveObject)(theOwner.Selectable());
+            if (anObj != null)
+            {
+                Prs3d_Drawer aHiStyle = getHiStyle(anObj, myLastPicked);
+                return aHiStyle.ZLayer() == Graphic3d_ZLayerId.Graphic3d_ZLayerId_UNKNOWN
+                   || !theViewer.ZLayerSettings(aHiStyle.ZLayer()).IsImmediate();
+            }
+            return false;
+        }
+
+
+        //! Returns the owner of the detected sensitive primitive which is currently dynamically highlighted.
+        //! WARNING! This method is irrelevant to InitDetected()/MoreDetected()/NextDetected().
+        //! @sa HasDetected(), HasNextDetected(), HilightPreviousDetected(), HilightNextDetected().
+        public SelectMgr_EntityOwner DetectedOwner() { return myLastPicked; }
 
         //! Returns the default attribute manager.
         //! This contains all the color and line attributes which can be used by interactive objects which do not have their own attributes.
@@ -239,7 +559,7 @@ namespace TKV3d
                                          //!  can be applied with AND or OR operation)
         Prs3d_Drawer myDefaultDrawer;
         Prs3d_Drawer[] myStyles = new Prs3d_Drawer[(int)Prs3d_TypeOfHighlight.Prs3d_TypeOfHighlight_NB];
-        int[] myDetectedSeq;
+        TColStd_SequenceOfInteger myDetectedSeq = new TColStd_SequenceOfInteger();
         int myCurDetected;
         int myCurHighlighted;
         SelectMgr_PickingStrategy myPickingStrategy; //!< picking strategy to be applied within MoveTo()
@@ -896,10 +1216,7 @@ namespace TKV3d
     public class AIS_Selection
     {
     }
-    public class AIS_NArray1OfEntityOwner : NCollection_Array1<SelectMgr_EntityOwner>
-    {
 
-    }
     public enum SelectMgr_PickingStrategy
     {
 
@@ -913,12 +1230,49 @@ namespace TKV3d
         //only topmost detected entity passing selection filter is accepted
     }
 
-    public class SelectMgr_AndOrFilter
+
+    //! A framework to define an OR or AND selection filter.
+    //! To use an AND selection filter call SetUseOrFilter with False parameter.
+    //! By default the OR selection filter is used.
+    public class SelectMgr_AndOrFilter : SelectMgr_CompositionFilter
     {
         public SelectMgr_AndOrFilter(SelectMgr_FilterType selectMgr_FilterType_OR)
         {
         }
+        SelectMgr_FilterType myFilterType; //!< selection filter type. SelectMgr_TypeFilter_OR by default.
+        Graphic3d_NMapOfTransient myDisabledObjects; //!< disabled objects.
+                                                     //!  Selection isn't applied to these objects.
+        public override bool IsOk(SelectMgr_EntityOwner theObj)
+        {
+            SelectMgr_SelectableObject aSelectable = theObj.Selectable();
+
+            if (myDisabledObjects != null && myDisabledObjects.Contains(aSelectable))
+            {
+                return false;
+            }
+
+            for (SelectMgr_ListIteratorOfListOfFilter anIter = new (myFilters); anIter.More(); anIter.Next())
+            {
+                bool isOK = anIter.Value().IsOk(theObj);
+                if (isOK && myFilterType == SelectMgr_FilterType.SelectMgr_FilterType_OR)
+                {
+                    return true;
+                }
+                else if (!isOK && myFilterType == SelectMgr_FilterType.SelectMgr_FilterType_AND)
+                {
+                    return false;
+                }
+            }
+
+            if (myFilterType == SelectMgr_FilterType.SelectMgr_FilterType_OR && !myFilters.IsEmpty())
+            {
+                return false;
+            }
+            return true;
+        }
+
     }
+
     public enum SelectMgr_FilterType
     {
 
@@ -936,5 +1290,27 @@ namespace TKV3d
     public class Select3D_SensitivePoint : Select3D_SensitiveEntity
     {
     }
+
+    //! Mouse button bitmask
+    enum Mouse_button_bitmask
+    {
+        Aspect_VKeyMouse_NONE = 0,       //!< no buttons
+
+        Aspect_VKeyMouse_LeftButton = 1 << 13, //!< mouse left   button
+        Aspect_VKeyMouse_MiddleButton = 1 << 14, //!< mouse middle button (scroll)
+        Aspect_VKeyMouse_RightButton = 1 << 15, //!< mouse right  button
+
+        Aspect_VKeyMouse_MainButtons = Aspect_VKeyMouse_LeftButton | Aspect_VKeyMouse_MiddleButton | Aspect_VKeyMouse_RightButton
+    };
+    public enum AIS_StatusOfDetection
+    {
+        AIS_SOD_Error,
+        AIS_SOD_Nothing,
+        AIS_SOD_AllBad,
+        AIS_SOD_Selected,
+        AIS_SOD_OnlyOneDetected,
+        AIS_SOD_OnlyOneGood,
+        AIS_SOD_SeveralGood
+    };
 }
 

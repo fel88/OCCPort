@@ -594,7 +594,7 @@ namespace TKService
         public bool IsComputed(int theStructId,
                                                     ref Graphic3d_Structure theComputedStruct)
         {
-            //theComputedStruct.Nullify(); back write up??
+            theComputedStruct = null;
             if (!ComputedMode())
                 return false;
 

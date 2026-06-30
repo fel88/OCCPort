@@ -599,11 +599,7 @@ bool IsVerifyTolerance, bool IsMutableInput, BRepTools_ReShape theReshaper)
             Add(item);
         }
     }
-    public class TColStd_SequenceOfInteger : NCollection_Sequence<int>
-    {
-
-
-    }
+    
     internal class BRepTopAdaptor_SeqOfPtr : NCollection_Sequence<object>
     {
         public int Length()

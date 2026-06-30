@@ -1,4 +1,5 @@
-﻿using TKernel;
+﻿using System.Reflection.Metadata;
+using TKernel;
 using TKMath;
 using TKService;
 
@@ -49,6 +50,34 @@ namespace TKV3d
             myGridEcho = (true);
             //myGridEchoLastVert (ShortRealLast(), ShortRealLast(), ShortRealLast())            
 
+        }
+        public void RedrawImmediate()
+        {
+            for (int aSubViewPass = 0; aSubViewPass < 2; ++aSubViewPass)
+            {
+                // redraw subviews first
+                bool isSubViewPass = (aSubViewPass == 0);
+                foreach (V3d_View aViewIter in myDefinedViews)
+                {
+                    if (isSubViewPass
+                     && aViewIter.IsSubview())
+                    {
+                        aViewIter.RedrawImmediate();
+                    }
+                    else if (!isSubViewPass
+                          && !aViewIter.IsSubview())
+                    {
+                        aViewIter.RedrawImmediate();
+                    }
+                }
+            }
+        }
+        public void Invalidate()
+        {
+            for (V3d_ListOfView.Iterator aDefViewIter = new NCollection_List<V3d_View>.Iterator(myDefinedViews); aDefViewIter.More(); aDefViewIter.Next())
+            {
+                aDefViewIter.Value().Invalidate();
+            }
         }
 
         //! Returns the structure manager associated to this viewer.
@@ -195,9 +224,25 @@ namespace TKV3d
             list = myActiveViews;
         }
 
-        internal bool More()
+        public V3d_ListOfViewIterator(V3d_ListOfViewIterator v3d_ListOfViewIterator)
         {
-            throw new NotImplementedException();
+            this.list = v3d_ListOfViewIterator.list;
+            this.index = v3d_ListOfViewIterator.index;
+        }
+        int index = 0;
+        public bool More()
+        {
+            return index < list.Count;
+        }
+
+        public void Next()
+        {
+            index++;
+        }
+
+        public V3d_View Value()
+        {
+            return list[index];
         }
     }
     internal class V3d_RectangularGrid : Aspect_RectangularGrid
@@ -220,12 +265,12 @@ namespace TKV3d
             : base(1.0, 8)
         {
             /*myViewer = (aViewer);
-			myCurAreDefined = (false);
-  myToComputePrs(Standard_False),
-  myCurDrawMode(Aspect_GDM_Lines),
-  myCurXo(0.0),
-  myCurYo(0.0),
-  myCurAngle(0.0),*/
+            myCurAreDefined = (false);
+    myToComputePrs(Standard_False),
+    myCurDrawMode(Aspect_GDM_Lines),
+    myCurXo(0.0),
+    myCurYo(0.0),
+    myCurAngle(0.0),*/
 
         }
     }

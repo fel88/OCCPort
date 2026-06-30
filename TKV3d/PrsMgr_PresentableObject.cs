@@ -1,4 +1,5 @@
-﻿using TKMath;
+﻿using System.Reflection.Metadata;
+using TKMath;
 using TKService;
 
 namespace TKV3d
@@ -18,6 +19,11 @@ namespace TKV3d
     //! For more sophisticated configuring, Prs3d_Drawer should be modified directly, while short-cuts might be left unimplemented.
     public abstract class PrsMgr_PresentableObject
     {
+        //! Get value of the flag "propagate visual state"
+      //! It means that the display/erase/color visual state is propagated automatically to all children;
+      //! by default, the flag is true 
+        public bool ToPropagateVisualState()  { return myToPropagateVisualState; }
+
         public virtual void ResetTransformation()
         {
             setLocalTransformation(null);
@@ -27,6 +33,10 @@ namespace TKV3d
         //! is applied within Local Coordinate system defined by this Persistence.
         public void SetLocalTransformation(gp_Trsf theTrsf) { setLocalTransformation(new TopLoc_Datum3D(theTrsf)); }
 
+        //! Returns the hilight attributes settings.
+        //! When not NULL, overrides both Prs3d_TypeOfHighlight_LocalDynamic and Prs3d_TypeOfHighlight_Dynamic defined within AIS_InteractiveContext::HighlightStyle().
+        //! @sa AIS_InteractiveContext::HighlightStyle()
+        public Prs3d_Drawer DynamicHilightAttributes() { return myDynHilightDrawer; }
 
         public void setLocalTransformation(TopLoc_Datum3D theTransformation)
         {

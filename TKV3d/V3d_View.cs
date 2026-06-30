@@ -1,5 +1,7 @@
 ﻿using OCCPort.Common;
+using System.Reflection.Metadata;
 using System.Runtime.Serialization;
+using TKernel;
 using TKMath;
 using TKService;
 
@@ -37,6 +39,34 @@ namespace TKV3d
             }
         }
 
+        //! Pick subview from the given 2D point.
+        public V3d_View PickSubview(Graphic3d_Vec2i thePnt)
+        {
+            if (thePnt.x() < 0
+   || thePnt.x() >= MyWindow.Dimensions().x()
+   || thePnt.y() < 0
+   || thePnt.y() >= MyWindow.Dimensions().y())
+            {
+                return null;
+            }
+
+            // iterate in opposite direction - from front to bottom views
+            for (int aSubviewIter = mySubviews.Upper(); aSubviewIter >= mySubviews.Lower(); --aSubviewIter)
+            {
+                V3d_View aSubview = mySubviews.Value(aSubviewIter);
+                if (aSubview.View().IsActive()
+                 && thePnt.x() >= aSubview.View().SubviewTopLeft().x()
+                 && thePnt.x() < (aSubview.View().SubviewTopLeft().x() + aSubview.Window().Dimensions().x())
+                 && thePnt.y() >= aSubview.View().SubviewTopLeft().y()
+                 && thePnt.y() < (aSubview.View().SubviewTopLeft().y() + aSubview.Window().Dimensions().y()))
+                {
+                    return aSubview;
+                }
+            }
+
+            return this;
+        }
+
         public V3d_Viewer MyViewer;
 
         //=============================================================================
@@ -70,11 +100,13 @@ namespace TKV3d
                 }
             }
         }
+        
+
 
         //! Returns the viewer in which the view has been created.
         public V3d_Viewer Viewer() { return MyViewer; }
 
-        private void AutoZFit()
+        public void AutoZFit()
         {
             if (!AutoZFitMode())
             {
@@ -1029,9 +1061,9 @@ namespace TKV3d
 
         //! Returns the associated Graphic3d view.
         public Graphic3d_CView View() { return myView; }
-        List<V3d_View> mySubviews = new List<V3d_View>();
+        NCollection_Sequence<V3d_View> mySubviews = new NCollection_Sequence<V3d_View>();
         //! Return subview list.
-        public V3d_View[] Subviews() { return mySubviews.ToArray(); }
+        public NCollection_Sequence<V3d_View> Subviews() { return mySubviews; }
 
         public void RedrawImmediate()
         {

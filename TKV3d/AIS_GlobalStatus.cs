@@ -1,4 +1,5 @@
 ﻿using OCCPort.Common;
+using System.Reflection.Metadata;
 using TKernel;
 
 namespace TKV3d
@@ -15,6 +16,12 @@ namespace TKV3d
             }
             return false;
         }
+
+        //! Sets highlighted state.
+        public void SetHilightStatus(bool theStatus) { myIsHilit = theStatus; }
+
+        //! Changes applied highlight style for a particular object
+        public void SetHilightStyle(Prs3d_Drawer theStyle) { myHiStyle = theStyle; }
 
         //! Remove selection mode.
         public bool RemoveSelectionMode(int theMode)

@@ -98,6 +98,8 @@ namespace OCCPort.Tester
 			}*/
             //glControl.SwapBuffers();
 
+            aIS_ViewController.FlushViewEvents(myAISContext, GravityViewManager.View, true);
+
             Redraw();
         }
 

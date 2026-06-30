@@ -198,6 +198,21 @@ namespace TKService
             return (myMask & aBit) != 0;
         }
 
+        //! Setup visibility flag.
+        public void SetVisible(int theViewId,
+                    bool theIsVisible)
+        {
+            uint aBit = (uint)1 << theViewId;
+            if (theIsVisible)
+            {
+                myMask |= aBit;
+            }
+            else
+            {
+                myMask &= ~aBit;
+            }
+        }
+
         public void SetVisible(bool theIsVisible)
         {
 
@@ -374,8 +389,8 @@ namespace TKService
         //	return Standard_True;
         //}
 
- 
-    
+
+
     }
 
     public class Aspect_DisplayConnection

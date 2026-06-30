@@ -227,150 +227,6 @@ namespace TKV3d
 
         }
     }
-    public abstract class SelectMgr_SelectingVolumeManager
-    {
-
-        SelectMgr_BaseIntersector myActiveSelectingVolume;
-        Graphic3d_SequenceOfHClipPlane myViewClipPlanes;                  //!< view clipping planes
-        Graphic3d_SequenceOfHClipPlane myObjectClipPlanes;                //!< object clipping planes
-        SelectMgr_ViewClipRange myViewClipRange;
-        bool myToAllowOverlap;                  //!< Defines if partially overlapped entities will me detected or not
-
-        //=======================================================================
-        // function : AllowOverlapDetection
-        // purpose  : If theIsToAllow is false, only fully included sensitives will
-        //            be detected, otherwise the algorithm will mark both included
-        //            and overlapped entities as matched
-        internal void AllowOverlapDetection(bool theIsToAllow)
-        {
-            myToAllowOverlap = theIsToAllow;
-        }
-
-        public void InitBoxSelectingVolume(gp_Pnt2d theMinPt,
-                                                                gp_Pnt2d theMaxPt)
-        {
-            SelectMgr_RectangularFrustum aBoxVolume = (SelectMgr_RectangularFrustum)myActiveSelectingVolume;
-            if (aBoxVolume == null)
-            {
-                aBoxVolume = new SelectMgr_RectangularFrustum();
-            }
-            aBoxVolume.Init(theMinPt, theMaxPt);
-            myActiveSelectingVolume = aBoxVolume;
-        }
-
-        //! Calculates the point on a view ray that was detected during the run of selection algo by given depth.
-        //! Throws exception if active selection type is not Point.
-        //public abstract gp_Pnt DetectedPoint(double theDepth);
-        // =======================================================================
-        // function : DetectedPoint
-        // purpose  : Calculates the point on a view ray that was detected during
-        //            the run of selection algo by given depth. Is valid for point
-        //            selection only
-        // =======================================================================
-        public gp_Pnt DetectedPoint(double theDepth)
-        {
-            Standard_ASSERT_RAISE(myActiveSelectingVolume != null,
-              "SelectMgr_SelectingVolumeManager::DetectedPoint() should be called after initialization of selection volume");
-            return myActiveSelectingVolume.DetectedPoint(theDepth);
-        }
-
-        private void Standard_ASSERT_RAISE(bool cond, string v)
-        {
-            if (!cond)
-                throw new Standard_ASSERT_RAISE(v);
-        }
-
-        internal Graphic3d_Camera Camera()
-        {
-            if (myActiveSelectingVolume == null)
-            {
-                Graphic3d_Camera anEmptyCamera = new Graphic3d_Camera();
-                return anEmptyCamera;
-            }
-            return myActiveSelectingVolume.Camera();
-
-        }
-
-        internal void InitPointSelectingVolume(gp_Pnt2d aMousePos)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal void SetCamera(Graphic3d_Camera graphic3d_Camera)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal void SetPixelTolerance(object value)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal void SetWindowSize(int aWidth, int aHeight)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal void WindowSize(ref int xx, ref int yy)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-
-    //! This class contains representation of rectangular selecting frustum, created in case
-    //! of point and box selection, and algorithms for overlap detection between selecting
-    //! frustum and sensitive entities. The principle of frustum calculation:
-    //! - for point selection: on a near view frustum plane rectangular neighborhood of
-    //!                        user-picked point is created according to the pixel tolerance
-    //!                        given and then this rectangle is projected onto far view frustum
-    //!                        plane. This rectangles define the parallel bases of selecting frustum;
-    //! - for box selection: box points are projected onto near and far view frustum planes.
-    //!                      These 2 projected rectangles define parallel bases of selecting frustum.
-    //! Overlap detection tests are implemented according to the terms of separating axis
-    //! theorem (SAT).
-    public class SelectMgr_RectangularFrustum : SelectMgr_Frustum //<4>
-
-    {
-        //! Auxiliary structure to define selection primitive (point or box)
-        //! In case of point selection min and max points are identical.
-        public struct SelectionRectangle
-        {
-            public SelectionRectangle()
-            {
-                //: myMinPnt(gp_Pnt2d(RealLast(), RealLast())),
-                //   myMaxPnt(gp_Pnt2d(RealLast(), RealLast())) 
-            }
-
-            public gp_Pnt2d MousePos() { return myMinPnt; }
-            public void SetMousePos(gp_Pnt2d thePos) { myMinPnt = thePos; myMaxPnt = thePos; }
-
-            public gp_Pnt2d MinPnt() { return myMinPnt; }
-            public void SetMinPnt(gp_Pnt2d theMinPnt) { myMinPnt = theMinPnt; }
-
-            public gp_Pnt2d MaxPnt() { return myMaxPnt; }
-            public void SetMaxPnt(gp_Pnt2d theMaxPnt) { myMaxPnt = theMaxPnt; }
-
-
-            gp_Pnt2d myMinPnt;
-            gp_Pnt2d myMaxPnt;
-        }
-
-        public void Init(gp_Pnt2d theMinPnt,
-                                                 gp_Pnt2d theMaxPnt)
-        {
-            mySelectionType = SelectMgr_SelectionType.SelectMgr_SelectionType_Box;
-            mySelRectangle.SetMinPnt(theMinPnt);
-            mySelRectangle.SetMaxPnt(theMaxPnt);
-        }
-        SelectionRectangle mySelRectangle;              //!< parameters for selection by point or box (it is used to build frustum)
-        gp_Pnt myNearPickedPnt;             //!< 3d projection of user-picked selection point onto near view plane
-        gp_Pnt myFarPickedPnt;              //!< 3d projection of user-picked selection point onto far view plane
-        gp_Dir myViewRayDir;                //!< view ray direction
-        double myScale;                     //!< Scale factor of applied transformation, if there was any
-
-
-    }
     public enum SelectMgr_SelectionType
     {
 
@@ -428,34 +284,6 @@ namespace TKV3d
     //! the selecting frustum
     public class SelectMgr_BaseFrustum : SelectMgr_BaseIntersector
     {
-    }
-
-    //! This class is an interface for different types of selecting intersector,
-    //! defining different selection types, like point, box or polyline
-    //! selection. It contains signatures of functions for detection of
-    //! overlap by sensitive entity and initializes some data for building
-    //! the selecting intersector
-    public class SelectMgr_BaseIntersector
-    {
-        //! Return camera definition.
-        public Graphic3d_Camera Camera() { return myCamera; }
-
-        //! Calculates the point on a view ray that was detected during the run of selection algo by given depth.
-        //! It makes sense only for intersectors built on a single point.
-        //! This method returns infinite point for the base class.
-        public gp_Pnt DetectedPoint(double theDepth)
-        {
-            return new gp_Pnt(RealLast(), RealLast(), RealLast());
-        }
-
-        private double RealLast()
-        {
-            return double.MaxValue;
-        }
-
-        protected Graphic3d_Camera myCamera;        //!< camera definition (if builder isn't NULL it is the same as its camera)
-        protected SelectMgr_SelectionType mySelectionType; //!< type of selection
-
     }
     //! An internal class for calculation of current largest tolerance value which will be applied for creation of selecting frustum by default.
     //! Each time the selection set is deactivated, maximum tolerance value will be recalculated.
@@ -642,7 +470,6 @@ namespace TKV3d
     {
 
     }
-
 }
 
 

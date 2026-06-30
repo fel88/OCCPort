@@ -1,4 +1,6 @@
-﻿using OCCPort;
+﻿global using TColStd_SequenceOfInteger = TKernel.NCollection_Sequence<int>;
+
+using OCCPort;
 using OCCPort.Common;
 using TKBRep;
 using TKG3d;

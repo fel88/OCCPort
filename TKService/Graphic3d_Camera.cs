@@ -730,25 +730,27 @@ namespace TKService
             InvalidateOrientation();
 
         }
-        private double ZFar()
+
+        public double ZFar()
         {
             return myZFar;
         }
 
-        private double ZNear()
+        public double ZNear()
         {
-
             return myZNear;
-
         }
+
         public Graphic3d_Mat4d OrientationMatrix()
         {
             return UpdateOrientation(myMatricesD).Orientation;
         }
+
         public NCollection_Mat4<double> ProjectionMatrix()
         {
             return UpdateProjection(myMatricesD).MProjection;
         }
+
         private TransformMatrices<double> UpdateOrientation(TransformMatrices<double> theMatrices)
         {
 

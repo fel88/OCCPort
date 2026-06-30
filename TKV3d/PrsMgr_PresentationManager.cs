@@ -1,4 +1,6 @@
-﻿using TKMath;
+﻿using OCCPort.Common;
+using System.Reflection.Metadata;
+using TKMath;
 using TKService;
 
 namespace TKV3d
@@ -177,18 +179,124 @@ namespace TKV3d
             throw new NotImplementedException();
         }
 
-        internal void SetVisibility(AIS_InteractiveObject theIObj, int anOldMode, bool v)
+        public void SetVisibility(PrsMgr_PresentableObject thePrsObj, int theMode, bool theValue)
         {
-            throw new NotImplementedException();
-        }
-    }
-    //! Defines a "shadow" of existing presentation object with custom aspects.
-    public class Prs3d_PresentationShadow : Graphic3d_Structure
-    {
-        //! Returns the id of the parent presentation
-        public int ParentId() { return myParentStructId; }
-        int myParentStructId;
+            if (thePrsObj.ToPropagateVisualState())
+            {
+                for (PrsMgr_ListOfPresentableObjectsIter anIter = new PrsMgr_ListOfPresentableObjectsIter(thePrsObj.Children()); anIter.More(); anIter.Next())
+                {
+                    PrsMgr_PresentableObject aChild = anIter.Value();
+                    if (!theValue
+                      || aChild.DisplayStatus() != PrsMgr_DisplayStatus.PrsMgr_DisplayStatus_Erased)
+                    {
+                        SetVisibility(anIter.Value(), theMode, theValue);
+                    }
+                }
+            }
+            if (!thePrsObj.HasOwnPresentations())
+            {
+                return;
+            }
 
+            PrsMgr_Presentation aPrs = Presentation(thePrsObj, theMode);
+            if (aPrs != null)
+            {
+                aPrs.SetVisible(theValue);
+            }
+        }
+
+        //! returns True if the immediate display has been done.
+        public void EndImmediateDraw(V3d_Viewer theViewer)
+        {
+            if (--myImmediateModeOn > 0)
+            {
+                return;
+            }
+
+            displayImmediate(theViewer);
+        }
+        // =======================================================================
+        // function : displayImmediate
+        // purpose  : Handles the structures from myImmediateList and its visibility
+        //            in all views of the viewer given by setting proper affinity
+        // =======================================================================
+        void displayImmediate(V3d_Viewer theViewer)
+        {
+            for (V3d_ListOfViewIterator anActiveViewIter = new V3d_ListOfViewIterator(theViewer.ActiveViewIterator()); anActiveViewIter.More(); anActiveViewIter.Next())
+            {
+                Graphic3d_CView aView = anActiveViewIter.Value().View();
+
+                for (PrsMgr_ListOfPresentations.Iterator anIter = new TKernel.NCollection_List<Graphic3d_Structure>.Iterator(myImmediateList); anIter.More(); anIter.Next())
+                {
+                    Prs3d_Presentation aPrs = anIter.Value();
+                    if (aPrs == null)
+                        continue;
+
+                    Graphic3d_Structure aViewDepPrs = new Graphic3d_Structure();
+                    Prs3d_PresentationShadow aShadowPrs = (Prs3d_PresentationShadow)(aPrs);
+                    if (aShadowPrs != null && aView.IsComputed(aShadowPrs.ParentId(), ref aViewDepPrs))
+                    {
+                        Graphic3d_ZLayerId aZLayer = aShadowPrs.GetZLayer();
+                        aShadowPrs = null;
+
+                        /*aShadowPrs = new Prs3d_PresentationShadow(myStructureManager, aViewDepPrs);
+                        aShadowPrs.SetZLayer(aZLayer);
+                        aShadowPrs.SetClipPlanes(aViewDepPrs->ClipPlanes());
+                        aShadowPrs.CStructure().IsForHighlight = 1;
+                        aShadowPrs.Highlight(aPrs.HighlightStyle());*/
+                        myViewDependentImmediateList.Append(aShadowPrs);
+                    }
+                    // handles custom highlight presentations which were defined in overridden
+                    // HilightOwnerWithColor method of a custom AIS objects and maintain its
+                    // visibility in different views on their own
+                    else if (aShadowPrs == null)
+                    {
+                        aPrs.Display();
+                        continue;
+                    }
+
+                    if (!aShadowPrs.IsDisplayed())
+                    {
+                        aShadowPrs.CStructure().ViewAffinity = new Graphic3d_ViewAffinity();
+                        aShadowPrs.CStructure().ViewAffinity.SetVisible(false);
+                        aShadowPrs.Display();
+                    }
+
+                    int aViewId = aView.Identification();
+                    bool isParentVisible = aShadowPrs.ParentAffinity() == null ?
+                      true : aShadowPrs.ParentAffinity().IsVisible(aViewId);
+                    aShadowPrs.CStructure().ViewAffinity.SetVisible(aViewId, isParentVisible);
+                }
+            }
+        }
+
+        internal void BeginImmediateDraw()
+        {
+
+            if (++myImmediateModeOn > 1)
+                return;
+
+            ClearImmediateDraw();
+        }
+
+        void ClearImmediateDraw()
+        {
+            //for (PrsMgr_ListOfPresentations::Iterator anIter (myImmediateList); anIter.More(); anIter.Next())
+            foreach (var anIter in myImmediateList)
+            {
+                anIter.Erase();
+
+            }
+
+            //for (PrsMgr_ListOfPresentations::Iterator anIter (myViewDependentImmediateList); anIter.More(); anIter.Next())
+            foreach (var anIter in myViewDependentImmediateList)
+            {
+                anIter.Erase();
+            }
+
+            myImmediateList.Clear();
+            myViewDependentImmediateList.Clear();
+        }
     }
 }
 
