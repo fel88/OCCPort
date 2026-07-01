@@ -20,12 +20,11 @@ namespace TKService
         public void InitOrientation()
         {
             myIsOrientationValid = true;
-            Orientation = new Graphic3d_Mat4d();
+            Orientation = new NCollection_Mat4<Elem_t>();
             Orientation.InitIdentity();
         }
 
 
-        public Graphic3d_Mat4d Orientation { get; internal set; }
 
         //! Invalidate orientation.
         public void ResetOrientation() { myIsOrientationValid = false; }
@@ -40,6 +39,7 @@ namespace TKService
 
         //! Return true if Projection was not invalidated.
         public bool IsProjectionValid() { return myIsProjectionValid; }
+        public NCollection_Mat4<Elem_t> Orientation { get; internal set; }
 
         public NCollection_Mat4<Elem_t> MProjection;
         public NCollection_Mat4<Elem_t> LProjection;

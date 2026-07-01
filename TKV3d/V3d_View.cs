@@ -39,6 +39,23 @@ namespace TKV3d
             }
         }
 
+        //! Defines the gradient background colors of the view by supplying the colors
+        //! and the fill method (horizontal by default).
+        public void SetBgGradientColors(Quantity_Color theColor1,
+                                             Quantity_Color theColor2,
+                                             Aspect_GradientFillMethod theFillStyle =Aspect_GradientFillMethod. Aspect_GradientFillMethod_Horizontal,
+                                             bool theToUpdate = false)
+        {
+            Aspect_GradientBackground aGradientBg = new Aspect_GradientBackground(theColor1, theColor2, theFillStyle);
+
+            myView.SetGradientBackground(aGradientBg);
+
+            if (myImmediateUpdate || theToUpdate)
+            {
+                Redraw();
+            }
+        }
+
         //! Pick subview from the given 2D point.
         public V3d_View PickSubview(Graphic3d_Vec2i thePnt)
         {
@@ -100,7 +117,7 @@ namespace TKV3d
                 }
             }
         }
-        
+
 
 
         //! Returns the viewer in which the view has been created.

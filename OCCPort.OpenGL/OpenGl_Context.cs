@@ -16,6 +16,50 @@ using OCCPort.Common;
 
 namespace OCCPort.OpenGL
 {
+    //! This class generalize access to the GL context and available extensions.
+    //!
+    //! Functions related to specific OpenGL version or extension are grouped into structures which can be accessed as fields of this class.
+    //! The most simple way to check that required functionality is available - is NULL check for the group:
+    //! @code
+    //!   if (myContext->core20 != NULL)
+    //!   {
+    //!     myGlProgram = myContext->core20->glCreateProgram();
+    //!     .. do more stuff ..
+    //!   }
+    //!   else
+    //!   {
+    //!     .. compatibility with outdated configurations ..
+    //!   }
+    //! @endcode
+    //!
+    //! Current implementation provide access to OpenGL core functionality up to 4.6 version (core12, core13, core14, etc.)
+    //! as well as several extensions (arbTBO, arbFBO, etc.).
+    //!
+    //! OpenGL context might be initialized in Core Profile. In this case deprecated functionality become unavailable.
+    //! To select which core** function set should be used in specific case:
+    //!  - Determine the minimal OpenGL version required for implemented functionality and use it to access all functions.
+    //!    For example, if algorithm requires OpenGL 2.1+, it is better to write core20fwd->glEnable() rather than core11fwd->glEnable() for uniformity.
+    //!  - Validate minimal requirements at initialization/creation time and omit checks within code where algorithm should be already initialized.
+    //!    Properly escape code incompatible with Core Profile. The simplest way to check Core Profile is "if (core11ffp == NULL)".
+    //!
+    //! Simplified extensions classification:
+    //!  - prefixed with NV, AMD, ATI are vendor-specific (however may be provided by other vendors in some cases);
+    //!  - prefixed with EXT are accepted by 2+ vendors;
+    //!  - prefixed with ARB are accepted by Architecture Review Board and are candidates
+    //!    for inclusion into GL core functionality.
+    //! Some functionality can be represented in several extensions simultaneously.
+    //! In this case developer should be careful because different specification may differ
+    //! in aspects (like enumeration values and error-handling).
+    //!
+    //! Notice that some systems provide mechanisms to simultaneously incorporate with GL contexts with different capabilities.
+    //! For this reason OpenGl_Context should be initialized and used for each GL context independently.
+    //!
+    //! Matrices of OpenGl transformations:
+    //! model -> world -> view -> projection
+    //! These matrices might be changed for local transformation, transform persistent using direct access to
+    //! current matrix of ModelWorldState, WorldViewState and ProjectionState
+    //! After, these matrices should be applied using ApplyModelWorldMatrix, ApplyWorldViewMatrix,
+    //! ApplyModelViewMatrix or ApplyProjectionMatrix.
     public class OpenGl_Context
     {
         public OpenGl_Context(OpenGl_Caps theCaps = null)
@@ -94,6 +138,7 @@ myLineFeather (1.0f),*/
             myRenderScale = (1.0f);
             myRenderScaleInv = 1.0f;
 
+            hasDrawBuffers = OpenGl_FeatureFlag.OpenGl_FeatureNotAvailable;
             caps = (theCaps != null ? theCaps : new OpenGl_Caps());
             myViewport[0] = 0;
             myViewport[1] = 0;
@@ -247,9 +292,9 @@ myLineFeather (1.0f),*/
                                            //! @name public properties tracking current state
         public bool hasUintIndex;       //!< GLuint for index buffer is supported (always available on desktop; on OpenGL ES - since 3.0 or as extension GL_OES_element_index_uint)
 
-        public OpenGl_MatrixState<float> ModelWorldState; //!< state of orientation matrix
-        public OpenGl_MatrixState<float> WorldViewState;  //!< state of orientation matrix
-        public OpenGl_MatrixState<float> ProjectionState; //!< state of projection  matrix
+        public OpenGl_MatrixState<float> ModelWorldState = new OpenGl_MatrixState<float>(); //!< state of orientation matrix
+        public OpenGl_MatrixState<float> WorldViewState = new OpenGl_MatrixState<float>();  //!< state of orientation matrix
+        public OpenGl_MatrixState<float> ProjectionState = new OpenGl_MatrixState<float>(); //!< state of projection  matrix
         OpenGl_GlCore32 core32;     //!< OpenGL 3.2 core profile
 
         internal bool GetResource<TheHandleType>(string theKey, ref TheHandleType theValue) where TheHandleType : class
@@ -350,7 +395,36 @@ myLineFeather (1.0f),*/
             return true;
         }
 
+        //! Sets camera object to the context and update matrices.
+        public void SetCamera(Graphic3d_Camera theCamera)
+        {
+            myCamera = theCamera;
+            if (theCamera != null)
+            {
+                ProjectionState.SetCurrent(theCamera.ProjectionMatrixF());
+                WorldViewState.SetCurrent(theCamera.OrientationMatrixF());
+                ApplyProjectionMatrix();
+                ApplyWorldViewMatrix();
+            }
+        }
 
+        readonly OpenGl_Mat4 THE_IDENTITY_MATRIX = new NCollection_Mat4<float>();
+
+        // =======================================================================
+        // function : ApplyWorldViewMatrix
+        // purpose  :
+        // =======================================================================
+        public void ApplyWorldViewMatrix()
+        {
+            if (myShaderManager.ModelWorldState().ModelWorldMatrix() != THE_IDENTITY_MATRIX)
+            {
+                myShaderManager.UpdateModelWorldStateTo(THE_IDENTITY_MATRIX);
+            }
+            if (myShaderManager.WorldViewState().WorldViewMatrix() != WorldViewState.Current())
+            {
+                myShaderManager.UpdateWorldViewStateTo(WorldViewState.Current());
+            }
+        }
         //! Switch read/draw buffers.
         public void SetReadDrawBuffer(int theBuffer)
         {
@@ -478,7 +552,10 @@ myLineFeather (1.0f),*/
 
         internal void ApplyProjectionMatrix()
         {
-            throw new NotImplementedException();
+            if (myShaderManager.ProjectionState().ProjectionMatrix() != ProjectionState.Current())
+            {
+                myShaderManager.UpdateProjectionStateTo(ProjectionState.Current());
+            }
         }
 
         internal void ApplyModelViewMatrix()
@@ -950,7 +1027,9 @@ myLineFeather (1.0f),*/
         bool myIsStereoBuffers;      //!< context supports stereo buffering
         bool myHasMsaaTextures;      //!< context supports MSAA textures
         Aspect_Display myDisplay;  //!< display           EGLDisplay | HDC   | Display*
-
+        public OpenGl_FeatureFlag hasDrawBuffers;     //!< Complex flag indicating support of multiple draw buffers (desktop OpenGL 2.0, OpenGL ES 3.0, GL_ARB_draw_buffers, GL_EXT_draw_buffers)
+        public bool arbDrawBuffers;     //!< GL_ARB_draw_buffers
+        public bool extDrawBuffers;     //!< GL_EXT_draw_buffers
 
 
 
@@ -964,10 +1043,4 @@ myLineFeather (1.0f),*/
 
 
     }
-    public enum OpenGl_FeatureFlag
-    {
-        OpenGl_FeatureNotAvailable = 0, //!< Feature is not supported by OpenGl implementation.
-        OpenGl_FeatureInExtensions = 1, //!< Feature is supported as extension.
-        OpenGl_FeatureInCore = 2  //!< Feature is supported as part of core profile.
-    };
 }

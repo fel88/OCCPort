@@ -1,5 +1,7 @@
-﻿using OpenTK;
+﻿using OCCPort.Common;
+using OpenTK;
 using System;
+using TKernel;
 using TKMath;
 using TKService;
 
@@ -83,14 +85,14 @@ namespace OCCPort.OpenGL
                     if (theProjection == Graphic3d_Camera.Projection.Projection_MonoLeftEye)
                     {
                         Graphic3d_Mat4 aMatProjL, aMatHeadToEyeL, aMatProjR, aMatHeadToEyeR;
-                     //   aCamera.StereoProjectionF(aMatProjL, aMatHeadToEyeL, aMatProjR, aMatHeadToEyeR);
+                        //   aCamera.StereoProjectionF(aMatProjL, aMatHeadToEyeL, aMatProjR, aMatHeadToEyeR);
                         //aProjection = aMatProjL;
                     }
                     else if (theProjection == Graphic3d_Camera.Projection.Projection_MonoRightEye)
                     {
                         Graphic3d_Mat4 aMatProjL, aMatHeadToEyeL, aMatProjR, aMatHeadToEyeR;
-                   //     aCamera.StereoProjectionF(aMatProjL, aMatHeadToEyeL, aMatProjR, aMatHeadToEyeR);
-                      //  aProjection = aMatProjR;
+                        //     aCamera.StereoProjectionF(aMatProjL, aMatHeadToEyeL, aMatProjR, aMatHeadToEyeR);
+                        //  aProjection = aMatProjR;
                     }
                 }
             }
@@ -98,9 +100,9 @@ namespace OCCPort.OpenGL
             {
                 aProjection.InitIdentity();
                 aWorldView.InitIdentity();
-              // if (aCtx.Camera().Tile().IsValid())
+                // if (aCtx.Camera().Tile().IsValid())
                 {
-                 //   aWorldView.SetDiagonal(OpenGl_Vec4(2.0f / aTileSize.x(), 2.0f / aTileSize.y(), 1.0f, 1.0f));
+                    //   aWorldView.SetDiagonal(OpenGl_Vec4(2.0f / aTileSize.x(), 2.0f / aTileSize.y(), 1.0f, 1.0f));
                     if (myType == Graphic3d_TypeOfBackground.Graphic3d_TOB_GRADIENT)
                     {
                         //aWorldView.SetColumn(3, OpenGl_Vec4(-1.0f - 2.0f * aTileOffset.x() / aTileSize.x(),
@@ -108,16 +110,16 @@ namespace OCCPort.OpenGL
                     }
                     else
                     {
-                   //     aWorldView.SetColumn(3, OpenGl_Vec4(-1.0f + (float)aViewSizeX / aTileSize.x() - 2.0f * aTileOffset.x() / aTileSize.x(),
-                          //                                    -1.0f + (float)aViewSizeY / aTileSize.y() - 2.0f * aTileOffset.y() / aTileSize.y(), 0.0f, 1.0f));
+                        //     aWorldView.SetColumn(3, OpenGl_Vec4(-1.0f + (float)aViewSizeX / aTileSize.x() - 2.0f * aTileOffset.x() / aTileSize.x(),
+                        //                                    -1.0f + (float)aViewSizeY / aTileSize.y() - 2.0f * aTileOffset.y() / aTileSize.y(), 0.0f, 1.0f));
                     }
                 }
-             //   else
+                //   else
                 {
-                   // aWorldView.SetDiagonal(OpenGl_Vec4(2.0f / myViewWidth, 2.0f / myViewHeight, 1.0f, 1.0f));
+                    // aWorldView.SetDiagonal(OpenGl_Vec4(2.0f / myViewWidth, 2.0f / myViewHeight, 1.0f, 1.0f));
                     if (myType == Graphic3d_TypeOfBackground.Graphic3d_TOB_GRADIENT)
                     {
-                      //  aWorldView.SetColumn(3, OpenGl_Vec4(-1.0f, -1.0f, 0.0f, 1.0f));
+                        //  aWorldView.SetColumn(3, OpenGl_Vec4(-1.0f, -1.0f, 0.0f, 1.0f));
                     }
                 }
             }
@@ -145,6 +147,32 @@ namespace OCCPort.OpenGL
         internal bool IsDefined()
         {
             throw new NotImplementedException();
+        }
+        void invalidateData()
+        {
+            myToUpdate = true;
+        }
+
+
+        //! Sets background gradient parameters
+        public void SetGradientParameters(Quantity_Color theColor1,
+                                               Quantity_Color theColor2,
+                                               Aspect_GradientFillMethod theType)
+        {
+            if (myType != Graphic3d_TypeOfBackground.Graphic3d_TOB_GRADIENT)
+            {
+                return;
+            }
+
+            double anR = 0, aG = 0, aB = 0;
+            theColor1.Values(ref anR, ref aG, ref aB, Quantity_TypeOfColor.Quantity_TOC_RGB);
+            myGradientParams.color1 = new OpenGl_Vec4((float)anR, (float)aG, (float)aB, 0.0f);
+
+            theColor2.Values(ref anR, ref aG, ref aB, Quantity_TypeOfColor.Quantity_TOC_RGB);
+            myGradientParams.color2 = new OpenGl_Vec4((float)anR, (float)aG, (float)aB, 0.0f);
+
+            myGradientParams.type = theType;
+            invalidateData();
         }
 
         internal Aspect_FillMethod TextureFillMethod()

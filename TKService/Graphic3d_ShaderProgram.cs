@@ -17,7 +17,7 @@ namespace TKService
         public Graphic3d_ShaderVariableList Variables() { return myVariables; }
 
         //! Return the list of custom vertex attributes.
-        public  Graphic3d_ShaderAttributeList VertexAttributes() { return myAttributes; }
+        public Graphic3d_ShaderAttributeList VertexAttributes() { return myAttributes; }
 
 
         // =======================================================================
@@ -28,6 +28,9 @@ namespace TKService
         {
             myVariables.Clear();
         }
+
+        //! Pushes vec3 uniform.
+        public bool PushVariableVec3(string theName, Graphic3d_Vec3 theValue) { return PushVariable(theName, theValue); }
 
         // =======================================================================
         // function : AttachShader

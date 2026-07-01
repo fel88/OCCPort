@@ -106,6 +106,15 @@ namespace OCCPort.OpenGL
         {
             GL.Uniform4(location, v2, theValue.ToFloatArray());
         }
+        internal void glUniform4fv(int location, int v2, float[] theValue)
+        {
+            GL.Uniform4(location, v2, theValue);
+        }
+
+        internal void glUniformMatrix4fv(int theLocation, int count, bool transpose, float[] data)
+        {
+            GL.UniformMatrix4(theLocation, count, transpose, data);
+        }
 
         internal void glUseProgram(int v)
         {

@@ -7,14 +7,18 @@ using System.Numerics;
 using System.Reflection.Metadata;
 using System.Xml.Linq;
 using TKernel;
+using TKMath;
 using TKService;
 
 namespace OCCPort.OpenGL
 {
+    //! Implementation of OpenGl view.
     public class OpenGl_View : Graphic3d_CView
     {
         OpenGl_FrameBuffer[] myMainSceneFbos;
         OpenGl_FrameBuffer[] myMainSceneFbosOit;
+        gp_XYZ myLocalOrigin;
+
         public override void changeZLayer(Graphic3d_CStructure theStructure,
                                  Graphic3d_ZLayerId theNewLayerId)
         {
@@ -28,19 +32,19 @@ namespace OCCPort.OpenGL
         public override void SetGradientBackground(Aspect_GradientBackground theBackground)
         {
             Quantity_Color aColor1, aColor2;
-            /*  theBackground.Colors(aColor1, aColor2);
-              myBackgrounds[Graphic3d_TOB_GRADIENT]->SetGradientParameters(aColor1, aColor2, theBackground.BgGradientFillMethod());
-              if (theBackground.BgGradientFillMethod() >= Aspect_GradientFillMethod. Aspect_GradientFillMethod_Corner1
-               && theBackground.BgGradientFillMethod() <= Aspect_GradientFillMethod.Aspect_GradientFillMethod_Corner4)
-              {
-                  var aCtx = myWorkspace.GetGlContext();
-                  if (aCtx != null)
-                  {
-                      myColoredQuadParams.Aspect().SetShaderProgram(aCtx.ShaderManager().GetColoredQuadProgram());
-                      myColoredQuadParams.Aspect().ShaderProgram().PushVariableVec3("uColor1", aColor1.Rgb());
-                      myColoredQuadParams.Aspect().ShaderProgram().PushVariableVec3("uColor2", aColor2.Rgb());
-                  }
-              }*/
+            theBackground.Colors(out aColor1,out aColor2);
+            myBackgrounds[(int)Graphic3d_TypeOfBackground.Graphic3d_TOB_GRADIENT].SetGradientParameters(aColor1, aColor2, theBackground.BgGradientFillMethod());
+            if (theBackground.BgGradientFillMethod() >= Aspect_GradientFillMethod.Aspect_GradientFillMethod_Corner1
+             && theBackground.BgGradientFillMethod() <= Aspect_GradientFillMethod.Aspect_GradientFillMethod_Corner4)
+            {
+                var aCtx = myWorkspace.GetGlContext();
+                if (aCtx != null)
+                {
+                    myColoredQuadParams.Aspect().SetShaderProgram(aCtx.ShaderManager().GetColoredQuadProgram());
+                    myColoredQuadParams.Aspect().ShaderProgram().PushVariableVec3("uColor1", aColor1.Rgb());
+                    myColoredQuadParams.Aspect().ShaderProgram().PushVariableVec3("uColor2", aColor2.Rgb());
+                }
+            }
             myBackgroundType = Graphic3d_TypeOfBackground.Graphic3d_TOB_GRADIENT;
         }
 
@@ -478,6 +482,8 @@ namespace OCCPort.OpenGL
             return myWorkspace.FBOCreate(theWidth, theHeight);
         }
         OpenGl_FrameBuffer[] myImmediateSceneFbosOit = new OpenGl_FrameBuffer[2]; //!< Additional buffers for transparency draw of immediate layer.
+
+        //! Redraw content of the view.
         public override void Redraw()
         {
             bool wasDisabledMSAA = myToDisableMSAA;
@@ -1521,7 +1527,7 @@ namespace OCCPort.OpenGL
                     aDestSize = new Graphic3d_Vec2i(new Graphic3d_Vec2d(aDestSize) / new Graphic3d_Vec2d(aSubView.RenderingParams().RenderResolutionScale));
                 }
                 //aSubViewPos.y() = aWinSize.y() - aDestSize.y() - aSubViewPos.y();
-                aSubViewPos.y( aWinSize.y() - aDestSize.y() - aSubViewPos.y());
+                aSubViewPos.y(aWinSize.y() - aDestSize.y() - aSubViewPos.y());
 
                 var aFilterGl = aDestSize == aSubViewSize ? BlitFramebufferFilter.Nearest : BlitFramebufferFilter.Linear;
                 aCtx.arbFBOBlit.glBlitFramebuffer(0, 0, aSubViewSize.x(), aSubViewSize.y(),
@@ -1537,7 +1543,7 @@ namespace OCCPort.OpenGL
                         myToDisableMSAA = true;
                         aMsg += "\n  MSAA settings should not be overridden by driver!";
                     }
-                    aCtx.PushMessage(GLConstants. GL_DEBUG_SOURCE_APPLICATION, GLConstants.GL_DEBUG_TYPE_ERROR, 0, GLConstants.GL_DEBUG_SEVERITY_HIGH, aMsg);
+                    aCtx.PushMessage(GLConstants.GL_DEBUG_SOURCE_APPLICATION, GLConstants.GL_DEBUG_TYPE_ERROR, 0, GLConstants.GL_DEBUG_SEVERITY_HIGH, aMsg);
                 }
 
                 if (theDrawFbo != null
@@ -1633,10 +1639,12 @@ namespace OCCPort.OpenGL
             //aContext->BindTextures(Handle(OpenGl_TextureSet)(), Handle(OpenGl_ShaderProgram)());
 
         }
-        //=======================================================================
-        //function : Render
-        //purpose  :
-        //=======================================================================
+
+        //! Renders the graphical contents of the view into the preprepared window or framebuffer.
+        //! @param theProjection [in] the projection that should be used for rendering.
+        //! @param theReadDrawFbo [in] the framebuffer for rendering graphics.
+        //! @param theOitAccumFbo [in] the framebuffer for accumulating color and coverage for OIT process.
+        //! @param theToDrawImmediate [in] the flag indicates whether the rendering performs in immediate mode.
         void render(Graphic3d_Camera.Projection theProjection,
                                       OpenGl_FrameBuffer theOutputFBO,
                                       OpenGl_FrameBuffer theOitAccumFbo,
@@ -1652,6 +1660,23 @@ namespace OCCPort.OpenGL
             aContext?.SetAllowSampleAlphaToCoverage(myRenderParams.ToEnableAlphaToCoverage
                                                   && theOutputFBO != null
                                                   && theOutputFBO.NbSamples() != 0);
+
+
+             OpenGl_ShaderManager aManager = aContext.ShaderManager();
+            // Update matrices if camera has changed.
+            //Graphic3d_WorldViewProjState aWVPState = myCamera.WorldViewProjState();
+            //if (myWorldViewProjState != aWVPState)
+            //{
+            //    myAccumFrames = 0;
+            //    myWorldViewProjState = aWVPState;
+            //}
+
+            myLocalOrigin.SetCoord(0.0, 0.0, 0.0);
+            aContext.SetCamera(myCamera);
+            if (aManager.ModelWorldState().Index() == 0)
+            {
+                aContext.ShaderManager().UpdateModelWorldStateTo(new OpenGl_Mat4());
+            }
             // ====================================
             //      Step 2: Redraw background
             // ====================================

@@ -2,6 +2,8 @@
 
 namespace OCCPort.OpenGL
 {
+    //! Defines interface for OpenGL state.
+
     public class OpenGl_StateInterface
     {
 

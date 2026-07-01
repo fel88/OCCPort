@@ -3,6 +3,7 @@ global using OpenGl_ShaderProgramList = TKernel.NCollection_Sequence<OCCPort.Ope
 
 using OCCPort.Common;
 using OCCPort.Enums;
+using OpenTK.Audio.OpenAL;
 using OpenTK.Compute.OpenCL;
 using OpenTK.Graphics.Egl;
 using OpenTK.Graphics.OpenGL;
@@ -16,8 +17,129 @@ using TKService;
 
 namespace OCCPort.OpenGL
 {
+    //! This class is responsible for managing shader programs.
     public class OpenGl_ShaderManager : Graphic3d_ShaderManager
     {
+
+        //! Returns current state of OCCT projection transform.
+        public  OpenGl_ProjectionState ProjectionState()  { return myProjectionState; }
+
+        // =======================================================================
+        // function : SetProjectionState
+        // purpose  : Sets new state of OCCT projection transform
+        // =======================================================================
+        public void UpdateProjectionStateTo(OpenGl_Mat4 theProjectionMatrix)
+        {
+            myProjectionState.Set(theProjectionMatrix);
+            myProjectionState.Update();
+        }
+
+        //! Pushes current state of OCCT model-world transform to specified program (only on state change).
+        public void PushModelWorldState(OpenGl_ShaderProgram theProgram)
+        {
+            if (myModelWorldState.Index() != theProgram.ActiveState(OpenGl_UniformStateType.OpenGl_MODEL_WORLD_STATE))
+            {
+                pushModelWorldState(theProgram);
+            }
+        }
+
+        //! Returns current state of OCCT world-view transform.
+        public OpenGl_WorldViewState WorldViewState() { return myWorldViewState; }
+
+        //! Updates state of OCCT world-view transform.
+        public void UpdateWorldViewStateTo(OpenGl_Mat4 theWorldViewMatrix)
+        {
+            myWorldViewState.Set(theWorldViewMatrix);
+            myWorldViewState.Update();
+        }
+
+        //! Returns current state of OCCT model-world transform.
+        public OpenGl_ModelWorldState ModelWorldState() { return myModelWorldState; }
+
+        // =======================================================================
+        // function : SetModelWorldState
+        // purpose  : Sets new state of OCCT model-world transform
+        // =======================================================================
+        public void UpdateModelWorldStateTo(OpenGl_Mat4 theModelWorldMatrix)
+        {
+            myModelWorldState.Set(theModelWorldMatrix);
+            myModelWorldState.Update();
+        }
+        // =======================================================================
+        // function : pushProjectionState
+        // purpose  :
+        // =======================================================================
+        void pushProjectionState(OpenGl_ShaderProgram theProgram)
+        {
+            theProgram.UpdateState(OpenGl_UniformStateType.OpenGl_PROJECTION_STATE, myProjectionState.Index());
+            if (theProgram == myFfpProgram)
+            {
+                if (myContext.core11ffp != null)
+                {
+                    myContext.core11ffp.glMatrixMode(All.Projection);
+                    myContext.core11ffp.glLoadMatrixf(myProjectionState.ProjectionMatrix().GetData());
+                }
+                return;
+            }
+
+            theProgram.SetUniform(myContext,
+                                    theProgram.GetStateLocation(OpenGl_StateVariable.OpenGl_OCC_PROJECTION_MATRIX),
+                                    myProjectionState.ProjectionMatrix());
+
+            GLint aLocation = theProgram.GetStateLocation(OpenGl_StateVariable.OpenGl_OCC_PROJECTION_MATRIX_INVERSE);
+            if (aLocation != OpenGl_ShaderProgram.INVALID_LOCATION)
+            {
+                theProgram.SetUniform(myContext, aLocation, myProjectionState.ProjectionMatrixInverse());
+            }
+
+            theProgram.SetUniform(myContext,
+                                    theProgram.GetStateLocation(OpenGl_StateVariable.OpenGl_OCC_PROJECTION_MATRIX_TRANSPOSE),
+                                    myProjectionState.ProjectionMatrix(), true);
+
+            aLocation = theProgram.GetStateLocation(OpenGl_StateVariable.OpenGl_OCC_PROJECTION_MATRIX_INVERSE_TRANSPOSE);
+            if (aLocation != OpenGl_ShaderProgram.INVALID_LOCATION)
+            {
+                theProgram.SetUniform(myContext, aLocation, myProjectionState.ProjectionMatrixInverse(), true);
+            }
+        }
+
+        //! Pushes current state of OCCT model-world transform to specified program.
+        public void pushModelWorldState(OpenGl_ShaderProgram theProgram)
+        {
+            theProgram.UpdateState(OpenGl_UniformStateType.OpenGl_MODEL_WORLD_STATE, myModelWorldState.Index());
+            if (theProgram == myFfpProgram)
+            {
+                if (myContext.core11ffp != null)
+                {
+                    OpenGl_Mat4 aModelView = myWorldViewState.WorldViewMatrix() * myModelWorldState.ModelWorldMatrix();
+                    myContext.core11ffp.glMatrixMode(All.Modelview);
+                    myContext.core11ffp.glLoadMatrixf(aModelView.GetData());
+                    theProgram.UpdateState(OpenGl_UniformStateType.OpenGl_WORLD_VIEW_STATE, myWorldViewState.Index());
+                }
+                return;
+            }
+
+            theProgram.SetUniform(myContext,
+                                    theProgram.GetStateLocation(OpenGl_StateVariable.OpenGl_OCC_MODEL_WORLD_MATRIX),
+                                    myModelWorldState.ModelWorldMatrix());
+
+            GLint aLocation = theProgram.GetStateLocation(OpenGl_StateVariable.OpenGl_OCC_MODEL_WORLD_MATRIX_INVERSE);
+            if (aLocation != OpenGl_ShaderProgram.INVALID_LOCATION)
+            {
+                theProgram.SetUniform(myContext, aLocation, myModelWorldState.ModelWorldMatrixInverse());
+            }
+
+            theProgram.SetUniform(myContext,
+                                    theProgram.GetStateLocation(OpenGl_StateVariable.OpenGl_OCC_MODEL_WORLD_MATRIX_TRANSPOSE),
+                                    myModelWorldState.ModelWorldMatrix(), true);
+
+            aLocation = theProgram.GetStateLocation(OpenGl_StateVariable.OpenGl_OCC_MODEL_WORLD_MATRIX_INVERSE_TRANSPOSE);
+            if (aLocation != OpenGl_ShaderProgram.INVALID_LOCATION)
+            {
+                theProgram.SetUniform(myContext, aLocation, myModelWorldState.ModelWorldMatrixInverse(), true);
+            }
+        }
+
         //! Overwrites context
         public void SetContext(OpenGl_Context theCtx)
         {
@@ -141,8 +263,8 @@ namespace OCCPort.OpenGL
 
 
         OpenGl_ProjectionState myProjectionState = new OpenGl_ProjectionState();    //!< State of OCCT projection  transformation
-        OpenGl_ModelWorldState myModelWorldState;    //!< State of OCCT model-world transformation
-        OpenGl_WorldViewState myWorldViewState;     //!< State of OCCT world-view  transformation
+        OpenGl_ModelWorldState myModelWorldState = new OpenGl_ModelWorldState();    //!< State of OCCT model-world transformation
+        OpenGl_WorldViewState myWorldViewState = new OpenGl_WorldViewState();     //!< State of OCCT world-view  transformation
         //OpenGl_ClippingState myClippingState;      //!< State of OCCT clipping planes
         OpenGl_LightSourceState myLightSourceState;   //!< State of OCCT light sources
         OpenGl_MaterialState myMaterialState = new OpenGl_MaterialState();      //!< State of Front and Back materials
@@ -406,39 +528,60 @@ namespace OCCPort.OpenGL
             }
         }
 
-        private void pushProjectionState(OpenGl_ShaderProgram theProgram)
+
+        // =======================================================================
+        // function : pushWorldViewState
+        // purpose  :
+        // =======================================================================
+        void pushWorldViewState(OpenGl_ShaderProgram theProgram)
         {
-            theProgram.UpdateState(OpenGl_UniformStateType.OpenGl_PROJECTION_STATE, myProjectionState.Index());
+            if (myWorldViewState.Index() == theProgram.ActiveState(OpenGl_UniformStateType.OpenGl_WORLD_VIEW_STATE))
+            {
+                return;
+            }
+
+            theProgram.UpdateState(OpenGl_UniformStateType.OpenGl_WORLD_VIEW_STATE, myWorldViewState.Index());
             if (theProgram == myFfpProgram)
             {
                 if (myContext.core11ffp != null)
                 {
-                    myContext.core11ffp.glMatrixMode(All.Projection);
-                    myContext.core11ffp.glLoadMatrixf(myProjectionState.ProjectionMatrix());
+                    OpenGl_Mat4 aModelView = myWorldViewState.WorldViewMatrix() * myModelWorldState.ModelWorldMatrix();
+                    myContext.core11ffp.glMatrixMode(All.Modelview);
+                    myContext.core11ffp.glLoadMatrixf(aModelView.GetData());
+                    theProgram.UpdateState(OpenGl_UniformStateType.OpenGl_MODEL_WORLD_STATE, myModelWorldState.Index());
                 }
                 return;
             }
-            /*
-             
-  theProgram->SetUniform (myContext,
-                          theProgram->GetStateLocation (OpenGl_OCC_PROJECTION_MATRIX),
-                          myProjectionState.ProjectionMatrix());
 
-  GLint aLocation = theProgram->GetStateLocation (OpenGl_OCC_PROJECTION_MATRIX_INVERSE);
-  if (aLocation != OpenGl_ShaderProgram::INVALID_LOCATION)
-  {
-    theProgram->SetUniform (myContext, aLocation, myProjectionState.ProjectionMatrixInverse());
-  }
+            theProgram.SetUniform(myContext,
+                                    theProgram.GetStateLocation(OpenGl_StateVariable.OpenGl_OCC_WORLD_VIEW_MATRIX),
+                                    myWorldViewState.WorldViewMatrix());
 
-  theProgram->SetUniform (myContext,
-                          theProgram->GetStateLocation (OpenGl_OCC_PROJECTION_MATRIX_TRANSPOSE),
-                          myProjectionState.ProjectionMatrix(), true);
+            GLint aLocation = theProgram.GetStateLocation(OpenGl_StateVariable.OpenGl_OCC_WORLD_VIEW_MATRIX_INVERSE);
+            if (aLocation != OpenGl_ShaderProgram.INVALID_LOCATION)
+            {
+                theProgram.SetUniform(myContext, aLocation, myWorldViewState.WorldViewMatrixInverse());
+            }
 
-  aLocation = theProgram->GetStateLocation (OpenGl_OCC_PROJECTION_MATRIX_INVERSE_TRANSPOSE);
-  if (aLocation != OpenGl_ShaderProgram::INVALID_LOCATION)
-  {
-    theProgram->SetUniform (myContext, aLocation, myProjectionState.ProjectionMatrixInverse(), true);
-  }*/
+            theProgram.SetUniform(myContext,
+                                    theProgram.GetStateLocation(OpenGl_StateVariable.OpenGl_OCC_WORLD_VIEW_MATRIX_TRANSPOSE),
+                                    myWorldViewState.WorldViewMatrix(), true);
+
+            aLocation = theProgram.GetStateLocation(OpenGl_StateVariable.OpenGl_OCC_WORLD_VIEW_MATRIX_INVERSE_TRANSPOSE);
+            if (aLocation != OpenGl_ShaderProgram.INVALID_LOCATION)
+            {
+                theProgram.SetUniform(myContext, aLocation, myWorldViewState.WorldViewMatrixInverse(), true);
+            }
+        }
+
+
+        //! Pushes current state of OCCT world-view transform to specified program (only on state change).
+        void PushWorldViewState(OpenGl_ShaderProgram theProgram)
+        {
+            if (myWorldViewState.Index() != theProgram.ActiveState(OpenGl_UniformStateType.OpenGl_WORLD_VIEW_STATE))
+            {
+                pushWorldViewState(theProgram);
+            }
         }
 
         // =======================================================================
@@ -447,13 +590,13 @@ namespace OCCPort.OpenGL
         // =======================================================================
         public void PushState(OpenGl_ShaderProgram theProgram,
 
-                    Graphic3d_TypeOfShadingModel theShadingModel = Graphic3d_TypeOfShadingModel.Graphic3d_TypeOfShadingModel_Unlit)
+                            Graphic3d_TypeOfShadingModel theShadingModel = Graphic3d_TypeOfShadingModel.Graphic3d_TypeOfShadingModel_Unlit)
         {
             OpenGl_ShaderProgram aProgram = theProgram != null ? theProgram : myFfpProgram;
             /*PushClippingState(aProgram);
-            PushLightSourceState(aProgram); // should be before PushWorldViewState()
+            PushLightSourceState(aProgram); // should be before PushWorldViewState()*/
             PushWorldViewState(aProgram);
-            PushModelWorldState(aProgram);*/
+            PushModelWorldState(aProgram);
             PushProjectionState(aProgram);/*
             PushMaterialState(aProgram);
             PushOitState(aProgram);*/

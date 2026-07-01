@@ -9,9 +9,11 @@ namespace OCCPort.OpenGL
     public class OpenGl_MatrixState<T>
     {
 
-        OpenGl_MatrixState()
+      public  OpenGl_MatrixState()
         {
             myStack = new Graphic3d_Mat4[8];
+            myStackHead = (-1);
+
         }
         //! Pushes current matrix into stack.
         public void Push()
@@ -38,9 +40,10 @@ namespace OCCPort.OpenGL
             myCurrent = new Graphic3d_Mat4();
         }
 
-        internal void SetCurrent(Graphic3d_Mat4 aWorldView)
+        internal void SetCurrent(Graphic3d_Mat4 theNewCurrent)
         {
-            throw new NotImplementedException();
+            myCurrent = theNewCurrent;
+            
         }
         //! Pops matrix from stack to current.
         public void Pop()

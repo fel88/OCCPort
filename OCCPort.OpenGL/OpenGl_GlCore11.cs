@@ -20,6 +20,10 @@ namespace OCCPort.OpenGL
         {
             GL.LoadMatrix(ref matrix4);
         }
+        internal void glLoadMatrixf(float[] matrix4)
+        {
+            GL.LoadMatrix( matrix4);
+        }
 
         internal void glMatrixMode(All projection)
         {

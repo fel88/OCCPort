@@ -4,7 +4,7 @@ global using Graphic3d_ShaderObjectList = TKernel.NCollection_Sequence<TKService
 //! List of custom uniform shader variables.
 global using Graphic3d_ShaderVariableList = TKernel.NCollection_Sequence<TKService.Graphic3d_ShaderVariable>;
 //! List of shader variable setters.
-global using OpenGl_SetterList = TKernel.NCollection_DataMap<int, OpenGl_SetterInterface>;
+global using OpenGl_SetterList = TKernel.NCollection_DataMap<int, OCCPort.OpenGL.OpenGl_SetterInterface>;
 global using OpenGl_ShaderList = TKernel.NCollection_Sequence<OCCPort.OpenGL.OpenGl_ShaderObject>;
 //! List of custom vertex shader attributes
 
@@ -24,17 +24,6 @@ using System.Threading;
 using TKService;
 
 
-//! Interface for generic setter of user-defined uniform variables.
-public abstract class OpenGl_SetterInterface
-{
-    //! Sets user-defined uniform variable to specified program.
-    public abstract void Set(OpenGl_Context theCtx,
-                     Graphic3d_ShaderVariable theVariable,
-                     OpenGl_ShaderProgram theProgram);
-
-    ////! Destructor
-    //virtual ~OpenGl_SetterInterface() { }
-};
 
 
 
@@ -71,6 +60,23 @@ namespace OCCPort.OpenGL
         }
         public OpenGl_ShaderProgram()
         {
+        }
+
+        //! Specifies the value of the float uniform 4x4 matrix.
+        //! Wrapper for glUniformMatrix4fv()
+        public  bool SetUniform( OpenGl_Context theCtx,
+                                               GLint theLocation,
+                                                OpenGl_Mat4            theValue,
+                                               bool theTranspose = false)
+        {
+
+            if (myProgramID == NO_PROGRAM || theLocation == INVALID_LOCATION)
+            {
+                return false;
+            }
+
+            theCtx.core20fwd.glUniformMatrix4fv(theLocation, 1, false, theTranspose ? theValue.Transposed().GetData() : theValue.GetData());
+            return true;
         }
         //! Decrements counter of users.
         //! Used by OpenGl_ShaderManager.
@@ -516,42 +522,42 @@ namespace OCCPort.OpenGL
                 }
 
                 string anExtensions = "// Enable extensions used in OCCT GLSL programs\n";
-                //if (myNbFragOutputs > 1)
-                //{
-                //    if (theCtx.hasDrawBuffers)
-                //    {
-                //        anExtensions += "#define OCC_ENABLE_draw_buffers\n";
-                //        switch (myOitOutput)
-                //        {
-                //            case Graphic3d_RTM_BLEND_UNORDERED:
-                //                break;
-                //            case Graphic3d_RTM_BLEND_OIT:
-                //                anExtensions += "#define OCC_WRITE_WEIGHT_OIT_COVERAGE\n";
-                //                break;
-                //            case Graphic3d_RTM_DEPTH_PEELING_OIT:
-                //                anExtensions += "#define OCC_DEPTH_PEEL_OIT\n";
-                //                break;
-                //        }
-                //    }
-                //    else
-                //    {
-                //        theCtx->PushMessage(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_HIGH,
-                //                             "Error! Multiple draw buffers required by the program, but aren't supported by OpenGL");
-                //        return false;
-                //    }
+                if (myNbFragOutputs > 1)
+                {
+                    if (theCtx.hasDrawBuffers!=OpenGl_FeatureFlag.OpenGl_FeatureNotAvailable)
+                    {
+                        anExtensions += "#define OCC_ENABLE_draw_buffers\n";
+                        switch (myOitOutput)
+                        {
+                            case Graphic3d_RenderTransparentMethod. Graphic3d_RTM_BLEND_UNORDERED:
+                                break;
+                            case Graphic3d_RenderTransparentMethod.Graphic3d_RTM_BLEND_OIT:
+                                anExtensions += "#define OCC_WRITE_WEIGHT_OIT_COVERAGE\n";
+                                break;
+                            case Graphic3d_RenderTransparentMethod.Graphic3d_RTM_DEPTH_PEELING_OIT:
+                                anExtensions += "#define OCC_DEPTH_PEEL_OIT\n";
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        //theCtx->PushMessage(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_HIGH,
+                          //                   "Error! Multiple draw buffers required by the program, but aren't supported by OpenGL");
+                        return false;
+                    }
 
-                //    if (theCtx->hasDrawBuffers == OpenGl_FeatureInExtensions)
-                //    {
-                //        if (theCtx->arbDrawBuffers)
-                //        {
-                //            anExtensions += "#extension GL_ARB_draw_buffers : enable\n";
-                //        }
-                //        else if (theCtx->extDrawBuffers)
-                //        {
-                //            anExtensions += "#extension GL_EXT_draw_buffers : enable\n";
-                //        }
-                //    }
-                //}
+                    if (theCtx.hasDrawBuffers == OpenGl_FeatureFlag.OpenGl_FeatureInExtensions)
+                    {
+                        if (theCtx.arbDrawBuffers)
+                        {
+                            anExtensions += "#extension GL_ARB_draw_buffers : enable\n";
+                        }
+                        else if (theCtx.extDrawBuffers)
+                        {
+                            anExtensions += "#extension GL_EXT_draw_buffers : enable\n";
+                        }
+                    }
+                }
                 if (myHasAlphaTest)
                 {
                     anExtensions += "#define OCC_ALPHA_TEST\n";
@@ -891,8 +897,8 @@ namespace OCCPort.OpenGL
         {
             return myStateLocations[(int)theVariable];
         }
-
-        internal bool SetUniform(OpenGl_Context theCtx, OpenGl_ShaderUniformLocation theLocation, Vector4 theValue)
+        
+        public bool SetUniform(OpenGl_Context theCtx, OpenGl_ShaderUniformLocation theLocation, Vector4 theValue)
         {
             if (myProgramID == NO_PROGRAM || theLocation.ToInt() == INVALID_LOCATION)
             {
@@ -900,6 +906,17 @@ namespace OCCPort.OpenGL
             }
 
             theCtx.core20fwd.glUniform4fv(theLocation.ToInt(), 1, theValue);
+            return true;
+        }
+
+        public bool SetUniform(OpenGl_Context theCtx, OpenGl_ShaderUniformLocation theLocation, OpenGl_Vec4 theValue)
+        {
+            if (myProgramID == NO_PROGRAM || theLocation.ToInt() == INVALID_LOCATION)
+            {
+                return false;
+            }
+
+            theCtx.core20fwd.glUniform4fv(theLocation.ToInt(), 1, theValue.v);
             return true;
         }
     }

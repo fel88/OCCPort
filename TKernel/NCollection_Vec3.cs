@@ -115,6 +115,15 @@ namespace TKernel
         public T y() { return v[1]; }
         public T z() { return v[2]; }
 
+        //! Alias to 1st component as RED channel in RGB.
+        public T r() { return v[0]; }
+
+        //! Alias to 2nd component as GREEN channel in RGB.
+        public T g() { return v[1]; }
+
+        //! Alias to 3rd component as BLUE channel in RGB.
+        public T b() { return v[2]; }
+
         public void Set(T[] temp)
         {
             for (int i = 0; i < 3; i++)

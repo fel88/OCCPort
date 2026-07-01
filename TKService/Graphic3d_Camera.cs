@@ -1,4 +1,5 @@
 ﻿using OCCPort.Common;
+using System.Numerics;
 using TKernel;
 using TKMath;
 
@@ -299,9 +300,11 @@ namespace TKService
 
                                              Aspect_FrustumLRBT theLRBT,
                                              double theNear,
-
                                              double theFar)
+
         {
+
+
             // row 0
             theOutMx.ChangeValue(0, 0).Assign((2.0) / (theLRBT.Right - theLRBT.Left));
             theOutMx.ChangeValue(0, 1).Assign(0.0);
@@ -782,6 +785,37 @@ namespace TKService
             return theMatrices; // for inline accessors
 
         }
+        private TransformMatrices<float> UpdateOrientation(TransformMatrices<float> theMatrices)
+        {
+
+            if (theMatrices.IsOrientationValid())
+            {
+                return theMatrices; // for inline accessors
+            }
+
+            theMatrices.InitOrientation();
+
+            NCollection_Vec3<double> anEye = new NCollection_Vec3<double>((myEye.X()),
+                                           (myEye.Y()),
+                                           (myEye.Z()));
+
+            NCollection_Vec3<double> aViewDir = new NCollection_Vec3<double>((myDirection.X()),
+                                              (myDirection.Y()),
+                                              (myDirection.Z()));
+
+            NCollection_Vec3<double> anUp = new NCollection_Vec3<double>((myUp.X()),
+                                          (myUp.Y()),
+                                          (myUp.Z()));
+
+            NCollection_Vec3<double> anAxialScale = new NCollection_Vec3<double>((myAxialScale.X()),
+                                                  (myAxialScale.Y()),
+                                                  (myAxialScale.Z()));
+
+            LookOrientation(anEye.ToFloat(), aViewDir.ToFloat(), anUp.ToFloat(), anAxialScale.ToFloat(), theMatrices.Orientation);
+
+            return theMatrices; // for inline accessors
+
+        }
 
         private void LookOrientation(NCollection_Vec3<double> theEye, NCollection_Vec3<double> theFwdDir,
 
@@ -817,7 +851,40 @@ namespace TKService
             theOutMx.Multiply(anAxialScaleMx);
 
         }
+        private void LookOrientation(NCollection_Vec3<float> theEye, NCollection_Vec3<float> theFwdDir,
 
+             NCollection_Vec3<float> theUpDir, NCollection_Vec3<float> theAxialScale,
+
+          Graphic3d_Mat4 theOutMx)
+        {
+
+            NCollection_Vec3<float> aForward = theFwdDir;
+            aForward.Normalize();
+
+            // side = forward x up
+            NCollection_Vec3<float> aSide = NCollection_Vec3<float>.Cross(aForward, theUpDir);
+            aSide.Normalize();
+
+            // recompute up as: up = side x forward
+            NCollection_Vec3<float> anUp = NCollection_Vec3<float>.Cross(aSide, aForward);
+
+            var aLookMx = new NCollection_Mat4<float>();
+            aLookMx.SetRow(0, aSide);
+            aLookMx.SetRow(1, anUp);
+            aLookMx.SetRow(2, -aForward);
+
+            theOutMx.InitIdentity();
+            theOutMx.Multiply(aLookMx);
+            theOutMx.Translate(-theEye);
+
+            var anAxialScaleMx = new NCollection_Mat4<float>();
+            anAxialScaleMx.ChangeValue(0, 0, theAxialScale.X);
+            anAxialScaleMx.ChangeValue(1, 1, theAxialScale.Y);
+            anAxialScaleMx.ChangeValue(2, 2, theAxialScale.Z);
+
+            theOutMx.Multiply(anAxialScaleMx);
+
+        }
         public double Scale()
         {
             switch (myProjType)
@@ -1047,6 +1114,29 @@ namespace TKService
             return theMatrices;
         }
 
+        TransformMatrices<float> UpdateProjection(TransformMatrices<float> theMatrices)
+        {
+            if (!theMatrices.IsProjectionValid())
+            {
+                theMatrices.InitProjection();
+                var projD = ToMat4d(theMatrices.MProjection);
+                var d2 = ToMat4d(theMatrices.LProjection);
+                var d3 = ToMat4d(theMatrices.RProjection);
+                computeProjection(projD, d2, d3, true);
+            }
+            return theMatrices;
+        }
+
+        private Graphic3d_Mat4d ToMat4d(Graphic3d_Mat4 mProjection)
+        {
+            var ret = new Graphic3d_Mat4d();
+            for (int i = 0; i < ret.myMat.Length; i++)
+            {
+                ret.myMat[i] = mProjection.myMat[i];
+            }
+            return ret;
+        }
+
         public gp_Pnt ConvertProj2View(gp_Pnt thePnt)
         {
             var aProjMx = ProjectionMatrix();
@@ -1091,12 +1181,15 @@ namespace TKService
 
         public Graphic3d_Mat4 ProjectionMatrixF()
         {
-            throw new NotImplementedException();
+            return UpdateProjection(myMatricesF).MProjection;
+
         }
+
 
         public Graphic3d_Mat4 OrientationMatrixF()
         {
-            throw new NotImplementedException();
+            return UpdateOrientation(myMatricesF).Orientation;
+
         }
 
         public void MoveEyeTo(gp_Pnt theEye)

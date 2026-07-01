@@ -1,5 +1,7 @@
 ﻿using OCCPort.Common;
 using System.Globalization;
+using System.Xml.Linq;
+using TKernel;
 
 namespace TKernel
 {
@@ -16,10 +18,119 @@ namespace TKernel
         {
             myRgb = (valuesOf(theName, Quantity_TypeOfColor.Quantity_TOC_RGB));
         }
-        float[] myRgb = new float[3];
+
+        // =======================================================================
+        // function : Convert_LinearRGB_To_Lab
+        // purpose  : convert RGB color to CIE Lab color
+        // see https://www.easyrgb.com/en/math.php
+        // =======================================================================
+        NCollection_Vec3<float> Convert_LinearRGB_To_Lab(NCollection_Vec3<float> theRgb)
+        {
+            double aR = theRgb[0];
+            double aG = theRgb[1];
+            double aB = theRgb[2];
+
+            // convert to XYZ normalized to D65 / 2 deg (CIE 1931) standard illuminant intensities
+            // see http://www.brucelindbloom.com/index.html?Equations.html
+            double aX = (aR * 0.4124564 + aG * 0.3575761 + aB * 0.1804375) * 100.0 / 95.047;
+            double aY = (aR * 0.2126729 + aG * 0.7151522 + aB * 0.0721750) * 100.0 / 100.000;
+            double aZ = (aR * 0.0193339 + aG * 0.1191920 + aB * 0.9503041) * 100.0 / 108.883;
+
+            // convert to Lab
+            double afX = CIELab_f(aX);
+            double afY = CIELab_f(aY);
+            double afZ = CIELab_f(aZ);
+
+            double aL = 116.0 * afY - 16.0;
+            double aa = 500.0 * (afX - afY);
+            double ab = 200.0 * (afY - afZ);
+
+            return new NCollection_Vec3<float>((float)aL, (float)aa, (float)ab);
+        }
+
+        // =======================================================================
+        // function : CIELab_f
+        // purpose  : non-linear function transforming XYZ coordinates to CIE Lab
+        // see http://www.brucelindbloom.com/index.html?Equations.html
+        // =======================================================================
+        static double CIELab_f(double theValue)
+        {
+            return theValue > 0.008856451679035631 ? Math.Pow(theValue, 1.0 / 3.0) : (7.787037037037037 * theValue) + 16.0 / 116.0;
+        }
+        public void Values(ref double theR1, ref double theR2, ref double theR3,
+                              Quantity_TypeOfColor theType)
+        {
+            switch (theType)
+            {
+                case Quantity_TypeOfColor.Quantity_TOC_RGB:
+                    {
+                        theR1 = myRgb.r();
+                        theR2 = myRgb.g();
+                        theR3 = myRgb.b();
+                        break;
+                    }
+                case Quantity_TypeOfColor.Quantity_TOC_sRGB:
+                    {
+                        theR1 = Convert_LinearRGB_To_sRGB((double)myRgb.r());
+                        theR2 = Convert_LinearRGB_To_sRGB((double)myRgb.g());
+                        theR3 = Convert_LinearRGB_To_sRGB((double)myRgb.b());
+                        break;
+                    }
+                case Quantity_TypeOfColor.Quantity_TOC_HLS:
+                    {
+                        NCollection_Vec3<float> aHls = Convert_LinearRGB_To_HLS(myRgb);
+                        theR1 = aHls[0];
+                        theR2 = aHls[1];
+                        theR3 = aHls[2];
+                        break;
+                    }
+                case Quantity_TypeOfColor.Quantity_TOC_CIELab:
+                    {
+                        NCollection_Vec3<float> aLab = Convert_LinearRGB_To_Lab(myRgb);
+                        theR1 = aLab[0];
+                        theR2 = aLab[1];
+                        theR3 = aLab[2];
+                        break;
+                    }
+                case Quantity_TypeOfColor.Quantity_TOC_CIELch:
+                    {
+                        NCollection_Vec3<float> aLch = Convert_Lab_To_Lch(Convert_LinearRGB_To_Lab(myRgb));
+                        theR1 = aLch[0];
+                        theR2 = aLch[1];
+                        theR3 = aLch[2];
+                        break;
+                    }
+            }
+
+        }
+
+
+        // =======================================================================
+        // function : Convert_Lab_To_Lch
+        // purpose  : convert CIE Lab color to CIE Lch color
+        // see https://www.easyrgb.com/en/math.php
+        // =======================================================================
+        NCollection_Vec3<float> Convert_Lab_To_Lch(NCollection_Vec3<float> theLab)
+        {
+            double aa = theLab[1];
+            double ab = theLab[2];
+
+            double aC = Math.Sqrt(aa * aa + ab * ab);
+            double aH = (aC > TheEpsilon ? Math.Atan2(ab, aa) * 180.0 / Math.PI : 0.0);
+
+            if (aH < 0.0) 
+                aH += 360.0;
+
+            return new NCollection_Vec3<float>(theLab[0], (float)aC, (float)aH);
+        }
+
+        NCollection_Vec3<float> myRgb = new NCollection_Vec3<float>();
+
+        //! Return the color as vector of 3 float elements.
+        public NCollection_Vec3<float> Rgb() { return myRgb; }
 
         //! Returns the values of a predefined color according to the mode.
-        static float[] valuesOf(Quantity_NameOfColor theName,
+        static NCollection_Vec3<float> valuesOf(Quantity_NameOfColor theName,
 
                                                            Quantity_TypeOfColor theType)
         {
@@ -29,7 +140,7 @@ namespace TKernel
                 throw new Standard_OutOfRange("Bad name");
             }
 
-            float[] anRgb = THE_COLORS(theName).RgbValues;
+            NCollection_Vec3<float> anRgb = THE_COLORS(theName).RgbValues;
             switch (theType)
             {
                 case Quantity_TypeOfColor.Quantity_TOC_RGB: return anRgb;
@@ -69,26 +180,17 @@ namespace TKernel
                     var r = float.Parse(spl[7], NumberStyles.Any, CultureInfo.InvariantCulture);
                     var g = float.Parse(spl[8], NumberStyles.Any, CultureInfo.InvariantCulture);
                     var b = float.Parse(spl[9], NumberStyles.Any, CultureInfo.InvariantCulture);
-                    float[] rgb = new float[] {
-                         r,g,b
-                    };
+                    NCollection_Vec3<float> rgb = new NCollection_Vec3<float>(r, g, b);
 
                     r = float.Parse(spl[3], NumberStyles.Any, CultureInfo.InvariantCulture);
                     g = float.Parse(spl[4], NumberStyles.Any, CultureInfo.InvariantCulture);
                     b = float.Parse(spl[5], NumberStyles.Any, CultureInfo.InvariantCulture);
                     var s = Convert.ToUInt32(spl[2], 16);
-                    float[] srgb = new float[] {
-                        s, r,g,b
-                    };
+                    NCollection_Vec3<float> srgb = new NCollection_Vec3<float>(r, g, b);
 
 
-                    ret.Add(new Quantity_StandardColor()
-                    {
-                        StringName = name,
-                        RgbValues = rgb,
-                        sRgbValues = srgb,
-                        EnumName = (Quantity_NameOfColor)Enum.Parse(typeof(Quantity_NameOfColor), name)
-                    });
+
+                    ret.Add(new Quantity_StandardColor((Quantity_NameOfColor)Enum.Parse(typeof(Quantity_NameOfColor), name), name, rgb, srgb));
 
 
 
@@ -114,11 +216,65 @@ namespace TKernel
             return (new NCollection_Vec3<float>(myRgb) - new NCollection_Vec3<float>(theColor.myRgb)).SquareModulus();
         }
 
-        private static float[] Convert_LinearRGB_To_sRGB(float[] anRgb)
+        private static NCollection_Vec3<float> Convert_LinearRGB_To_sRGB(NCollection_Vec3<float> theRGB)
         {
-            throw new NotImplementedException();
+            return new NCollection_Vec3<float>(Convert_LinearRGB_To_sRGB(theRGB.r()),
+                              Convert_LinearRGB_To_sRGB(theRGB.g()),
+                              Convert_LinearRGB_To_sRGB(theRGB.b()));
         }
 
+
+        //! Converts Linear RGB components into HLS ones.
+        static NCollection_Vec3<float> Convert_LinearRGB_To_HLS(NCollection_Vec3<float> theRgb)
+        {
+            return Convert_sRGB_To_HLS(Convert_LinearRGB_To_sRGB(theRgb));
+        }
+
+        // =======================================================================
+        // function : Convert_sRGB_To_HLS
+        // purpose  : Reference: La synthese d'images, Collection Hermes
+        // =======================================================================
+        static NCollection_Vec3<float> Convert_sRGB_To_HLS(NCollection_Vec3<float> theRgb)
+        {
+
+            const float RGBHLS_H_UNDEFINED = -1.0f;
+
+            float aPlus = 0.0f;
+            float aDiff = theRgb.g() - theRgb.b();
+
+            // compute maximum from RGB components, which will be a luminance
+            float aMax = theRgb.r();
+            if (theRgb.g() > aMax) { aPlus = 2.0f; aDiff = theRgb.b() - theRgb.r(); aMax = theRgb.g(); }
+            if (theRgb.b() > aMax) { aPlus = 4.0f; aDiff = theRgb.r() - theRgb.g(); aMax = theRgb.b(); }
+
+            // compute minimum from RGB components
+            float min = theRgb.r();
+            if (theRgb.g() < min) min = theRgb.g();
+            if (theRgb.b() < min) min = theRgb.b();
+
+            float aDelta = aMax - min;
+
+            // compute saturation
+            float aSaturation = 0.0f;
+            if (aMax != 0.0f) aSaturation = aDelta / aMax;
+
+            // compute hue
+            float aHue = RGBHLS_H_UNDEFINED;
+            if (aSaturation != 0.0f)
+            {
+                aHue = 60.0f * (aPlus + aDiff / aDelta);
+                if (aHue < 0.0f) aHue += 360.0f;
+            }
+            return new NCollection_Vec3<float>(aHue, aMax, aSaturation);
+        }
+
+        //! Convert linear RGB component into sRGB using OpenGL specs formula (double precision), also known as gamma correction.
+        static double Convert_LinearRGB_To_sRGB(double theLinearValue)
+        {
+            return theLinearValue <= 0.0031308
+                 ? theLinearValue * 12.92
+                 : Math.Pow(theLinearValue, 1.0 / 2.4) * 1.055 - 0.055;
+        }
         //! Convert linear RGB component into sRGB using OpenGL specs formula (single precision), also known as gamma correction.
         internal static float Convert_LinearRGB_To_sRGB(float theLinearValue)
         {
