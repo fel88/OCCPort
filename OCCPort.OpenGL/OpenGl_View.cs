@@ -52,6 +52,7 @@ namespace OCCPort.OpenGL
         {
             myZLayers.InvalidateBVHData(theLayerId);
         }
+        Graphic3d_LightSet      myNoShadingLight;
 
         public OpenGl_View(Graphic3d_StructureManager theMgr,
             OpenGl_GraphicDriver theDriver,
@@ -61,6 +62,18 @@ namespace OCCPort.OpenGL
         {
             myDriver = theDriver;
             myCaps = theCaps;
+
+
+            myHasFboBlit = (true);
+            myTransientDrawToFront = true;
+            myWorkspace = new OpenGl_Workspace(this, null);
+
+            Graphic3d_CLight aLight = new Graphic3d_CLight(Graphic3d_TypeOfLightSource.Graphic3d_TypeOfLightSource_Ambient);
+            aLight.SetColor(new Quantity_Color ( Quantity_NameOfColor.Quantity_NOC_WHITE));
+            myLights = new Graphic3d_LightSet();
+            myNoShadingLight = new Graphic3d_LightSet();
+            myNoShadingLight.Add(aLight);
+
             myMainSceneFbos = new OpenGl_FrameBuffer[2];
             myMainSceneFbosOit = new OpenGl_FrameBuffer[2];
             myZLayers = new OpenGl_LayerList();
@@ -69,9 +82,15 @@ namespace OCCPort.OpenGL
             myMainSceneFbos[1] = new OpenGl_FrameBuffer("fbo1_main");
             myMainSceneFbosOit[0] = new OpenGl_FrameBuffer("fbo0_main_oit");
             myMainSceneFbosOit[1] = new OpenGl_FrameBuffer("fbo1_main_oit");
+            myImmediateSceneFbos[0] = new OpenGl_FrameBuffer("fbo0_imm");
+            myImmediateSceneFbos[1] = new OpenGl_FrameBuffer("fbo1_imm");
+            myImmediateSceneFbosOit[0] = new OpenGl_FrameBuffer("fbo0_imm_oit");
+            myImmediateSceneFbosOit[1] = new OpenGl_FrameBuffer("fbo1_imm_oit");
 
+            myOpenGlFBO = new OpenGl_FrameBuffer("fbo_gl");
+            myOpenGlFBO2 = new OpenGl_FrameBuffer("fbo_gl2");
 
-            myWorkspace = new OpenGl_Workspace(this, null);
+          
             myTextureParams = new OpenGl_Aspects();
 
             for (int i = 0; i < (int)Graphic3d_TypeOfBackground.Graphic3d_TypeOfBackground_NB; ++i)
@@ -184,8 +203,8 @@ namespace OCCPort.OpenGL
         OpenGl_FrameBuffer myXrSceneFbo;               //!< additional FBO (without MSAA) for submitting to XR
         OpenGl_DepthPeeling myDepthPeelingFbos;   //!< additional buffers for depth peeling
         OpenGl_ShadowMapArray myShadowMaps;         //!< additional FBOs for shadow map rendering
-        OpenGl_VertexBuffer myFullScreenQuad;        //!< Vertices for full-screen quad rendering.
-        OpenGl_VertexBuffer myFullScreenQuadFlip;
+        OpenGl_VertexBuffer myFullScreenQuad=new OpenGl_VertexBufferT_OpenGl_VertexBuffer() ;        //!< Vertices for full-screen quad rendering.
+        OpenGl_VertexBuffer myFullScreenQuadFlip=new OpenGl_VertexBufferT_OpenGl_VertexBuffer();
         bool myToFlipOutput;          //!< Flag to draw result image upside-down
         uint myFrameCounter;          //!< redraw counter, for debugging
         bool myHasFboBlit;            //!< disable FBOs on failure
@@ -1427,24 +1446,113 @@ namespace OCCPort.OpenGL
 
             //  aCtx.SetColorMaskRGBA(NCollection_Vec4<bool>(true)); // force writes into all components, including alpha
             aCtx.core20fwd.glClearDepth(1.0);
-            //aCtx.core20fwd.glClearColor(0.0f, 0.0f, 0.0f, aCtx.caps.buffersOpaqueAlpha ? 1.0f : 0.0f);
+            aCtx.core20fwd.glClearColor(0.0f, 0.0f, 0.0f, aCtx.caps.buffersOpaqueAlpha ? 1.0f : 0.0f);
             aCtx.core20fwd.glClear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit);
             aCtx.SetColorMask(true); // restore default alpha component write state
 
             bool toApplyGamma = aCtx.ToRenderSRGB() != aCtx.IsFrameBufferSRGB();
+            bool toDrawTexture = true;
+            if (aCtx.arbFBOBlit != null)
+            {
+                if (!toApplyGamma
+                 && theReadFbo.NbSamples() != 0)
+                {
+                    toDrawTexture = false;
+                }
+                if (theReadFbo.IsColorRenderBuffer())
+                {
+                    // render buffers could be resolved only via glBlitFramebuffer()
+                    toDrawTexture = false;
+                }
+            }
+            if (!toDrawTexture)
+            {
+                GLbitfield aCopyMask = 0;
+                theReadFbo.BindReadBuffer(aCtx);
+                if (theDrawFbo != null
+    && theDrawFbo.IsValid())
+                {
+                    theDrawFbo.BindDrawBuffer(aCtx);
+                    if (theDrawFbo.HasColor()
+                     && theReadFbo.HasColor())
+                    {
+                        aCopyMask |= (int)All.ColorBufferBit;
+                    }
+                    if (theDrawFbo.HasDepth()
+                     && theReadFbo.HasDepth())
+                    {
+                        aCopyMask |= (int)All.DepthBufferBit;
+                    }
+                }
+                else
+                {
+                    if (theReadFbo.HasColor())
+                    {
+                        aCopyMask |= (int)All.ColorBufferBit;
+                    }
+                    if (theReadFbo.HasDepth())
+                    {
+                        aCopyMask |= (int)All.DepthBufferBit;
+                    }
+                    aCtx.arbFBO.glBindFramebuffer(All.DrawFramebuffer, OpenGl_FrameBuffer.NO_FRAMEBUFFER);
+                    aCtx.SetFrameBufferSRGB(false);
+                }
+                // we don't copy stencil buffer here... does it matter for performance?
+                aCtx.arbFBOBlit.glBlitFramebuffer(0, 0, aReadSizeX, aReadSizeY,
+                                                     0, 0, aDrawSizeX, aDrawSizeY,
+                                                   (ClearBufferMask)aCopyMask, BlitFramebufferFilter.Nearest);
+                int anErr = (int)aCtx.core11fwd.glGetError();
+
+                if (anErr != (int)All.NoError)
+                {
+                    // glBlitFramebuffer() might fail in several cases:
+                    // - Both FBOs have MSAA and they are samples number does not match.
+                    //   OCCT checks that this does not happen,
+                    //   however some graphics drivers provide an option for overriding MSAA.
+                    //   In this case window MSAA might be non-zero (and application can not check it)
+                    //   and might not match MSAA of our offscreen FBOs.
+                    // - Pixel formats of FBOs do not match.
+                    //   This also might happen with window has pixel format,
+                    //   e.g. Mesa fails blitting RGBA8 -> RGB8 while other drivers support this conversion.
+                    string aMsg = "FBO blitting has failed [Error " + OpenGl_Context.FormatGlError(anErr) + "]\n"
+                                                    + "  Please check your graphics driver settings or try updating driver.";
+                    if (theReadFbo.NbSamples() != 0)
+                    {
+                        myToDisableMSAA = true;
+                        aMsg += "\n  MSAA settings should not be overridden by driver!";
+                    }
+                    // aCtx.PushMessage(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_HIGH, aMsg);
+                }
+                if (theDrawFbo != null
+     && theDrawFbo.IsValid())
+                {
+                    theDrawFbo.BindBuffer(aCtx);
+                }
+                else
+                {
+                    aCtx.arbFBO.glBindFramebuffer(All.Framebuffer, OpenGl_FrameBuffer.NO_FRAMEBUFFER);
+                    aCtx.SetFrameBufferSRGB(false);
+                }
+            }
+            else
+            {
+                aCtx.core20fwd.glDepthFunc(DepthFunction.Always);
+                aCtx.core20fwd.glDepthMask(true);
+                aCtx.core20fwd.glEnable(All.DepthTest);
+                if (aCtx.GraphicsLibrary() == Aspect_GraphicsLibrary.Aspect_GraphicsLibrary_OpenGLES
+                && !aCtx.IsGlGreaterEqual(3, 0)
+                && !aCtx.extFragDepth)
+                {
+                    aCtx.core20fwd.glDisable(All.DepthTest);
+                }
+                /*
+                 more code here
+                 */
+            }
             /*
              more code here
              */
 
-            aCtx.core20fwd.glDepthFunc(DepthFunction.Always);
-            aCtx.core20fwd.glDepthMask(true);
-            // aCtx->core20fwd->glEnable(GL_DEPTH_TEST);
-            //  if (aCtx->GraphicsLibrary() == Aspect_GraphicsLibrary_OpenGLES
-            //   && !aCtx->IsGlGreaterEqual(3, 0)
-            //    && !aCtx->extFragDepth)
-            {
-                //     aCtx->core20fwd->glDisable(GL_DEPTH_TEST);
-            }
 
             // aCtx->BindTextures(Handle(OpenGl_TextureSet)(), Handle(OpenGl_ShaderProgram)());
 
@@ -1739,6 +1847,35 @@ namespace OCCPort.OpenGL
 
             renderScene(theProjection, theOutputFBO, theOitAccumFbo, theToDrawImmediate);
 
+            // ===============================
+            //      Step 4: Trihedron
+            // ===============================
+
+            // Resetting GL parameters according to the default aspects
+            // in order to synchronize GL state with the graphic driver state
+            // before drawing auxiliary stuff (trihedrons, overlayer)
+            myWorkspace.ResetAppliedAspect();
+
+            // Render trihedron
+            if (!theToDrawImmediate)
+            {
+                //  renderTrihedron(myWorkspace);
+            }
+            else
+            {
+                //renderFrameStats();
+            }
+
+            myWorkspace.ResetAppliedAspect();
+            aContext.SetAllowSampleAlphaToCoverage(false);
+            // aContext.SetSampleAlphaToCoverage(false);
+
+            // reset FFP state for safety
+            aContext.BindProgram(null);
+            if (aContext.caps.ffpEnable)
+            {
+                aContext.ShaderManager().PushState(null);
+            }
         }
 
 

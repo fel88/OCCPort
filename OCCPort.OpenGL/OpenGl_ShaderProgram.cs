@@ -384,7 +384,7 @@ namespace OCCPort.OpenGL
             }
             //myHasTessShader = (aShaderMask & (Graphic3d_TOS_TESS_CONTROL | Graphic3d_TOS_TESS_EVALUATION)) != 0;
             //myNbFragOutputs = !myProxy.IsNull() ? myProxy->NbFragmentOutputs() : 1;
-            //myTextureSetBits = Graphic3d_TextureSetBits_NONE;
+            myTextureSetBits = (int)Graphic3d_TextureSetBits.Graphic3d_TextureSetBits_NONE;
             //myHasAlphaTest = !myProxy.IsNull() && myProxy->HasAlphaTest();
             //myOitOutput = !myProxy.IsNull() ? myProxy->OitOutput() : Graphic3d_RTM_BLEND_UNORDERED;
             if (myOitOutput == Graphic3d_RenderTransparentMethod.Graphic3d_RTM_BLEND_OIT
@@ -458,45 +458,45 @@ namespace OCCPort.OpenGL
             }
             else
             {
-                //if ((aShaderMask & Graphic3d_TOS_COMPUTE) != 0)
-                //{
-                //    if (!theCtx.IsGlGreaterEqual(4, 3))
-                //    {
-                //        theCtx->PushMessage(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_HIGH,
-                //                             "Error! Compute shaders require OpenGL 4.3+");
-                //        return false;
-                //    }
-                //    else if (aHeaderVer.IsEmpty())
-                //    {
-                //        aHeaderVer = "#version 430";
-                //    }
-                //}
-                //else if (myHasTessShader)
-                //{
-                //    if (!theCtx->IsGlGreaterEqual(4, 0))
-                //    {
-                //        theCtx->PushMessage(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_HIGH,
-                //                             "Error! Tessellation shaders require OpenGL 4.0+");
-                //        return false;
-                //    }
-                //    else if (aHeaderVer.IsEmpty())
-                //    {
-                //        aHeaderVer = "#version 400";
-                //    }
-                //}
-                //else if ((aShaderMask & Graphic3d_TOS_GEOMETRY) != 0)
-                //{
-                //    if (!theCtx->IsGlGreaterEqual(3, 2))
-                //    {
-                //        theCtx->PushMessage(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_HIGH,
-                //                             "Error! Geometry shaders require OpenGL 3.2+");
-                //        return false;
-                //    }
-                //    else if (aHeaderVer.IsEmpty())
-                //    {
-                //        aHeaderVer = "#version 150";
-                //    }
-                //}
+                if ((aShaderMask &(int) Graphic3d_TypeOfShaderObject.Graphic3d_TOS_COMPUTE) != 0)
+                {
+                    if (!theCtx.IsGlGreaterEqual(4, 3))
+                    {
+                        //theCtx->PushMessage(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_HIGH,
+                                   //          "Error! Compute shaders require OpenGL 4.3+");
+                        return false;
+                    }
+                    else if (aHeaderVer.IsEmpty())
+                    {
+                        aHeaderVer = "#version 430";
+                    }
+                }
+                else if (myHasTessShader)
+                {
+                    if (!theCtx.IsGlGreaterEqual(4, 0))
+                    {
+                        //theCtx->PushMessage(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_HIGH,
+                               //              "Error! Tessellation shaders require OpenGL 4.0+");
+                        return false;
+                    }
+                    else if (aHeaderVer.IsEmpty())
+                    {
+                        aHeaderVer = "#version 400";
+                    }
+                }
+                else if ((aShaderMask & (int)Graphic3d_TypeOfShaderObject.Graphic3d_TOS_GEOMETRY) != 0)
+                {
+                    if (!theCtx.IsGlGreaterEqual(3, 2))
+                    {
+                       // theCtx->PushMessage(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_HIGH,
+                       //                      "Error! Geometry shaders require OpenGL 3.2+");
+                        return false;
+                    }
+                    else if (aHeaderVer.IsEmpty())
+                    {
+                        aHeaderVer = "#version 150";
+                    }
+                }
             }
 
             for (Graphic3d_ShaderObjectList.Iterator anIter = new TKernel.NCollection_Sequence<Graphic3d_ShaderObject>.Iterator(theShaders); anIter.More(); anIter.Next())
@@ -563,19 +563,19 @@ namespace OCCPort.OpenGL
                     anExtensions += "#define OCC_ALPHA_TEST\n";
                 }
 
-                //if (theCtx->hasSampleVariables == OpenGl_FeatureInExtensions)
-                //{
-                //    if (theCtx->GraphicsLibrary() == Aspect_GraphicsLibrary_OpenGLES
-                //     && theCtx->oesSampleVariables)
-                //    {
-                //        anExtensions += "#extension GL_OES_sample_variables : enable\n";
-                //    }
-                //    else if (theCtx->GraphicsLibrary() == Aspect_GraphicsLibrary_OpenGL
-                //          && theCtx->arbSampleShading)
-                //    {
-                //        anExtensions += "#extension GL_ARB_sample_shading : enable\n";
-                //    }
-                //}
+                if (theCtx.hasSampleVariables == OpenGl_FeatureFlag. OpenGl_FeatureInExtensions)
+                {
+                    if (theCtx.GraphicsLibrary() ==Aspect_GraphicsLibrary. Aspect_GraphicsLibrary_OpenGLES
+                     && theCtx.oesSampleVariables)
+                    {
+                        anExtensions += "#extension GL_OES_sample_variables : enable\n";
+                    }
+                    else if (theCtx.GraphicsLibrary() ==Aspect_GraphicsLibrary. Aspect_GraphicsLibrary_OpenGL
+                          && theCtx.arbSampleShading)
+                    {
+                        anExtensions += "#extension GL_ARB_sample_shading : enable\n";
+                    }
+                }
 
                 if (theCtx.GraphicsLibrary() == Aspect_GraphicsLibrary.Aspect_GraphicsLibrary_OpenGLES
                  && theCtx.hasGeometryStage == OpenGl_FeatureFlag.OpenGl_FeatureInExtensions)
@@ -588,11 +588,11 @@ namespace OCCPort.OpenGL
                 if (anIter.Value().Type() == Graphic3d_TypeOfShaderObject.Graphic3d_TOS_FRAGMENT
                  && theCtx.GraphicsLibrary() == Aspect_GraphicsLibrary.Aspect_GraphicsLibrary_OpenGLES)
                 {
-                    /*aPrecisionHeader = theCtx.hasHighp
+                    aPrecisionHeader = theCtx.hasHighp
                                      ? "precision highp float;\n"+
                                        "precision highp int;\n"
                                    : "precision mediump float;\n"+
-                                     "precision mediump int;\n";*/
+                                     "precision mediump int;\n";
                 }
 
                 string aHeaderType = "";
@@ -633,26 +633,26 @@ namespace OCCPort.OpenGL
                     {
                         aHeaderConstants += "#define THE_IS_PBR\n";
                     }
-                    //if ((myProxy.TextureSetBits() & Graphic3d_TextureSetBits_BaseColor) != 0)
-                    //{
-                    //    aHeaderConstants += "#define THE_HAS_TEXTURE_COLOR\n";
-                    //}
-                    //if ((myProxy.TextureSetBits() & Graphic3d_TextureSetBits_Emissive) != 0)
-                    //{
-                    //    aHeaderConstants += "#define THE_HAS_TEXTURE_EMISSIVE\n";
-                    //}
-                    //if ((myProxy.TextureSetBits() & Graphic3d_TextureSetBits_Normal) != 0)
-                    //{
-                    //    aHeaderConstants += "#define THE_HAS_TEXTURE_NORMAL\n";
-                    //}
-                    //if ((myProxy.TextureSetBits() & Graphic3d_TextureSetBits_Occlusion) != 0)
-                    //{
-                    //    aHeaderConstants += "#define THE_HAS_TEXTURE_OCCLUSION\n";
-                    //}
-                    //if ((myProxy.TextureSetBits() & Graphic3d_TextureSetBits_MetallicRoughness) != 0)
-                    //{
-                    //    aHeaderConstants += "#define THE_HAS_TEXTURE_METALROUGHNESS\n";
-                    //}
+                    if ((myProxy.TextureSetBits() & (int)Graphic3d_TextureSetBits. Graphic3d_TextureSetBits_BaseColor) != 0)
+                    {
+                        aHeaderConstants += "#define THE_HAS_TEXTURE_COLOR\n";
+                    }
+                    if ((myProxy.TextureSetBits() & (int)Graphic3d_TextureSetBits.Graphic3d_TextureSetBits_Emissive) != 0)
+                    {
+                        aHeaderConstants += "#define THE_HAS_TEXTURE_EMISSIVE\n";
+                    }
+                    if ((myProxy.TextureSetBits() & (int)Graphic3d_TextureSetBits.Graphic3d_TextureSetBits_Normal) != 0)
+                    {
+                        aHeaderConstants += "#define THE_HAS_TEXTURE_NORMAL\n";
+                    }
+                    if ((myProxy.TextureSetBits() & (int)Graphic3d_TextureSetBits.Graphic3d_TextureSetBits_Occlusion) != 0)
+                    {
+                        aHeaderConstants += "#define THE_HAS_TEXTURE_OCCLUSION\n";
+                    }
+                    if ((myProxy.TextureSetBits() & (int)Graphic3d_TextureSetBits.Graphic3d_TextureSetBits_MetallicRoughness) != 0)
+                    {
+                        aHeaderConstants += "#define THE_HAS_TEXTURE_METALROUGHNESS\n";
+                    }
                 }
 
                 string aSource = aHeaderVer                     // #version   - header defining GLSL version, should be first

@@ -174,9 +174,10 @@ namespace TKService
             throw new NotImplementedException();
         }
 
-        public void SetNbClipPlanesMax(int aNbClipPlanes)
+  //! Specify the length of array of clipping planes (THE_MAX_CLIP_PLANES).
+        public void SetNbClipPlanesMax(int theNbPlanes)
         {
-            throw new NotImplementedException();
+            myNbClipPlanesMax = theNbPlanes;
         }
 
         public void SetOitOutput(Graphic3d_RenderTransparentMethod graphic3d_RTM_DEPTH_PEELING_OIT)

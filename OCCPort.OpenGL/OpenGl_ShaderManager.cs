@@ -282,6 +282,13 @@ namespace OCCPort.OpenGL
             myContext = theContext;
             //myHasLocalOrigin(Standard_False)
             //mySRgbState = theContext->ToRenderSRGB();
+
+            // not origin code here
+            for (int i = 0; i < myBlitPrograms.Length; i++)
+            {
+                myBlitPrograms[i] = new NCollection_Array1<OpenGl_ShaderProgram>();
+            }
+            //end of not origin code
         }
 
 

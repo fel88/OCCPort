@@ -103,7 +103,7 @@ namespace OCCPort.OpenGL
             myGlContext.BindDefaultVao();
 
             myHighlightStyle = null;
-            //myToAllowFaceCulling = false;
+            myToAllowFaceCulling = false;
             // myAspectsSet = &myDefaultAspects;
             // myAspectsApplied = null;
             // myGlContext.SetPolygonOffset(Graphic3d_PolygonOffset());

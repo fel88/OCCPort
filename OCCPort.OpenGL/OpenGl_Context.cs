@@ -71,7 +71,7 @@ namespace OCCPort.OpenGL
             core20fwd = new OpenGl_GlCore20();
             //hasPackRowLength=(Standard_True),
             //hasUnpackRowLength=(Standard_True),
-            //hasHighp=(Standard_True),
+            hasHighp = (true);
             hasUintIndex = true;
             //hasTexRGBA8=(Standard_True),
             //
@@ -158,6 +158,12 @@ myLineFeather (1.0f),*/
 
 
         }
+
+        public bool hasHighp;           //!< highp in GLSL ES fragment shader is supported
+
+
+        public bool extFragDepth;       //!< GL_EXT_frag_depth on OpenGL ES 2.0 (gl_FragDepthEXT built-in variable, before OpenGL ES 3.0)
+
         public void SetColorMaskRGBA(NCollection_Vec4<bool> theVal)
         {
             core11fwd.glColorMask(theVal.r() ? true : false,
@@ -290,11 +296,13 @@ myLineFeather (1.0f),*/
                 core11ffp.glShadeModel(aModel);
             }
         }
+      public   OpenGl_FeatureFlag hasSampleVariables; //!< Complex flag indicating support of MSAA variables in GLSL shader (desktop OpenGL 4.0, GL_ARB_sample_shading)
+     public    bool oesSampleVariables; //!< GL_OES_sample_variables
 
         public OpenGl_GlFunctions /*OpenGl_ArbFBO */arbFBO;             //!< GL_ARB_framebuffer_object
         public OpenGl_GlFunctions /*OpenGl_ArbFBOBlit */arbFBOBlit;         //!< glBlitFramebuffer function, moved out from OpenGl_ArbFBO structure for compatibility with OpenGL ES 2.0
-        bool arbSampleShading;   //!< GL_ARB_sample_shading
-        bool arbDepthClamp;      //!< GL_ARB_depth_clamp (on desktop 
+        public bool arbSampleShading;   //!< GL_ARB_sample_shading
+        public bool arbDepthClamp;      //!< GL_ARB_depth_clamp (on desktop 
         public OpenGl_GlCore11 core11ffp;  //!< OpenGL 1.1 core functionality
                                            //! @name public properties tracking current state
         public bool hasUintIndex;       //!< GLuint for index buffer is supported (always available on desktop; on OpenGL ES - since 3.0 or as extension GL_OES_element_index_uint)
@@ -583,7 +591,8 @@ myLineFeather (1.0f),*/
 
         internal bool IsFeedback()
         {
-            throw new NotImplementedException();
+            return myRenderMode == (int)All.Feedback;
+
         }
         //! Enables/disables GL_FRAMEBUFFER_SRGB flag.
         //! This flag can be set to:
@@ -998,7 +1007,7 @@ myLineFeather (1.0f),*/
                  ? Vec4LinearFromQuantityColor(theColor)
                  : Vec4sRGBFromQuantityColor(theColor);
         }
-        
+
         public OpenGl_Vec4 Vec4FromQuantityColor(Vector4 theColor)
         {
             return Vec4FromQuantityColor(theColor.ToOpenGl_Vec4());

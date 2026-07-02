@@ -15,11 +15,20 @@ namespace OCCPort
         //! Number of multisampling samples.
         public int NbSamples() { return myNbSamples; }
 
+        //! Return true if FBO has been created with color attachment.
+      public   bool HasColor()  { return !myColorFormats.IsEmpty(); }
+
+        //! Return true if FBO has been created with depth attachment.
+        public bool HasDepth()  { return myDepthFormat != 0; }
+
         internal void BindBuffer(OpenGl_Context theGlCtx)
         {
             theGlCtx.arbFBO.glBindFramebuffer(All.Framebuffer, myGlFBufferId);
             theGlCtx.SetFrameBufferSRGB(true);
         }
+        //! Returns TRUE if color Render Buffer is defined.
+   public     bool IsColorRenderBuffer()  { return myGlColorRBufferId != NO_RENDERBUFFER; }
+
         public void SetupViewport(OpenGl_Context theGlCtx)
         {
             int[] aViewport = new int[4] { 0, 0, myVPSizeX, myVPSizeY };

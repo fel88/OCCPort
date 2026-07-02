@@ -44,5 +44,11 @@ namespace OCCPort.OpenGL
         {
             GL.DeleteBuffers(v,ref myBufferId);
         }
+
+        internal int glGetError()
+        {
+            return (int)GL.GetError();
+
+        }
     }
 }

@@ -128,9 +128,11 @@ namespace TKernel
             var old = list;
             list = new T[theUpper - theLower + 1];
 
-            if (theToCopyData)
+            if (old != null && theToCopyData)
             {
-                for (int i = 0; i < Math.Min(list.Length, old.Length); i++)
+                int min = Math.Min(list.Length, old.Length);
+
+                for (int i = 0; i < min; i++)
                 {
                     list[i] = old[i];
                 }

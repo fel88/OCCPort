@@ -1,5 +1,7 @@
 ﻿using OCCPort.Common;
 using OpenTK.Graphics.OpenGL;
+using System;
+using System.Linq;
 using System.Reflection.Metadata;
 using TKMath;
 
@@ -89,7 +91,7 @@ namespace OCCPort.OpenGL
 //                case GL_INT:
 //#endif
 //                case GL_UNSIGNED_INT: return sizeof(unsigned int);
-//                case GL_FLOAT: return sizeof(float);
+                case (int)All.Float: return sizeof(float);
 //# ifdef GL_DOUBLE
 //                case GL_DOUBLE: return sizeof(double);
 //#endif
@@ -113,11 +115,13 @@ namespace OCCPort.OpenGL
                           float[] theData)
         {
 
-            if (myDataType == All.Float)
+            var data = theData.SelectMany(z => BitConverter.GetBytes(z)).ToArray();
+            return init(theGlCtx, theComponentsNb, theElemsNb, data, (int)All.Float);
+            /*if (myDataType == All.Float)
             {
-                theGlCtx.core15fwd.glBufferData(GetTarget(), myElemsNb * sizeof(float), theData, OpenTK.Graphics.OpenGL.BufferUsageHint.StaticDraw);
-            }
-            return true;
+                theGlCtx.core15fwd.glBufferData(GetTarget(), theElemsNb * sizeof(float), theData, OpenTK.Graphics.OpenGL.BufferUsageHint.StaticDraw);
+            }*/
+            //return true;
         }
         public bool Create(OpenGl_Context theGlCtx)
         {
@@ -148,7 +152,11 @@ namespace OCCPort.OpenGL
             myComponentsNb = theComponentsNb;
             myElemsNb = theElemsNb;
             theGlCtx.core15fwd.glBufferData(GetTarget(), myElemsNb * theStride, theData, OpenTK.Graphics.OpenGL.BufferUsageHint.StaticDraw);
-            return true;
+             int anErr = theGlCtx.core15fwd.glGetError();
+
+            Unbind(theGlCtx);
+            return anErr == (int)All.NoError ;
+            
         }
         public void Bind(OpenGl_Context theGlCtx)
         {

@@ -28,6 +28,11 @@ namespace OCCPort.OpenGL
             GL.Clear(value);
         }
 
+        internal void glClearColor(float v1, float v2, float v3, float v4)
+        {
+            GL.ClearColor(v1, v2, v3, v4);
+        }
+
         internal void glClearDepth(double v)
         {
             GL.ClearDepth(v);
@@ -61,6 +66,16 @@ namespace OCCPort.OpenGL
         internal void glDepthMask(bool v)
         {
             GL.DepthMask(v);
+        }
+
+        internal void glDisable(All depthTest)
+        {
+            GL.Disable((EnableCap)depthTest);
+        }
+
+        internal void glEnable(All depthTest)
+        {
+            GL.Enable((EnableCap)depthTest);
         }
 
         internal void glGetProgramInfoLog(int myProgramID, int aLength, out int len, out string aLog)

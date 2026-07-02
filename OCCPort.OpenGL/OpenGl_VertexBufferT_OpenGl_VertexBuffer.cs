@@ -4,10 +4,13 @@ using System.Reflection.Metadata;
 
 namespace OCCPort.OpenGL
 {
-    internal class OpenGl_VertexBufferT_OpenGl_VertexBuffer : OpenGl_VertexBuffer
+    public class OpenGl_VertexBufferT_OpenGl_VertexBuffer : OpenGl_VertexBuffer
     {
 
+       public OpenGl_VertexBufferT_OpenGl_VertexBuffer()
+        {
 
+        }
         public OpenGl_VertexBufferT_OpenGl_VertexBuffer(int nbAttributes, object attribs) : base()
         {
             NbAttributes = nbAttributes;
