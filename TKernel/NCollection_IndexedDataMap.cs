@@ -9,8 +9,19 @@ using System.Xml.Linq;
 
 namespace TKernel
 {
+    public class NCollection_IndexedDataMap<TheKeyType, T2> : NCollection_IndexedDataMap<TheKeyType, T2, NCollection_DefaultHasher<TheKeyType>>
+    {
+
+    }
     public class NCollection_IndexedDataMap<TheKeyType, T2, Hasher> : NCollection_BaseMap where Hasher : IEqualityComparer<TheKeyType>, new()
     {
+        public void ChangeFromIndex(int theIndex, T2 v)
+        {
+            Exceptions.Standard_OutOfRange_Raise_if(theIndex < 1 || theIndex > Extent(), "NCollection_IndexedDataMap::ChangeFromIndex");
+            var d = dic[theIndex - 1];
+            dic[theIndex - 1] = new KeyValuePair<TheKeyType, T2>(d.Key, v);
+
+        }
         public class Iterator
         {
             public Iterator(NCollection_IndexedDataMap<TheKeyType, T2, Hasher> aMapOfPCurves)

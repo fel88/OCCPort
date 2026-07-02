@@ -1,4 +1,7 @@
-﻿using System.Reflection.Metadata;
+﻿global using V3d_Light = TKService.Graphic3d_CLight;
+using System;
+using System.Reflection.Metadata;
+using System.Security.AccessControl;
 using TKernel;
 using TKMath;
 using TKService;
@@ -24,6 +27,24 @@ namespace TKV3d
         bool myDisplayPlane;
         double myDisplayPlaneLength;
         bool myGridEcho;
+        public bool IsGlobalLight(V3d_Light theLight)
+        {
+            return myActiveLights.Contains(theLight);
+        }
+        public void SetLightOn()
+        {
+            for (V3d_ListOfLight.Iterator aDefLightIter = new NCollection_List<Graphic3d_CLight>.Iterator(myDefinedLights); aDefLightIter.More(); aDefLightIter.Next())
+            {
+                if (!myActiveLights.Contains(aDefLightIter.Value()))
+                {
+                    myActiveLights.Append(aDefLightIter.Value());
+                    for (V3d_ListOfView.Iterator anActiveViewIter = new NCollection_List<V3d_View>.Iterator(myActiveViews); anActiveViewIter.More(); anActiveViewIter.Next())
+                    {
+                        anActiveViewIter.Value().SetLightOn(aDefLightIter.Value());
+                    }
+                }
+            }
+        }
 
         [Obsolete("! Deprecated, Redraw() should be used instead.")]
         public void Update() { Redraw(); }
@@ -147,6 +168,9 @@ namespace TKV3d
         public V3d_ListOfView myActiveViews = new V3d_ListOfView();
 
 
+
+        V3d_ListOfLight myDefinedLights = new V3d_ListOfLight();
+
         internal void SetViewOn(V3d_View theView)
         {
             Graphic3d_CView aViewImpl = theView.View();
@@ -203,18 +227,110 @@ namespace TKV3d
                         return (Aspect_Grid)(myRGrid);
                     }
             }
-            return new Aspect_Grid();
+            return null;
         }
 
+        void AddLight(V3d_Light theLight)
+        {
+            if (!myDefinedLights.Contains(theLight))
+            {
+                myDefinedLights.Append(theLight);
+            }
+        }
+
+        void DelLight(V3d_Light theLight)
+        {
+            SetLightOff(theLight);
+            myDefinedLights.Remove(theLight);
+        }
+
+        void SetLightOff(V3d_Light theLight)
+        {
+            myActiveLights.Remove(theLight);
+            for (V3d_ListOfView.Iterator anActiveViewIter = new NCollection_List<V3d_View>.Iterator(myActiveViews); anActiveViewIter.More(); anActiveViewIter.Next())
+            {
+                anActiveViewIter.Value().SetLightOff(theLight);
+            }
+        }
+
+        public void SetDefaultLights()
+        {
+            while (!myDefinedLights.IsEmpty())
+            {
+                V3d_Light aLight = myDefinedLights.First();
+                DelLight(aLight);
+            }
+
+            V3d_DirectionalLight aDirLight = new V3d_DirectionalLight(V3d_TypeOfOrientation.V3d_Zneg, Quantity_NameOfColor.Quantity_NOC_WHITE);
+            aDirLight.SetName("headlight");
+            aDirLight.SetHeadlight(true);
+            V3d_AmbientLight anAmbLight = new V3d_AmbientLight(Quantity_NameOfColor.Quantity_NOC_WHITE);
+            anAmbLight.SetName("amblight");
+            AddLight(aDirLight);
+            AddLight(anAmbLight);
+            SetLightOn(aDirLight);
+            SetLightOn(anAmbLight);
+
+        }
+        void SetLightOn(V3d_Light theLight)
+        {
+            if (!myActiveLights.Contains(theLight))
+            {
+                myActiveLights.Append(theLight);
+            }
+
+            for (V3d_ListOfView.Iterator anActiveViewIter = new NCollection_List<V3d_View>.Iterator(myActiveViews); anActiveViewIter.More(); anActiveViewIter.Next())
+            {
+                anActiveViewIter.Value().SetLightOn(theLight);
+            }
+        }
+        Graphic3d_Structure myGridEchoStructure;
+
+        //! Deactivates the grid in all views of <me>.
+        public void DeactivateGrid()
+        {
+            Aspect_Grid aGrid = Grid(false);
+            if (aGrid == null)
+                return;
+
+            aGrid.Erase();
+            aGrid.Deactivate();
+
+            myGridType = Aspect_GridType.Aspect_GT_Rectangular;
+            for (V3d_ListOfView.Iterator anActiveViewIter = new NCollection_List<V3d_View>.Iterator(myActiveViews); anActiveViewIter.More(); anActiveViewIter.Next())
+            {
+                anActiveViewIter.Value().SetGridActivity(false);
+                if (myGridEcho
+                && myGridEchoStructure != null)
+                {
+                    myGridEchoStructure.Erase();
+                }
+            }
+        }
+
+        //! Activates the grid in all views of <me>.
+        public void ActivateGrid(Aspect_GridType theType, Aspect_GridDrawMode theMode)
+        {
+            Aspect_Grid anOldGrid = Grid(false);
+            if (anOldGrid != null)
+            {
+                anOldGrid.Erase();
+            }
+
+            myGridType = theType;
+            Aspect_Grid aGrid = Grid(true);
+            aGrid.SetDrawMode(theMode);
+            if (theMode != Aspect_GridDrawMode.Aspect_GDM_None)
+            {
+                aGrid.Display();
+            }
+            aGrid.Activate();
+            for (V3d_ListOfView.Iterator anActiveViewIter = new NCollection_List<V3d_View>.Iterator(myActiveViews); anActiveViewIter.More(); anActiveViewIter.Next())
+            {
+                anActiveViewIter.Value().SetGrid(myPrivilegedPlane, aGrid);
+            }
+        }
     }
-    //! Defines the type of projection of the view.
-    public enum V3d_TypeOfView
-    {
-        V3d_ORTHOGRAPHIC,
-        V3d_PERSPECTIVE
-
-
-    };
 
     public class V3d_ListOfViewIterator
     {

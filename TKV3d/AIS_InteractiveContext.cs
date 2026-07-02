@@ -1,10 +1,13 @@
 ﻿global using AIS_NArray1OfEntityOwner = TKernel.NCollection_Array1<TKV3d.SelectMgr_EntityOwner>;
 global using Graphic3d_NMapOfTransient = TKernel.NCollection_Map<object>;
+global using SelectMgr_ListIteratorOfListOfFilter = TKernel.NCollection_List<TKV3d.SelectMgr_Filter>.Iterator;
 global using SelectMgr_ListOfFilter = TKernel.NCollection_List<TKV3d.SelectMgr_Filter>;
 global using TColStd_ListIteratorOfListOfInteger = TKernel.NCollection_List<int>.Iterator;
 global using TColStd_ListOfInteger = TKernel.NCollection_List<int>;
 global using TColStd_SequenceOfInteger = TKernel.NCollection_Sequence<int>;
-global using SelectMgr_ListIteratorOfListOfFilter = TKernel.NCollection_List<TKV3d.SelectMgr_Filter>.Iterator;
+global using AIS_NListOfEntityOwner = TKernel.NCollection_List<TKV3d.SelectMgr_EntityOwner>;
+using TKV3d;
+
 
 
 
@@ -92,6 +95,36 @@ namespace TKV3d
             }
 
             InitAttributes();
+        }
+
+        //! Return Handle(AIS_InteractiveObject)::DownCast (SelectedOwner()->Selectable()).
+        //! @sa SelectedOwner().
+        public AIS_InteractiveObject SelectedInteractive()
+        {
+            return !mySelection.More()
+                 ? null
+                 : (AIS_InteractiveObject)(mySelection.Value().Selectable());
+        }
+
+        //! Returns true if there is another object found by the scan of the list of selected objects.
+        //! @sa SelectedOwner(), InitSelected(), NextSelected().
+        public bool MoreSelected() { return mySelection.More(); }
+
+        //! Continues the scan to the next object in the list of selected objects.
+        //! @sa SelectedOwner(), InitSelected(), MoreSelected().
+        public void NextSelected() { mySelection.Next(); }
+
+        //! Count a number of selected entities using InitSelected()+MoreSelected()+NextSelected() iterator.
+        //! @sa SelectedOwner(), InitSelected(), MoreSelected(), NextSelected().
+        public int NbSelected() { return mySelection.Extent(); }
+
+        //! returns Standard_True if the hidden lines are to be drawn.
+        //! By default the hidden lines are not drawn.
+        public bool DrawHiddenLine() { return myDefaultDrawer.DrawHiddenLine(); }
+
+        public void EnableDrawHiddenLine()
+        {
+            myDefaultDrawer.EnableDrawHiddenLine();
         }
 
         //! Select and hilights the previous detected via AIS_InteractiveContext::MoveTo() method;
@@ -1137,8 +1170,62 @@ namespace TKV3d
         {
             throw new NotImplementedException();
         }
+        //! Sets the display mode of seen Interactive Objects (which have no overridden Display Mode).
+        public void SetDisplayMode(int theMode,
+                                        bool theToUpdateViewer)
+        {
+            if (theMode == myDefaultDrawer.DisplayMode())
+            {
+                return;
+            }
 
-        public void SetDisplayMode(AIS_Shape theIObj, AIS_DisplayMode theMode, bool theToUpdateViewer)
+            for (AIS_DataMapIteratorOfDataMapOfIOStatus anObjIter = new NCollection_DataMap<AIS_InteractiveObject, AIS_GlobalStatus, NCollection_DefaultHasher<object>>.Iterator(myObjects); anObjIter.More(); anObjIter.Next())
+            {
+                AIS_InteractiveObject anObj = anObjIter.Key();
+                bool toProcess = anObj is AIS_Shape
+                                          || anObj is AIS_ConnectedInteractive
+                                          || anObj is AIS_MultipleConnectedInteractive;
+
+                if (!toProcess
+                 || anObj.HasDisplayMode()
+                 || !anObj.AcceptDisplayMode(theMode))
+                {
+                    continue;
+                }
+
+                AIS_GlobalStatus aStatus = anObjIter.Value();
+                aStatus.SetDisplayMode(theMode);
+
+                if (anObj.DisplayStatus() == PrsMgr_DisplayStatus.PrsMgr_DisplayStatus_Displayed)
+                {
+                    myMainPM.Display(anObj, theMode);
+                    if (myLastPicked != null && myLastPicked.IsSameSelectable(anObj))
+                    {
+                        myMainPM.BeginImmediateDraw();
+                        unhighlightGlobal(anObj);
+                        myMainPM.EndImmediateDraw(myMainVwr);
+                    }
+                    if (aStatus.IsSubIntensityOn())
+                    {
+                        highlightWithSubintensity(anObj, theMode);
+                    }
+                    myMainPM.SetVisibility(anObj, myDefaultDrawer.DisplayMode(), false);
+                }
+            }
+
+            myDefaultDrawer.SetDisplayMode(theMode);
+            if (theToUpdateViewer)
+            {
+                myMainVwr.Update();
+            }
+        }
+
+        private void highlightWithSubintensity(AIS_InteractiveObject anObj, int theMode)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetDisplayMode(AIS_InteractiveObject theIObj, int theMode, bool theToUpdateViewer)
         {
             setContextToObject(theIObj);
             if (!myObjects.IsBound(theIObj))
@@ -1151,42 +1238,65 @@ namespace TKV3d
                 return;
             }*/
 
-            //AIS_GlobalStatus aStatus = myObjects(theIObj);
-            /*if (theIObj->DisplayStatus() != PrsMgr_DisplayStatus_Displayed)
+            AIS_GlobalStatus aStatus = myObjects[theIObj];
+            if (theIObj.DisplayStatus() !=PrsMgr_DisplayStatus. PrsMgr_DisplayStatus_Displayed)
             {
-                aStatus->SetDisplayMode(theMode);
-                theIObj->SetDisplayMode(theMode);
+                aStatus.SetDisplayMode(theMode);
+                theIObj.SetDisplayMode(theMode);
                 return;
             }
-
+            
             // erase presentations for all display modes different from <aMode>
-            const Standard_Integer anOldMode = aStatus->DisplayMode();
+            int anOldMode = aStatus.DisplayMode();
             if (anOldMode != theMode)
             {
-                if (myMainPM->IsHighlighted(theIObj, anOldMode))
+                if (myMainPM.IsHighlighted(theIObj, anOldMode))
                 {
                     unhighlightGlobal(theIObj);
                 }
-                myMainPM->SetVisibility(theIObj, anOldMode, Standard_False);
+                myMainPM.SetVisibility(theIObj, anOldMode, false);
             }
 
-            aStatus->SetDisplayMode(theMode);
-
-            myMainPM->Display(theIObj, theMode);
-            if (aStatus->IsHilighted())
+            aStatus.SetDisplayMode(theMode);
+            
+            myMainPM.Display(theIObj, theMode);
+            if (aStatus.IsHilighted())
             {
-                highlightGlobal(theIObj, getSelStyle(theIObj, theIObj->GlobalSelOwner()), theMode);
+                //highlightGlobal(theIObj, getSelStyle(theIObj, theIObj.GlobalSelOwner()), theMode);
             }
-            if (aStatus->IsSubIntensityOn())
+            if (aStatus.IsSubIntensityOn())
             {
                 highlightWithSubintensity(theIObj, theMode);
             }
-            */
+            
             if (theToUpdateViewer)
             {
                 myMainVwr.Update();
             }
             theIObj.SetDisplayMode((int)theMode);
+        }
+
+        //! Initializes a scan of the selected objects.
+        //! @sa SelectedOwner(), MoreSelected(), NextSelected().
+        public void InitSelected()
+        {
+            mySelection.Init();
+
+        }
+
+        //! Provides the type of material setting for the view of the Object.
+        public void SetMaterial(AIS_InteractiveObject theIObj, Graphic3d_MaterialAspect theMaterial, bool theToUpdateViewer)
+        {
+            if (theIObj==null)            
+                return;            
+
+            setContextToObject(theIObj);
+            theIObj.SetMaterial(theMaterial);
+            theIObj.UpdatePresentations();
+            if (theToUpdateViewer)
+            {
+                UpdateCurrentViewer();
+            }
         }
     }
 
@@ -1211,80 +1321,6 @@ namespace TKV3d
         Prs3d_TypeOfHighlight_SubIntensity,   //!< sub-intensity style
         Prs3d_TypeOfHighlight_NB
     };
-
-    //! Class holding the list of selected owners.
-    public class AIS_Selection
-    {
-    }
-
-    public enum SelectMgr_PickingStrategy
-    {
-
-        //Enumeration defines picking strategy - which entities detected by picking line will be accepted, considering selection filters.
-
-        SelectMgr_PickingStrategy_FirstAcceptable,
-
-        //the first detected entity passing selection filter is accepted(e.g.any)
-        SelectMgr_PickingStrategy_OnlyTopmost
-
-        //only topmost detected entity passing selection filter is accepted
-    }
-
-
-    //! A framework to define an OR or AND selection filter.
-    //! To use an AND selection filter call SetUseOrFilter with False parameter.
-    //! By default the OR selection filter is used.
-    public class SelectMgr_AndOrFilter : SelectMgr_CompositionFilter
-    {
-        public SelectMgr_AndOrFilter(SelectMgr_FilterType selectMgr_FilterType_OR)
-        {
-        }
-        SelectMgr_FilterType myFilterType; //!< selection filter type. SelectMgr_TypeFilter_OR by default.
-        Graphic3d_NMapOfTransient myDisabledObjects; //!< disabled objects.
-                                                     //!  Selection isn't applied to these objects.
-        public override bool IsOk(SelectMgr_EntityOwner theObj)
-        {
-            SelectMgr_SelectableObject aSelectable = theObj.Selectable();
-
-            if (myDisabledObjects != null && myDisabledObjects.Contains(aSelectable))
-            {
-                return false;
-            }
-
-            for (SelectMgr_ListIteratorOfListOfFilter anIter = new (myFilters); anIter.More(); anIter.Next())
-            {
-                bool isOK = anIter.Value().IsOk(theObj);
-                if (isOK && myFilterType == SelectMgr_FilterType.SelectMgr_FilterType_OR)
-                {
-                    return true;
-                }
-                else if (!isOK && myFilterType == SelectMgr_FilterType.SelectMgr_FilterType_AND)
-                {
-                    return false;
-                }
-            }
-
-            if (myFilterType == SelectMgr_FilterType.SelectMgr_FilterType_OR && !myFilters.IsEmpty())
-            {
-                return false;
-            }
-            return true;
-        }
-
-    }
-
-    public enum SelectMgr_FilterType
-    {
-
-        //Enumeration defines the filter type.
-
-        SelectMgr_FilterType_AND,
-
-        //an object should be suitable for all filters.
-        SelectMgr_FilterType_OR
-
-        //an object should be suitable at least one filter. 
-    }
 
     //! A framework to define sensitive 3D points.
     public class Select3D_SensitivePoint : Select3D_SensitiveEntity

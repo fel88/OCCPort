@@ -545,10 +545,10 @@ myLineFeather (1.0f),*/
         public void SetAllowSampleAlphaToCoverage(bool theToEnable) { myAllowAlphaToCov = theToEnable; }
         bool myAllowAlphaToCov; //!< flag allowing   GL_SAMPLE_ALPHA_TO_COVERAGE usage
 
-        internal Graphic3d_Camera Camera()
-        {
-            throw new NotImplementedException();
-        }
+
+        //! Returns camera object.
+        public  Graphic3d_Camera Camera()  { return myCamera; }
+
 
         internal void ApplyProjectionMatrix()
         {
@@ -560,7 +560,15 @@ myLineFeather (1.0f),*/
 
         internal void ApplyModelViewMatrix()
         {
-            throw new NotImplementedException();
+
+            if (myShaderManager.ModelWorldState().ModelWorldMatrix() != ModelWorldState.Current())
+            {
+                myShaderManager.UpdateModelWorldStateTo(ModelWorldState.Current());
+            }
+            if (myShaderManager.WorldViewState().WorldViewMatrix() != WorldViewState.Current())
+            {
+                myShaderManager.UpdateWorldViewStateTo(WorldViewState.Current());
+            }
         }
 
         //! Return cached viewport definition (x, y, width, height).

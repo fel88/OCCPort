@@ -27,25 +27,26 @@
         public class Iterator
         {
 
-
+            NCollection_List<T> list;
             public Iterator(NCollection_List<T> aDisplayedObjects)
             {
-
+                list = aDisplayedObjects;
             }
 
+            int index = 0;
             public bool More()
             {
-                throw new NotImplementedException();
+                return index < list.Count;
             }
 
-            public object Next()
+            public void Next()
             {
-                throw new NotImplementedException();
+                index++;
             }
 
             public T Value()
             {
-                throw new NotImplementedException();
+                return list[index];
             }
         }
         public void Append(T aPoints)

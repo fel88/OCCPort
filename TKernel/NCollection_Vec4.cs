@@ -80,6 +80,9 @@ namespace TKernel
         public Element_t[] v; //!< define the vector as array to avoid structure alignment issues
                               //! Alias to 1st component as X coordinate in XYZW.
         public Element_t x() { return v[0]; }
+        public void x(Element_t val) { v[0] = val; }
+        public void y(Element_t val) { v[1] = val; }
+        public void z(Element_t val) { v[2] = val; }
 
         //! Alias to 1st component as RED channel in RGBA.
         public Element_t r() { return v[0]; }
@@ -102,6 +105,9 @@ namespace TKernel
         //! Alias to 4th component as ALPHA channel in RGBA.
         public Element_t a() { return v[3]; }
 
-
+        public Element_t[] ChangeData()
+        {
+            return v;
+        }
     }
 }

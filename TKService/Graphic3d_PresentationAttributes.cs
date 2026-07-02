@@ -15,6 +15,11 @@ namespace TKService
             myZLayer = Graphic3d_ZLayerId.Graphic3d_ZLayerId_Default;
             myDispMode = (0);
         }
+        //! Sets basic presentation color (RGB components, does not modifies transparency).
+        public virtual void SetColor( Quantity_Color theColor)
+  {
+    myBasicColor.ChangeRGB( theColor);
+  }
 
         //! Returns presentation Zlayer, Graphic3d_ZLayerId_Default by default.
         //! Graphic3d_ZLayerId_UNKNOWN means undefined (a layer of main presentation to be used).

@@ -1,4 +1,5 @@
 ﻿using OpenTK.Mathematics;
+using System.Threading;
 using TKernel;
 
 namespace OCCPort
@@ -19,6 +20,17 @@ namespace OCCPort
                                    theRGB.W);
         }
 
+        public void ChangeRGB(Quantity_Color theColor)
+        {
+            myRgb = theColor;
+        }
+
+
+        //! Return RGB color value.
+        public Quantity_Color GetRGB() { return myRgb; }
+
+
+
         //! Creates the color with specified RGB value.
         public Quantity_ColorRGBA(Quantity_Color theRgb)
         {
@@ -26,6 +38,14 @@ namespace OCCPort
             myAlpha = (1.0f);
         }
 
+
+        //! Creates the color from RGBA values.
+        public Quantity_ColorRGBA(float theRed, float theGreen, float theBlue, float theAlpha)
+        {
+            myRgb = new(theRed, theGreen, theBlue, Quantity_TypeOfColor.Quantity_TOC_RGB);
+    myAlpha = (theAlpha);
+
+        }
 
         Quantity_Color myRgb;
 

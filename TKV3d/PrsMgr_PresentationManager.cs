@@ -128,9 +128,20 @@ namespace TKV3d
 
         }
 
-        private void Update(AIS_InteractiveObject thePrsObj, int theMode)
+        public void Update(PrsMgr_PresentableObject thePrsObj, int theMode)
         {
-            throw new NotImplementedException();
+            for (PrsMgr_ListOfPresentableObjectsIter anIter=new PrsMgr_ListOfPresentableObjectsIter  (thePrsObj.Children()); anIter.More(); anIter.Next())
+            {
+                Update(anIter.Value(), theMode);
+            }
+
+            PrsMgr_Presentation aPrs = Presentation(thePrsObj, theMode);
+            if (aPrs!=null)
+            {
+                aPrs.Clear();
+                thePrsObj.Fill(this, aPrs, theMode);
+                aPrs.SetUpdateStatus(false);
+            }
         }
 
         //! Returns the presentation Presentation of the presentable object thePrsObject in this framework.
@@ -169,14 +180,59 @@ namespace TKV3d
 
         }
 
-        private void AddToImmediateList(PrsMgr_Presentation aPrs)
+        private void AddToImmediateList(PrsMgr_Presentation thePrs)
         {
-            throw new NotImplementedException();
+            if (myImmediateModeOn < 1)
+            {
+                return;
+            }
+
+            for (PrsMgr_ListOfPresentations.Iterator anIter=new TKernel.NCollection_List<Graphic3d_Structure>.Iterator  (myImmediateList); anIter.More(); anIter.Next())
+            {
+                if (anIter.Value() == thePrs)
+                {
+                    return;
+                }
+            }
+
+            myImmediateList.Append(thePrs);
         }
 
-        internal bool IsHighlighted(AIS_InteractiveObject theIObj, int anOldMode)
+        public bool IsDisplayed(PrsMgr_PresentableObject thePrsObj,
+                                                           int theMode)
         {
-            throw new NotImplementedException();
+            if (thePrsObj.ToPropagateVisualState())
+            {
+                for (PrsMgr_ListOfPresentableObjectsIter anIter=new PrsMgr_ListOfPresentableObjectsIter (thePrsObj.Children()); anIter.More(); anIter.Next())
+                {
+                    if (IsDisplayed(anIter.Value(), theMode))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+             PrsMgr_Presentation aPrs = Presentation(thePrsObj, theMode);
+            return aPrs!=null
+                 && aPrs.IsDisplayed();
+        }
+
+        internal bool IsHighlighted(PrsMgr_PresentableObject thePrsObj, int theMode)
+        {
+            if (thePrsObj.ToPropagateVisualState())
+            {
+                for (PrsMgr_ListOfPresentableObjectsIter anIter=new PrsMgr_ListOfPresentableObjectsIter (thePrsObj.Children()); anIter.More(); anIter.Next())
+                {
+                    if (IsHighlighted(anIter.Value(), theMode))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+             PrsMgr_Presentation aPrs = Presentation(thePrsObj, theMode);
+            return aPrs!=null
+                 && aPrs.IsHighlighted();
         }
 
         public void SetVisibility(PrsMgr_PresentableObject thePrsObj, int theMode, bool theValue)

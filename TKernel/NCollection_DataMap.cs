@@ -34,30 +34,31 @@ namespace TKernel
 
         public class Iterator
         {
-            NCollection_DataMap<T1, T2, T3> collection;
+            KeyValuePair<T1, T2>[] collection;
             public Iterator(NCollection_DataMap<T1, T2, T3> _collection)
             {
-                collection = _collection;
+                collection = _collection.ToArray();
             }
-
+            int index = 0;
             public T1 Key()
             {
-                throw new NotImplementedException();
+                return collection[index].Key;
             }
 
             public bool More()
             {
-                throw new NotImplementedException();
+                return index < collection.Length;
             }
 
-            public object Next()
+            public void Next()
             {
-                throw new NotImplementedException();
+                index++;
             }
 
             public T2 Value()
             {
-                throw new NotImplementedException();
+                return collection[index].Value;
+
             }
         }
         public bool IsEmpty()

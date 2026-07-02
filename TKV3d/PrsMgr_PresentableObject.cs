@@ -20,10 +20,33 @@ namespace TKV3d
     public abstract class PrsMgr_PresentableObject
     {
         //! Get value of the flag "propagate visual state"
-      //! It means that the display/erase/color visual state is propagated automatically to all children;
-      //! by default, the flag is true 
-        public bool ToPropagateVisualState()  { return myToPropagateVisualState; }
+        //! It means that the display/erase/color visual state is propagated automatically to all children;
+        //! by default, the flag is true 
+        public bool ToPropagateVisualState() { return myToPropagateVisualState; }
 
+        //! Recomputes invalidated presentations of the object.
+        //! @param theToIncludeHidden if TRUE, then even hidden invalidated presentations will be updated
+        //! @return TRUE if some presentations were recomputed
+        public bool UpdatePresentations(bool theToIncludeHidden = false)
+        {
+            bool hasUpdates = false;
+            for (PrsMgr_Presentations.Iterator aPrsIter = new PrsMgr_Presentations.Iterator(myPresentations); aPrsIter.More(); aPrsIter.Next())
+            {
+                PrsMgr_Presentation aModedPrs = aPrsIter.Value();
+                if (aModedPrs.MustBeUpdated())
+                {
+                    PrsMgr_PresentationManager aPrsMgr = aModedPrs.PresentationManager();
+                    if (theToIncludeHidden
+                     || aPrsMgr.IsDisplayed(this, aModedPrs.Mode())
+                     || aPrsMgr.IsHighlighted(this, aModedPrs.Mode()))
+                    {
+                        hasUpdates = true;
+                        aPrsMgr.Update(this, aModedPrs.Mode());
+                    }
+                }
+            }
+            return hasUpdates;
+        }
         public virtual void ResetTransformation()
         {
             setLocalTransformation(null);
@@ -132,6 +155,12 @@ namespace TKV3d
 
             myDrawer.SetDisplayMode(-1);
         }
+
+
+        //! Sets the material aMat defining this display attribute
+        //! for the interactive object.
+        //! Material aspect determines shading aspect, color and
+        //! transparency of visible entities.
         public void SetMaterial(Graphic3d_MaterialAspect theMaterial)
         {
             myDrawer.SetupOwnShadingAspect();

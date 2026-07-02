@@ -2,10 +2,35 @@
 
 namespace TKService
 {
-    public class Aspect_Grid
+    public abstract class Aspect_Grid
     {
+        //! activates the grid. The Hit method will return
+        //! gridx and gridx computed according to the steps
+        //! of the grid.
+        public void Activate() { myIsActive = true; }
+
         //! Returns TRUE when the grid is active.
         public bool IsActive() { return myIsActive; }
+
+        //! Updates the grid parameters.
+        public abstract   void UpdateDisplay() ;
+        //! Display the grid at screen.
+        public abstract   void Display() ;
+  
+        //! Erase the grid from screen.
+        public abstract   void Erase() ;
+
+        //! deactivates the grid. The hit method will return
+        //! gridx and gridx as the enter value X & Y.
+        public void Deactivate() { myIsActive = false; }
+
+        public void SetDrawMode(Aspect_GridDrawMode theDrawMode)
+        {
+            myDrawMode = theDrawMode;
+            UpdateDisplay();
+        }
+        Aspect_GridDrawMode myDrawMode;
+
         double myRotationAngle;
         double myXOrigin;
         double myYOrigin;
@@ -17,8 +42,8 @@ namespace TKService
         public Aspect_Grid(double theXOrigin = 0,
                                 double theYOrigin = 0,
                                 double theAngle = 0,
-                                Quantity_Color theColor = null,
-                                Quantity_Color theTenthColor = null)
+                                Quantity_Color? theColor = null,
+                                Quantity_Color? theTenthColor = null)
         {
             if (theColor == null)
                 theColor = new Quantity_Color(Quantity_NameOfColor.Quantity_NOC_GRAY50);

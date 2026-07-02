@@ -1,6 +1,6 @@
 ﻿using OCCPort.Common;
+using System.Numerics;
 using System.Reflection.Metadata;
-using System.Runtime.Serialization;
 using TKernel;
 using TKMath;
 using TKService;
@@ -43,7 +43,7 @@ namespace TKV3d
         //! and the fill method (horizontal by default).
         public void SetBgGradientColors(Quantity_Color theColor1,
                                              Quantity_Color theColor2,
-                                             Aspect_GradientFillMethod theFillStyle =Aspect_GradientFillMethod. Aspect_GradientFillMethod_Horizontal,
+                                             Aspect_GradientFillMethod theFillStyle = Aspect_GradientFillMethod.Aspect_GradientFillMethod_Horizontal,
                                              bool theToUpdate = false)
         {
             Aspect_GradientBackground aGradientBg = new Aspect_GradientBackground(theColor1, theColor2, theFillStyle);
@@ -1059,19 +1059,93 @@ namespace TKV3d
         //! Return parent View or NULL if this is not a subview.
         public V3d_View ParentView() { return myParentView; }
 
-        internal void SetLightOn(Graphic3d_CLight anActiveLightIter)
+        internal void SetLightOn(Graphic3d_CLight theLight)
         {
-            throw new NotImplementedException();
+            if (!myActiveLights.Contains(theLight))
+            {
+                myActiveLights.Append(theLight);
+                UpdateLights();
+            }
         }
+        Aspect_Grid MyGrid;
 
-        internal void SetGridActivity(bool v)
+        internal void SetGridActivity(bool AFlag)
         {
-            throw new NotImplementedException();
+            if (AFlag) MyGrid.Activate();
+            else MyGrid.Deactivate();
         }
+        gp_Ax3 MyPlane;
 
-        internal void SetGrid(gp_Ax3 myPrivilegedPlane, Aspect_Grid aGrid)
+        internal void SetGrid(gp_Ax3 aPlane, Aspect_Grid aGrid)
         {
-            throw new NotImplementedException();
+            MyPlane = aPlane;
+            MyGrid = aGrid;
+
+  //          double xl, yl, zl;
+  //          double xdx, xdy, xdz;
+  //          double ydx, ydy, ydz;
+  //          double dx, dy, dz;
+  //          aPlane.Location().Coord(xl, yl, zl);
+  //          aPlane.XDirection().Coord(xdx, xdy, xdz);
+  //          aPlane.YDirection().Coord(ydx, ydy, ydz);
+  //          aPlane.Direction().Coord(dx, dy, dz);
+
+  //          double CosAlpha = Cos(MyGrid->RotationAngle());
+  //          double SinAlpha = Sin(MyGrid->RotationAngle());
+
+  //          TColStd_Array2OfReal Trsf1(1, 4, 1, 4);
+  //          Trsf1(4, 4) = 1.0;
+  //          Trsf1(4, 1) = Trsf1(4, 2) = Trsf1(4, 3) = 0.0;
+  //          // Translation
+  //          Trsf1(1, 4) = xl,
+  //Trsf1(2, 4) = yl,
+  //Trsf1(3, 4) = zl;
+  //          // Transformation change of marker
+  //          Trsf1(1, 1) = xdx,
+  //Trsf1(2, 1) = xdy,
+  //Trsf1(3, 1) = xdz,
+  //Trsf1(1, 2) = ydx,
+  //Trsf1(2, 2) = ydy,
+  //Trsf1(3, 2) = ydz,
+  //Trsf1(1, 3) = dx,
+  //Trsf1(2, 3) = dy,
+  //Trsf1(3, 3) = dz;
+
+  //          TColStd_Array2OfReal Trsf2(1, 4, 1, 4);
+  //          Trsf2(4, 4) = 1.0;
+  //          Trsf2(4, 1) = Trsf2(4, 2) = Trsf2(4, 3) = 0.0;
+  //          // Translation of the origin
+  //          Trsf2(1, 4) = -MyGrid->XOrigin(),
+  //Trsf2(2, 4) = -MyGrid->YOrigin(),
+  //Trsf2(3, 4) = 0.0;
+  //          // Rotation Alpha around axis -Z
+  //          Trsf2(1, 1) = CosAlpha,
+  //Trsf2(2, 1) = -SinAlpha,
+  //Trsf2(3, 1) = 0.0,
+  //Trsf2(1, 2) = SinAlpha,
+  //Trsf2(2, 2) = CosAlpha,
+  //Trsf2(3, 2) = 0.0,
+  //Trsf2(1, 3) = 0.0,
+  //Trsf2(2, 3) = 0.0,
+  //Trsf2(3, 3) = 1.0;
+
+  //          double valuetrsf;
+  //          double valueoldtrsf;
+  //          double valuenewtrsf;
+  //          int i, j, k;
+  //          // Calculation of the product of matrices
+  //          for (i = 1; i <= 4; i++)
+  //              for (j = 1; j <= 4; j++)
+  //              {
+  //                  MyTrsf(i, j) = 0.0;
+  //                  for (k = 1; k <= 4; k++)
+  //                  {
+  //                      valueoldtrsf = Trsf1(i, k);
+  //                      valuetrsf = Trsf2(k, j);
+  //                      valuenewtrsf = MyTrsf(i, j) + valueoldtrsf * valuetrsf;
+  //                      MyTrsf(i, j) = valuenewtrsf;
+  //                  }
+  //              }
         }
 
 
@@ -1170,25 +1244,31 @@ namespace TKV3d
             }
         }
 
-    }
-    [Serializable]
-    public class V3d_BadValue : Exception
-    {
-        public V3d_BadValue()
+        public Graphic3d_RenderingParams ChangeRenderingParams()
         {
+            return myView.ChangeRenderingParams();
+
+        }
+        public void SetLightOff(V3d_Light theLight)
+        {
+            if (MyViewer.IsGlobalLight(theLight))
+                throw new Standard_TypeMismatch("V3d_View::SetLightOff, the light is global");
+            myActiveLights.Remove(theLight);
+            UpdateLights();
         }
 
-        public V3d_BadValue(string message) : base(message)
+        V3d_ListOfLight myActiveLights = new V3d_ListOfLight();
+
+        public void UpdateLights()
         {
+            Graphic3d_LightSet aLights = new Graphic3d_LightSet();
+            for (V3d_ListOfLight.Iterator anActiveLightIter = new NCollection_List<Graphic3d_CLight>.Iterator(myActiveLights); anActiveLightIter.More(); anActiveLightIter.Next())
+            {
+                aLights.Add(anActiveLightIter.Value());
+            }
+            myView.SetLights(aLights);
         }
 
-        public V3d_BadValue(string message, Exception innerException) : base(message, innerException)
-        {
-        }
-
-        protected V3d_BadValue(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-        }
     }
 }
 

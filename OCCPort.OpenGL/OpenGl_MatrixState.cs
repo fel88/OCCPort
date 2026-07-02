@@ -30,7 +30,7 @@ namespace OCCPort.OpenGL
         }
 
         Graphic3d_Mat4[] myStack;     //!< Collection used to maintenance matrix stack
-        Graphic3d_Mat4 myCurrent;   //!< Current matrix
+        Graphic3d_Mat4 myCurrent=new TKernel.NCollection_Mat4<float> ()  ;   //!< Current matrix
 
         int myStackHead; //!< Index of stack head
                          //! Sets current matrix to identity.

@@ -54,6 +54,17 @@ namespace TKV3d
         {
             myWireAspect = theAspect;
         }
+        public void SetFaceBoundaryDraw(bool theIsEnabled)
+        {
+            myHasOwnFaceBoundaryDraw = true;
+            myFaceBoundaryDraw = theIsEnabled;
+        }
+
+        public void EnableDrawHiddenLine()
+        {
+            myHasOwnDrawHiddenLine = true;
+            myDrawHiddenLine = true;
+        }
 
         //! Returns True if the drawing of isos on planes is enabled.
         public bool IsoOnPlane()
@@ -595,38 +606,18 @@ namespace TKV3d
                 myPreviousDeviationCoefficient = DeviationCoefficient();
             }
         }
-    }
 
+        bool myHasOwnDrawHiddenLine;
+        bool myDrawHiddenLine;
 
-    //! A graphic attribute manager which governs how
-    //! A framework to define the display attributes of isoparameters.
-    //! This framework can be used to modify the default
-    //! setting for isoparameters in Prs3d_Drawer.
-    public class Prs3d_IsoAspect : Prs3d_LineAspect
-    {
-        //! Constructs a framework to define display attributes of isoparameters.
-        //! These include:
-        //! -   the color attribute aColor
-        //! -   the type of line aType
-        //! -   the width value aWidth
-        //! -   aNumber, the number of isoparameters to be   displayed.
-        public Prs3d_IsoAspect(Quantity_Color theColor,
-            Aspect_TypeOfLine theType,
-            double theWidth,
-            int theNumber)
-            : base(theColor, theType, theWidth)
+        //! Returns Standard_True if the hidden lines are to be drawn.
+        //! By default the hidden lines are not drawn.
+        public bool DrawHiddenLine()
         {
-
+            return myHasOwnDrawHiddenLine || myLink == null
+                 ? myDrawHiddenLine
+                 : myLink.DrawHiddenLine();
         }
-
-        //! defines the number of U or V isoparametric curves
-        //! to be drawn for a single face.
-        //! Default value: 10
-        public void SetNumber(int theNumber) { myNumber = theNumber; }
-
-        //! returns the number of U or V isoparametric curves drawn for a single face.
-        public int Number() { return myNumber; }
-        protected int myNumber;
     }
     public class Prs3d_LineAspect : Prs3d_BasicAspect
     {

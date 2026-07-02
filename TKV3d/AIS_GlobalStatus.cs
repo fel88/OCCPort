@@ -65,6 +65,11 @@ namespace TKV3d
         {
             mySelModes.Clear();
         }
+
+        internal bool IsSubIntensityOn()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
 

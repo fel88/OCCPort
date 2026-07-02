@@ -72,6 +72,9 @@
             CollectedStats(PerfCounters_Basic),
             ToShowStats(Standard_False)*/
         }
+  public      bool IsShadowEnabled;             //!< enables/disables shadows rendering, True by default
+        public bool IsReflectionEnabled;         //!< enables/disables specular reflections, False by default
+        public bool IsAntialiasingEnabled;       //!< enables/disables adaptive anti-aliasing, False by default
 
         //! Returns resolution ratio.
         public float ResolutionRatio()

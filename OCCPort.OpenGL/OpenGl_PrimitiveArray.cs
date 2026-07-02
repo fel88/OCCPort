@@ -32,6 +32,7 @@ namespace OCCPort.OpenGL
 
             setDrawMode(theType);
         }
+        protected bool myIsVboInit;
 
         //=======================================================================
         public void setDrawMode(Graphic3d_TypeOfPrimitiveArray theType)
@@ -121,9 +122,9 @@ namespace OCCPort.OpenGL
         protected Graphic3d_IndexBuffer myIndices;
         protected Graphic3d_Buffer myAttribs;
         Graphic3d_BoundBuffer myBounds;
-        int myDrawMode;
-        bool myIsFillType;
-        bool myIsVboInit;
+        protected  int myDrawMode;
+        protected bool myIsFillType;
+        
 
         int myUID; //!< Unique ID of primitive array. 
 
@@ -452,7 +453,8 @@ namespace OCCPort.OpenGL
             return true;
         }
 
-        private void clearMemoryGL(OpenGl_Context theGlCtx)
+        
+     protected   void clearMemoryGL(OpenGl_Context theGlCtx)
         {
             if (myVboIndices != null)
             {

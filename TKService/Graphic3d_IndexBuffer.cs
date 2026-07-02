@@ -27,6 +27,18 @@ namespace TKService
             }
             return ret.ToArray();
         }
+        public bool Init<T>(int theNbElems)
+        {
+            if (typeof( T) == typeof(ushort))
+            {
+                return Init(2, theNbElems);
+            }
+            if (typeof(T) == typeof(uint))
+            {
+                return Init(4, theNbElems);
+            }
+            throw new NotImplementedException();
+        }
         public bool Init(int sizeOfElement, int theNbElems)
         {
             release();

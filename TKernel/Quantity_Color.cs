@@ -1,5 +1,6 @@
 ﻿using OCCPort.Common;
 using System.Globalization;
+using System.Security.Cryptography.X509Certificates;
 using System.Xml.Linq;
 using TKernel;
 
@@ -11,12 +12,82 @@ namespace TKernel
     //! other OCCT interfaces taking/returning Quantity_Color would expect them in linear space.
     //! Therefore, take a look into methods converting to and from non-linear sRGB color space, if needed;
     //! for instance, application usually providing color picking within 0..255 range in sRGB color space.
-    public class Quantity_Color
+    public struct Quantity_Color
     {
         //! Creates the color from enumeration value.
         public Quantity_Color(Quantity_NameOfColor theName)
         {
             myRgb = (valuesOf(theName, Quantity_TypeOfColor.Quantity_TOC_RGB));
+        }
+        //! Creates a color according to the definition system theType.
+        //! Throws exception if values are out of range.
+        public Quantity_Color(double theC1,
+                                   double theC2,
+                                   double theC3,
+                                   Quantity_TypeOfColor theType)
+        {
+            SetValues(theC1, theC2, theC3, theType);
+
+        }
+
+
+        // Throw exception if RGB values are out of range.
+        void Quantity_ColorValidateRgbRange(double theR, double theG, double theB)
+        {
+            if (theR < 0.0 || theR > 1.0
+   || theG < 0.0 || theG > 1.0
+   || theB < 0.0 || theB > 1.0) { throw new Standard_OutOfRange("Color out"); }
+        }
+        //! Convert sRGB component into linear RGB using OpenGL specs formula (double precision), also known as gamma correction.
+        static double Convert_sRGB_To_LinearRGB(double thesRGBValue)
+        {
+            return thesRGBValue <= 0.04045
+                 ? thesRGBValue / 12.92
+                 : Math.Pow((thesRGBValue + 0.055) / 1.055, 2.4);
+        }
+        void SetValues(double theC1, double theC2, double theC3,
+                                 Quantity_TypeOfColor theType)
+        {
+            switch (theType)
+            {
+                case Quantity_TypeOfColor.Quantity_TOC_RGB:
+                    {
+                        Quantity_ColorValidateRgbRange(theC1, theC2, theC3);
+                        myRgb.SetValues((float)(theC1), (float)(theC2), (float)(theC3));
+                        break;
+                    }
+                case Quantity_TypeOfColor.Quantity_TOC_sRGB:
+                    {
+                        Quantity_ColorValidateRgbRange(theC1, theC2, theC3);
+                        myRgb.SetValues((float)Convert_sRGB_To_LinearRGB(theC1),
+                                           (float)Convert_sRGB_To_LinearRGB(theC2),
+                                           (float)Convert_sRGB_To_LinearRGB(theC3));
+                        break;
+                    }
+                case Quantity_TypeOfColor.Quantity_TOC_HLS:
+                    {
+                        throw new NotImplementedException();
+                        //Quantity_ColorValidateHlsRange(theC1, theC2, theC3);
+                        // myRgb = Convert_HLS_To_LinearRGB(NCollection_Vec3<float>(float(theC1), float(theC2), float(theC3)));
+                        break;
+                    }
+                case Quantity_TypeOfColor.Quantity_TOC_CIELab:
+                    {
+                        throw new NotImplementedException();
+
+                        //  Quantity_ColorValidateLabRange(theC1, theC2, theC3);
+                        //   myRgb = Convert_Lab_To_LinearRGB(NCollection_Vec3<float>(float(theC1), float(theC2), float(theC3)));
+                        break;
+                    }
+                case Quantity_TypeOfColor.Quantity_TOC_CIELch:
+                    {
+                        throw new NotImplementedException();
+
+                        // Quantity_ColorValidateLchRange(theC1, theC2, theC3);
+                        // myRgb = Convert_Lab_To_LinearRGB(Convert_Lch_To_Lab(NCollection_Vec3<float>(float(theC1), float(theC2), float(theC3))));
+                        break;
+                    }
+            }
         }
 
         // =======================================================================
@@ -118,7 +189,7 @@ namespace TKernel
             double aC = Math.Sqrt(aa * aa + ab * ab);
             double aH = (aC > TheEpsilon ? Math.Atan2(ab, aa) * 180.0 / Math.PI : 0.0);
 
-            if (aH < 0.0) 
+            if (aH < 0.0)
                 aH += 360.0;
 
             return new NCollection_Vec3<float>(theLab[0], (float)aC, (float)aH);
@@ -282,6 +353,12 @@ namespace TKernel
         ? theLinearValue * 12.92f
         : (float)Math.Pow(theLinearValue, 1.0f / 2.4f) * 1.055f - 0.055f;
         }
+
+
+        //! Returns TRUE if the distance between two colors is greater than Epsilon().
+        public bool IsDifferent(Quantity_Color theOther) { return (SquareDistance(theOther) > Epsilon() * Epsilon()); }
+
+
     }
 
 }

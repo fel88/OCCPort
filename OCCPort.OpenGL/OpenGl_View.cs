@@ -32,7 +32,7 @@ namespace OCCPort.OpenGL
         public override void SetGradientBackground(Aspect_GradientBackground theBackground)
         {
             Quantity_Color aColor1, aColor2;
-            theBackground.Colors(out aColor1,out aColor2);
+            theBackground.Colors(out aColor1, out aColor2);
             myBackgrounds[(int)Graphic3d_TypeOfBackground.Graphic3d_TOB_GRADIENT].SetGradientParameters(aColor1, aColor2, theBackground.BgGradientFillMethod());
             if (theBackground.BgGradientFillMethod() >= Aspect_GradientFillMethod.Aspect_GradientFillMethod_Corner1
              && theBackground.BgGradientFillMethod() <= Aspect_GradientFillMethod.Aspect_GradientFillMethod_Corner4)
@@ -72,6 +72,13 @@ namespace OCCPort.OpenGL
 
 
             myWorkspace = new OpenGl_Workspace(this, null);
+            myTextureParams = new OpenGl_Aspects();
+
+            for (int i = 0; i < (int)Graphic3d_TypeOfBackground.Graphic3d_TypeOfBackground_NB; ++i)
+            {
+                //myBackgrounds[i] = new OpenGl_BackgroundArray(Enum.GetValues<Graphic3d_TypeOfBackground>()[i]);
+                myBackgrounds[i] = new OpenGl_BackgroundArray((Graphic3d_TypeOfBackground)i);
+            }
 
         }
         //! Return true if view content cache has been invalidated.
@@ -1662,7 +1669,7 @@ namespace OCCPort.OpenGL
                                                   && theOutputFBO.NbSamples() != 0);
 
 
-             OpenGl_ShaderManager aManager = aContext.ShaderManager();
+            OpenGl_ShaderManager aManager = aContext.ShaderManager();
             // Update matrices if camera has changed.
             //Graphic3d_WorldViewProjState aWVPState = myCamera.WorldViewProjState();
             //if (myWorldViewProjState != aWVPState)
@@ -1739,6 +1746,15 @@ namespace OCCPort.OpenGL
             }
             return aLayer;
 
+        }
+        Graphic3d_LightSet myLights;
+        int myCurrLightSourceState;
+        OpenGl_StateCounter myStateCounter = new OpenGl_StateCounter();
+
+        public override void SetLights(Graphic3d_LightSet theLights)
+        {
+            myLights = theLights;
+            myCurrLightSourceState = myStateCounter.Increment();
         }
     }
 

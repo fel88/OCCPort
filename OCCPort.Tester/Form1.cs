@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -34,6 +35,7 @@ namespace OCCPort.Tester
                 Profile = OpenTK.Windowing.Common.ContextProfile.Compatability,
                 NumberOfSamples = 8
             });
+            Shown += Form1_Shown;
             v3d_viewer = new V3d_Viewer(new OpenGl_GraphicDriver(new Aspect_DisplayConnection()));
 
             aIS_ViewController = new AIS_ViewController();
@@ -61,7 +63,47 @@ namespace OCCPort.Tester
             Controls.Add(glControl);
             glControl.Dock = DockStyle.Fill;
         }
+        IOCCTProxyInterface proxy;
+        public IOCCTProxyInterface Proxy => proxy;
+        [DllImport("opengl32.dll")]
+        public static extern IntPtr wglGetCurrentContext();
+        nint? hglrc;
+        bool inited = false;
 
+        private void Form1_Shown(object sender, EventArgs e)
+        {
+            proxy = new OCCTProxy();
+
+            hglrc = wglGetCurrentContext();
+
+            Proxy.runOpenTk(glControl.Context.WindowPtr, hglrc.Value);
+
+
+            inited = true;
+
+            //  proxy.InitOCCTProxy();
+
+
+            // if (!proxy.InitViewer2(panel1.Handle))
+            {
+
+            }
+            proxy.ActivateGrid(true);
+            //proxy.ShowCube();
+            proxy.SetDisplayMode(1);
+            proxy.SetMaterial(1);
+            //proxy.SetDegenerateModeOff();
+            proxy.RedrawView();
+
+            Color clr1 = Color.DarkBlue;
+            Color clr2 = Color.Olive;
+            //proxy.SetBackgroundColor(clr1.R, clr1.G, clr1.B, clr2.R, clr2.G, clr2.B);
+
+
+            proxy.UpdateCurrentViewer();
+            proxy.UpdateView();
+            Width = Width + 1;
+        }
 
         GravityCameraViewManager GravityViewManager;
         public CameraViewManager ViewManager;
@@ -100,7 +142,9 @@ namespace OCCPort.Tester
 
             aIS_ViewController.FlushViewEvents(myAISContext, GravityViewManager.View, true);
 
-            Redraw();
+
+            //glControl.SwapBuffers();
+            // Redraw();
         }
 
         void Redraw()
@@ -290,16 +334,16 @@ namespace OCCPort.Tester
         {
             var d = DialogHelpers.StartDialog();
             d.Text = "New box";
-            d.AddNumericField("w", "Width", 50);
-            d.AddNumericField("l", "Length", 50);
-            d.AddNumericField("h", "Height", 50);
+            d.AddDouble("w", "Width", 50);
+            d.AddDouble("l", "Length", 50);
+            d.AddDouble("h", "Height", 50);
 
             if (!d.ShowDialog())
                 return;
 
-            var w = d.GetNumericField("w");
-            var h = d.GetNumericField("h");
-            var l = d.GetNumericField("l");
+            var w = d.GetDouble("w");
+            var h = d.GetDouble("h");
+            var l = d.GetDouble("l");
             gp_Pnt p1 = new gp_Pnt(0, 0, 0);
             gp_Pnt p2 = new gp_Pnt(w, h, l);
             BRepPrimAPI_MakeBox box = new BRepPrimAPI_MakeBox(p1, p2);
@@ -309,7 +353,7 @@ namespace OCCPort.Tester
             lastGenerated = solid;
             var shape = new AIS_Shape(solid);
             myAISContext.Display(shape, true);
-            myAISContext.SetDisplayMode(shape, AIS_DisplayMode.AIS_Shaded, false);
+            myAISContext.SetDisplayMode(shape, (int)AIS_DisplayMode.AIS_Shaded, false);
             myAISContext.UpdateCurrentViewer();
 
 
@@ -334,7 +378,7 @@ namespace OCCPort.Tester
             var shape = new AIS_Shape(solid);
 
             myAISContext.Display(shape, true);
-            myAISContext.SetDisplayMode(shape, AIS_DisplayMode.AIS_Shaded, false);
+            myAISContext.SetDisplayMode(shape, (int)AIS_DisplayMode.AIS_Shaded, false);
 
             GravityViewManager.View.Redraw();
         }
@@ -485,7 +529,7 @@ namespace OCCPort.Tester
             var shape = new AIS_Shape(solid);
 
             myAISContext.Display(shape, true);
-            myAISContext.SetDisplayMode(shape, AIS_DisplayMode.AIS_Shaded, false);
+            myAISContext.SetDisplayMode(shape, (int)AIS_DisplayMode.AIS_Shaded, false);
             myAISContext.UpdateCurrentViewer();
         }
     }

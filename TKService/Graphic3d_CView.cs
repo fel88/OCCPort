@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using System.Reflection.Metadata;
 using System.Xml.Linq;
 using TKernel;
 using TKMath;
@@ -13,6 +14,9 @@ namespace TKService
     //! computed (HLR or "view-dependent") structures.
     public abstract class Graphic3d_CView : Graphic3d_DataStructureManager
     {
+        //! Sets list of lights for the view.
+        public abstract void SetLights(Graphic3d_LightSet theLights) ;
+
         public void ChangeZLayer(Graphic3d_Structure theStructure,
                                     Graphic3d_ZLayerId theLayerId)
         {
@@ -997,56 +1001,6 @@ namespace TKService
     {
         Graphic3d_TOA_POS = 0, Graphic3d_TOA_NORM, Graphic3d_TOA_UV, Graphic3d_TOA_COLOR,
         Graphic3d_TOA_CUSTOM
-    }
-
-    public class Aspect_CircularGrid : Aspect_Grid
-    {  //! creates a new grid. By default this grid is not
-       //! active.
-        public Aspect_CircularGrid(double aRadiusStep, int aDivisionNumber, double anXOrigin = 0, double anYOrigin = 0, double aRotationAngle = 0)
-            : base(anXOrigin, anYOrigin, aRotationAngle)
-        {
-            myRadiusStep = (aRadiusStep);
-            myDivisionNumber = aDivisionNumber;
-        }
-
-        double myRadiusStep;
-        int myDivisionNumber;
-        double myAlpha;
-        double myA1;
-        double myB1;
-
-    }
-
-    public class Graphic3d_Vertex
-    {
-
-
-        float[] xyz = new float[3];
-
-
-        //! Returns the X coordinates.
-        public float X() { return xyz[0]; }
-
-        //! Returns the Y coordinate.
-        public float Y() { return xyz[1]; }
-
-        //! Returns the Z coordinate.
-        public float Z() { return xyz[2]; }
-
-
-        public void SetCoord(float x, float y, float z)
-        {
-            xyz[0] = x;
-            xyz[1] = y;
-            xyz[2] = z;
-        }
-
-        public void SetCoord(double x, double y, double z)
-        {
-            xyz[0] = (float)x;
-            xyz[1] = (float)y;
-            xyz[2] = (float)z;
-        }
     }
 }
 

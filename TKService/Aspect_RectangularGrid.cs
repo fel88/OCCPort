@@ -24,5 +24,19 @@
 			Standard_NullValue_Raise_if(aYStep == 0. , "invalid y step");*/
         }
 
+        public override void Display()
+        {
+            //throw new NotImplementedException();
+        }
+
+        public override void Erase()
+        {
+        //    throw new NotImplementedException();
+        }
+
+        public override void UpdateDisplay()
+        {
+            //throw new NotImplementedException();
+        }
     }
 }
