@@ -39,7 +39,7 @@ namespace OCCPort.Tester
             v3d_viewer = new V3d_Viewer(new OpenGl_GraphicDriver(new Aspect_DisplayConnection()));
 
             aIS_ViewController = new AIS_ViewController();
-            myAISContext = new AIS_InteractiveContext(v3d_viewer);
+            //myAISContext = new AIS_InteractiveContext(v3d_viewer);
 
             /*if (glControl.Context.GraphicsMode.Samples == 0)
             {
@@ -63,7 +63,7 @@ namespace OCCPort.Tester
             Controls.Add(glControl);
             glControl.Dock = DockStyle.Fill;
         }
-        IOCCTProxyInterface proxy;
+        OCCTProxy proxy;
         public IOCCTProxyInterface Proxy => proxy;
         [DllImport("opengl32.dll")]
         public static extern IntPtr wglGetCurrentContext();
@@ -125,9 +125,13 @@ namespace OCCPort.Tester
                 first = false;
                 //V3d_View.CreateView = () => new OpenGL.OpenGl_View();
 
-                GravityViewManager.View = v3d_viewer.CreateView();
-                GravityViewManager.View.SetWindow(new Aspect_NeutralWindow() { Width = glControl.Width, Height = glControl.Height }, IntPtr.Zero);
-                GravityViewManager.View.MustBeResized();
+
+                myAISContext = proxy.gview.myContext;
+
+                //GravityViewManager.View = v3d_viewer.CreateView();
+                GravityViewManager.View = proxy.gview.myView;
+                //GravityViewManager.View.SetWindow(new Aspect_NeutralWindow() { Width = glControl.Width, Height = glControl.Height }, IntPtr.Zero);
+                //GravityViewManager.View.MustBeResized();
 
             }
             /*try
@@ -138,18 +142,15 @@ namespace OCCPort.Tester
             {
 
 			}*/
-            //glControl.SwapBuffers();
-
-            aIS_ViewController.FlushViewEvents(myAISContext, GravityViewManager.View, true);
-
-
-            //glControl.SwapBuffers();
-            // Redraw();
+            
+             Redraw();
         }
 
         void Redraw()
         {
-
+            proxy.iterate();
+            glControl.SwapBuffers();
+            return;
             GravityViewManager.View.MyWindow.Width = glControl.Width;
             GravityViewManager.View.MyWindow.Height = glControl.Height;
 

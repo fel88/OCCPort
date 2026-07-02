@@ -11,13 +11,17 @@ namespace OCCPort.Tester
 {
     public class OCCTProxy : IOCCTProxyInterface
     {
+        public  void iterate()
+        {
+            gview.iterate();
+        }
         bool AutoViewerUpdate;
-        V3d_Viewer myViewer;
-        V3d_View myView;
+        public V3d_Viewer myViewer;
+        public V3d_View myView;
         AIS_InteractiveContext myAISContext;
         OpenGl_GraphicDriver myGraphicDriver;
-        OCCImpl impl = new OCCImpl();
-        GlfwOcctView gview = new GlfwOcctView();
+        public OCCImpl impl = new OCCImpl();
+        public GlfwOcctView gview = new GlfwOcctView();
         public void ActivateGrid(bool en)
         {
             if (en)

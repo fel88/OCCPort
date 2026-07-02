@@ -2,7 +2,7 @@
 
 namespace OCCPort.Tester
 {
-    internal class OCCImpl
+    public class OCCImpl
     {
         AIS_InteractiveContext ctx;
       public   void setAisCtx(AIS_InteractiveContext _ctx)

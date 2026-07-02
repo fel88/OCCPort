@@ -9,5 +9,7 @@
         void SetMaterial(int v);
         void UpdateCurrentViewer();
         void UpdateView();
+        void iterate();
+
     }
 }

@@ -297,7 +297,7 @@ namespace TKService
         protected Graphic3d_Camera myCamera;
         protected Graphic3d_SequenceOfStructure myStructsToCompute = new Graphic3d_SequenceOfStructure();
         protected Graphic3d_SequenceOfStructure myStructsComputed = new Graphic3d_SequenceOfStructure();
-        protected Graphic3d_MapOfStructure myStructsDisplayed;
+        protected Graphic3d_MapOfStructure myStructsDisplayed = new Graphic3d_MapOfStructure();
         protected bool myIsInComputedMode;
         protected bool myIsActive;
         protected bool myIsRemoved;
@@ -397,42 +397,42 @@ namespace TKService
             //// or more, of calculated type =>
             //// - removes it as well as the associated old computed
             //// THis happens when hlhsr becomes again of type e non computed after SetVisual.
-            //int anIndex = IsComputed(theStructure);
-            //if (anIndex != 0
-            // && theStructure.Visual() != Graphic3d_TOS_COMPUTED)
-            //{
-            //	myStructsToCompute.Remove(anIndex);
-            //	myStructsComputed.Remove(anIndex);
-            //	anIndex = 0;
-            //}
+            int anIndex = IsComputed(theStructure);
+            if (anIndex != 0
+             && theStructure.Visual() != Graphic3d_TypeOfStructure.Graphic3d_TOS_COMPUTED)
+            {
+            	myStructsToCompute.Remove(anIndex);
+            	myStructsComputed.Remove(anIndex);
+            	anIndex = 0;
+            }
 
-            //Graphic3d_TypeOfAnswer anAnswer = acceptDisplay(theStructure->Visual());
-            //if (anAnswer == Graphic3d_TOA_NO)
-            //{
-            //	return;
-            //}
+            Graphic3d_TypeOfAnswer anAnswer = acceptDisplay(theStructure.Visual());
+            if (anAnswer == Graphic3d_TypeOfAnswer.Graphic3d_TOA_NO)
+            {
+                return;
+            }
 
-            //if (!ComputedMode())
-            //{
-            //	anAnswer = Graphic3d_TOA_YES;
-            //}
+            if (!ComputedMode())
+            {
+                anAnswer = Graphic3d_TypeOfAnswer.Graphic3d_TOA_YES;
+            }
 
-            //if (anAnswer == Graphic3d_TOA_YES)
-            //{
-            //	if (!myStructsDisplayed.Add(theStructure))
-            //	{
-            //		return;
-            //	}
+            if (anAnswer ==Graphic3d_TypeOfAnswer. Graphic3d_TOA_YES)
+            {
+                if (!myStructsDisplayed.Add(theStructure))
+                {
+                    return;
+                }
 
-            //	theStructure.CalculateBoundBox();
-            displayStructure(theStructure.CStructure(), theStructure.DisplayPriority());
-            //	Update(theStructure.GetZLayer());
-            //	return;
-            //}
-            //else if (anAnswer != Graphic3d_TOA_COMPUTE)
-            //{
-            //	return;
-            //}
+                //	theStructure.CalculateBoundBox();
+                displayStructure(theStructure.CStructure(), theStructure.DisplayPriority());
+            	Update(theStructure.GetZLayer());
+            	return;
+            }
+            else if (anAnswer !=Graphic3d_TypeOfAnswer. Graphic3d_TOA_COMPUTE)
+            {
+            	return;
+            }
 
             //if (anIndex != 0)
             //{
@@ -486,12 +486,12 @@ namespace TKService
             //}
 
             //// Compute + Validation
-            //Graphic3d_Structure aStruct;
-            //if (anIndex != 0)
-            //{
-            //	aStruct = myStructsComputed.Value(anIndex);
-            //	aStruct.SetTransformation(Handle(TopLoc_Datum3D)());
-            //}
+            Graphic3d_Structure aStruct = null;
+            if (anIndex != 0)
+            {
+                aStruct = myStructsComputed.Value(anIndex);
+                aStruct.SetTransformation(null);
+            }
             //theStructure.computeHLR(myCamera, aStruct);
             //if (aStruct.IsNull())
             //{
@@ -511,36 +511,36 @@ namespace TKService
             //}
 
             //// Of which type will be the computed?
-            //const Standard_Boolean toComputeWireframe = myVisualization == Graphic3d_TOV_WIREFRAME
-            //										 && theStructure->ComputeVisual() != Graphic3d_TOS_SHADING;
-            //const Standard_Boolean toComputeShading = myVisualization == Graphic3d_TOV_SHADING
-            //										 && theStructure->ComputeVisual() != Graphic3d_TOS_WIREFRAME;
-            //if (!toComputeShading && !toComputeWireframe)
-            //{
-            //	anAnswer = Graphic3d_TOA_NO;
-            //}
-            //else
-            //{
-            //	aStruct->SetVisual(toComputeWireframe ? Graphic3d_TOS_WIREFRAME : Graphic3d_TOS_SHADING);
-            //	anAnswer = acceptDisplay(aStruct->Visual());
-            //}
+bool toComputeWireframe = myVisualization == Graphic3d_TypeOfVisualization.Graphic3d_TOV_WIREFRAME
+            										 && theStructure.ComputeVisual() != Graphic3d_TypeOfStructure.Graphic3d_TOS_SHADING;
+             bool toComputeShading = myVisualization ==Graphic3d_TypeOfVisualization. Graphic3d_TOV_SHADING
+            										 && theStructure.ComputeVisual() !=Graphic3d_TypeOfStructure. Graphic3d_TOS_WIREFRAME;
+            if (!toComputeShading && !toComputeWireframe)
+            {
+            	anAnswer =Graphic3d_TypeOfAnswer. Graphic3d_TOA_NO;
+            }
+            else
+            {
+            	aStruct.SetVisual(toComputeWireframe ?Graphic3d_TypeOfStructure. Graphic3d_TOS_WIREFRAME : Graphic3d_TypeOfStructure.Graphic3d_TOS_SHADING);
+            	anAnswer = acceptDisplay(aStruct.Visual());
+            }
 
-            //if (theStructure->IsHighlighted())
-            //{
-            //	aStruct->Highlight(theStructure->HighlightStyle(), Standard_False);
-            //}
+            if (theStructure.IsHighlighted())
+            {
+                aStruct.Highlight(theStructure.HighlightStyle(), false);
+            }
 
-            //// It is displayed only if the calculated structure
-            //// has a proper type corresponding to the one of the view.
-            //if (anAnswer == Graphic3d_TOA_NO)
-            //{
-            //	return;
-            //}
+            // It is displayed only if the calculated structure
+            // has a proper type corresponding to the one of the view.
+            if (anAnswer ==Graphic3d_TypeOfAnswer. Graphic3d_TOA_NO)
+            {
+                return;
+            }
 
-            //myStructsDisplayed.Add(theStructure);
-            //displayStructure(aStruct->CStructure(), theStructure->DisplayPriority());
+            myStructsDisplayed.Add(theStructure);
+            displayStructure(aStruct.CStructure(), theStructure.DisplayPriority());
 
-            //Update(aStruct->GetZLayer());
+            Update(aStruct.GetZLayer());
 
         }
 
@@ -1002,6 +1002,23 @@ namespace TKService
         Graphic3d_TOA_POS = 0, Graphic3d_TOA_NORM, Graphic3d_TOA_UV, Graphic3d_TOA_COLOR,
         Graphic3d_TOA_CUSTOM
     }
+
+
+    //! Defines the type of Resize Window method applied
+    //! by the user.
+    public enum Aspect_TypeOfResize
+    {
+        Aspect_TOR_UNKNOWN,
+        Aspect_TOR_NO_BORDER,
+        Aspect_TOR_TOP_BORDER,
+        Aspect_TOR_RIGHT_BORDER,
+        Aspect_TOR_BOTTOM_BORDER,
+        Aspect_TOR_LEFT_BORDER,
+        Aspect_TOR_TOP_AND_RIGHT_BORDER,
+        Aspect_TOR_RIGHT_AND_BOTTOM_BORDER,
+        Aspect_TOR_BOTTOM_AND_LEFT_BORDER,
+        Aspect_TOR_LEFT_AND_TOP_BORDER
+    };
 }
 
 

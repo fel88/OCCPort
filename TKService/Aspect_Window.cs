@@ -12,6 +12,9 @@ namespace TKService
             y = Height;
         }
 
+        //! Apply the resizing to the window <me>.
+        public abstract  Aspect_TypeOfResize DoResize();
+
         //! Returns native Window handle (HWND on Windows, Window with Xlib, and so on)
         public abstract Aspect_Drawable NativeHandle();
 

@@ -38,9 +38,25 @@ namespace OCCPort.Tester
             }
         }
 
+        public override Aspect_TypeOfResize DoResize()
+        {
+            if (GLFW.GetWindowAttrib(myGlfwWindow, WindowAttributeGetBool.Visible) )
+            {
+                int anXPos = 0, anYPos = 0, aWidth = 0, aHeight = 0;
+                GLFW.GetWindowPos(myGlfwWindow, out anXPos, out anYPos);
+                GLFW.GetWindowSize(myGlfwWindow, out aWidth, out aHeight);
+                myXLeft = anXPos;
+                myXRight = anXPos + aWidth;
+                myYTop = anYPos;
+                myYBottom = anYPos + aHeight;
+            }
+            return Aspect_TypeOfResize. Aspect_TOR_UNKNOWN;
+        }
+
         public override bool IsMapped()
         {
-            throw new NotImplementedException();
+            return GLFW.GetWindowAttrib(myGlfwWindow, WindowAttributeGetBool.Visible);
+
         }
 
         public override nint NativeHandle()

@@ -37,7 +37,10 @@
             return true;
         }
 
-
+        public override Aspect_TypeOfResize DoResize()
+        {
+            return Aspect_TypeOfResize. Aspect_TOR_UNKNOWN;
+        }
     }
 
 }

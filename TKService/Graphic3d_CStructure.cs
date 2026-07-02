@@ -1,4 +1,5 @@
 ﻿using OCCPort.Common;
+using System.Reflection.Metadata;
 using TKernel;
 using TKMath;
 
@@ -156,6 +157,13 @@ namespace TKService
         {
             myBndBox = aBox;
         }
+        Graphic3d_PresentationAttributes myHighlightStyle; //! Current highlight style; is set only if highlight flag is true
+
+
+        //! Returns valid handle to highlight style of the structure in case if
+        //! highlight flag is set to true
+        public Graphic3d_PresentationAttributes HighlightStyle()  { return myHighlightStyle; }
+
 
         Graphic3d_DisplayPriority myPriority;
         Graphic3d_DisplayPriority myPreviousPriority;

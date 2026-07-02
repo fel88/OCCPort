@@ -68,7 +68,7 @@ namespace TKV3d
 
         internal bool IsSubIntensityOn()
         {
-            throw new NotImplementedException();
+            return mySubInt;
         }
     }
 }

@@ -1222,7 +1222,7 @@ namespace TKV3d
 
         private void highlightWithSubintensity(AIS_InteractiveObject anObj, int theMode)
         {
-            throw new NotImplementedException();
+            
         }
 
         public void SetDisplayMode(AIS_InteractiveObject theIObj, int theMode, bool theToUpdateViewer)

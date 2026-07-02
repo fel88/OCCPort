@@ -1,4 +1,5 @@
 ﻿using OCCPort.Common;
+using System.Reflection.Metadata;
 using TKernel;
 using TKMath;
 
@@ -12,6 +13,9 @@ namespace TKService
         public Graphic3d_Structure()
         {
         }
+
+        //! Returns the highlight attributes.
+        public Graphic3d_PresentationAttributes HighlightStyle() { return myCStructure.HighlightStyle(); }
 
         //! Returns the last created group or creates new one if list is empty.
         public Graphic3d_Group CurrentGroup()
@@ -408,11 +412,11 @@ namespace TKService
 
         NCollection_IndexedMap<Graphic3d_Structure, NCollection_DefaultHasher<Graphic3d_Structure>> myDescendants = new NCollection_IndexedMap<Graphic3d_Structure, NCollection_DefaultHasher<Graphic3d_Structure>>();
         NCollection_IndexedMap<Graphic3d_Structure, NCollection_DefaultHasher<Graphic3d_Structure>> myAncestors = new NCollection_IndexedMap<Graphic3d_Structure, NCollection_DefaultHasher<Graphic3d_Structure>>();
-        void getBox(out Graphic3d_BndBox3d theBox,
+        void getBox(ref Graphic3d_BndBox3d theBox,
                                   bool theToIgnoreInfiniteFlag)
         {
             Graphic3d_BndBox4f aBoxF = minMaxCoord();
-            theBox = null;
+            
             if (aBoxF.IsValid())
             {
                 theBox = new Graphic3d_BndBox3d(new Graphic3d_Vec3d((double)aBoxF.CornerMin().X,
@@ -448,14 +452,14 @@ namespace TKService
         void addTransformed(Graphic3d_BndBox3d theBox,
                                           bool theToIgnoreInfiniteFlag)
         {
-            Graphic3d_BndBox3d aCombinedBox, aBox;
-            getBox(out aCombinedBox, theToIgnoreInfiniteFlag);
+            Graphic3d_BndBox3d aCombinedBox=new Graphic3d_BndBox3d (), aBox=new Graphic3d_BndBox3d ();
+            getBox(ref aCombinedBox, theToIgnoreInfiniteFlag);
 
             //for (NCollection_IndexedMap<Graphic3d_Structure*>::Iterator anIter (myDescendants); anIter.More(); anIter.Next())
             foreach (var anIter in myDescendants)
             {
                 Graphic3d_Structure aStruct = anIter;
-                aStruct.getBox(out aBox, theToIgnoreInfiniteFlag);
+                aStruct.getBox(ref aBox, theToIgnoreInfiniteFlag);
                 aCombinedBox.Combine(aBox);
             }
 
@@ -658,6 +662,13 @@ namespace TKService
         {
             return myCStructure.ZLayer();
         }
+
+        internal void Highlight(object value, bool v)
+        {
+            
+        }
+
+       
     }
     public class Graphic3d_SequenceOfHClipPlane
     {
