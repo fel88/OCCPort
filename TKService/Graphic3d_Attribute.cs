@@ -3,6 +3,11 @@
     //! Vertex attribute definition.
     public struct Graphic3d_Attribute
     {
+        public Graphic3d_Attribute(Graphic3d_TypeOfAttribute attr, Graphic3d_TypeOfData data)
+        {
+            Id = attr;
+            DataType = data;
+        }
 
         public Graphic3d_TypeOfAttribute Id;       //!< attribute identifier in vertex shader, 0 is reserved for vertex position
         public Graphic3d_TypeOfData DataType; //!< vec2,vec3,vec4,vec4ub

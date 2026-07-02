@@ -1,4 +1,5 @@
 ﻿global using V3d_Light = TKService.Graphic3d_CLight;
+using OCCPort.Common;
 using System;
 using System.Reflection.Metadata;
 using System.Security.AccessControl;
@@ -27,6 +28,20 @@ namespace TKV3d
         bool myDisplayPlane;
         double myDisplayPlaneLength;
         bool myGridEcho;
+
+        //! Returns the default size of the view.
+        public double DefaultViewSize()  { return myViewSize; }
+
+        //! Returns the default type of Visualization.
+    public     V3d_TypeOfVisualization DefaultVisualization()  { return myVisualization; }
+
+        //! Returns the default background colour.
+        public Aspect_Background GetBackgroundColor()  { return myBackground; }
+        Aspect_Background myBackground = new Aspect_Background();
+        Aspect_GradientBackground myGradientBackground = new Aspect_GradientBackground();
+        //! Returns the gradient background of the view.
+        public Aspect_GradientBackground GetGradientBackground()  { return myGradientBackground; }
+  
         public bool IsGlobalLight(V3d_Light theLight)
         {
             return myActiveLights.Contains(theLight);

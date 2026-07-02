@@ -30,6 +30,20 @@ namespace TKMath
     //! when consulting the finite bounds of the box.
     public class Bnd_Box
     {
+        public Bnd_Box()
+        {
+            Xmin = (Standard_Real.RealLast());
+            Xmax = -Standard_Real.RealLast();
+            Ymin = Standard_Real.RealLast();
+            Ymax = -Standard_Real.RealLast();
+            Zmin = Standard_Real.RealLast();
+            Zmax = -Standard_Real.RealLast();
+  Gap = (0.0);
+
+
+
+            SetVoid();
+        }
 
         //! Returns true if this bounding box is empty (Void flag).
         public bool IsVoid()

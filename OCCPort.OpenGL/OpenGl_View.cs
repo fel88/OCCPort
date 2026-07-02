@@ -469,8 +469,39 @@ namespace OCCPort.OpenGL
                           OpenGl_FrameBuffer theReadDrawFbo,
                           OpenGl_FrameBuffer theOitAccumFbo)
         {
+            OpenGl_Context aCtx = myWorkspace.GetGlContext();
+            if (theReadDrawFbo != null)
+            {
+                theReadDrawFbo.BindBuffer(aCtx);
+                theReadDrawFbo.SetupViewport(aCtx);
+            }
+            else
+            {
+                int[] aViewport = { 0, 0, myWindow.Width(), myWindow.Height() };
+                aCtx.ResizeViewport(aViewport);
+            }
+
+            // request reset of material
+            aCtx.ShaderManager().UpdateMaterialState();
+
+            myWorkspace.UseZBuffer(true);
+            myWorkspace.UseDepthWrite(true);
+            GLbitfield toClear = (int)(All.ColorBufferBit | All.DepthBufferBit);
+            aCtx.core11fwd.glDepthFunc(All.Lequal);
+            aCtx.core11fwd.glDepthMask(true);
+            aCtx.core11fwd.glEnable(All.DepthTest);
+
+            aCtx.core11fwd.glClearDepth(1.0);
+
+            OpenGl_Vec4 aBgColor = aCtx.Vec4FromQuantityColor(myBgColor);
+            aCtx.SetColorMaskRGBA(new NCollection_Vec4<bool>(true)); // force writes into all components, including alpha
+            aCtx.core11fwd.glClearColor(aBgColor.r(), aBgColor.g(), aBgColor.b(), aCtx.caps.buffersOpaqueAlpha ? 1.0f : 0.0f);
+            aCtx.core11fwd.glClear(toClear);
+            aCtx.SetColorMask(true); // restore default alpha component write state
+
             render(theProjection, theReadDrawFbo, theOitAccumFbo, false);
         }
+
         OpenGl_FrameBuffer myFBO;
         //=======================================================================
         //function : SetFBO
@@ -1760,6 +1791,14 @@ namespace OCCPort.OpenGL
 
     public static class Extensions
     {
+        public static Graphic3d_Vec3 rgb(this NCollection_Vec4<float> v)
+        {
+            return new NCollection_Vec3<float>(v.r(), v.g(), v.b());
+        }
+        public static OpenGl_Vec4 ToOpenGl_Vec4(this OpenTK.Mathematics.Vector4 v)
+        {
+            return new NCollection_Vec4<float>(v.X, v.Y, v.Z, v.W);
+        }
         public static float[] GetData(this Vector4 v)
         {
             return new[] { v.X, v.Y, v.Z, v.W };

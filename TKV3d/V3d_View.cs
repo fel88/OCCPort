@@ -1,6 +1,9 @@
-﻿using OCCPort.Common;
+﻿//global using TColStd_Array2OfReal = NCollection_Array2<double>;
+
+using OCCPort.Common;
 using System.Numerics;
 using System.Reflection.Metadata;
+using System.Security.AccessControl;
 using TKernel;
 using TKMath;
 using TKService;
@@ -273,54 +276,182 @@ namespace TKV3d
             }
 
         }
+        //TColStd_Array2OfReal MyTrsf;
+        public void SetBackFacingModel(Graphic3d_TypeOfBackfacingModel theModel)
+        {
+            myView.SetBackfacingModel(theModel);
+            Redraw();
+        }
+        // ========================================================================
+        // function : SetAutoZFitMode
+        // purpose  :
+        // ========================================================================
+        void SetAutoZFitMode(bool theIsOn,
+                                 double theScaleFactor)
+        {
+            Exceptions.Standard_ASSERT_RAISE(theScaleFactor > 0.0, "Zero or negative scale factor is not allowed.");
+            myAutoZFitScaleFactor = theScaleFactor;
+            myAutoZFitIsOn = theIsOn;
+        }
 
         public V3d_View(V3d_Viewer theViewer, V3d_TypeOfView theType)
         {
-            //myIsInvalidatedImmediate = (true);
+            myIsInvalidatedImmediate = (true);
             MyViewer = theViewer;
             SwitchSetFront = (false);
             myZRotation = (false);
-            //MyTrsf=new  (1, 4, 1, 4)
+            //MyTrsf = new(1, 4, 1, 4);
 
             myView = theViewer.Driver().CreateView(theViewer.StructureManager());
-            //	myView.SetBackground(theViewer.GetBackgroundColor());
-            //	myView.SetGradientBackground(theViewer.GetGradientBackground());
+            myView.SetBackground(theViewer.GetBackgroundColor());
+            myView.SetGradientBackground(theViewer.GetGradientBackground());
 
             //ChangeRenderingParams() = theViewer->DefaultRenderingParams();
 
             // camera init
             Graphic3d_Camera aCamera = new Graphic3d_Camera();
-            //aCamera.SetFOVy(45.0);
-            /*aCamera.SetIOD(Graphic3d_Camera::IODType_Relative, 0.05);
-			aCamera.SetZFocus(Graphic3d_Camera::FocusType_Relative, 1.0);
-			aCamera.SetProjectionType((theType == V3d_ORTHOGRAPHIC)
-			  ? Graphic3d_Camera::Projection_Orthographic
-			  : Graphic3d_Camera::Projection_Perspective);
-			*/
+            aCamera.SetFOVy(45.0);
+            aCamera.SetIOD(Graphic3d_Camera.IODType.IODType_Relative, 0.05);
+            aCamera.SetZFocus(Graphic3d_Camera.FocusType.FocusType_Relative, 1.0);
+            aCamera.SetProjectionType((theType == V3d_TypeOfView.V3d_ORTHOGRAPHIC)
+              ? Graphic3d_Camera.Projection.Projection_Orthographic
+              : Graphic3d_Camera.Projection.Projection_Perspective);
+
             myDefaultCamera = new Graphic3d_Camera();
 
-            myImmediateUpdate = false;/*
-			SetAutoZFitMode(Standard_True, 1.0);
-			SetBackFacingModel(V3d_TOBM_AUTOMATIC);*/
+            myImmediateUpdate = false;
+            SetAutoZFitMode(true, 1.0);
+            SetBackFacingModel(Graphic3d_TypeOfBackfacingModel.V3d_TOBM_AUTOMATIC);
             SetCamera(aCamera);
 
             SetAxis(0.0, 0.0, 0.0, 1.0, 1.0, 1.0);
-            //SetVisualization (theViewer->DefaultVisualization());
+            SetVisualization(theViewer.DefaultVisualization());
             SetTwist(0.0);
             SetAt(0.0, 0.0, 0.0);
             SetProj(theViewer.DefaultViewProj());
-            /*
-  SetSize (theViewer->DefaultViewSize());
-  Standard_Real zsize = theViewer->DefaultViewSize();
-  SetZSize (2.*zsize);
-  SetDepth (theViewer->DefaultViewSize() / 2.0);
-  SetViewMappingDefault();
-  SetViewOrientationDefault();
 
-			 */
+            SetSize(theViewer.DefaultViewSize());
+            double zsize = theViewer.DefaultViewSize();
+            SetZSize(2.0 * zsize);
+            SetDepth(theViewer.DefaultViewSize() / 2.0);
+            SetViewMappingDefault();
+            SetViewOrientationDefault();
+
+
             theViewer.AddView(this);
             Init();
             myImmediateUpdate = true;
+        }
+        public void SetDepth(double Depth)
+        {
+            Exceptions.V3d_BadValue_Raise_if(Depth == 0.0 , "V3d_View::SetDepth, bad depth");
+
+            Graphic3d_Camera aCamera = Camera();
+
+            if (Depth > 0.0)
+            {
+                // Move eye using center (target) as anchor.
+                aCamera.SetDistance(Depth);
+            }
+            else
+            {
+                // Move the view ref point instead of the eye.
+                gp_Vec aDir=new gp_Vec (aCamera.Direction());
+                gp_Pnt aCameraEye = aCamera.Eye();
+                gp_Pnt aCameraCenter = aCameraEye.Translated(aDir.Multiplied(Math.Abs(Depth)));
+
+                aCamera.SetCenter(aCameraCenter);
+            }
+
+            ImmediateUpdate();
+        }
+        public void SetZSize(double theSize)
+        {
+            Graphic3d_Camera aCamera = Camera();
+
+            double Zmax = theSize / 2.0;
+
+            double aDistance = aCamera.Distance();
+
+            if (theSize <= 0.0)
+            {
+                Zmax = aDistance;
+            }
+
+            // ShortReal precision factor used to add meaningful tolerance to
+            // ZNear, ZFar values in order to avoid equality after type conversion
+            // to ShortReal matrices type.
+            double aPrecision = 1.0 / Math.Pow(10.0, ShortRealDigits() - 1);
+
+            double aZFar = Zmax + aDistance * 2.0;
+            double aZNear = -Zmax + aDistance;
+            aZNear -= Math.Abs(aZNear) * aPrecision;
+            aZFar += Math.Abs(aZFar) * aPrecision;
+
+            if (!aCamera.IsOrthographic())
+            {
+                if (aZFar < aPrecision)
+                {
+                    // Invalid case when both values are negative
+                    aZNear = aPrecision;
+                    aZFar = aPrecision * 2.0;
+                }
+                else if (aZNear < Math.Abs(aZFar) * aPrecision)
+                {
+                    // Z is less than 0.0, try to fix it using any appropriate z-scale
+                    aZNear = Math.Abs(aZFar) * aPrecision;
+                }
+            }
+
+            // If range is too small
+            if (aZFar < (aZNear + Math.Abs(aZFar) * aPrecision))
+            {
+                aZFar = aZNear + Math.Abs(aZFar) * aPrecision;
+            }
+
+            aCamera.SetZRange(aZNear, aZFar);
+
+            if (myImmediateUpdate)
+            {
+                Redraw();
+            }
+        }
+
+        private int ShortRealDigits()
+        {
+            return 6;
+        }
+
+        //! Returns the default size of the view.
+        public double DefaultViewSize() { return myViewSize; }
+        double myViewSize;
+        public void SetVisualization(V3d_TypeOfVisualization theType)
+        {
+            myView.SetVisualizationType((Graphic3d_TypeOfVisualization)(theType));
+
+            if (myImmediateUpdate)
+            {
+                Redraw();
+            }
+        }
+        public void SetSize(double theSize)
+        {
+            Exceptions.V3d_BadValue_Raise_if(theSize <= 0.0, "V3d_View::SetSize, Window Size is NULL");
+
+            Graphic3d_Camera aCamera = Camera();
+
+            aCamera.SetScale(aCamera.Aspect() >= 1.0 ? theSize / aCamera.Aspect() : theSize);
+
+            ImmediateUpdate();
+        }
+
+        public void SetViewMappingDefault()
+        {
+            myDefaultCamera.CopyMappingData(Camera());
+        }
+        public void SetViewOrientationDefault()
+        {
+            myDefaultCamera.CopyOrientationData(Camera());
         }
 
         //! Returns true if immediate layer content has been invalidated.
@@ -1081,71 +1212,71 @@ namespace TKV3d
             MyPlane = aPlane;
             MyGrid = aGrid;
 
-  //          double xl, yl, zl;
-  //          double xdx, xdy, xdz;
-  //          double ydx, ydy, ydz;
-  //          double dx, dy, dz;
-  //          aPlane.Location().Coord(xl, yl, zl);
-  //          aPlane.XDirection().Coord(xdx, xdy, xdz);
-  //          aPlane.YDirection().Coord(ydx, ydy, ydz);
-  //          aPlane.Direction().Coord(dx, dy, dz);
+            //          double xl, yl, zl;
+            //          double xdx, xdy, xdz;
+            //          double ydx, ydy, ydz;
+            //          double dx, dy, dz;
+            //          aPlane.Location().Coord(xl, yl, zl);
+            //          aPlane.XDirection().Coord(xdx, xdy, xdz);
+            //          aPlane.YDirection().Coord(ydx, ydy, ydz);
+            //          aPlane.Direction().Coord(dx, dy, dz);
 
-  //          double CosAlpha = Cos(MyGrid->RotationAngle());
-  //          double SinAlpha = Sin(MyGrid->RotationAngle());
+            //          double CosAlpha = Cos(MyGrid->RotationAngle());
+            //          double SinAlpha = Sin(MyGrid->RotationAngle());
 
-  //          TColStd_Array2OfReal Trsf1(1, 4, 1, 4);
-  //          Trsf1(4, 4) = 1.0;
-  //          Trsf1(4, 1) = Trsf1(4, 2) = Trsf1(4, 3) = 0.0;
-  //          // Translation
-  //          Trsf1(1, 4) = xl,
-  //Trsf1(2, 4) = yl,
-  //Trsf1(3, 4) = zl;
-  //          // Transformation change of marker
-  //          Trsf1(1, 1) = xdx,
-  //Trsf1(2, 1) = xdy,
-  //Trsf1(3, 1) = xdz,
-  //Trsf1(1, 2) = ydx,
-  //Trsf1(2, 2) = ydy,
-  //Trsf1(3, 2) = ydz,
-  //Trsf1(1, 3) = dx,
-  //Trsf1(2, 3) = dy,
-  //Trsf1(3, 3) = dz;
+            //          TColStd_Array2OfReal Trsf1(1, 4, 1, 4);
+            //          Trsf1(4, 4) = 1.0;
+            //          Trsf1(4, 1) = Trsf1(4, 2) = Trsf1(4, 3) = 0.0;
+            //          // Translation
+            //          Trsf1(1, 4) = xl,
+            //Trsf1(2, 4) = yl,
+            //Trsf1(3, 4) = zl;
+            //          // Transformation change of marker
+            //          Trsf1(1, 1) = xdx,
+            //Trsf1(2, 1) = xdy,
+            //Trsf1(3, 1) = xdz,
+            //Trsf1(1, 2) = ydx,
+            //Trsf1(2, 2) = ydy,
+            //Trsf1(3, 2) = ydz,
+            //Trsf1(1, 3) = dx,
+            //Trsf1(2, 3) = dy,
+            //Trsf1(3, 3) = dz;
 
-  //          TColStd_Array2OfReal Trsf2(1, 4, 1, 4);
-  //          Trsf2(4, 4) = 1.0;
-  //          Trsf2(4, 1) = Trsf2(4, 2) = Trsf2(4, 3) = 0.0;
-  //          // Translation of the origin
-  //          Trsf2(1, 4) = -MyGrid->XOrigin(),
-  //Trsf2(2, 4) = -MyGrid->YOrigin(),
-  //Trsf2(3, 4) = 0.0;
-  //          // Rotation Alpha around axis -Z
-  //          Trsf2(1, 1) = CosAlpha,
-  //Trsf2(2, 1) = -SinAlpha,
-  //Trsf2(3, 1) = 0.0,
-  //Trsf2(1, 2) = SinAlpha,
-  //Trsf2(2, 2) = CosAlpha,
-  //Trsf2(3, 2) = 0.0,
-  //Trsf2(1, 3) = 0.0,
-  //Trsf2(2, 3) = 0.0,
-  //Trsf2(3, 3) = 1.0;
+            //          TColStd_Array2OfReal Trsf2(1, 4, 1, 4);
+            //          Trsf2(4, 4) = 1.0;
+            //          Trsf2(4, 1) = Trsf2(4, 2) = Trsf2(4, 3) = 0.0;
+            //          // Translation of the origin
+            //          Trsf2(1, 4) = -MyGrid->XOrigin(),
+            //Trsf2(2, 4) = -MyGrid->YOrigin(),
+            //Trsf2(3, 4) = 0.0;
+            //          // Rotation Alpha around axis -Z
+            //          Trsf2(1, 1) = CosAlpha,
+            //Trsf2(2, 1) = -SinAlpha,
+            //Trsf2(3, 1) = 0.0,
+            //Trsf2(1, 2) = SinAlpha,
+            //Trsf2(2, 2) = CosAlpha,
+            //Trsf2(3, 2) = 0.0,
+            //Trsf2(1, 3) = 0.0,
+            //Trsf2(2, 3) = 0.0,
+            //Trsf2(3, 3) = 1.0;
 
-  //          double valuetrsf;
-  //          double valueoldtrsf;
-  //          double valuenewtrsf;
-  //          int i, j, k;
-  //          // Calculation of the product of matrices
-  //          for (i = 1; i <= 4; i++)
-  //              for (j = 1; j <= 4; j++)
-  //              {
-  //                  MyTrsf(i, j) = 0.0;
-  //                  for (k = 1; k <= 4; k++)
-  //                  {
-  //                      valueoldtrsf = Trsf1(i, k);
-  //                      valuetrsf = Trsf2(k, j);
-  //                      valuenewtrsf = MyTrsf(i, j) + valueoldtrsf * valuetrsf;
-  //                      MyTrsf(i, j) = valuenewtrsf;
-  //                  }
-  //              }
+            //          double valuetrsf;
+            //          double valueoldtrsf;
+            //          double valuenewtrsf;
+            //          int i, j, k;
+            //          // Calculation of the product of matrices
+            //          for (i = 1; i <= 4; i++)
+            //              for (j = 1; j <= 4; j++)
+            //              {
+            //                  MyTrsf(i, j) = 0.0;
+            //                  for (k = 1; k <= 4; k++)
+            //                  {
+            //                      valueoldtrsf = Trsf1(i, k);
+            //                      valuetrsf = Trsf2(k, j);
+            //                      valuenewtrsf = MyTrsf(i, j) + valueoldtrsf * valuetrsf;
+            //                      MyTrsf(i, j) = valuenewtrsf;
+            //                  }
+            //              }
         }
 
 
@@ -1226,7 +1357,7 @@ namespace TKV3d
 
         public void FitAll(Bnd_Box theBox, double theMargin, bool theToUpdate)
         {
-            new Standard_ASSERT_RAISE(theMargin >= 0.0 && theMargin < 1.0, "Invalid margin coefficient");
+            Exceptions.Standard_ASSERT_RAISE(theMargin >= 0.0 && theMargin < 1.0, "Invalid margin coefficient");
 
             if (myView.NumberOfDisplayedStructures() == 0)
             {

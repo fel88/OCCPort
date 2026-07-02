@@ -124,6 +124,9 @@ namespace TKV3d
                     }
 
             }
+
+            // Recompute hidden line presentation (if necessary).
+            thePrs.ReCompute();
         }
 
 

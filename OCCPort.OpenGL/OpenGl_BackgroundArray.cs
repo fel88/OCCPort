@@ -1,10 +1,12 @@
-﻿global using OpenGl_Vec2= TKernel.NCollection_Vec2<float>;
+﻿global using OpenGl_Vec2 = TKernel.NCollection_Vec2<float>;
 
 
 using OCCPort.Common;
 using OpenTK;
 using OpenTK.Graphics.ES11;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection.Metadata;
 using System.Security.AccessControl;
 using TKernel;
@@ -56,7 +58,7 @@ namespace OCCPort.OpenGL
             OpenGl_Context aCtx = theWorkspace.GetGlContext();
             int aViewSizeX = aCtx.Viewport()[2];
             int aViewSizeY = aCtx.Viewport()[3];
-            Graphic3d_Vec2i aTileOffset, aTileSize;
+            Graphic3d_Vec2i aTileOffset = new NCollection_Vec2<int>(), aTileSize = new NCollection_Vec2<int>();
 
             if (aCtx.Camera().Tile().IsValid())
             {
@@ -124,13 +126,13 @@ namespace OCCPort.OpenGL
             {
                 aProjection.InitIdentity();
                 aWorldView.InitIdentity();
-                // if (aCtx.Camera().Tile().IsValid())
+                if (aCtx.Camera().Tile().IsValid())
                 {
-                    //   aWorldView.SetDiagonal(OpenGl_Vec4(2.0f / aTileSize.x(), 2.0f / aTileSize.y(), 1.0f, 1.0f));
+                    aWorldView.SetDiagonal(new OpenGl_Vec4(2.0f / aTileSize.x(), 2.0f / aTileSize.y(), 1.0f, 1.0f));
                     if (myType == Graphic3d_TypeOfBackground.Graphic3d_TOB_GRADIENT)
                     {
-                        //aWorldView.SetColumn(3, OpenGl_Vec4(-1.0f - 2.0f * aTileOffset.x() / aTileSize.x(),
-                        //                                      -1.0f - 2.0f * aTileOffset.y() / aTileSize.y(), 0.0f, 1.0f));
+                        aWorldView.SetColumn(3, new OpenGl_Vec4(-1.0f - 2.0f * aTileOffset.x() / aTileSize.x(),
+                                                              -1.0f - 2.0f * aTileOffset.y() / aTileSize.y(), 0.0f, 1.0f));
                     }
                     else
                     {
@@ -155,7 +157,7 @@ namespace OCCPort.OpenGL
             aCtx.ApplyProjectionMatrix();
             aCtx.ApplyModelViewMatrix();
 
-            //OpenGl_PrimitiveArray::Render(theWorkspace);
+            //OpenGl_PrimitiveArray.Render(theWorkspace);
             Render(theWorkspace);
 
             aCtx.ProjectionState.Pop();
@@ -213,13 +215,13 @@ namespace OCCPort.OpenGL
 
         bool createGradientArray(OpenGl_Context theCtx)
         {
-            return false;
+
             // Initialize data for primitive array
             Graphic3d_Attribute[] aGragientAttribInfo =
-            {
-   // { Graphic3d_TOA_POS,   Graphic3d_TOD_VEC2 },
-   // { Graphic3d_TOA_COLOR, Graphic3d_TOD_VEC3 }
-  };
+            [
+                new(Graphic3d_TypeOfAttribute.Graphic3d_TOA_POS,   Graphic3d_TypeOfData.Graphic3d_TOD_VEC2 ),
+   new (Graphic3d_TypeOfAttribute. Graphic3d_TOA_COLOR,Graphic3d_TypeOfData. Graphic3d_TOD_VEC3 )
+  ];
 
             if (!myAttribs.Init(4, aGragientAttribInfo, 2))
             {
@@ -229,8 +231,8 @@ namespace OCCPort.OpenGL
             {
                 return false;
             }
-            ushort []THE_FS_QUAD_TRIS = { 0, 1, 3, 1, 2, 3 };
-            for ( int aVertIter = 0; aVertIter < 6; ++aVertIter)
+            ushort[] THE_FS_QUAD_TRIS = { 0, 1, 3, 1, 2, 3 };
+            for (int aVertIter = 0; aVertIter < 6; ++aVertIter)
             {
                 myIndices.SetIndex(aVertIter, THE_FS_QUAD_TRIS[aVertIter]);
             }
@@ -244,8 +246,8 @@ namespace OCCPort.OpenGL
   };
 
             float[][] aCorners = new float[4][];
-            //float[]  aDiagCorner1[3] = {};
-            //float [] aDiagCorner2[3] = {};
+            float[] aDiagCorner1 = new float[3];
+            float[] aDiagCorner2 = new float[3];
 
             switch (myGradientParams.type)
             {
@@ -276,17 +278,17 @@ namespace OCCPort.OpenGL
                 //  aCorners[3] = aDiagCorner2;
                 //  break;
                 //}
-                //case Aspect_GradientFillMethod_Diagonal2:
-                //{
-                //  aCorners[1] = myGradientParams.color1.ChangeData();
-                //  aCorners[3] = myGradientParams.color2.ChangeData();
-                //  aDiagCorner1[0] = aDiagCorner2[0] = 0.5f * (aCorners[1][0] + aCorners[3][0]);
-                //  aDiagCorner1[1] = aDiagCorner2[1] = 0.5f * (aCorners[1][1] + aCorners[3][1]);
-                //  aDiagCorner1[2] = aDiagCorner2[2] = 0.5f * (aCorners[1][2] + aCorners[3][2]);
-                //  aCorners[0] = aDiagCorner1;
-                //  aCorners[2] = aDiagCorner2;
-                //  break;
-                //}
+                case Aspect_GradientFillMethod.Aspect_GradientFillMethod_Diagonal2:
+                    {
+                        aCorners[1] = myGradientParams.color1.ChangeData();
+                        aCorners[3] = myGradientParams.color2.ChangeData();
+                        aDiagCorner1[0] = aDiagCorner2[0] = 0.5f * (aCorners[1][0] + aCorners[3][0]);
+                        aDiagCorner1[1] = aDiagCorner2[1] = 0.5f * (aCorners[1][1] + aCorners[3][1]);
+                        aDiagCorner1[2] = aDiagCorner2[2] = 0.5f * (aCorners[1][2] + aCorners[3][2]);
+                        aCorners[0] = aDiagCorner1;
+                        aCorners[2] = aDiagCorner2;
+                        break;
+                    }
                 //case Aspect_GradientFillMethod_Corner1:
                 //case Aspect_GradientFillMethod_Corner2:
                 //case Aspect_GradientFillMethod_Corner3:
@@ -375,11 +377,19 @@ namespace OCCPort.OpenGL
 
             for (int anIt = 0; anIt < 4; ++anIt)
             {
-                //OpenGl_Vec2 aVertData  = reinterpret_cast<OpenGl_Vec2* >(myAttribs->changeValue (anIt));
-              //  *aVertData = aVertices[anIt];
-
-              //  OpenGl_Vec3* aColorData = reinterpret_cast<OpenGl_Vec3* >(myAttribs->changeValue (anIt) + myAttribs->AttributeOffset (1));
-              //  *aColorData = theCtx->Vec4FromQuantityColor (OpenGl_Vec4(aCorners[anIt][0], aCorners[anIt][1], aCorners[anIt][2], 1.0f)).rgb();*/
+                var b1 = BitConverter.GetBytes(aVertices[anIt][0]);
+                var b2 = BitConverter.GetBytes(aVertices[anIt][1]);
+                myAttribs.changeValue(anIt, b1.Concat(b2).ToArray());                                
+                
+                var color = theCtx.Vec4FromQuantityColor(new OpenGl_Vec4(aCorners[anIt][0], aCorners[anIt][1], aCorners[anIt][2], 1.0f)).rgb();
+                List<byte> data = new List<byte>();
+                for (int i = 0; i < color.v.Length; i++)
+                {
+                    data.AddRange(BitConverter.GetBytes(color.v[i]));
+                }
+                myAttribs.changeValue(anIt, data.ToArray(), myAttribs.AttributeOffset(1));
+                //OpenGl_Vec3* aColorData = reinterpret_cast<OpenGl_Vec3*>(myAttribs->changeValue(anIt) + myAttribs.AttributeOffset(1));
+                
             }
 
             return true;

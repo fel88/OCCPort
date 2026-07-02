@@ -21,7 +21,7 @@ namespace TKV3d
         //! Allows to manage sensitivity of a particular sensitive entity
         public void SetSensitivityFactor(int theNewSens)
         {
-            new Standard_ASSERT_RAISE(theNewSens >= 0, "Error! Selection sensitivity should not be negative value.");
+            Exceptions. Standard_ASSERT_RAISE(theNewSens >= 0, "Error! Selection sensitivity should not be negative value.");
             mySFactor = theNewSens;
         }
 

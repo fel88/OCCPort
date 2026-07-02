@@ -63,6 +63,7 @@ namespace OCCPort.OpenGL
 
         //! @return true if usage of Z buffer is enabled.
         public bool UseZBuffer() { return myUseZBuffer; }
+        public void UseZBuffer(bool v) {  myUseZBuffer=v; }
 
         // =======================================================================
         // function : FBOCreate
@@ -243,6 +244,12 @@ namespace OCCPort.OpenGL
         {
             return myHighlightStyle != null;
         }
+
+
+        //! @return true if depth writing is enabled.
+        public bool UseDepthWrite() { return myUseDepthWrite; }
+        public void UseDepthWrite(bool v) { myUseDepthWrite = v; }
+
 
         OpenGl_View myView;
         OpenGl_Window myWindow;

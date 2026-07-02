@@ -122,9 +122,9 @@ namespace OCCPort.OpenGL
         protected Graphic3d_IndexBuffer myIndices;
         protected Graphic3d_Buffer myAttribs;
         Graphic3d_BoundBuffer myBounds;
-        protected  int myDrawMode;
+        protected int myDrawMode;
         protected bool myIsFillType;
-        
+
 
         int myUID; //!< Unique ID of primitive array. 
 
@@ -453,8 +453,8 @@ namespace OCCPort.OpenGL
             return true;
         }
 
-        
-     protected   void clearMemoryGL(OpenGl_Context theGlCtx)
+
+        protected void clearMemoryGL(OpenGl_Context theGlCtx)
         {
             if (myVboIndices != null)
             {

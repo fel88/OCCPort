@@ -24,7 +24,7 @@ namespace OCCPort.OpenGL
 
             OpenGl_Structure aStruct = (OpenGl_Structure)theStructure;
 
-            new Standard_ASSERT_RAISE(myInstancedStructure == null || myInstancedStructure == aStruct,
+            Exceptions. Standard_ASSERT_RAISE(myInstancedStructure == null || myInstancedStructure == aStruct,
               "Error! Instanced structure is already defined");
 
             myInstancedStructure = aStruct;

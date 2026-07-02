@@ -722,6 +722,9 @@ namespace OCCPort.OpenGL
         //! Returns current state of material.
         public OpenGl_MaterialState MaterialState() { return myMaterialState; }
 
-
+        internal void UpdateMaterialState()
+        {
+            myMaterialState.Update();
+        }
     }
 }

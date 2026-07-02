@@ -1,4 +1,5 @@
-﻿using TKernel;
+﻿using OCCPort.Common;
+using TKernel;
 
 namespace TKService
 {
@@ -12,6 +13,16 @@ namespace TKService
             NbAttributes = (0);
         }
 
+        //! @return data offset to specified attribute
+        public int AttributeOffset(int theAttribIndex)
+        {
+            int anOffset = 0;
+            for (int anAttribIter = 0; anAttribIter < theAttribIndex; ++anAttribIter)
+            {
+                anOffset += Graphic3d_Attribute.Stride(Attribute(anAttribIter).DataType);
+            }
+            return anOffset;
+        }
 
 
         //! Release buffer.
@@ -161,6 +172,16 @@ namespace TKService
 
         }
 
+        //! Access specified element.
+        public void changeValue(int theElem, byte[] data, int entryOffset = 0)
+        {
+            var offset = Stride * (theElem);
+            for (int i = 0; i < data.Length; i++)
+            {
+                myData[entryOffset + offset + i] = data[i];
+            }
+
+        }
         //! Allocate the buffer.
         //! @param theSize buffer length in bytes
         protected bool Allocate(int theSize)

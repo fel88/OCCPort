@@ -75,7 +75,7 @@ namespace TKV3d
         private void Standard_ASSERT_RAISE(bool cond, string v)
         {
             if (!cond)
-                throw new Standard_ASSERT_RAISE(v);
+                throw new Exception(v);
         }
 
         internal Graphic3d_Camera Camera()

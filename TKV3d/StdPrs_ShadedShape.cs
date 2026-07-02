@@ -1,4 +1,6 @@
 ﻿using OCCPort;
+using OCCPort.Common;
+using System.Reflection.Metadata;
 using TKBRep;
 using TKernel;
 using TKG3d;
@@ -36,7 +38,7 @@ namespace TKV3d
             wireframeFromShape(thePrs, theShape, theDrawer);
 
             // add special wireframe presentation for faces without triangulation
-            //   wireframeNoTriangFacesFromShape(thePrs, theShape, theDrawer);
+            wireframeNoTriangFacesFromShape(thePrs, theShape, theDrawer);
 
             // The shape types listed below need advanced analysis as potentially containing
             // both closed and open parts. Solids are also included, because they might
@@ -82,6 +84,41 @@ namespace TKV3d
                     //aPrsGrp.SetGroupPrimitivesAspect(theDrawer.FaceBoundaryAspect().Aspect());
                     aPrsGrp.AddPrimitiveArray(aBndSegments);
                 }
+            }
+        }
+        //! Computes special wireframe presentation for faces without triangulation.
+       static void wireframeNoTriangFacesFromShape(Prs3d_Presentation thePrs,
+                                         TopoDS_Shape theShape,
+                                         Prs3d_Drawer theDrawer)
+        {
+            TopoDS_Compound aCompoundWF = new TopoDS_Compound();
+            BRep_Builder aBuilder = new BRep_Builder();
+            aBuilder.MakeCompound(aCompoundWF);
+            TopLoc_Location aLoc = new TopLoc_Location();
+            bool hasElement = false;
+
+            for (TopExp_Explorer aShapeIter = new TopExp_Explorer(theShape, TopAbs_ShapeEnum.TopAbs_FACE); aShapeIter.More(); aShapeIter.Next())
+            {
+                TopoDS_Face aFace = TopoDS.Face(aShapeIter.Current());
+                Poly_Triangulation aTriang = BRep_Tool.Triangulation(aFace, ref aLoc);
+                if (aTriang == null)
+                {
+                    hasElement = true;
+                    aBuilder.Add(aCompoundWF, aFace);
+                }
+            }
+
+            if (hasElement)
+            {
+                int aPrevUIsoNb = theDrawer.UIsoAspect().Number();
+                int aPrevVIsoNb = theDrawer.VIsoAspect().Number();
+                theDrawer.UIsoAspect().SetNumber(5);
+                theDrawer.VIsoAspect().SetNumber(5);
+
+                StdPrs_WFShape.Add(thePrs, aCompoundWF, theDrawer);
+
+                theDrawer.UIsoAspect().SetNumber(aPrevUIsoNb);
+                theDrawer.VIsoAspect().SetNumber(aPrevVIsoNb);
             }
         }
 

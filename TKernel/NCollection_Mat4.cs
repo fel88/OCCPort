@@ -17,7 +17,23 @@ namespace TKernel
 
         }
 
-
+        //! Set diagonal elements of the matrix by the passed vector.
+        //! @param theVec [in] the vector of values.
+       public  void SetDiagonal( NCollection_Vec4<Element_t> theVec)
+  {
+    SetValue(0, 0, theVec.x());
+        SetValue(1, 1, theVec.y());
+        SetValue(2, 2, theVec.z());
+        SetValue(3, 3, theVec.w());
+  }
+        //! Change first 3 elements of the diagonal matrix.
+        //! @param theVec the vector of values.
+      public void SetDiagonal( NCollection_Vec3<Element_t> theVec)
+  {
+    SetValue(0, 0, theVec.x());
+        SetValue(1, 1, theVec.y());
+        SetValue(2, 2, theVec.z());
+  }
         //! Compute matrix multiplication product: A * B.
         //! @param theMatA [in] the matrix "A".
         //! @param theMatB [in] the matrix "B".
@@ -347,7 +363,18 @@ namespace TKernel
 
         }
 
-        internal void SetColumn(int theCol, NCollection_Vec3<Element_t> theVec)
+        //! Set column values by the passed 4 element vector.
+        //! @param theCol [in] the column to change.
+        //! @param theVec [in] the vector of values.
+      public   void SetColumn( int theCol,
+                   NCollection_Vec4<Element_t> theVec)
+  {
+    SetValue(0, theCol, theVec.x());
+        SetValue(1, theCol, theVec.y());
+        SetValue(2, theCol, theVec.z());
+        SetValue(3, theCol, theVec.w());
+  }
+        public void SetColumn(int theCol, NCollection_Vec3<Element_t> theVec)
         {
 
             SetValue(0, theCol, theVec.X);

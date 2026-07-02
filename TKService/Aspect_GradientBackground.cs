@@ -6,6 +6,19 @@ namespace TKService
     public class Aspect_GradientBackground : Aspect_Background
     {
 
+        //! Creates a window gradient background.
+        //! Default color is Quantity_NOC_BLACK.
+        //! Default fill method is Aspect_GradientFillMethod_None.
+        public Aspect_GradientBackground()
+        {
+
+            Quantity_Color Black=new Quantity_Color (Quantity_NameOfColor.Quantity_NOC_BLACK);
+
+            SetColor(Black);
+            MyColor2 = Black;
+            MyGradientMethod = Aspect_GradientFillMethod.Aspect_GradientFillMethod_None;
+        }
+ 
         public Aspect_GradientBackground(Quantity_Color AColor1,
                                                       Quantity_Color AColor2,
                                                       Aspect_GradientFillMethod AMethod)

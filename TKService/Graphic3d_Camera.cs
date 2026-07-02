@@ -1,7 +1,11 @@
 ﻿using OCCPort.Common;
+using OpenTK.Mathematics;
 using System.Numerics;
+using System.Reflection.Metadata;
+using System.Security.Cryptography;
 using TKernel;
 using TKMath;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace TKService
 {
@@ -27,6 +31,194 @@ namespace TKService
         {
             return myZFocus;
         }
+        //! Return TRUE if camera should calculate projection matrix for [0, 1] depth range or for [-1, 1] range.
+        //! FALSE by default.
+        public bool IsZeroToOneDepth()  { return myIsZeroToOneDepth; }
+
+        
+        //! Return TRUE if custom projection matrix is set.
+       public bool IsCustomMonoProjection()  { return myIsCustomProjMatM; }
+
+        //! Set using [0, 1] depth range or [-1, 1] range.
+        public void SetZeroToOneDepth(bool theIsZeroToOne)
+        {
+            if (myIsZeroToOneDepth != theIsZeroToOne)
+            {
+                myIsZeroToOneDepth = theIsZeroToOne;
+                InvalidateProjection();
+            }
+        }
+        //! Get Field Of View (FOV) restriction for 2D on-screen elements; 180 degrees by default.
+        //! When 2D FOV is smaller than FOVy or FOVx, 2D elements defined within offset from view corner
+        //! will be extended to fit into specified 2D FOV.
+        //! This can be useful to make 2D elements sharply visible, like in case of HMD normally having extra large FOVy.
+        public double FOV2d() { return myFOV2d; }
+
+        public void SetFOV2d(double theFOV)
+        {
+            if (FOV2d() == theFOV)
+            {
+                return;
+            }
+
+            myFOV2d = theFOV;
+            InvalidateProjection();
+        }
+        public void CopyMappingData(Graphic3d_Camera theOtherCamera)
+        {
+            SetZeroToOneDepth(theOtherCamera.IsZeroToOneDepth());
+            SetProjectionType(theOtherCamera.ProjectionType());
+            SetFOVy(theOtherCamera.FOVy());
+            SetFOV2d(theOtherCamera.FOV2d());
+            SetZRange(theOtherCamera.ZNear(), theOtherCamera.ZFar());
+            SetAspect(theOtherCamera.Aspect());
+            SetScale(theOtherCamera.Scale());
+            SetZFocus(theOtherCamera.ZFocusType(), theOtherCamera.ZFocus());
+            SetIOD(theOtherCamera.GetIODType(), theOtherCamera.IOD());
+            SetTile(theOtherCamera.myTile);
+
+            ResetCustomProjection();
+            if (theOtherCamera.IsCustomStereoProjection())
+            {
+                SetCustomStereoProjection(theOtherCamera.myCustomProjMatL,
+                                           theOtherCamera.myCustomHeadToEyeMatL,
+                                           theOtherCamera.myCustomProjMatR,
+                                           theOtherCamera.myCustomHeadToEyeMatR);
+            }
+            else if (theOtherCamera.IsCustomStereoFrustum())
+            {
+                SetCustomStereoFrustums(theOtherCamera.myCustomFrustumL, theOtherCamera.myCustomFrustumR);
+            }
+            if (theOtherCamera.IsCustomMonoProjection())
+            {
+                SetCustomMonoProjection(theOtherCamera.myCustomProjMatM);
+            }
+        }
+        public void SetCustomStereoProjection( Graphic3d_Mat4d theProjL,
+                                                   Graphic3d_Mat4d theHeadToEyeL,
+                                                   Graphic3d_Mat4d theProjR,
+                                                   Graphic3d_Mat4d theHeadToEyeR)
+{
+  myCustomProjMatL = theProjL;
+  myCustomProjMatR = theProjR;
+  myCustomHeadToEyeMatL = theHeadToEyeL;
+  myCustomHeadToEyeMatR = theHeadToEyeR;
+  myIsCustomProjMatLR = true;
+  myIsCustomFrustomLR = false;
+  InvalidateProjection();
+}
+        public void ResetCustomProjection()
+        {
+            if (myIsCustomFrustomLR
+             || myIsCustomProjMatLR
+             || myIsCustomProjMatM)
+            {
+                myIsCustomFrustomLR = false;
+                myIsCustomProjMatLR = false;
+                myIsCustomProjMatM = false;
+                InvalidateProjection();
+            }
+        }
+
+        public void SetCustomStereoFrustums( Aspect_FrustumLRBT theFrustumL,
+                                                 Aspect_FrustumLRBT theFrustumR)
+{
+  myCustomFrustumL = theFrustumL;
+  myCustomFrustumR = theFrustumR;
+  myIsCustomFrustomLR = true;
+  myIsCustomProjMatLR = false;
+  InvalidateProjection();
+}
+        public void SetCustomMonoProjection(Graphic3d_Mat4d theProj)
+        {
+            myCustomProjMatM = theProj;
+            myIsCustomProjMatM = true;
+            InvalidateProjection();
+        }
+
+        public void SetTile(Graphic3d_CameraTile theTile)
+        {
+            if (myTile == theTile)
+            {
+                return;
+            }
+
+            myTile = theTile;
+            InvalidateProjection();
+        }
+        public void CopyOrientationData(Graphic3d_Camera theOtherCamera)
+        {
+            if (!myEye.IsEqual(theOtherCamera.Eye(), 0.0)
+             || !myUp.IsEqual(theOtherCamera.Up(), 0.0)
+             || !myDirection.IsEqual(theOtherCamera.Direction(), 0.0)
+             || myDistance != theOtherCamera.Distance())
+            {
+                myEye = theOtherCamera.Eye();
+                myUp = theOtherCamera.Up();
+                myDirection = theOtherCamera.Direction();
+                myDistance = theOtherCamera.Distance();
+                InvalidateOrientation();
+            }
+            SetAxialScale(theOtherCamera.AxialScale());
+        }
+
+        public void SetAxialScale(gp_XYZ theAxialScale)
+        {
+            if (AxialScale().IsEqual(theAxialScale, 0.0))
+            {
+                return;
+            }
+
+            myAxialScale = theAxialScale;
+            InvalidateOrientation();
+        }
+
+        //! Get camera axial scale.
+        //! @return Camera's axial scale.
+        public gp_XYZ AxialScale() { return myAxialScale; }
+
+        //! Get Intraocular distance definition type.
+        //! @return definition type used for Intraocular distance.
+        IODType GetIODType()
+        {
+            return myIODType;
+        }
+        //! Get Intraocular distance value.
+        //! @return absolute or relative IOD value depending on its definition type.
+        double IOD()
+        {
+            return myIOD;
+        }
+        public void SetIOD(IODType theType, double theIOD)
+        {
+            if (GetIODType() == theType
+             && IOD() == theIOD)
+            {
+                return;
+            }
+
+            myIODType = theType;
+            myIOD = theIOD;
+
+            InvalidateProjection();
+        }
+        //! Set Field Of View (FOV) in y axis for perspective projection.
+        //! Field of View in x axis is automatically scaled from view aspect ratio.
+        //! @param theFOVy [in] the FOV in degrees.
+        public void SetFOVy(double theFOVy)
+        {
+            if (FOVy() == theFOVy)
+            {
+                return;
+            }
+
+            myFOVy = theFOVy;
+            myFOVx = theFOVy * myAspect;
+            myFOVyTan = Math.Tan(DTR_HALF * myFOVy);
+
+            InvalidateProjection();
+        }
+
 
         //! Check whether the camera projection is stereo.
         //! Please note that stereo rendering is now implemented with support of
@@ -219,7 +411,7 @@ namespace TKService
             var anUp = new gp_Vec(OrthogonalizedUp());
             gp_Vec aSide = aProjection ^ anUp;
 
-            new Standard_ASSERT_RAISE(
+            Exceptions. Standard_ASSERT_RAISE(
          !aProjection.IsParallel(anUp, Precision.Angular()),
           "Can not derive SIDE = PROJ x UP - directions are parallel");
 
@@ -720,7 +912,7 @@ namespace TKService
 
         }
 
-        private void SetDistance(double theDistance)
+        public void SetDistance(double theDistance)
         {
             if (myDistance == theDistance)
             {
@@ -1164,19 +1356,42 @@ namespace TKService
             throw new NotImplementedException();
         }
 
+  //! Return TRUE if custom stereo frustums are set.
         public bool IsCustomStereoFrustum()
         {
-            throw new NotImplementedException();
+              return myIsCustomFrustomLR; 
         }
 
+        //! Return TRUE if custom stereo projection matrices are set.
         public bool IsCustomStereoProjection()
         {
-            throw new NotImplementedException();
+            return myIsCustomProjMatLR;
         }
 
-        public void SetProjectionType(Projection projection)
+        public void SetProjectionType(Projection theProjectionType)
         {
-            throw new NotImplementedException();
+            Projection anOldType = ProjectionType();
+
+            if (anOldType == theProjectionType)
+            {
+                return;
+            }
+
+            if (anOldType == Projection.Projection_Orthographic)
+            {
+                if (myZNear <= Standard_Real. RealEpsilon())
+                {
+                    myZNear = DEFAULT_ZNEAR;
+                }
+                if (myZFar <= Standard_Real.RealEpsilon())
+                {
+                    myZFar = DEFAULT_ZFAR;
+                }
+            }
+
+            myProjType = theProjectionType;
+
+            InvalidateProjection();
         }
 
         public Graphic3d_Mat4 ProjectionMatrixF()
@@ -1208,8 +1423,8 @@ namespace TKService
         public void SetZRange(double theZNear,
                                      double theZFar)
         {
-            if (theZFar > theZNear)
-                throw new Exception("ZFar should be greater than ZNear");
+         Exceptions.   Standard_ASSERT_RAISE(theZFar > theZNear, "ZFar should be greater than ZNear");
+
             if (!IsOrthographic())
             {
                 if (theZNear > 0.0)
@@ -1281,7 +1496,7 @@ namespace TKService
                                 double theZNear,
                                 double theZFar)
         {
-            new Standard_ASSERT_RAISE(theScaleFactor > 0.0, "Zero or negative scale factor is not allowed.");
+            Exceptions. Standard_ASSERT_RAISE(theScaleFactor > 0.0, "Zero or negative scale factor is not allowed.");
 
             // Method changes zNear and zFar parameters of camera so as to fit graphical structures
             // by their graphical boundaries. It precisely fits min max boundaries of primary application
@@ -1464,12 +1679,12 @@ namespace TKService
                 {
                     aZNear = zEpsilon();
                 }
-                new Standard_ASSERT_RAISE(aZFar > aZNear, "ZFar should be greater than ZNear");
+                Exceptions.Standard_ASSERT_RAISE(aZFar > aZNear, "ZFar should be greater than ZNear");
             }
 
             theZNear = aZNear;
             theZFar = aZFar;
-            new Standard_ASSERT_RAISE(aZFar > aZNear, "ZFar should be greater than ZNear");
+            Exceptions.Standard_ASSERT_RAISE(aZFar > aZNear, "ZFar should be greater than ZNear");
             return true;
         }
 

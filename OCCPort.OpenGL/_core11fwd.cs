@@ -5,9 +5,24 @@ namespace OCCPort.OpenGL
 {
     public class _core11fwd
     {
+        internal void glClear(uint toClear)
+        {
+            GL.Clear((ClearBufferMask)toClear);
+        }
+
+        internal void glClearColor(float v1, float v2, float v3, float v4)
+        {
+            GL.ClearColor(v1, v2, v3, v4);
+        }
+
         internal void glClearDepth(double v)
         {
             GL.ClearDepth(v);
+        }
+
+        internal void glColorMask(bool v1, bool v2, bool v3, bool v4)
+        {
+            GL.ColorMask(v1, v2, v3, v4);
         }
 
         internal void glDepthFunc(All lequal)

@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using OCCPort;
+using System.Drawing;
 using System.Reflection.Metadata;
 using System.Xml.Linq;
 using TKernel;
@@ -15,7 +16,8 @@ namespace TKService
     public abstract class Graphic3d_CView : Graphic3d_DataStructureManager
     {
         //! Sets list of lights for the view.
-        public abstract void SetLights(Graphic3d_LightSet theLights) ;
+        public abstract void SetLights(Graphic3d_LightSet theLights);
+        protected Quantity_ColorRGBA myBgColor = new Quantity_ColorRGBA();
 
         public void ChangeZLayer(Graphic3d_Structure theStructure,
                                     Graphic3d_ZLayerId theLayerId)
@@ -40,6 +42,9 @@ namespace TKService
             changeZLayer(aCStruct, theLayerId);
         }
 
+        //! Sets visualization type of the view.
+   public      void SetVisualizationType( Graphic3d_TypeOfVisualization theType) { myVisualization = theType; }
+
         //! Change Z layer of a structure already presented in view.
         public abstract void changeZLayer(Graphic3d_CStructure theCStructure,
                              Graphic3d_ZLayerId theNewLayerId);
@@ -51,6 +56,12 @@ namespace TKService
             myId = myStructureManager.Identification(this);
 
         }
+
+        //! Sets backfacing model for the view.
+        public void SetBackfacingModel( Graphic3d_TypeOfBackfacingModel theModel) { myBackfacing = theModel; }
+
+        //! Sets background fill color.
+        public virtual void SetBackground( Aspect_Background theBackground) { myBgColor.SetRGB(theBackground.Color()); }
 
         //! Return subview top-left position relative to parent view in pixels.
         public Graphic3d_Vec2i SubviewTopLeft() { return mySubviewTopLeft; }
@@ -401,9 +412,9 @@ namespace TKService
             if (anIndex != 0
              && theStructure.Visual() != Graphic3d_TypeOfStructure.Graphic3d_TOS_COMPUTED)
             {
-            	myStructsToCompute.Remove(anIndex);
-            	myStructsComputed.Remove(anIndex);
-            	anIndex = 0;
+                myStructsToCompute.Remove(anIndex);
+                myStructsComputed.Remove(anIndex);
+                anIndex = 0;
             }
 
             Graphic3d_TypeOfAnswer anAnswer = acceptDisplay(theStructure.Visual());
@@ -417,7 +428,7 @@ namespace TKService
                 anAnswer = Graphic3d_TypeOfAnswer.Graphic3d_TOA_YES;
             }
 
-            if (anAnswer ==Graphic3d_TypeOfAnswer. Graphic3d_TOA_YES)
+            if (anAnswer == Graphic3d_TypeOfAnswer.Graphic3d_TOA_YES)
             {
                 if (!myStructsDisplayed.Add(theStructure))
                 {
@@ -426,12 +437,12 @@ namespace TKService
 
                 //	theStructure.CalculateBoundBox();
                 displayStructure(theStructure.CStructure(), theStructure.DisplayPriority());
-            	Update(theStructure.GetZLayer());
-            	return;
+                Update(theStructure.GetZLayer());
+                return;
             }
-            else if (anAnswer !=Graphic3d_TypeOfAnswer. Graphic3d_TOA_COMPUTE)
+            else if (anAnswer != Graphic3d_TypeOfAnswer.Graphic3d_TOA_COMPUTE)
             {
-            	return;
+                return;
             }
 
             //if (anIndex != 0)
@@ -511,18 +522,18 @@ namespace TKService
             //}
 
             //// Of which type will be the computed?
-bool toComputeWireframe = myVisualization == Graphic3d_TypeOfVisualization.Graphic3d_TOV_WIREFRAME
-            										 && theStructure.ComputeVisual() != Graphic3d_TypeOfStructure.Graphic3d_TOS_SHADING;
-             bool toComputeShading = myVisualization ==Graphic3d_TypeOfVisualization. Graphic3d_TOV_SHADING
-            										 && theStructure.ComputeVisual() !=Graphic3d_TypeOfStructure. Graphic3d_TOS_WIREFRAME;
+            bool toComputeWireframe = myVisualization == Graphic3d_TypeOfVisualization.Graphic3d_TOV_WIREFRAME
+                                                                 && theStructure.ComputeVisual() != Graphic3d_TypeOfStructure.Graphic3d_TOS_SHADING;
+            bool toComputeShading = myVisualization == Graphic3d_TypeOfVisualization.Graphic3d_TOV_SHADING
+                                                    && theStructure.ComputeVisual() != Graphic3d_TypeOfStructure.Graphic3d_TOS_WIREFRAME;
             if (!toComputeShading && !toComputeWireframe)
             {
-            	anAnswer =Graphic3d_TypeOfAnswer. Graphic3d_TOA_NO;
+                anAnswer = Graphic3d_TypeOfAnswer.Graphic3d_TOA_NO;
             }
             else
             {
-            	aStruct.SetVisual(toComputeWireframe ?Graphic3d_TypeOfStructure. Graphic3d_TOS_WIREFRAME : Graphic3d_TypeOfStructure.Graphic3d_TOS_SHADING);
-            	anAnswer = acceptDisplay(aStruct.Visual());
+                aStruct.SetVisual(toComputeWireframe ? Graphic3d_TypeOfStructure.Graphic3d_TOS_WIREFRAME : Graphic3d_TypeOfStructure.Graphic3d_TOS_SHADING);
+                anAnswer = acceptDisplay(aStruct.Visual());
             }
 
             if (theStructure.IsHighlighted())
@@ -532,7 +543,7 @@ bool toComputeWireframe = myVisualization == Graphic3d_TypeOfVisualization.Graph
 
             // It is displayed only if the calculated structure
             // has a proper type corresponding to the one of the view.
-            if (anAnswer ==Graphic3d_TypeOfAnswer. Graphic3d_TOA_NO)
+            if (anAnswer == Graphic3d_TypeOfAnswer.Graphic3d_TOA_NO)
             {
                 return;
             }
@@ -995,12 +1006,6 @@ bool toComputeWireframe = myVisualization == Graphic3d_TypeOfVisualization.Graph
         Graphic3d_TOD_FLOAT,
 
         //float value
-    }
-
-    public enum Graphic3d_TypeOfAttribute
-    {
-        Graphic3d_TOA_POS = 0, Graphic3d_TOA_NORM, Graphic3d_TOA_UV, Graphic3d_TOA_COLOR,
-        Graphic3d_TOA_CUSTOM
     }
 
 

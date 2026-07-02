@@ -158,7 +158,14 @@ myLineFeather (1.0f),*/
 
 
         }
-
+        public void SetColorMaskRGBA(NCollection_Vec4<bool> theVal)
+        {
+            core11fwd.glColorMask(theVal.r() ? true : false,
+                         theVal.g() ? true : false,
+                         theVal.b() ? true : false,
+                         theVal.a() ? true : false);
+            myColorMask = theVal;
+        }
         //! @return value for GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS
         public int MaxCombinedTextureUnits() { return myMaxTexCombined; }
 
@@ -547,7 +554,7 @@ myLineFeather (1.0f),*/
 
 
         //! Returns camera object.
-        public  Graphic3d_Camera Camera()  { return myCamera; }
+        public Graphic3d_Camera Camera() { return myCamera; }
 
 
         internal void ApplyProjectionMatrix()
@@ -985,17 +992,24 @@ myLineFeather (1.0f),*/
         //! Convert Quantity_ColorRGBA into vec4
         //! with conversion or no conversion into non-linear sRGB
         //! basing on ToRenderSRGB() flag.
-        Vector4 Vec4FromQuantityColor(Vector4 theColor)
+        public OpenGl_Vec4 Vec4FromQuantityColor(OpenGl_Vec4 theColor)
         {
             return myIsSRgbActive
                  ? Vec4LinearFromQuantityColor(theColor)
                  : Vec4sRGBFromQuantityColor(theColor);
         }
+        
+        public OpenGl_Vec4 Vec4FromQuantityColor(Vector4 theColor)
+        {
+            return Vec4FromQuantityColor(theColor.ToOpenGl_Vec4());
+
+        }
         //! Convert Quantity_ColorRGBA into vec4.
         //! Quantity_Color is expected to be linear RGB, hence conversion is NOT required
-        Vector4 Vec4LinearFromQuantityColor(Vector4 theColor) { return theColor; }
+        OpenGl_Vec4 Vec4LinearFromQuantityColor(OpenGl_Vec4 theColor) { return theColor; }
+
         //! Convert Quantity_ColorRGBA (linear RGB) into non-linear sRGB vec4.
-        public Vector4 Vec4sRGBFromQuantityColor(Vector4 theColor)
+        public OpenGl_Vec4 Vec4sRGBFromQuantityColor(OpenGl_Vec4 theColor)
         {
             return Quantity_ColorRGBA.Convert_LinearRGB_To_sRGB(theColor);
         }

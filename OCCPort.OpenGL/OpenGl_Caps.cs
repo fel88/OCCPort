@@ -24,6 +24,15 @@
         public bool useSystemBuffer;   //!< Enables usage of system backbuffer for blitting (OFF by default on desktop OpenGL and ON on OpenGL ES for testing)
         public int swapInterval;      //!< controls swap interval - 0 for VSync off and 1 for VSync on, 1 by default
         public bool useZeroToOneDepth; //!< use [0, 1] depth range instead of [-1, 1] range, when possible (OFF by default)
-
+        /**
+  * Specify whether alpha component within color buffer should be written or not.
+  * With alpha write enabled, background is considered transparent by default
+  * and overridden by alpha value of last drawn object
+  * (e.g. it could be opaque or not in case of transparent material).
+  * With alpha writes disabled, color buffer will be kept opaque.
+  *
+  * ON by default.
+  */
+        public bool buffersOpaqueAlpha;
     }
 }

@@ -58,6 +58,11 @@ namespace TKernel
         public NCollection_Vec4()
         {
             v = new Element_t[4];
+        }  //! Initialize ALL components of vector within specified value.
+        public NCollection_Vec4(Element_t theValue)
+        {
+            v = new Element_t[4];
+            v[0] = v[1] = v[2] = v[3] = theValue;
         }
         //! Per-component constructor.
         public NCollection_Vec4(Element_t theX,
@@ -72,7 +77,14 @@ namespace TKernel
             v[3] = theW;
         }
 
-
+        public NCollection_Vec4(Element_t[] array)
+        {
+            v = new Element_t[4];
+            for (int i = 0; i < array.Length; i++)
+            {
+                v[i] = array[i];
+            }
+        }
         public Element_t X { get => v[0]; set => v[0] = value; }
         public Element_t Y { get => v[1]; set => v[1] = value; }
         public Element_t Z { get => v[2]; set => v[2] = value; }
@@ -109,5 +121,7 @@ namespace TKernel
         {
             return v;
         }
+
+
     }
 }

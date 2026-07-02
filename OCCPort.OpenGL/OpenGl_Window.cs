@@ -10,9 +10,10 @@ namespace OCCPort
 {
     public class OpenGl_Window
     {
+        //! Return window object defining dimensions.
         internal Aspect_Window SizeWindow()
         {
-            throw new NotImplementedException();
+            return mySizeWindow;
         }
 
         OpenGl_Context myGlContext;
