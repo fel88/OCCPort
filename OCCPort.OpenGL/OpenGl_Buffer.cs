@@ -137,15 +137,10 @@ namespace OCCPort.OpenGL
                                   byte[] theData,
                                   All theDataType,
                                   int theStride)
-        {
-            if (theDataType == All.UnsignedByte)
-            {
-
-            }
-            if (!Create(theGlCtx))
-            {
+        {         
+            if (!Create(theGlCtx))            
                 return false;
-            }
+            
 
             Bind(theGlCtx);
             myDataType = theDataType;
@@ -153,8 +148,18 @@ namespace OCCPort.OpenGL
             myElemsNb = theElemsNb;
             theGlCtx.core15fwd.glBufferData(GetTarget(), myElemsNb * theStride, theData, OpenTK.Graphics.OpenGL.BufferUsageHint.StaticDraw);
              int anErr = theGlCtx.core15fwd.glGetError();
-
-            Unbind(theGlCtx);
+            if (anErr != (int)All.NoError
+    && anErr != (int)All.OutOfMemory ) // pass-through out-of-memory error, but log unexpected errors
+            {
+                theGlCtx.PushMessage(All.DebugSourceApplication, All.DebugTypeError, 0, All.DebugSeverityHigh,
+                           ("Error: glBufferData (")
+                           //+ FormatTarget(GetTarget()) + ","
+                           //+ OpenGl_Context.FormatSize(GLsizeiptr(myElemsNb) * theStride) + ","
+                           //+ OpenGl_Context.FormatPointer(theData) + ") Id: " + (int)myBufferId
+                           + " failed with " + OpenGl_Context.FormatGlError(anErr));
+            }
+                Unbind(theGlCtx);
+            
             return anErr == (int)All.NoError ;
             
         }

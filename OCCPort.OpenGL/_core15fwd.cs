@@ -9,7 +9,10 @@ namespace OCCPort.OpenGL
         {
             GL.ActiveTexture((TextureUnit)texture0);
         }
-
+        internal void glActiveTexture(int texture0)
+        {
+            GL.ActiveTexture((TextureUnit)texture0);
+        }
         internal void glBindBuffer(BufferTarget bufferTarget, uint myBufferId)
         {
             GL.BindBuffer(bufferTarget, myBufferId);

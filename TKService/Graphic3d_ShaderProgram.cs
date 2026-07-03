@@ -11,6 +11,27 @@ namespace TKService
 {
     public class Graphic3d_ShaderProgram
     {
+        static volatile int THE_PROGRAM_OBJECT_COUNTER = 0;
+
+        public Graphic3d_ShaderProgram()
+        {
+            myNbLightsMax = (THE_MAX_LIGHTS_DEFAULT);
+            myNbShadowMaps = (0);
+            myNbClipPlanesMax = (THE_MAX_CLIP_PLANES_DEFAULT);
+            myNbFragOutputs = (THE_NB_FRAG_OUTPUTS);
+            myTextureSetBits = (int)Graphic3d_TextureSetBits.Graphic3d_TextureSetBits_NONE;
+            myOitOutput =Graphic3d_RenderTransparentMethod.Graphic3d_RTM_BLEND_UNORDERED;
+            myHasDefSampler = (true);
+            myHasAlphaTest = (false);
+            myIsPBR = false;
+
+            myID = ("Graphic3d_ShaderProgram_")
+                 + (Interlocked.Increment(ref THE_PROGRAM_OBJECT_COUNTER));
+        }
+        Graphic3d_RenderTransparentMethod myOitOutput; //!< flag indicating that Fragment Shader includes OIT outputs
+
+        //! Return TRUE if standard program header should define default texture sampler occSampler0; TRUE by default for compatibility.
+        public bool HasDefaultSampler() { return myHasDefSampler; }
 
         //! The list of currently pushed but not applied custom uniform variables.
         //! This list is automatically cleared after applying to GLSL program.
@@ -174,7 +195,7 @@ namespace TKService
             throw new NotImplementedException();
         }
 
-  //! Specify the length of array of clipping planes (THE_MAX_CLIP_PLANES).
+        //! Specify the length of array of clipping planes (THE_MAX_CLIP_PLANES).
         public void SetNbClipPlanesMax(int theNbPlanes)
         {
             myNbClipPlanesMax = theNbPlanes;
@@ -217,4 +238,20 @@ namespace TKService
             Add(aVariable);
         }
     }*/
+
+    //! Standard texture units combination bits.
+
+    public enum Graphic3d_TextureSetBits
+    {
+        Graphic3d_TextureSetBits_NONE = 0,
+        Graphic3d_TextureSetBits_BaseColor = (1 << (Graphic3d_TextureUnit.Graphic3d_TextureUnit_BaseColor)),
+        Graphic3d_TextureSetBits_Emissive = (1 << (Graphic3d_TextureUnit.Graphic3d_TextureUnit_Emissive)),
+        Graphic3d_TextureSetBits_Occlusion = (1 << (Graphic3d_TextureUnit.Graphic3d_TextureUnit_Occlusion)),
+        Graphic3d_TextureSetBits_Normal = (1 << (Graphic3d_TextureUnit.Graphic3d_TextureUnit_Normal)),
+        Graphic3d_TextureSetBits_MetallicRoughness = (1 << (Graphic3d_TextureUnit.Graphic3d_TextureUnit_MetallicRoughness)),
+    };
+    //  enum
+    // {
+    //   Graphic3d_TextureUnit_NB = Graphic3d_TextureUnit_15 + 1,
+    //  };
 }

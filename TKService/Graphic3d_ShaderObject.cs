@@ -1,4 +1,6 @@
-﻿using OCCPort.Common;
+﻿global using ShaderVariableList = TKernel.NCollection_Sequence<TKService.Graphic3d_ShaderObject.ShaderVariable>;
+
+using OCCPort.Common;
 
 namespace TKService
 {
@@ -131,7 +133,7 @@ namespace TKService
 
             if (theType == Graphic3d_TypeOfShaderObject.Graphic3d_TOS_GEOMETRY)
             {
-                aSrcUniforms.Prepend(
+                aSrcUniforms = aSrcUniforms.Prepend(
                                      "\nlayout (triangles) in;" +
 
 
@@ -165,7 +167,7 @@ namespace TKService
             }
 
 
-            theSource.Prepend(aSrcUniforms + aSrcInStructs + aSrcOutStructs + aSrcInOuts);
+            theSource = theSource.Prepend(aSrcUniforms + aSrcInStructs + aSrcOutStructs + aSrcInOuts);
             return Graphic3d_ShaderObject.CreateFromSource(theType, theSource);
 
         }
@@ -192,9 +194,7 @@ namespace TKService
         //! Returns the source code of the shader object.
         public string Source() { return mySource; }
 
-        public class ShaderVariableList : List<ShaderVariable>
-        {
-        }
+
 
         public class ShaderVariable
         {

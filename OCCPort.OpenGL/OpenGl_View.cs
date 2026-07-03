@@ -3,6 +3,7 @@ using OpenTK.Compute.OpenCL;
 using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using System.Reflection.Metadata;
 using System.Xml.Linq;
@@ -1586,7 +1587,7 @@ namespace OCCPort.OpenGL
        new Vector4(-1.0f, -1.0f, 0.0f, 0.0f),
        new Vector4(-1.0f,  1.0f, 0.0f, 1.0f)
       };
-                    aVerts.Init(myWorkspace.GetGlContext(), 4, 4, aQuad[0].GetData());
+                    aVerts.Init(myWorkspace.GetGlContext(), 4, 4, aQuad.SelectMany(z=>z.GetData()).ToArray());
                 }
             }
             else

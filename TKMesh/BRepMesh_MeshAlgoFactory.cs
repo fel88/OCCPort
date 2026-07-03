@@ -593,11 +593,11 @@ namespace TKMesh
 
         public override DelaBella_Triangle GetFirstDelaunayTriangle()
         {
-            var ret1 = d.GetFirstTriangle();
-
+            //var ret1 = d.GetFirstTriangle();
+            throw new NotImplementedException();
             DelaBella_Triangle ret = null;
             DelaBella_Triangle root = null;
-            while (ret1 != null)
+           /* while (ret1 != null)
             {
                 var old = ret;
 
@@ -610,7 +610,7 @@ namespace TKMesh
                 {
                     old.next = ret;
                 }
-                for (int i = 0; i < ret1.v.Length; i++)
+                /*for (int i = 0; i < ret1.v.Length; i++)
                 {
                     TVert item = ret1.v[i];
                     ret.v[i] = new DelaBella_Vertex();
@@ -619,12 +619,12 @@ namespace TKMesh
                     ret.v[i].i = item.index;
 
                 }
-                ret1 = ret1.Next;
-            }
-            return root;
+                ret1 = ret1.Next;*/
+          //  }
+          //  return root;
 
         }
-        DelabellaWrapper d;
+        //DelabellaWrapper d;
         // return 0: no output 
         // negative: all points are colinear, output hull vertices form colinear segment list, no triangles on output
         // positive: output hull vertices form counter-clockwise ordered segment contour, delaunay and hull triangles are available
@@ -632,7 +632,7 @@ namespace TKMesh
         // if advance_bytes is less than 2*sizeof coordinate type, it is treated as 2*sizeof coordinate type  
         public override int Triangulate(int points, double[] xy, int advance_bytes = 0)
         {
-            d = new DelabellaWrapper();
+          // d = new DelabellaWrapper();
 
             if (xy == null)
                 return 0;
@@ -644,9 +644,9 @@ namespace TKMesh
                 x[i] = xy[i * 2];
                 y[i] = xy[i * 2 + 1];
             }
-            var res = d.Triangulate(points, x, y);
-
-            return res;
+            //    var res = d.Triangulate(points, x, y);
+            throw new NotImplementedException();
+           // return res;
             //   if (y == null)
             //     y = x + 1;
         }

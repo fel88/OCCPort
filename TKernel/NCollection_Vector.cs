@@ -24,6 +24,14 @@ namespace TKernel
     //! to enlarge the vector during the iteration.
     public class NCollection_Vector<T> : NCollection_BaseVector<T>
     {
+        public NCollection_Vector() { }
+        public NCollection_Vector(NCollection_Vector<T> copy)
+        {
+            foreach (var item in copy)
+            {
+                Add(item);
+            }
+        }
 
         //! Operator[] - query the const value
         public new T this[int key]
@@ -43,17 +51,24 @@ namespace TKernel
             return findV(theIndex);
         }
 
-
-
         public void Append(T t)
         {
             Add(t);
-        }  //! Total number of items in the vector
+        }  
+        
+        //! Total number of items in the vector
         public int Size()
         {
             return Count;
-        }  //! Method for consistency with other collections.
-           //! @return Lower bound (inclusive) for iteration.
+        }
+
+        public int Length()
+        {
+            return Count;
+        }
+
+        //! Method for consistency with other collections.
+        //! @return Lower bound (inclusive) for iteration.
         public int Lower()
         {
             return 0;
@@ -66,24 +81,26 @@ namespace TKernel
 
         public class Iterator
         {
+            NCollection_Vector<T> list;
             public Iterator(NCollection_Vector<T> selectMgr_SensitiveEntities)
             {
-
+                list = selectMgr_SensitiveEntities;
             }
 
+            int index = 0;
             public bool More()
             {
-                throw new NotImplementedException();
+                return index < list.Count;
             }
 
-            public object Next()
+            public void Next()
             {
-                throw new NotImplementedException();
+                index++;
             }
 
             public T Value()
             {
-                throw new NotImplementedException();
+                return list[index];
             }
         }
     }

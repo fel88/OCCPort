@@ -5,6 +5,11 @@ namespace OCCPort.OpenGL
 {
     public class _core11fwd
     {
+        internal void glBindTexture(uint myTarget, uint myTextureId)
+        {
+            GL.BindTexture((TextureTarget)myTarget, myTextureId);
+        }
+
         internal void glClear(uint toClear)
         {
             GL.Clear((ClearBufferMask)toClear);
@@ -23,6 +28,11 @@ namespace OCCPort.OpenGL
         internal void glColorMask(bool v1, bool v2, bool v3, bool v4)
         {
             GL.ColorMask(v1, v2, v3, v4);
+        }
+
+        internal void glDeleteTextures(int v, uint[] value)
+        {
+            GL.DeleteTextures(v, value);
         }
 
         internal void glDepthFunc(All lequal)
@@ -78,6 +88,11 @@ namespace OCCPort.OpenGL
             GL.Flush();
         }
 
+        internal void glGenTextures(int v, ref uint myTextureId)
+        {
+            GL.GenTextures(v, out myTextureId);
+        }
+
         internal void glGetBooleanv(GetPName n, ref bool v)
         {
             v = GL.GetBoolean(n);
@@ -88,9 +103,19 @@ namespace OCCPort.OpenGL
            return  GL.GetError();
         }
 
+        internal void glGetIntegerv(All drawBuffer, ref int aDrawBuffer)
+        {
+            GL.GetInteger((GetPName)drawBuffer, out aDrawBuffer);
+        }
+
         internal void glGetIntegerv(GetPName drawBuffer, ref int aDrawBuffer)
         {            
             GL.GetInteger(drawBuffer, out aDrawBuffer);
+        }
+
+        internal string glGetString(All extensions)
+        {
+            return GL.GetString((StringName)extensions);
         }
 
         internal void glReadBuffer(int myReadBuffer)

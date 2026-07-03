@@ -159,7 +159,17 @@ myLineFeather (1.0f),*/
 
         }
 
+public bool extPDS;             //!< GL_EXT_packed_depth_stencil
+
+        //! @return true if MSAA textures are supported.
+        public bool HasTextureMultisampling()  { return myHasMsaaTextures; }
+
+
+
+        public IOpenGl_ArbSamplerObject arbSamplerObject; //!< GL_ARB_sampler_objects (on desktop OpenGL - since 3.3 or as extension GL_ARB_sampler_objects; on OpenGL ES - since 3.0)
+
         public bool hasHighp;           //!< highp in GLSL ES fragment shader is supported
+        public bool arbClipControl;     //!< GL_ARB_clip_control, in core since 4.5
 
 
         public bool extFragDepth;       //!< GL_EXT_frag_depth on OpenGL ES 2.0 (gl_FragDepthEXT built-in variable, before OpenGL ES 3.0)
@@ -296,8 +306,8 @@ myLineFeather (1.0f),*/
                 core11ffp.glShadeModel(aModel);
             }
         }
-      public   OpenGl_FeatureFlag hasSampleVariables; //!< Complex flag indicating support of MSAA variables in GLSL shader (desktop OpenGL 4.0, GL_ARB_sample_shading)
-     public    bool oesSampleVariables; //!< GL_OES_sample_variables
+        public OpenGl_FeatureFlag hasSampleVariables; //!< Complex flag indicating support of MSAA variables in GLSL shader (desktop OpenGL 4.0, GL_ARB_sample_shading)
+        public bool oesSampleVariables; //!< GL_OES_sample_variables
 
         public OpenGl_GlFunctions /*OpenGl_ArbFBO */arbFBO;             //!< GL_ARB_framebuffer_object
         public OpenGl_GlFunctions /*OpenGl_ArbFBOBlit */arbFBOBlit;         //!< glBlitFramebuffer function, moved out from OpenGl_ArbFBO structure for compatibility with OpenGL ES 2.0
@@ -1039,6 +1049,97 @@ myLineFeather (1.0f),*/
             }
         }
 
+
+        //! @return value for GL_MAX_TEXTURE_SIZE
+        public int MaxTextureSize() { return myMaxTexDim; }
+        public bool CheckExtension(string theExtString,
+                                                 string theExtName)
+        {
+            if (theExtString == null)
+            {
+                return false;
+            }
+            return theExtString.Contains(theExtName);
+            throw new NotImplementedException();
+            // Search for theExtName in the extensions string.
+            // Use of strstr() is not sufficient because extension names can be prefixes of other extension names.
+            //char* aPtrIter = (char*)theExtString;
+            //const char* aPtrEnd = aPtrIter + strlen(theExtString);
+            //const size_t anExtNameLen = strlen(theExtName);
+            //while (aPtrIter < aPtrEnd)
+            //{
+            //    const size_t n = strcspn(aPtrIter, " ");
+            //    if ((n == anExtNameLen) && (strncmp(aPtrIter, theExtName, anExtNameLen) == 0))
+            //    {
+            //        return true;
+            //    }
+            //    aPtrIter += (n + 1);
+            //}
+            return false;
+        }
+
+
+        internal bool CheckExtension(string theExtName)
+        {
+
+            if (theExtName == null)
+            {
+                //# ifdef OCCT_DEBUG
+                //                    std::cerr << "CheckExtension called with NULL string!\n";
+                //#endif
+                return false;
+            }
+            else if (caps.contextNoExtensions)
+            {
+                return false;
+            }
+
+            // available since OpenGL 3.0
+            // and the ONLY way to check extensions with OpenGL 3.1+ core profile
+            if (myGapi == Aspect_GraphicsLibrary.Aspect_GraphicsLibrary_OpenGL
+             && IsGlGreaterEqual(3, 0)
+             && myFuncs.glGetStringi != null)
+            {
+                GLint anExtNb = 0;
+                core11fwd.glGetIntegerv(All.NumExtensions, ref anExtNb);
+                int anExtNameLen = theExtName.Length;
+                for (GLint anIter = 0; anIter < anExtNb; ++anIter)
+                {
+                    string anExtension = myFuncs.glGetStringi(All.Extensions, (int)anIter);
+                    int aTestExtNameLen = anExtension.Length;
+                    if (aTestExtNameLen == anExtNameLen
+                     && string.Compare(anExtension, theExtName) == 0)
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            // use old way with huge string for all extensions
+            string anExtString = core11fwd.glGetString(All.Extensions);
+            if (anExtString == null)
+            {
+                //Messenger()->Send("TKOpenGL: glGetString (GL_EXTENSIONS) has returned NULL! No GL context?", Message_Warning);
+                return false;
+            }
+            if (!CheckExtension(anExtString, theExtName))
+            {
+                return false;
+            }
+
+
+            return true;
+
+        }
+
+        
+
+            //! Access entire map of loaded OpenGL functions.
+            public  OpenGl_GlFunctions Functions()  { return myFuncs; }
+
+        
+
         bool myIsSRgbActive;    //!< flag indicating GL_FRAMEBUFFER_SRGB state
 
         int myAnisoMax;             //!< maximum level of anisotropy texture filter
@@ -1074,4 +1175,14 @@ myLineFeather (1.0f),*/
 
 
     }
+
+
+    //! Provide Sampler Object functionality (texture parameters stored independently from texture itself).
+    //! Available since OpenGL 3.3+ (GL_ARB_sampler_objects extension) and OpenGL ES 3.0+.
+    public interface IOpenGl_ArbSamplerObject
+    {
+        void glBindSampler(Graphic3d_TextureUnit theUnit, uint mySamplerID);
+        void glDeleteSamplers(int v,  uint[] mySamplerID);
+    }
+    
 }

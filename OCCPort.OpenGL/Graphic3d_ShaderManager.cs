@@ -1,4 +1,6 @@
-﻿using OCCPort;
+﻿global using ShaderVariableList = TKernel.NCollection_Sequence<TKService.Graphic3d_ShaderObject.ShaderVariable>;
+
+using OCCPort;
 using OCCPort.Enums;
 using OCCPort.Common;
 using OCCPort.Tester;
@@ -179,7 +181,7 @@ namespace OCCPort.OpenGL
         protected Graphic3d_ShaderProgram getStdProgramFboBlit(int theNbSamples,
                                                                                  bool theIsFallback_sRGB)
         {
-            Graphic3d_ShaderObject.ShaderVariableList aUniforms = new Graphic3d_ShaderObject.ShaderVariableList(), aStageInOuts = new Graphic3d_ShaderObject.ShaderVariableList();
+            ShaderVariableList aUniforms = new ShaderVariableList(), aStageInOuts = new ShaderVariableList();
             aStageInOuts.Append(new Graphic3d_ShaderObject.ShaderVariable("vec2 TexCoord", Graphic3d_TypeOfShaderObject.Graphic3d_TOS_VERTEX | Graphic3d_TypeOfShaderObject.Graphic3d_TOS_FRAGMENT));
 
             string aSrcVert =
@@ -366,8 +368,8 @@ namespace OCCPort.OpenGL
         {
             Graphic3d_ShaderProgram aProgSrc = new Graphic3d_ShaderProgram();
 
-            Graphic3d_ShaderObject.ShaderVariableList aUniforms = new Graphic3d_ShaderObject.ShaderVariableList();
-            Graphic3d_ShaderObject.ShaderVariableList aStageInOuts = new Graphic3d_ShaderObject.ShaderVariableList();
+            ShaderVariableList aUniforms = new ShaderVariableList();
+            ShaderVariableList aStageInOuts = new ShaderVariableList();
             aStageInOuts.Append(new Graphic3d_ShaderObject.ShaderVariable("vec2 TexCoord", Graphic3d_TypeOfShaderObject.Graphic3d_TOS_VERTEX | Graphic3d_TypeOfShaderObject.Graphic3d_TOS_FRAGMENT));
             aUniforms.Append(new Graphic3d_ShaderObject.ShaderVariable("vec3 uColor1", Graphic3d_TypeOfShaderObject.Graphic3d_TOS_FRAGMENT));
             aUniforms.Append(new Graphic3d_ShaderObject.ShaderVariable("vec3 uColor2", Graphic3d_TypeOfShaderObject.Graphic3d_TOS_FRAGMENT));
@@ -430,7 +432,7 @@ namespace OCCPort.OpenGL
             string aSrcVert, aSrcVertExtraFunc = "", aSrcVertExtraMain = "";
             string aSrcFrag = "", aSrcFragGetVertColor = "", aSrcFragExtraMain = "";
             string aSrcFragGetColor = Environment.NewLine + "vec4 getColor(void) { return " + aPhongCompLight + "; }";
-            Graphic3d_ShaderObject.ShaderVariableList aUniforms = new Graphic3d_ShaderObject.ShaderVariableList(), aStageInOuts = new Graphic3d_ShaderObject.ShaderVariableList();
+            ShaderVariableList aUniforms = new ShaderVariableList(), aStageInOuts = new ShaderVariableList();
             if ((theBits & (int)Graphic3d_ShaderFlags.Graphic3d_ShaderFlags_IsPoint) != 0)
             {
                 if (mySetPointSize)
@@ -655,6 +657,17 @@ namespace OCCPort.OpenGL
             int aMaxLimit = roundUpMaxLightSources(theLights.NbEnabled());
             return ("l_") + theLights.KeyEnabledShort() + aMaxLimit;
         }
+        //! Auxiliary function to transform normal from model to view coordinate system.
+        static string THE_FUNC_transformNormal_view =
+          "vec3 transformNormal (in vec3 theNormal)"+
+  "{"+
+  "  vec4 aResult = occWorldViewMatrixInverseTranspose"+
+  "               * occModelWorldMatrixInverseTranspose"+
+  "               * vec4 (theNormal, 0.0);"+
+  "  return normalize (aResult.xyz);"+
+  "}";
+
+        public object Graphic3d_ShaderFlags_TextureEnv { get; private set; }
 
         //! Prepare standard GLSL program without lighting.
         //! @param theBits      [in] program bits
@@ -667,8 +680,8 @@ namespace OCCPort.OpenGL
             string aSrcFrag = "", aSrcFragExtraMain = "";
             string aSrcFragGetColor = "vec4 getColor(void) { return occColor; }";
             string aSrcFragMainGetColor = "  occSetFragColor (getFinalColor());";
-            Graphic3d_ShaderObject.ShaderVariableList aUniforms = new Graphic3d_ShaderObject.ShaderVariableList(),
-                aStageInOuts = new Graphic3d_ShaderObject.ShaderVariableList();
+            ShaderVariableList aUniforms = new ShaderVariableList(),
+                aStageInOuts = new ShaderVariableList();
             if ((theBits & (int)Graphic3d_ShaderFlags.Graphic3d_ShaderFlags_IsPoint) != 0)
             {
                 if (mySetPointSize)
@@ -680,37 +693,37 @@ namespace OCCPort.OpenGL
             {
                 if ((theBits & (int)Graphic3d_ShaderFlags.Graphic3d_ShaderFlags_HasTextures) != 0)
                 {
-                    aUniforms.Append(Graphic3d_ShaderObject.ShaderVariable("sampler2D occSamplerBaseColor", Graphic3d_TOS_FRAGMENT));
-                    aStageInOuts.Append(Graphic3d_ShaderObject.ShaderVariable("vec4 TexCoord", Graphic3d_TOS_VERTEX | Graphic3d_TOS_FRAGMENT));
-                    if ((theBits & Graphic3d_ShaderFlags_HasTextures) == Graphic3d_ShaderFlags_TextureEnv)
+                    aUniforms.Append(new Graphic3d_ShaderObject.ShaderVariable("sampler2D occSamplerBaseColor",Graphic3d_TypeOfShaderObject. Graphic3d_TOS_FRAGMENT));
+                    aStageInOuts.Append(new Graphic3d_ShaderObject.ShaderVariable("vec4 TexCoord",Graphic3d_TypeOfShaderObject. Graphic3d_TOS_VERTEX | Graphic3d_TypeOfShaderObject.Graphic3d_TOS_FRAGMENT));
+                    if ((theBits &(int)Graphic3d_ShaderFlags.Graphic3d_ShaderFlags_HasTextures) ==(int) Graphic3d_ShaderFlags. Graphic3d_ShaderFlags_TextureEnv)
                     {
                         aSrcVertExtraFunc = THE_FUNC_transformNormal_view;
 
                         aSrcVertExtraMain +=
-                          EOL"  vec4 aPosition = occWorldViewMatrix * occModelWorldMatrix * occVertex;"
-          EOL"  vec3 aNormal   = transformNormal (occNormal);"
-          EOL"  vec3 aReflect  = reflect (normalize (aPosition.xyz), aNormal);"
-          EOL"  aReflect.z += 1.0;"
-          EOL"  TexCoord = vec4(aReflect.xy * inversesqrt (dot (aReflect, aReflect)) * 0.5 + vec2 (0.5), 0.0, 1.0);";
+                          "  vec4 aPosition = occWorldViewMatrix * occModelWorldMatrix * occVertex;"+
+          "  vec3 aNormal   = transformNormal (occNormal);"+
+          "  vec3 aReflect  = reflect (normalize (aPosition.xyz), aNormal);"+
+          "  aReflect.z += 1.0;"+
+          "  TexCoord = vec4(aReflect.xy * inversesqrt (dot (aReflect, aReflect)) * 0.5 + vec2 (0.5), 0.0, 1.0);";
 
                         aSrcFragGetColor =
-                          EOL"vec4 getColor(void) { return occTexture2D (occSamplerBaseColor, TexCoord.st); }";
+                          "vec4 getColor(void) { return occTexture2D (occSamplerBaseColor, TexCoord.st); }";
                     }
                     else
                     {
-                        aProgramSrc->SetTextureSetBits(Graphic3d_TextureSetBits_BaseColor);
+                        aProgramSrc.SetTextureSetBits((int)Graphic3d_TextureSetBits.Graphic3d_TextureSetBits_BaseColor);
                         aSrcVertExtraMain += THE_VARY_TexCoord_Trsf;
 
                         aSrcFragGetColor =
-                          EOL"vec4 getColor(void) { return occTexture2D(occSamplerBaseColor, TexCoord.st / TexCoord.w); }";
+                          "vec4 getColor(void) { return occTexture2D(occSamplerBaseColor, TexCoord.st / TexCoord.w); }";
                     }
                 }
             }
-            if ((theBits & Graphic3d_ShaderFlags_VertColor) != 0)
+            if ((theBits & (int)Graphic3d_ShaderFlags.Graphic3d_ShaderFlags_VertColor) != 0)
             {
-                aStageInOuts.Append(Graphic3d_ShaderObject::ShaderVariable("vec4 VertColor", Graphic3d_TOS_VERTEX | Graphic3d_TOS_FRAGMENT));
-                aSrcVertExtraMain += EOL"  VertColor = occVertColor;";
-                aSrcFragGetColor = EOL"vec4 getColor(void) { return VertColor; }";
+                aStageInOuts.Append(new Graphic3d_ShaderObject.ShaderVariable("vec4 VertColor", Graphic3d_TypeOfShaderObject.Graphic3d_TOS_VERTEX |Graphic3d_TypeOfShaderObject. Graphic3d_TOS_FRAGMENT));
+                aSrcVertExtraMain += "  VertColor = occVertColor;";
+                aSrcFragGetColor = "vec4 getColor(void) { return VertColor; }";
             }
 
             int aNbClipPlanes = 0;
@@ -759,8 +772,8 @@ namespace OCCPort.OpenGL
         }
 
         private string prepareGeomMainSrc(
-            Graphic3d_ShaderObject.ShaderVariableList theUnifoms,
-            Graphic3d_ShaderObject.ShaderVariableList theStageInOuts,
+            ShaderVariableList theUnifoms,
+            ShaderVariableList theStageInOuts,
             int theBits)
         {
 

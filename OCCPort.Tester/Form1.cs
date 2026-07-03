@@ -148,8 +148,8 @@ namespace OCCPort.Tester
 
         void Redraw()
         {
-            //GL.ClearColor(Color.Green);
-           // GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+           //GL.ClearColor(Color.Green);
+            //GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             proxy.iterate();
             glControl.SwapBuffers();

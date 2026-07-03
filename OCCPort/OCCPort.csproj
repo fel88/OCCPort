@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net9.0-windows</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <OutputType>Library</OutputType>
   </PropertyGroup>
   <ItemGroup>
@@ -17,7 +17,6 @@
     <PackageReference Include="OpenTK" Version="4.9.4" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\delabella\delabella.vcxproj" />
     <ProjectReference Include="..\OCCPort.Common\OCCPort.Common.csproj" />
     <ProjectReference Include="..\TKernel\TKernel.csproj" />
     <ProjectReference Include="..\TKG2d\TKG2d.csproj" />

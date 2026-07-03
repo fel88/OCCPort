@@ -64,9 +64,9 @@ namespace OCCPort.OpenGL
 
         //! Specifies the value of the float uniform 4x4 matrix.
         //! Wrapper for glUniformMatrix4fv()
-        public  bool SetUniform( OpenGl_Context theCtx,
+        public bool SetUniform(OpenGl_Context theCtx,
                                                GLint theLocation,
-                                                OpenGl_Mat4            theValue,
+                                                OpenGl_Mat4 theValue,
                                                bool theTranspose = false)
         {
 
@@ -458,12 +458,12 @@ namespace OCCPort.OpenGL
             }
             else
             {
-                if ((aShaderMask &(int) Graphic3d_TypeOfShaderObject.Graphic3d_TOS_COMPUTE) != 0)
+                if ((aShaderMask & (int)Graphic3d_TypeOfShaderObject.Graphic3d_TOS_COMPUTE) != 0)
                 {
                     if (!theCtx.IsGlGreaterEqual(4, 3))
                     {
                         //theCtx->PushMessage(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_HIGH,
-                                   //          "Error! Compute shaders require OpenGL 4.3+");
+                        //          "Error! Compute shaders require OpenGL 4.3+");
                         return false;
                     }
                     else if (aHeaderVer.IsEmpty())
@@ -476,7 +476,7 @@ namespace OCCPort.OpenGL
                     if (!theCtx.IsGlGreaterEqual(4, 0))
                     {
                         //theCtx->PushMessage(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_HIGH,
-                               //              "Error! Tessellation shaders require OpenGL 4.0+");
+                        //              "Error! Tessellation shaders require OpenGL 4.0+");
                         return false;
                     }
                     else if (aHeaderVer.IsEmpty())
@@ -488,8 +488,8 @@ namespace OCCPort.OpenGL
                 {
                     if (!theCtx.IsGlGreaterEqual(3, 2))
                     {
-                       // theCtx->PushMessage(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_HIGH,
-                       //                      "Error! Geometry shaders require OpenGL 3.2+");
+                        // theCtx->PushMessage(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_HIGH,
+                        //                      "Error! Geometry shaders require OpenGL 3.2+");
                         return false;
                     }
                     else if (aHeaderVer.IsEmpty())
@@ -524,12 +524,12 @@ namespace OCCPort.OpenGL
                 string anExtensions = "// Enable extensions used in OCCT GLSL programs\n";
                 if (myNbFragOutputs > 1)
                 {
-                    if (theCtx.hasDrawBuffers!=OpenGl_FeatureFlag.OpenGl_FeatureNotAvailable)
+                    if (theCtx.hasDrawBuffers != OpenGl_FeatureFlag.OpenGl_FeatureNotAvailable)
                     {
                         anExtensions += "#define OCC_ENABLE_draw_buffers\n";
                         switch (myOitOutput)
                         {
-                            case Graphic3d_RenderTransparentMethod. Graphic3d_RTM_BLEND_UNORDERED:
+                            case Graphic3d_RenderTransparentMethod.Graphic3d_RTM_BLEND_UNORDERED:
                                 break;
                             case Graphic3d_RenderTransparentMethod.Graphic3d_RTM_BLEND_OIT:
                                 anExtensions += "#define OCC_WRITE_WEIGHT_OIT_COVERAGE\n";
@@ -542,7 +542,7 @@ namespace OCCPort.OpenGL
                     else
                     {
                         //theCtx->PushMessage(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_HIGH,
-                          //                   "Error! Multiple draw buffers required by the program, but aren't supported by OpenGL");
+                        //                   "Error! Multiple draw buffers required by the program, but aren't supported by OpenGL");
                         return false;
                     }
 
@@ -563,14 +563,14 @@ namespace OCCPort.OpenGL
                     anExtensions += "#define OCC_ALPHA_TEST\n";
                 }
 
-                if (theCtx.hasSampleVariables == OpenGl_FeatureFlag. OpenGl_FeatureInExtensions)
+                if (theCtx.hasSampleVariables == OpenGl_FeatureFlag.OpenGl_FeatureInExtensions)
                 {
-                    if (theCtx.GraphicsLibrary() ==Aspect_GraphicsLibrary. Aspect_GraphicsLibrary_OpenGLES
+                    if (theCtx.GraphicsLibrary() == Aspect_GraphicsLibrary.Aspect_GraphicsLibrary_OpenGLES
                      && theCtx.oesSampleVariables)
                     {
                         anExtensions += "#extension GL_OES_sample_variables : enable\n";
                     }
-                    else if (theCtx.GraphicsLibrary() ==Aspect_GraphicsLibrary. Aspect_GraphicsLibrary_OpenGL
+                    else if (theCtx.GraphicsLibrary() == Aspect_GraphicsLibrary.Aspect_GraphicsLibrary_OpenGL
                           && theCtx.arbSampleShading)
                     {
                         anExtensions += "#extension GL_ARB_sample_shading : enable\n";
@@ -589,9 +589,9 @@ namespace OCCPort.OpenGL
                  && theCtx.GraphicsLibrary() == Aspect_GraphicsLibrary.Aspect_GraphicsLibrary_OpenGLES)
                 {
                     aPrecisionHeader = theCtx.hasHighp
-                                     ? "precision highp float;\n"+
+                                     ? "precision highp float;\n" +
                                        "precision highp int;\n"
-                                   : "precision mediump float;\n"+
+                                   : "precision mediump float;\n" +
                                      "precision mediump int;\n";
                 }
 
@@ -617,23 +617,23 @@ namespace OCCPort.OpenGL
                 {
                     aHeaderConstants += ("#define THE_NB_SHADOWMAPS ") + myNbShadowMaps + "\n";
                 }
-                //if (theCtx->caps->useZeroToOneDepth
-                // && theCtx->arbClipControl)
-                //{
-                //    aHeaderConstants += "#define THE_ZERO_TO_ONE_DEPTH\n";
-                //}
-                //if (!myProxy.IsNull()
-                //  && myProxy->HasDefaultSampler())
-                //{
-                //    aHeaderConstants += "#define THE_HAS_DEFAULT_SAMPLER\n";
-                //}
+                if (theCtx.caps.useZeroToOneDepth
+                 && theCtx.arbClipControl)
+                {
+                    aHeaderConstants += "#define THE_ZERO_TO_ONE_DEPTH\n";
+                }
+                if (myProxy != null
+                  && myProxy.HasDefaultSampler())
+                {
+                    aHeaderConstants += "#define THE_HAS_DEFAULT_SAMPLER\n";
+                }
                 if (myProxy != null)
                 {
                     if (myProxy.IsPBR())
                     {
                         aHeaderConstants += "#define THE_IS_PBR\n";
                     }
-                    if ((myProxy.TextureSetBits() & (int)Graphic3d_TextureSetBits. Graphic3d_TextureSetBits_BaseColor) != 0)
+                    if ((myProxy.TextureSetBits() & (int)Graphic3d_TextureSetBits.Graphic3d_TextureSetBits_BaseColor) != 0)
                     {
                         aHeaderConstants += "#define THE_HAS_TEXTURE_COLOR\n";
                     }
@@ -794,11 +794,11 @@ namespace OCCPort.OpenGL
             //          }
 
             string aSamplerNamePrefix = ("occSampler");
-            int aNbUnitsMax = Math.Max(theCtx.MaxCombinedTextureUnits(), (int)Graphic3d_TextureUnit. Graphic3d_TextureUnit_NB);
+            int aNbUnitsMax = Math.Max(theCtx.MaxCombinedTextureUnits(), (int)Graphic3d_TextureUnit.Graphic3d_TextureUnit_NB);
             for (int aUnitIter = 0; aUnitIter < aNbUnitsMax; ++aUnitIter)
             {
                 string aName = aSamplerNamePrefix + aUnitIter;
-                 aLocSampler = GetUniformLocation(theCtx, aName);
+                aLocSampler = GetUniformLocation(theCtx, aName);
                 if (aLocSampler != null)
                 {
                     SetUniform(theCtx, aLocSampler, aUnitIter);
@@ -897,7 +897,7 @@ namespace OCCPort.OpenGL
         {
             return myStateLocations[(int)theVariable];
         }
-        
+
         public bool SetUniform(OpenGl_Context theCtx, OpenGl_ShaderUniformLocation theLocation, Vector4 theValue)
         {
             if (myProgramID == NO_PROGRAM || theLocation.ToInt() == INVALID_LOCATION)

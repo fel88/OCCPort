@@ -34,5 +34,14 @@
   * ON by default.
   */
         public bool buffersOpaqueAlpha;
+
+
+        /**
+         * Disallow using OpenGL extensions.
+         * Should be used for debugging purposes only!
+         *
+         * OFF by default.
+         */
+        public bool contextNoExtensions;
     }
 }

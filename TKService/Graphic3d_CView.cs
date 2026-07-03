@@ -43,7 +43,7 @@ namespace TKService
         }
 
         //! Sets visualization type of the view.
-   public      void SetVisualizationType( Graphic3d_TypeOfVisualization theType) { myVisualization = theType; }
+        public void SetVisualizationType(Graphic3d_TypeOfVisualization theType) { myVisualization = theType; }
 
         //! Change Z layer of a structure already presented in view.
         public abstract void changeZLayer(Graphic3d_CStructure theCStructure,
@@ -58,10 +58,10 @@ namespace TKService
         }
 
         //! Sets backfacing model for the view.
-        public void SetBackfacingModel( Graphic3d_TypeOfBackfacingModel theModel) { myBackfacing = theModel; }
+        public void SetBackfacingModel(Graphic3d_TypeOfBackfacingModel theModel) { myBackfacing = theModel; }
 
         //! Sets background fill color.
-        public virtual void SetBackground( Aspect_Background theBackground) { myBgColor.SetRGB(theBackground.Color()); }
+        public virtual void SetBackground(Aspect_Background theBackground) { myBgColor.SetRGB(theBackground.Color()); }
 
         //! Return subview top-left position relative to parent view in pixels.
         public Graphic3d_Vec2i SubviewTopLeft() { return mySubviewTopLeft; }
@@ -899,10 +899,17 @@ namespace TKService
 
     public class Graphic3d_TextureParams
     {
+        //! Return modification counter of parameters related to sampler state.
+        public uint SamplerRevision()  { return mySamplerRevision; }
+
         public void SetModulate(bool theToModulate)
         {
             myToModulate = theToModulate;
         }
+
+        //! Default texture unit to be used, default is Graphic3d_TextureUnit_BaseColor.
+        public Graphic3d_TextureUnit TextureUnit() { return myTextureUnit; }
+        Graphic3d_TextureUnit myTextureUnit;     //!< default texture unit to bind texture; Graphic3d_TextureUnit_BaseColor by default
 
         public void SetGenMode(Graphic3d_TypeOfTextureMode theMode,
                                             Graphic3d_Vec4 thePlaneS,
@@ -940,9 +947,31 @@ namespace TKService
         Graphic3d_TOTM_SPRITE
     };
 
-    internal class Graphic3d_TypeOfTexture
+
+    //! Type of the texture file format.
+ public   enum Graphic3d_TypeOfTexture
     {
-    }
+        //! 1D texture (array).
+        //! Note that this texture type might be unsupported by graphics API (emulated by 2D texture with 1 pixel height).
+        Graphic3d_TypeOfTexture_1D,
+
+        //! 2D texture (image plane).
+        Graphic3d_TypeOfTexture_2D,
+
+        //! 3D texture (a set of image planes).
+        Graphic3d_TypeOfTexture_3D,
+
+        //! Cubemap texture (6 image planes defining cube sides).
+        Graphic3d_TypeOfTexture_CUBEMAP,
+
+        //! Obsolete type - Graphic3d_TextureRoot::SetMipmapsGeneration() should be used instead.
+        Graphic3d_TOT_2D_MIPMAP,
+
+        // old aliases
+        Graphic3d_TOT_1D = Graphic3d_TypeOfTexture_1D,
+        Graphic3d_TOT_2D = Graphic3d_TypeOfTexture_2D,
+        Graphic3d_TOT_CUBEMAP = Graphic3d_TypeOfTexture_CUBEMAP
+    };
     public class Image_PixMap
     {
     }

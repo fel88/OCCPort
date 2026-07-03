@@ -93,6 +93,10 @@ namespace TKernel
 
         }
 
+        public NCollection_Vec3(Graphic3d_Vec2i theSizeXY, int v1) : this()
+        {
+        }
+
 
         //! Computes the square of vector modulus(magnitude, length).
         //! This method may be used for performance tricks.
@@ -202,6 +206,13 @@ namespace TKernel
 
         }
 
+        //! Constructor from 2-components vector + optional 3rd value.
+        public NCollection_Vec3(NCollection_Vec2<T> theVec2, T theZ = default)
+        {
+            v[0] = theVec2[0];
+            v[1] = theVec2[1];
+            v[2] = theZ;
+        }
         //public void Normalize()
         //{
         //    T aModulus = Modulus();
