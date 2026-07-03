@@ -1,4 +1,7 @@
-﻿namespace TKMath
+﻿using OCCPort.Common;
+using TKernel;
+
+namespace TKMath
 {
     public class gp_Trsf
     {
@@ -9,6 +12,80 @@
             shape = gp_TrsfForm.gp_Identity;
             matrix = new gp_Mat(1, 0, 0, 0, 1, 0, 0, 0, 1);
             loc = new gp_XYZ(0.0, 0.0, 0.0);
+        } //! Convert transformation to 4x4 matrix.
+        
+  public void GetMat4(NCollection_Mat4<float> theMat) 
+  {
+    if (shape == gp_TrsfForm.gp_Identity)
+    {
+      theMat.InitIdentity();
+      return;
+    }
+
+    theMat.SetValue(0, 0, (float)(Value (1, 1)));
+    theMat.SetValue(0, 1, (float)(Value (1, 2)));
+    theMat.SetValue(0, 2, (float)(Value (1, 3)));
+    theMat.SetValue(0, 3, (float)(Value (1, 4)));
+    theMat.SetValue(1, 0, (float)(Value (2, 1)));
+    theMat.SetValue(1, 1, (float)(Value (2, 2)));
+    theMat.SetValue(1, 2, (float)(Value (2, 3)));
+    theMat.SetValue(1, 3, (float)(Value (2, 4)));
+    theMat.SetValue(2, 0, (float)(Value (3, 1)));
+    theMat.SetValue(2, 1, (float)(Value (3, 2)));
+    theMat.SetValue(2, 2, (float)(Value (3, 3)));
+    theMat.SetValue(2, 3, (float)(Value (3, 4)));
+    theMat.SetValue(3, 0, (float)(0));
+    theMat.SetValue(3, 1, (float)(0));
+    theMat.SetValue(3, 2, (float)(0));
+    theMat.SetValue(3, 3, (float)(1));
+  }
+public void SetTranslationPart(gp_Vec V)
+        {
+
+            loc = V.XYZ();
+            bool locnull = (loc.SquareModulus() < gp.Resolution());
+
+            switch (shape)
+            {
+
+                case gp_TrsfForm. gp_Identity:
+                    if (!locnull) shape = gp_TrsfForm.gp_Translation;
+                    break;
+
+                    case gp_TrsfForm.gp_Translation:
+                    if (locnull) shape = gp_TrsfForm.gp_Identity;
+                    break;
+
+                case gp_TrsfForm.gp_Rotation:
+                case gp_TrsfForm.gp_PntMirror:
+                case gp_TrsfForm.gp_Ax1Mirror:
+                case gp_TrsfForm.gp_Ax2Mirror:
+                case gp_TrsfForm.gp_Scale:
+                case gp_TrsfForm.gp_CompoundTrsf:
+                case gp_TrsfForm.gp_Other:
+                    if (!locnull)
+                    {
+                        shape = gp_TrsfForm.gp_CompoundTrsf;
+                    }
+                    break;
+            }
+        }
+
+        //! Returns the coefficients of the transformation's matrix.
+        //! It is a 3 rows * 4 columns matrix.
+        //! This coefficient includes the scale factor.
+        //! Raises OutOfRanged if theRow < 1 or theRow > 3 or theCol < 1 or theCol > 4
+        public double Value(int theRow, int theCol)
+        {
+            Exceptions.Standard_OutOfRange_Raise_if(theRow < 1 || theRow > 3 || theCol < 1 || theCol > 4, " ");
+            if (theCol < 4)
+            {
+                return scale * matrix.Value(theRow, theCol);
+            }
+            else
+            {
+                return loc.Coord(theRow);
+            }
         }
 
         //! Computes the following composition of transformations
@@ -340,7 +417,7 @@
         //! scale factor to obtain the coefficients of the transformation.
         public gp_Mat HVectorialPart() { return matrix; }
 
-        internal gp_XYZ TranslationPart()
+        public gp_XYZ TranslationPart()
         {
             return loc;
         }

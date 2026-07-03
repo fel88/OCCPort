@@ -11,8 +11,12 @@ namespace TKService
         public Graphic3d_BndBox3d myBndBox;
         internal int highlight;
         public int visible;
+        
         int myId;
         Graphic3d_SequenceOfHClipPlane myClipPlanes;
+
+        //! Create shadow link to this structure
+        public abstract Graphic3d_CStructure ShadowLink( Graphic3d_StructureManager theManager) ;
 
         //! Set transformation persistence.
         public virtual void SetTransformPersistence(Graphic3d_TransformPers theTrsfPers) { myTrsfPers = theTrsfPers; }
@@ -28,7 +32,7 @@ namespace TKService
         //! Return transformation.
         public TopLoc_Datum3D Transformation() { return myTrsf; }
 
-        TopLoc_Datum3D myTrsf;
+protected         TopLoc_Datum3D myTrsf;
         //! Connect other structure to this one
         public abstract void Connect(Graphic3d_CStructure theStructure);
 
@@ -37,7 +41,7 @@ namespace TKService
         //! Assign transformation.
         public virtual void SetTransformation(TopLoc_Datum3D theTrsf) { myTrsf = theTrsf; }
 
-        public bool IsInfinite { get; internal set; }
+        public bool IsInfinite { get; set; }
         public bool IsForHighlight;
         public bool IsMutable;
         public bool Is2dText;
@@ -104,7 +108,7 @@ namespace TKService
             return myId;
         }
 
-        internal Graphic3d_TransformPers TransformPersistence()
+        public Graphic3d_TransformPers TransformPersistence()
         {
             return myTrsfPers;
         }
@@ -129,7 +133,7 @@ namespace TKService
         //! Get z layer ID
         public Graphic3d_ZLayerId ZLayer() { return myZLayer; }
 
-        Graphic3d_ZLayerId myZLayer;
+        protected Graphic3d_ZLayerId myZLayer;
 
         internal bool IsAlwaysRendered()
         {
@@ -148,9 +152,9 @@ namespace TKService
         //! Return structure display priority.
         public Graphic3d_DisplayPriority Priority() { return myPriority; }
 
-        internal void updateLayerTransformation()
+        public virtual void updateLayerTransformation()
         {
-            throw new NotImplementedException();
+            
         }
 
         internal void ChangeBoundingBox(Graphic3d_BndBox3d aBox)

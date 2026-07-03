@@ -11,15 +11,15 @@
 
             myPresentationManager = (thePrsMgr);
             myPresentableObject = (thePrsObject);
-            //myBeforeHighlightState=(State_Empty);
+            myBeforeHighlightState = (int)BeforeHighlightState.State_Empty;
             myMode = (theMode);
-            /*myMustBeUpdated = false;
-			if (thePrsObject.TypeOfPresentation3d() == PrsMgr_TOP_ProjectorDependent)
-			{
-				SetVisual(Graphic3d_TOS_COMPUTED);
-			}
-			SetOwner(myPresentableObject);
-			SetMutable(myPresentableObject->IsMutable());*/
+            myMustBeUpdated = false;
+            if (thePrsObject.TypeOfPresentation3d() == PrsMgr_TypeOfPresentation3d. PrsMgr_TOP_ProjectorDependent)
+            {
+                SetVisual(TKService.Graphic3d_TypeOfStructure.Graphic3d_TOS_COMPUTED);
+            }
+            SetOwner(myPresentableObject);
+            SetMutable(myPresentableObject.IsMutable());
         }
 
         PrsMgr_PresentationManager myPresentationManager;

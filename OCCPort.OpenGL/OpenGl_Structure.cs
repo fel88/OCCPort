@@ -1,8 +1,11 @@
 ﻿using OCCPort.Common;
 using OCCPort.Tester;
+using OpenTK.Graphics.OpenGL;
 using System;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text.RegularExpressions;
+using TKMath;
 using TKService;
 
 
@@ -11,11 +14,68 @@ namespace OCCPort.OpenGL
     //! Implementation of low-level graphic structure.
     public class OpenGl_Structure : Graphic3d_CStructure
     {
+        //! Returns instanced OpenGL structure.
+        public OpenGl_Structure InstancedStructure() { return myInstancedStructure; }
 
-        OpenGl_Structure myInstancedStructure;
 
+        protected OpenGl_Structure myInstancedStructure;
+        public override void SetTransformation(TopLoc_Datum3D theTrsf)
+        {
+            myTrsf = theTrsf;
+            myIsMirrored = false;
+            if (myTrsf != null)
+            {
+                // Determinant of transform matrix less then 0 means that mirror transform applied.
+                gp_Trsf aTrsf = myTrsf.Transformation();
+                double aDet = aTrsf.Value(1, 1) * (aTrsf.Value(2, 2) * aTrsf.Value(3, 3) - aTrsf.Value(3, 2) * aTrsf.Value(2, 3))
+                                        - aTrsf.Value(1, 2) * (aTrsf.Value(2, 1) * aTrsf.Value(3, 3) - aTrsf.Value(3, 1) * aTrsf.Value(2, 3))
+                                        + aTrsf.Value(1, 3) * (aTrsf.Value(2, 1) * aTrsf.Value(3, 2) - aTrsf.Value(3, 1) * aTrsf.Value(2, 2));
+                myIsMirrored = aDet < 0.0;
+            }
+
+            updateLayerTransformation();
+            if (IsRaytracable())
+            {
+                ++myModificationState;
+            }
+        }
+
+        bool myIsMirrored; //!< Used to tell OpenGl to interpret polygons in clockwise order.
+
+        int myModificationState;
         public OpenGl_Structure(Graphic3d_StructureManager theManager) : base(theManager)
         {
+            myInstancedStructure = (null);
+            myIsRaytracable = (false);
+            myModificationState = (0);
+            myIsMirrored = false;
+
+            updateLayerTransformation();
+        }
+        public override void updateLayerTransformation()
+        {
+            gp_Trsf aRenderTrsf = new gp_Trsf();
+            if (myTrsf != null)
+            {
+                aRenderTrsf = myTrsf.Trsf();
+            }
+
+            Graphic3d_ZLayerSettings aLayer = myGraphicDriver.ZLayerSettings(myZLayer);
+            if (aLayer.OriginTransformation() != null
+              && myTrsfPers == null)
+            {
+                aRenderTrsf.SetTranslationPart( 
+                    new gp_Vec (
+                    aRenderTrsf.TranslationPart() - aLayer.Origin()));
+            }
+            aRenderTrsf.GetMat4(myRenderTrsf);
+        }
+
+        Graphic3d_Mat4 myRenderTrsf=new TKernel.NCollection_Mat4<float> (); //!< transformation, actually used for rendering (includes Local Origin shift)
+
+        public override Graphic3d_CStructure ShadowLink(Graphic3d_StructureManager theManager)
+        {
+            return new OpenGl_StructureShadow(theManager, this);
         }
 
         //! Connect other structure to this one
@@ -24,7 +84,7 @@ namespace OCCPort.OpenGL
 
             OpenGl_Structure aStruct = (OpenGl_Structure)theStructure;
 
-            Exceptions. Standard_ASSERT_RAISE(myInstancedStructure == null || myInstancedStructure == aStruct,
+            Exceptions.Standard_ASSERT_RAISE(myInstancedStructure == null || myInstancedStructure == aStruct,
               "Error! Instanced structure is already defined");
 
             myInstancedStructure = aStruct;
@@ -101,7 +161,7 @@ namespace OCCPort.OpenGL
 
         public OpenGl_GraphicDriver GlDriver()
         {
-    //return (OpenGl_GraphicDriver* )myGraphicDriver.operator->();
+            //return (OpenGl_GraphicDriver* )myGraphicDriver.operator->();
             return (OpenGl_GraphicDriver)myGraphicDriver;
         }
 

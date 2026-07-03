@@ -6,7 +6,17 @@ namespace TKV3d
 {
     //! Defines a "shadow" of existing presentation object with custom aspects.
     public class Prs3d_PresentationShadow : Graphic3d_Structure
-    {
+    {//! Constructs a shadow of existing presentation object.
+        public Prs3d_PresentationShadow(Graphic3d_StructureManager theViewer,
+                                             Graphic3d_Structure thePrs)
+            : base(theViewer, thePrs)
+        {
+
+            myParentAffinity = thePrs.CStructure().ViewAffinity;
+            myParentStructId = thePrs.Identification();
+
+        }
+
         //! Returns the id of the parent presentation
         public int ParentId() { return myParentStructId; }
         int myParentStructId;
@@ -14,7 +24,7 @@ namespace TKV3d
         public Graphic3d_ViewAffinity ParentAffinity() { return myParentAffinity; }
 
         Graphic3d_ViewAffinity myParentAffinity;
-  
+
 
     }
 }

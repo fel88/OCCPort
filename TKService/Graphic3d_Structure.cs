@@ -10,9 +10,44 @@ namespace TKService
     //! This graphic structure can be connected with another graphic structure.
     public class Graphic3d_Structure
     {
-        public Graphic3d_Structure()
+      public   void SetOwner( object theOwner) { myOwner = theOwner; }
+        //! Sets if the structure location has mutable nature (content or location will be changed regularly).
+        public void SetMutable(bool theIsMutable)
         {
+            if (myCStructure != null) { myCStructure.IsMutable = theIsMutable; }
         }
+
+        //! Creates a graphic object in the manager theManager.
+        //! It will appear in all the views of the visualiser.
+        //! The structure is not displayed when it is created.
+        //! @param theManager structure manager holding this structure
+        //! @param theLinkPrs another structure for creating a shadow (linked) structure
+        public Graphic3d_Structure(Graphic3d_StructureManager theManager,
+                    Graphic3d_Structure theLinkPrs = null)
+        {
+            myStructureManager = theManager;
+            myOwner = null;
+            myVisual = Graphic3d_TypeOfStructure.Graphic3d_TOS_ALL;
+            myComputeVisual = Graphic3d_TypeOfStructure.Graphic3d_TOS_ALL;
+
+            if (theLinkPrs != null)
+            {
+                myOwner = theLinkPrs.myOwner;
+                if (theLinkPrs.myVisual != Graphic3d_TypeOfStructure.Graphic3d_TOS_COMPUTED)
+                {
+                    myVisual = theLinkPrs.myVisual;
+                }
+                myComputeVisual = theLinkPrs.myComputeVisual;
+                myCStructure = theLinkPrs.myCStructure.ShadowLink(theManager);
+            }
+            else
+            {
+                myCStructure = theManager.GraphicDriver().CreateStructure(theManager);
+            }
+
+
+        }
+        object myOwner;
 
         //! Returns the highlight attributes.
         public Graphic3d_PresentationAttributes HighlightStyle() { return myCStructure.HighlightStyle(); }
@@ -416,7 +451,7 @@ namespace TKService
                                   bool theToIgnoreInfiniteFlag)
         {
             Graphic3d_BndBox4f aBoxF = minMaxCoord();
-            
+
             if (aBoxF.IsValid())
             {
                 theBox = new Graphic3d_BndBox3d(new Graphic3d_Vec3d((double)aBoxF.CornerMin().X,
@@ -452,7 +487,7 @@ namespace TKService
         void addTransformed(Graphic3d_BndBox3d theBox,
                                           bool theToIgnoreInfiniteFlag)
         {
-            Graphic3d_BndBox3d aCombinedBox=new Graphic3d_BndBox3d (), aBox=new Graphic3d_BndBox3d ();
+            Graphic3d_BndBox3d aCombinedBox = new Graphic3d_BndBox3d(), aBox = new Graphic3d_BndBox3d();
             getBox(ref aCombinedBox, theToIgnoreInfiniteFlag);
 
             //for (NCollection_IndexedMap<Graphic3d_Structure*>::Iterator anIter (myDescendants); anIter.More(); anIter.Next())
@@ -605,12 +640,6 @@ namespace TKService
 
         Graphic3d_StructureManager myStructureManager;
 
-        public Graphic3d_Structure(Graphic3d_StructureManager theManager)
-        {
-            myStructureManager = theManager;
-            myCStructure = theManager.GraphicDriver().CreateStructure(theManager);
-
-        }
 
         public Graphic3d_Group NewGroup()
         {
@@ -665,10 +694,10 @@ namespace TKService
 
         internal void Highlight(object value, bool v)
         {
-            
+
         }
 
-       
+
     }
     public class Graphic3d_SequenceOfHClipPlane
     {

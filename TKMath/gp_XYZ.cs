@@ -67,6 +67,24 @@ namespace TKMath
             y -= theOther.y;
             z -= theOther.z;
         }
+        //! returns the coordinate of range theIndex :
+        //! theIndex = 1 => X is returned
+        //! theIndex = 2 => Y is returned
+        //! theIndex = 3 => Z is returned
+        //!
+        //! Raises OutOfRange if theIndex != {1, 2, 3}.
+        public double Coord(int theIndex)
+        {
+            Exceptions.Standard_OutOfRange_Raise_if(theIndex < 1 || theIndex > 3, null);
+            if (theIndex == 1)
+                return x;
+            if (theIndex == 2)
+                return y;
+            if (theIndex == 3)
+                return z;
+            //return (&x)[theIndex - 1];
+            throw new NotImplementedException();
+        }
 
         public void Coord(ref double theX, ref double theY, ref double theZ)
         {

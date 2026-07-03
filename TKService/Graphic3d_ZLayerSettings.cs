@@ -1,4 +1,5 @@
-﻿using TKMath;
+﻿using System.Reflection.Metadata;
+using TKMath;
 
 namespace TKService
 {
@@ -10,6 +11,9 @@ namespace TKService
 
         //! Return the origin of all objects within the layer.
         public gp_XYZ Origin() { return myOrigin; }
+
+        //! Return the transformation to the origin.
+        public  TopLoc_Datum3D OriginTransformation()  { return myOriginTrsf; }
 
         //! Returns TRUE if layer should be processed by ray-tracing renderer; TRUE by default.
         //! Note that this flag is IGNORED for layers with IsImmediate() flag.

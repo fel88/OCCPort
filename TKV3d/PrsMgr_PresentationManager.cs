@@ -69,7 +69,7 @@ namespace TKV3d
                 foreach (var anActiveViewIter in theViewer.myActiveViews)
                 {
                     Graphic3d_CView aView = anActiveViewIter.View();
-                    Graphic3d_Structure aViewDepParentPrs = new Graphic3d_Structure();
+                    Graphic3d_Structure aViewDepParentPrs = null;
                     if (aView.IsComputed(aParentId, ref aViewDepParentPrs))
                     {
                         updatePrsTransformation(myViewDependentImmediateList,
@@ -89,7 +89,7 @@ namespace TKV3d
             aPrs.Connect(aPrsOther, Graphic3d_TypeOfConnection.Graphic3d_TOC_DESCENDANT);
         }
 
-        internal void Display(AIS_InteractiveObject thePrsObj, int theMode)
+        internal void Display(PrsMgr_PresentableObject thePrsObj, int theMode)
         {
 
             if (thePrsObj.HasOwnPresentations())
@@ -111,20 +111,20 @@ namespace TKV3d
             }
             else
             {
-                thePrsObj.Compute(this, new Prs3d_Presentation(), theMode);
+                thePrsObj.Compute(this, null, theMode);
             }
 
-            /*if (thePrsObj.ToPropagateVisualState())
+            if (thePrsObj.ToPropagateVisualState())
 			{
-				for (PrsMgr_ListOfPresentableObjectsIter anIter(thePrsObj.Children()); anIter.More(); anIter.Next())
+				for (PrsMgr_ListOfPresentableObjectsIter anIter=new PrsMgr_ListOfPresentableObjectsIter (thePrsObj.Children()); anIter.More(); anIter.Next())
 				{
 					PrsMgr_PresentableObject aChild = anIter.Value();
-					if (aChild.DisplayStatus() != PrsMgr_DisplayStatus_Erased)
+					if (aChild.DisplayStatus() != PrsMgr_DisplayStatus.PrsMgr_DisplayStatus_Erased)
 					{
 						Display(anIter.Value(), theMode);
 					}
 				}
-			}*/
+			}
 
         }
 
@@ -288,13 +288,13 @@ namespace TKV3d
                     if (aPrs == null)
                         continue;
 
-                    Graphic3d_Structure aViewDepPrs = new Graphic3d_Structure();
+                    Graphic3d_Structure aViewDepPrs = null;
                     Prs3d_PresentationShadow aShadowPrs = (Prs3d_PresentationShadow)(aPrs);
                     if (aShadowPrs != null && aView.IsComputed(aShadowPrs.ParentId(), ref aViewDepPrs))
                     {
                         Graphic3d_ZLayerId aZLayer = aShadowPrs.GetZLayer();
                         aShadowPrs = null;
-
+                        throw new NotImplementedException();
                         /*aShadowPrs = new Prs3d_PresentationShadow(myStructureManager, aViewDepPrs);
                         aShadowPrs.SetZLayer(aZLayer);
                         aShadowPrs.SetClipPlanes(aViewDepPrs->ClipPlanes());

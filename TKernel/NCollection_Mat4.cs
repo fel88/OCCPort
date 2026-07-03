@@ -279,13 +279,13 @@ namespace TKernel
             Multiply(aTempMat);
         }
 
-        double[] MyIdentityArray =
+       static  double[] MyIdentityArray =
          {1, 0, 0, 0,
    0, 1, 0, 0,
    0, 0, 1, 0,
    0, 0, 0, 1};
 
-        float[] MyIdentityArrayF =
+        static float[] MyIdentityArrayF =
                  {1, 0, 0, 0,
    0, 1, 0, 0,
    0, 0, 1, 0,
@@ -351,7 +351,7 @@ namespace TKernel
 
         }
 
-        private void SetValue(int theRow, int theCol, Element_t theValue)
+        public void SetValue(int theRow, int theCol, Element_t theValue)
         {
             myMat[theCol * 4 + theRow] = theValue;
         }

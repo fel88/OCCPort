@@ -19,6 +19,13 @@ namespace TKV3d
     //! For more sophisticated configuring, Prs3d_Drawer should be modified directly, while short-cuts might be left unimplemented.
     public abstract class PrsMgr_PresentableObject
     {
+
+
+        //! Returns true if object has mutable nature (content or location are be changed regularly).
+        //! Mutable object will be managed in different way than static onces (another optimizations).
+        public bool IsMutable()  { return myIsMutable; }
+
+
         //! Get value of the flag "propagate visual state"
         //! It means that the display/erase/color visual state is propagated automatically to all children;
         //! by default, the flag is true 
@@ -323,6 +330,10 @@ namespace TKV3d
         //! @sa Graphic3d_TransformPers class description
         public Graphic3d_TransformPers TransformPersistence() { return myTransformPersistence; }
 
-    }
+
+        //! Returns information on whether the object accepts display in HLR mode or not.
+        public PrsMgr_TypeOfPresentation3d TypeOfPresentation3d()  { return myTypeOfPresentation3d; }
+
+}
 }
 
