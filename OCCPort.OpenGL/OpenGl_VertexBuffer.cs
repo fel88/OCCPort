@@ -14,13 +14,13 @@ namespace OCCPort.OpenGL
             //const int GL_ARRAY_BUFFER = 0x8892;			
 		}
 
-        internal bool HasColorAttribute()
+        public virtual bool HasColorAttribute()
         {
             return false;
 
         }
 
-        internal bool HasNormalAttribute()
+        public virtual bool HasNormalAttribute()
 		{
 			return false;
 		}

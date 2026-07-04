@@ -95,14 +95,14 @@ namespace OCCPort.OpenGL
             myIsInitialized = (false);
             myIsStereoBuffers = (false);
             myHasMsaaTextures = (false);
-            //myIsGlNormalizeEnabled = (false);
+            myIsGlNormalizeEnabled = (false);
             mySpriteTexUnit = Graphic3d_TextureUnit.Graphic3d_TextureUnit_PointSprite;
             //myHasRayTracing = (false);
 
             //myHasRayTracingTextures = (false);
             //myHasRayTracingAdaptiveSampling = (false);
             //myHasRayTracingAdaptiveSamplingAtomic = false;
-            //myHasPBR = (false);
+            myHasPBR = (false);
             /*
 myPBREnvLUTTexUnit       (Graphic3d_TextureUnit_PbrEnvironmentLUT),
 myPBRDiffIBLMapSHTexUnit (Graphic3d_TextureUnit_PbrIblDiffuseSH),
@@ -121,11 +121,12 @@ myPointSpriteOrig (GL_UPPER_LEFT),*/
             myPolygonMode = (int)All.Fill;
 
             myFaceCulling = Graphic3d_TypeOfBackfacingModel.Graphic3d_TypeOfBackfacingModel_DoubleSided;
-            //myReadBuffer (0),*/
+            myReadBuffer = (0);
             myDrawBuffers = new NCollection_Array1<int>(0, 7);
+
+            myDefaultVao = (0);
+            //myColorMask = (true);
             /*
-myDefaultVao (0),
-myColorMask (true),
 myAlphaToCoverage (false),
 myIsGlDebugCtx (false),
 myIsWindowDeepColor (false),
@@ -156,13 +157,119 @@ myLineFeather (1.0f),*/
             myShaderManager = new OpenGl_ShaderManager(this);
             mySharedResources = (new OpenGl_ResourcesMap());
 
+        }        
+        
 
+        public void DisableFeatures()
+        {
+            // Disable stuff that's likely to slow down glDrawPixels.
+            core11fwd.glDisable(All.Dither);
+            core11fwd.glDisable(All.Blend);
+            core11fwd.glDisable(All.DepthTest);
+            core11fwd.glDisable(All.StencilTest);
+
+            if (core11ffp == null)
+            {
+                return;
+            }
+
+            core11fwd.glDisable(All.Texture1D);
+            core11fwd.glDisable(All.Texture2D);
+
+            core11fwd.glDisable(All.Lighting);
+            core11fwd.glDisable(All.AlphaTest);
+            core11fwd.glDisable(All.Fog);
+            core11fwd.glDisable(All.LogicOp);
+
+            core11ffp.glPixelTransferi(All.MapColor, 0);//false
+            core11ffp.glPixelTransferi(All.RedScale, 1);
+            core11ffp.glPixelTransferi(All.RedBias, 0);
+            core11ffp.glPixelTransferi(All.GreenScale, 1);
+            core11ffp.glPixelTransferi(All.GreenBias, 0);
+            core11ffp.glPixelTransferi(All.BlueScale, 1);
+            core11ffp.glPixelTransferi(All.BlueBias, 0);
+            core11ffp.glPixelTransferi(All.AlphaScale, 1);
+            core11ffp.glPixelTransferi(All.AlphaBias, 0);
+
+            if (IsGlGreaterEqual(1, 2))
+            {
+                if (CheckExtension("GL_CONVOLUTION_1D_EXT"))
+                {
+                    core11fwd.glDisable(All.Convolution1DExt);
+                }
+                if (CheckExtension("GL_CONVOLUTION_2D_EXT"))
+                {
+                    core11fwd.glDisable(All.Convolution2DExt);
+                }
+                if (CheckExtension("GL_SEPARABLE_2D_EXT"))
+                {
+                    core11fwd.glDisable(All.Separable2DExt);
+                }
+                if (CheckExtension("GL_SEPARABLE_2D_EXT"))
+                {
+                    core11fwd.glDisable(All.HistogramExt);
+                }
+                if (CheckExtension("GL_MINMAX_EXT"))
+                {
+                    core11fwd.glDisable(All.MinmaxExt);
+                }
+                if (CheckExtension("GL_TEXTURE_3D_EXT"))
+                {
+                    core11fwd.glDisable(All.Texture3DExt);
+                }
+            }
         }
 
-public bool extPDS;             //!< GL_EXT_packed_depth_stencil
+        //! Get maximum number of clip planes supported by OpenGl.
+        //! This value is implementation dependent. At least 6
+        //! planes should be supported by OpenGl (see specs).
+        //! @return value for GL_MAX_CLIP_PLANES
+        public int MaxClipPlanes()  { return myMaxClipPlanes; }
+
+        //! Returns TRUE if PBR shading model is supported.
+        //! Basically, feature requires OpenGL 3.0+ / OpenGL ES 3.0+ hardware; more precisely:
+        //! - Graphics hardware with moderate capabilities for compiling long enough GLSL program.
+        //! - FBO (e.g. for baking environment).
+        //! - Multi-texturing with >= 4 units (LUT and IBL textures).
+        //! - GL_RG32F texture format (arbTexRG + arbTexFloat)
+        //! - Cubemap texture lookup textureCubeLod()/textureLod() with LOD index within Fragment Shader,
+        //!   which requires GLSL OpenGL 3.0+ / OpenGL ES 3.0+ or OpenGL 2.1 + GL_EXT_gpu_shader4 extension.
+        public bool HasPBR()  { return myHasPBR; }
+        bool myHasPBR;                      //!< indicates whether PBR shading model is supported
+
+
+        bool myIsGlNormalizeEnabled; //!< GL_NORMALIZE flag
+                                                 //!< Used to tell OpenGl that normals should be normalized
+        public bool SetGlNormalizeEnabled(bool isEnabled)
+        {
+            if (isEnabled == myIsGlNormalizeEnabled)
+            {
+                return myIsGlNormalizeEnabled;
+            }
+
+            bool anOldGlNormalize = myIsGlNormalizeEnabled;
+            myIsGlNormalizeEnabled = isEnabled;
+
+            if (core11ffp != null)
+            {
+                if (isEnabled)
+                {
+                    core11fwd.glEnable(All.Normalize);
+                }
+                else
+                {
+                    core11fwd.glDisable(All.Normalize);
+                }
+            }
+
+            return anOldGlNormalize;
+        }
+
+
+        public bool extPDS;             //!< GL_EXT_packed_depth_stencil
 
         //! @return true if MSAA textures are supported.
-        public bool HasTextureMultisampling()  { return myHasMsaaTextures; }
+        public bool HasTextureMultisampling() { return myHasMsaaTextures; }
 
 
 
@@ -827,8 +934,40 @@ public bool extPDS;             //!< GL_EXT_packed_depth_stencil
 
             myFuncs.load(this, theIsCoreProfile);
 
+
+            if (hasDrawBuffers != OpenGl_FeatureFlag.OpenGl_FeatureNotAvailable)
+            {
+                core11fwd.glGetIntegerv(All.MaxDrawBuffers, ref myMaxDrawBuffers);
+                core11fwd.glGetIntegerv(All.MaxColorAttachments, ref myMaxColorAttachments);
+                if (myDrawBuffers.Length() < myMaxDrawBuffers)
+                {
+                    myDrawBuffers.Resize(0, myMaxDrawBuffers - 1, false);
+                }
+            }
+
+            if (myGapi != Aspect_GraphicsLibrary.Aspect_GraphicsLibrary_OpenGLES)
+            {
+                if (core32 != null && core11ffp == null)
+                {
+                    uint[] ar = [myDefaultVao];
+                    core32.glGenVertexArrays(1, ar);
+                    myDefaultVao = ar[0];
+                }
+
+                myTexClamp = (int)(IsGlGreaterEqual(1, 2) ? All.ClampToEdge : All.Clamp);
+
+                GLint aStereo = 0;
+                core11fwd.glGetIntegerv(All.Stereo, ref aStereo);
+                myIsStereoBuffers = aStereo == 1;
+
+                // get number of maximum clipping planes
+                core11fwd.glGetIntegerv(All.MaxClipPlanes, ref myMaxClipPlanes);
+            }
+
         }
         OpenGl_GlFunctions myFuncs;                //!< mega structure for all GL functions
+
+
         internal bool MakeCurrent()
         {
             /*if (myDisplay == null || myGContext == null)
@@ -898,13 +1037,17 @@ public bool extPDS;             //!< GL_EXT_packed_depth_stencil
 
             core32.glBindVertexArray(myDefaultVao);
         }
+        [DllImport("gdi32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool SwapBuffers(IntPtr hdc);
 
         public void SwapBuffers()
         {
 
             if (myDisplay != null)
             {
-                //??SwapBuffers((HDC)myDisplay);
+               
+                SwapBuffers(myDisplay);
                 core11fwd.glFlush();
             }
 
@@ -1133,12 +1276,15 @@ public bool extPDS;             //!< GL_EXT_packed_depth_stencil
 
         }
 
-        
 
-            //! Access entire map of loaded OpenGL functions.
-            public  OpenGl_GlFunctions Functions()  { return myFuncs; }
 
-        
+        //! Access entire map of loaded OpenGL functions.
+        public OpenGl_GlFunctions Functions() { return myFuncs; }
+
+        internal void EnableFeatures()
+        {
+            
+        }
 
         bool myIsSRgbActive;    //!< flag indicating GL_FRAMEBUFFER_SRGB state
 
@@ -1182,7 +1328,7 @@ public bool extPDS;             //!< GL_EXT_packed_depth_stencil
     public interface IOpenGl_ArbSamplerObject
     {
         void glBindSampler(Graphic3d_TextureUnit theUnit, uint mySamplerID);
-        void glDeleteSamplers(int v,  uint[] mySamplerID);
+        void glDeleteSamplers(int v, uint[] mySamplerID);
     }
-    
+
 }

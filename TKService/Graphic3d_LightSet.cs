@@ -8,6 +8,19 @@ namespace TKService
     //! Class defining the set of light sources.
     public class Graphic3d_LightSet
     {
+        public Graphic3d_LightSet()
+        {
+            //myAmbient=new   (0.0f, 0.0f, 0.0f, 0.0f),
+            myNbEnabled = (0);
+            myNbCastShadows = 0;
+            myRevision = (1);
+            //myCacheRevision(0)
+
+            // memset(myLightTypes, 0, sizeof(myLightTypes));
+            //    memset(myLightTypesEnabled, 0, sizeof(myLightTypesEnabled));
+        }
+
+
         NCollection_IndexedDataMap<Graphic3d_CLight, int> myLights = new NCollection_IndexedDataMap<Graphic3d_CLight, int>();              //!< list of light sources with their cached state (revision)
         int[] myLightTypes = new int[(int)Graphic3d_TypeOfLightSource.Graphic3d_TypeOfLightSource_NB]; //!< counters per each light source type defined in the list
         public bool Add(Graphic3d_CLight theLight)
@@ -46,9 +59,11 @@ namespace TKService
         //! @sa UpdateRevision()
         public string KeyEnabledShort() { return myKeyEnabledShort; }
 
+        //! Returns total amount of enabled lights castings shadows.
+        //! @sa UpdateRevision()
         public int NbCastShadows()
         {
-            throw new NotImplementedException();
+            return myNbCastShadows;
         }
 
         //int myLightTypes[Graphic3d_TypeOfLightSource_NB]; //!< counters per each light source type defined in the list
@@ -61,31 +76,5 @@ namespace TKService
         string myKeyEnabledLong;         //!< key identifying the list of enabled light sources by their type
         string myKeyEnabledShort;        //!< key identifying the list of enabled light sources by the number of sources of each type
     }
-
-
-
-    //! Definition of all the type of light source.
-    public enum Graphic3d_TypeOfLightSource
-    {
-        Graphic3d_TypeOfLightSource_Ambient,     //!< ambient light
-        Graphic3d_TypeOfLightSource_Directional, //!< directional light
-        Graphic3d_TypeOfLightSource_Positional,  //!< positional light
-        Graphic3d_TypeOfLightSource_Spot,        //!< spot light
-
-        // obsolete aliases
-        Graphic3d_TOLS_AMBIENT = Graphic3d_TypeOfLightSource_Ambient,
-        Graphic3d_TOLS_DIRECTIONAL = Graphic3d_TypeOfLightSource_Directional,
-        Graphic3d_TOLS_POSITIONAL = Graphic3d_TypeOfLightSource_Positional,
-        Graphic3d_TOLS_SPOT = Graphic3d_TypeOfLightSource_Spot,
-        //
-        V3d_AMBIENT = Graphic3d_TypeOfLightSource_Ambient,
-        V3d_DIRECTIONAL = Graphic3d_TypeOfLightSource_Directional,
-        V3d_POSITIONAL = Graphic3d_TypeOfLightSource_Positional,
-        V3d_SPOT = Graphic3d_TypeOfLightSource_Spot,
-
-
-        //! Auxiliary value defining the overall number of values in enumeration Graphic3d_TypeOfLightSource
-        Graphic3d_TypeOfLightSource_NB = Graphic3d_TypeOfLightSource_Spot + 1
-    };
 
 }

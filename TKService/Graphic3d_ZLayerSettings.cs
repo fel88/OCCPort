@@ -6,6 +6,24 @@ namespace TKService
     //! Structure defines list of ZLayer properties.
     public class Graphic3d_ZLayerSettings
     {
+
+        public Graphic3d_ZLayerSettings()
+        {
+            myCullingDistance = (Precision.Infinite());
+            myCullingSize = (Precision.Infinite());
+            myIsImmediate = (false);
+            myToRaytrace = (true);
+            myUseEnvironmentTexture = (true);
+            //myToEnableDepthTest = (true);
+            //myToEnableDepthWrite = (true);
+            myToClearDepth = (true);
+            myToRenderInDepthPrepass = (true);
+
+        }
+        //! Return TRUE if layer should be rendered within depth pre-pass; TRUE by default.
+        public bool ToRenderInDepthPrepass() { return myToRenderInDepthPrepass; }
+        bool myToRenderInDepthPrepass;//!< option to render layer within depth pre-pass
+
         //! Return true if this layer should be drawn after all normal (non-immediate) layers.
         public bool IsImmediate() { return myIsImmediate; }
 
@@ -13,11 +31,17 @@ namespace TKService
         public gp_XYZ Origin() { return myOrigin; }
 
         //! Return the transformation to the origin.
-        public  TopLoc_Datum3D OriginTransformation()  { return myOriginTrsf; }
+        public TopLoc_Datum3D OriginTransformation() { return myOriginTrsf; }
 
         //! Returns TRUE if layer should be processed by ray-tracing renderer; TRUE by default.
         //! Note that this flag is IGNORED for layers with IsImmediate() flag.
         public bool IsRaytracable() { return myToRaytrace; }
+
+
+        //! Return true if depth values should be cleared before drawing the layer.
+        public bool ToClearDepth() { return myToClearDepth; }
+
+        bool myToClearDepth;          //!< option to clear depth values before drawing the layer
 
         bool myToRaytrace;            //!< option to render layer within ray-tracing engine
         bool myUseEnvironmentTexture; //!< flag to allow/prevent environment texture mapping usage for specific layer

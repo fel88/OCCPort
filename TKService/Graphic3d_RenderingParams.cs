@@ -26,41 +26,44 @@
             RenderResolutionScale = (1.0f);
             /*ShadowMapResolution(1024),
             ShadowMapBias(0.005f),
-            ToEnableDepthPrepass(Standard_False),
-            ToEnableAlphaToCoverage(Standard_True),
-            // ray tracing parameters
-            IsGlobalIlluminationEnabled(Standard_False),
-            SamplesPerPixel(0),
-            RaytracingDepth(THE_DEFAULT_DEPTH),
-            IsShadowEnabled(Standard_True),
-            IsReflectionEnabled(Standard_False),
-            IsAntialiasingEnabled(Standard_False),
-            IsTransparentShadowEnabled(Standard_False),
-            UseEnvironmentMapBackground(Standard_False),
-            ToIgnoreNormalMapInRayTracing(Standard_False),
-            CoherentPathTracingMode(Standard_False),
-            AdaptiveScreenSampling(Standard_False),
-            AdaptiveScreenSamplingAtomic(Standard_False),
-            ShowSamplingTiles(Standard_False),
-            TwoSidedBsdfModels(Standard_False),
-            RadianceClampingValue(30.0),
-            RebuildRayTracingShaders(Standard_False),
-            RayTracingTileSize(32),
-            NbRayTracingTiles(16 * 16),
-            CameraApertureRadius(0.0f),
-            CameraFocalPlaneDist(1.0f),
-            FrustumCullingState(FrustumCulling_On),
-            ToneMappingMethod(Graphic3d_ToneMappingMethod_Disabled),
-            Exposure(0.f),
-            WhitePoint(1.f),
-            // stereoscopic parameters
-            StereoMode(Graphic3d_StereoMode_QuadBuffer),
-            HmdFov2d(30.0f),
-            AnaglyphFilter(Anaglyph_RedCyan_Optimized),
-            ToReverseStereo(Standard_False),
-            ToSmoothInterlacing(Standard_True),
-            ToMirrorComposer(Standard_True),
-            //
+            */
+            ToEnableDepthPrepass = (false);
+            /*
+        ToEnableAlphaToCoverage(Standard_True),
+        // ray tracing parameters
+        IsGlobalIlluminationEnabled(Standard_False),
+        SamplesPerPixel(0),
+        RaytracingDepth(THE_DEFAULT_DEPTH),
+        IsShadowEnabled(Standard_True),
+        IsReflectionEnabled(Standard_False),
+        IsAntialiasingEnabled(Standard_False),
+        IsTransparentShadowEnabled(Standard_False),
+        UseEnvironmentMapBackground(Standard_False),
+        ToIgnoreNormalMapInRayTracing(Standard_False),
+        CoherentPathTracingMode(Standard_False),
+        AdaptiveScreenSampling(Standard_False),
+        AdaptiveScreenSamplingAtomic(Standard_False),
+        ShowSamplingTiles(Standard_False),
+        TwoSidedBsdfModels(Standard_False),
+        RadianceClampingValue(30.0),
+        RebuildRayTracingShaders(Standard_False),
+        RayTracingTileSize(32),
+        NbRayTracingTiles(16 * 16),
+        CameraApertureRadius(0.0f),
+        CameraFocalPlaneDist(1.0f),*/
+            FrustumCullingState = FrustumCulling.FrustumCulling_On;
+                /*
+        ToneMappingMethod(Graphic3d_ToneMappingMethod_Disabled),
+        Exposure(0.f),
+        WhitePoint(1.f),
+        // stereoscopic parameters
+        StereoMode(Graphic3d_StereoMode_QuadBuffer),
+        HmdFov2d(30.0f),
+        AnaglyphFilter(Anaglyph_RedCyan_Optimized),
+        ToReverseStereo(Standard_False),*/
+            ToSmoothInterlacing = (true);
+            ToMirrorComposer = (true);
+            /*
             StatsPosition(new Graphic3d_TransformPers(Graphic3d_TMF_2d, Aspect_TOTP_LEFT_UPPER, Graphic3d_Vec2i(20, 20))),
             ChartPosition(new Graphic3d_TransformPers(Graphic3d_TMF_2d, Aspect_TOTP_RIGHT_UPPER, Graphic3d_Vec2i(20, 20))),
             ChartSize(-1, -1),
@@ -72,9 +75,20 @@
             CollectedStats(PerfCounters_Basic),
             ToShowStats(Standard_False)*/
         }
-  public      bool IsShadowEnabled;             //!< enables/disables shadows rendering, True by default
+        public FrustumCulling FrustumCullingState;         //!< state of frustum culling optimization; FrustumCulling_On by default
+
+        //! State of frustum culling optimization.
+        public enum FrustumCulling
+        {
+            FrustumCulling_Off,     //!< culling is disabled
+            FrustumCulling_On,      //!< culling is active, and the list of culled entities is automatically updated before redraw
+            FrustumCulling_NoUpdate //!< culling is active, but the list of culled entities is not updated
+        }
+
+        public bool IsShadowEnabled;             //!< enables/disables shadows rendering, True by default
         public bool IsReflectionEnabled;         //!< enables/disables specular reflections, False by default
         public bool IsAntialiasingEnabled;       //!< enables/disables adaptive anti-aliasing, False by default
+        public bool ToEnableDepthPrepass;        //!< enables/disables depth pre-pass, False by default
 
         //! Returns resolution ratio.
         public float ResolutionRatio()

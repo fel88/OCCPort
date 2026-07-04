@@ -1,4 +1,5 @@
 ﻿global using Select3D_BVHBuilder3d = TKMath.BVH_Builder;
+using OCCPort.Common;
 using TKernel;
 using TKMath;
 
@@ -10,6 +11,22 @@ namespace TKService
     //! Presentations list sorted within priorities.
     public class Graphic3d_Layer
     {
+        //! Returns TRUE if layer is empty or has been discarded entirely by culling test.
+        public bool IsCulled() { return myNbStructuresNotCulled == 0; }
+
+
+        //! Update culling state - should be called before rendering.
+        //! Traverses through BVH tree to determine which structures are in view volume.
+        public void UpdateCulling(int theViewId,
+                                      Graphic3d_CullingTool theSelector,
+                                      Graphic3d_RenderingParams.FrustumCulling theFrustumCullingState)
+        {
+            updateBVH();
+
+            myNbStructuresNotCulled = myNbStructures;
+        }
+
+
         // =======================================================================
         public void InvalidateBVHData()
         {
@@ -498,5 +515,14 @@ namespace TKService
         Graphic3d_IndexedMapOfStructure myStructs = new Graphic3d_IndexedMapOfStructure();
 
     }
-}
+
+
+
+    //! Graphic3d_CullingTool class provides a possibility to store parameters of view volume,
+    //! such as its vertices and equations, and contains methods detecting if given AABB overlaps view volume.
+    public class Graphic3d_CullingTool
+    {
+    }
+    }
+
 

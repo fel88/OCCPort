@@ -1,4 +1,7 @@
-﻿namespace TKernel
+﻿
+
+
+namespace TKernel
 {//! Generic matrix of 4 x 4 elements.
     public class NCollection_List<T> : List<T>
     {
@@ -27,7 +30,7 @@
         public class Iterator
         {
 
-            NCollection_List<T> list;
+            public NCollection_List<T> list;
             public Iterator(NCollection_List<T> aDisplayedObjects)
             {
                 list = aDisplayedObjects;
@@ -47,6 +50,11 @@
             public T Value()
             {
                 return list[index];
+            }
+
+            public T ChangeValue()
+            {
+                return Value();
             }
         }
         public void Append(T aPoints)
@@ -72,6 +80,16 @@
             return Count;
         }
 
-       
+        public void InsertBefore(T aNewLayer, T aLayerIter)
+        {
+            var index = IndexOf(aLayerIter);
+            Insert(index, aNewLayer);
+        }
+
+        public void InsertAfter(T aNewLayer, T aLayerIter)
+        {
+            var index = IndexOf(aLayerIter);
+            Insert(index + 1, aNewLayer);
+        }
     }
 }

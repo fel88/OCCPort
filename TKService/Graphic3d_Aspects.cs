@@ -154,6 +154,11 @@ namespace TKService
             throw new NotImplementedException();
         }
 
+
+        //! Sets shading model
+        public void SetShadingModel(Graphic3d_TypeOfShadingModel theShadingModel) { myShadingModel = theShadingModel; }
+
+
         Graphic3d_ShaderProgram myProgram;
 
         Graphic3d_MarkerImage myMarkerImage;

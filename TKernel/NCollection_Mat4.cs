@@ -393,6 +393,9 @@ namespace TKernel
             }
         }
 
-
+        public Element_t[] ChangeData()
+        {
+            return myMat;
+        }
     }
 }

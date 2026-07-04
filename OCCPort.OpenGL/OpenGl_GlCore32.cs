@@ -9,5 +9,10 @@ namespace OCCPort.OpenGL
         {
             GL.BindVertexArray(myDefaultVao);
         }
+
+        internal void glGenVertexArrays(int v, uint [] myDefaultVao)
+        {
+            GL.GenVertexArrays(v, myDefaultVao);
+        }
     }
 }

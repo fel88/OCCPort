@@ -63,7 +63,7 @@ namespace OCCPort.OpenGL
 
         //! @return true if usage of Z buffer is enabled.
         public bool UseZBuffer() { return myUseZBuffer; }
-        public void UseZBuffer(bool v) {  myUseZBuffer=v; }
+        public void UseZBuffer(bool v) { myUseZBuffer = v; }
 
         // =======================================================================
         // function : FBOCreate
@@ -93,9 +93,11 @@ namespace OCCPort.OpenGL
             return myAspectsSet;
         }
 
+        //! Get rendering filter.
+        //! @sa ShouldRender()
         internal int RenderFilter()
         {
-            throw new NotImplementedException();
+            return myRenderFilter;
         }
 
         internal void ResetAppliedAspect()
@@ -249,6 +251,21 @@ namespace OCCPort.OpenGL
         //! @return true if depth writing is enabled.
         public bool UseDepthWrite() { return myUseDepthWrite; }
         public void UseDepthWrite(bool v) { myUseDepthWrite = v; }
+
+        //! Sets a new environment texture.
+        public void SetEnvironmentTexture(OpenGl_TextureSet theTexture)
+        {
+            myEnvironmentTexture = theTexture;
+        }
+
+
+        //! Reset skipped transparent elements counter.
+        //! @sa OpenGl_LayerList::Render()
+        public void ResetSkippedCounter() { myNbSkippedTranspElems = 0; }
+
+        //! Return the number of skipped transparent elements within active OpenGl_RenderFilter_OpaqueOnly filter.
+        //! @sa OpenGl_LayerList::Render()
+        public int NbSkippedTransparentElements() { return myNbSkippedTranspElems; }
 
 
         OpenGl_View myView;

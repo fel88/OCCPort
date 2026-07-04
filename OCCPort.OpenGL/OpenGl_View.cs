@@ -10,6 +10,7 @@ using System.Xml.Linq;
 using TKernel;
 using TKMath;
 using TKService;
+using static TKService.Graphic3d_Camera;
 
 namespace OCCPort.OpenGL
 {
@@ -20,6 +21,18 @@ namespace OCCPort.OpenGL
         OpenGl_FrameBuffer[] myMainSceneFbosOit;
         gp_XYZ myLocalOrigin;
 
+
+        //! Returns selector for BVH tree, providing a possibility to store information
+        //! about current view volume and to detect which objects are overlapping it.
+        public Graphic3d_CullingTool BVHTreeSelector() { return myBVHSelector; }
+
+        //! Is needed for selection of overlapping objects and storage of the current view volume
+        Graphic3d_CullingTool myBVHSelector;
+
+        public uint SpecIBLMapLevels()
+        {
+            return myPBREnvironment == null ? 0 : myPBREnvironment.SpecMapLevelsNumber();
+        }
         public override void changeZLayer(Graphic3d_CStructure theStructure,
                                  Graphic3d_ZLayerId theNewLayerId)
         {
@@ -53,7 +66,7 @@ namespace OCCPort.OpenGL
         {
             myZLayers.InvalidateBVHData(theLayerId);
         }
-        Graphic3d_LightSet      myNoShadingLight;
+        Graphic3d_LightSet myNoShadingLight;
 
         public OpenGl_View(Graphic3d_StructureManager theMgr,
             OpenGl_GraphicDriver theDriver,
@@ -70,7 +83,7 @@ namespace OCCPort.OpenGL
             myWorkspace = new OpenGl_Workspace(this, null);
 
             Graphic3d_CLight aLight = new Graphic3d_CLight(Graphic3d_TypeOfLightSource.Graphic3d_TypeOfLightSource_Ambient);
-            aLight.SetColor(new Quantity_Color ( Quantity_NameOfColor.Quantity_NOC_WHITE));
+            aLight.SetColor(new Quantity_Color(Quantity_NameOfColor.Quantity_NOC_WHITE));
             myLights = new Graphic3d_LightSet();
             myNoShadingLight = new Graphic3d_LightSet();
             myNoShadingLight.Add(aLight);
@@ -91,7 +104,7 @@ namespace OCCPort.OpenGL
             myOpenGlFBO = new OpenGl_FrameBuffer("fbo_gl");
             myOpenGlFBO2 = new OpenGl_FrameBuffer("fbo_gl2");
 
-          
+
             myTextureParams = new OpenGl_Aspects();
 
             for (int i = 0; i < (int)Graphic3d_TypeOfBackground.Graphic3d_TypeOfBackground_NB; ++i)
@@ -204,8 +217,8 @@ namespace OCCPort.OpenGL
         OpenGl_FrameBuffer myXrSceneFbo;               //!< additional FBO (without MSAA) for submitting to XR
         OpenGl_DepthPeeling myDepthPeelingFbos;   //!< additional buffers for depth peeling
         OpenGl_ShadowMapArray myShadowMaps;         //!< additional FBOs for shadow map rendering
-        OpenGl_VertexBuffer myFullScreenQuad=new OpenGl_VertexBufferT_OpenGl_VertexBuffer() ;        //!< Vertices for full-screen quad rendering.
-        OpenGl_VertexBuffer myFullScreenQuadFlip=new OpenGl_VertexBufferT_OpenGl_VertexBuffer();
+        OpenGl_VertexBuffer myFullScreenQuad = new OpenGl_VertexBufferT_OpenGl_VertexBuffer();        //!< Vertices for full-screen quad rendering.
+        OpenGl_VertexBuffer myFullScreenQuadFlip = new OpenGl_VertexBufferT_OpenGl_VertexBuffer();
         bool myToFlipOutput;          //!< Flag to draw result image upside-down
         uint myFrameCounter;          //!< redraw counter, for debugging
         bool myHasFboBlit;            //!< disable FBOs on failure
@@ -234,18 +247,17 @@ namespace OCCPort.OpenGL
             bool wasUsedZBuffer = theWorkspace.SetUseZBuffer(false);
             if (wasUsedZBuffer)
             {
-                GL.Disable(EnableCap.DepthTest);
-                //aCtx->core11fwd->glDisable(GL_DEPTH_TEST);
+                aCtx.core11fwd.glDisable(All.DepthTest);
             }
 
-#if GL_DEPTH_CLAMP
-            const bool wasDepthClamped = aCtx->arbDepthClamp && aCtx->core11fwd->glIsEnabled(GL_DEPTH_CLAMP);
-            if (aCtx->arbDepthClamp && !wasDepthClamped)
+
+            bool wasDepthClamped = aCtx.arbDepthClamp && aCtx.core11fwd.glIsEnabled(All.DepthClamp);
+            if (aCtx.arbDepthClamp && !wasDepthClamped)
             {
                 // make sure background is always drawn (workaround skybox rendering on some hardware)
-                aCtx->core11fwd->glEnable(GL_DEPTH_CLAMP);
+                aCtx.core11fwd.glEnable(All.DepthClamp);
             }
-#endif
+
 
             if (myBackgroundType == Graphic3d_TypeOfBackground.Graphic3d_TOB_CUBEMAP)
             {
@@ -305,12 +317,12 @@ namespace OCCPort.OpenGL
                 theWorkspace.SetUseZBuffer(true);
                 aCtx.core11fwd.glEnable(All.DepthTest);
             }
-#if GL_DEPTH_CLAMP
-            if (aCtx->arbDepthClamp && !wasDepthClamped)
+
+            if (aCtx.arbDepthClamp && !wasDepthClamped)
             {
-                aCtx->core11fwd->glDisable(GL_DEPTH_CLAMP);
+                aCtx.core11fwd.glDisable(All.DepthClamp);
             }
-#endif
+
 
         }
 
@@ -517,6 +529,7 @@ namespace OCCPort.OpenGL
             aCtx.SetColorMaskRGBA(new NCollection_Vec4<bool>(true)); // force writes into all components, including alpha
             aCtx.core11fwd.glClearColor(aBgColor.r(), aBgColor.g(), aBgColor.b(), aCtx.caps.buffersOpaqueAlpha ? 1.0f : 0.0f);
             aCtx.core11fwd.glClear(toClear);
+
             aCtx.SetColorMask(true); // restore default alpha component write state
 
             render(theProjection, theReadDrawFbo, theOitAccumFbo, false);
@@ -1587,7 +1600,7 @@ namespace OCCPort.OpenGL
        new Vector4(-1.0f, -1.0f, 0.0f, 0.0f),
        new Vector4(-1.0f,  1.0f, 0.0f, 1.0f)
       };
-                    aVerts.Init(myWorkspace.GetGlContext(), 4, 4, aQuad.SelectMany(z=>z.GetData()).ToArray());
+                    aVerts.Init(myWorkspace.GetGlContext(), 4, 4, aQuad.SelectMany(z => z.GetData()).ToArray());
                 }
             }
             else
@@ -1719,25 +1732,25 @@ namespace OCCPort.OpenGL
                 return false;
             }
 
-            /*OpenGl_Mat4 aProjectMat;
+            OpenGl_Mat4 aProjectMat = new NCollection_Mat4<float>();
             Graphic3d_TransformUtils.Ortho2D(aProjectMat,
-                                               0.0f, static_cast<GLfloat>(myWindow->Width()),
-                                               0.0f, static_cast<GLfloat>(myWindow->Height()));
-            */
+                                               0.0f, (float)(myWindow.Width()),
+                                               0.0f, (float)(myWindow.Height()));
+
             aCtx.WorldViewState.Push();
             aCtx.ProjectionState.Push();
 
             aCtx.WorldViewState.SetIdentity();
-            //  aCtx.ProjectionState.SetCurrent(aProjectMat);
+            aCtx.ProjectionState.SetCurrent(aProjectMat);
 
             aCtx.ApplyProjectionMatrix();
-            //  aCtx.ApplyWorldViewMatrix();
+            aCtx.ApplyWorldViewMatrix();
 
 
             // synchronize FFP state before copying pixels
             aCtx.BindProgram(new OpenGl_ShaderProgram());
-            //   aCtx.ShaderManager().PushState(new OpenGl_ShaderProgram());
-            //  aCtx.DisableFeatures();
+            aCtx.ShaderManager().PushState(new OpenGl_ShaderProgram());
+            aCtx.DisableFeatures();
 
             switch (aCtx.DrawBuffer())
             {
@@ -1761,18 +1774,18 @@ namespace OCCPort.OpenGL
                     }
             }
 
-            /*aCtx->core11ffp->glRasterPos2i(0, 0);
-            aCtx->core11ffp->glCopyPixels(0, 0, myWindow->Width() + 1, myWindow->Height() + 1, GL_COLOR);
+            aCtx.core11ffp.glRasterPos2i(0, 0);
+            aCtx.core11ffp.glCopyPixels(0, 0, myWindow.Width() + 1, myWindow.Height() + 1, All.Color);
             //aCtx->core11ffp->glCopyPixels  (0, 0, myWidth + 1, myHeight + 1, GL_DEPTH);
 
-            aCtx->EnableFeatures();
+            aCtx.EnableFeatures();
 
-            aCtx->WorldViewState.Pop();
-            aCtx->ProjectionState.Pop();
-            aCtx->ApplyProjectionMatrix();
+            aCtx.WorldViewState.Pop();
+            aCtx.ProjectionState.Pop();
+            aCtx.ApplyProjectionMatrix();
 
             // read/write from front buffer now
-            aCtx->SetReadBuffer(aCtx->DrawBuffer());*/
+            aCtx.SetReadBuffer(aCtx.DrawBuffer());
             return true;
         }
 
@@ -1785,6 +1798,11 @@ namespace OCCPort.OpenGL
             renderStructs(theProjection, theReadDrawFbo, theOitAccumFbo, theToDrawImmediate);
             //aContext->BindTextures(Handle(OpenGl_TextureSet)(), Handle(OpenGl_ShaderProgram)());
 
+        }
+        bool checkPBRAvailability()
+        {
+            return myWorkspace.GetGlContext().HasPBR()
+                && myPBREnvironment != null;
         }
 
         //! Renders the graphical contents of the view into the preprepared window or framebuffer.
@@ -1808,6 +1826,21 @@ namespace OCCPort.OpenGL
                                                   && theOutputFBO != null
                                                   && theOutputFBO.NbSamples() != 0);
 
+            // Disable current clipping planes
+            if (aContext.core11ffp != null)
+            {
+                int aMaxPlanes = aContext.MaxClipPlanes();
+                for (int aClipPlaneId = (int)All.ClipPlane0; aClipPlaneId < (int)All.ClipPlane0 + aMaxPlanes; ++aClipPlaneId)
+                {
+                    aContext.core11fwd.glDisable(aClipPlaneId);
+                }
+            }
+
+            // update states of OpenGl_BVHTreeSelector (frustum culling algorithm);
+            // note that we pass here window dimensions ignoring Graphic3d_RenderingParams::RenderResolutionScale
+            /* myBVHSelector.SetViewVolume(myCamera);
+             myBVHSelector.SetViewportSize(myWindow.Width(), myWindow.Height(), myRenderParams.ResolutionRatio());
+             myBVHSelector.CacheClipPtsProjections();*/
 
             OpenGl_ShaderManager aManager = aContext.ShaderManager();
             // Update matrices if camera has changed.
@@ -1845,9 +1878,60 @@ namespace OCCPort.OpenGL
             // =================================
             //      Step 3: Redraw main plane
             // =================================
+            // if the view is scaled normal vectors are scaled to unit
+            // length for correct displaying of shaded objects
+            gp_Pnt anAxialScale = aContext.Camera().AxialScale();
+            if (anAxialScale.X() != 1f ||
+                anAxialScale.Y() != 1f ||
+                anAxialScale.Z() != 1f)
+            {
+                aContext.SetGlNormalizeEnabled(true);
+            }
+            else
+            {
+                aContext.SetGlNormalizeEnabled(false);
+            }
 
+            aManager.SetShadingModel(OpenGl_ShaderManager.PBRShadingModelFallback(myRenderParams.ShadingModel, checkPBRAvailability()));
+
+            // Redraw 3d scene
+            if (theProjection == Projection.Projection_MonoLeftEye)
+            {
+                aContext.ProjectionState.SetCurrent(aContext.Camera().ProjectionStereoLeftF());
+                aContext.ApplyProjectionMatrix();
+            }
+            else if (theProjection == Projection.Projection_MonoRightEye)
+            {
+                aContext.ProjectionState.SetCurrent(aContext.Camera().ProjectionStereoRightF());
+                aContext.ApplyProjectionMatrix();
+            }
+
+
+            bool hasShadowMap = aContext.ShaderManager().LightSourceState().HasShadowMaps();
+            if (hasShadowMap)
+            {
+                for (int aShadowIter = myShadowMaps.Lower(); aShadowIter <= myShadowMaps.Upper(); ++aShadowIter)
+                {
+                    OpenGl_ShadowMap aShadow = myShadowMaps.Value(aShadowIter);
+                    aShadow.Texture().Bind(aContext);
+                }
+            }
             renderScene(theProjection, theOutputFBO, theOitAccumFbo, theToDrawImmediate);
 
+            if (hasShadowMap)
+            {
+                for (int aShadowIter = myShadowMaps.Lower(); aShadowIter <= myShadowMaps.Upper(); ++aShadowIter)
+                {
+                    OpenGl_ShadowMap aShadow = myShadowMaps.Value(aShadowIter);
+                    aShadow.Texture().Unbind(aContext);
+                }
+                if (aContext.core15fwd != null)
+                {
+                    aContext.core15fwd.glActiveTexture(All.Texture0);
+                }
+            }
+
+            myWorkspace.SetEnvironmentTexture(null);
             // ===============================
             //      Step 4: Trihedron
             // ===============================
@@ -1942,4 +2026,15 @@ namespace OCCPort.OpenGL
             return new[] { v.X, v.Y, v.Z, v.W };
         }
     }
+
+
+    //! OpenGL 1.1 core without deprecated Fixed Pipeline entry points.
+    //! Notice that all functions within this structure are actually exported by system GL library.
+    //! The main purpose for these hint - to control visibility of functions per GL version
+    //! (global functions should not be used directly to achieve this effect!).
+    public interface IOpenGl_GlCore11Fwd
+    {
+        void glDisable(All dither);
+    }
+
 }

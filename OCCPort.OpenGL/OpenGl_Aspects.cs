@@ -19,8 +19,8 @@ namespace OCCPort.OpenGL
             /*myAspect.SetInteriorColor(Quantity_NOC_WHITE);
             myAspect.SetEdgeColor(Quantity_NOC_WHITE);
             myAspect.SetFrontMaterial(THE_DEFAULT_MATERIAL);
-            myAspect.SetBackMaterial(THE_DEFAULT_MATERIAL);
-            myAspect.SetShadingModel(myShadingModel);
+            myAspect.SetBackMaterial(THE_DEFAULT_MATERIAL);*/
+            myAspect.SetShadingModel(myShadingModel);/*
             myAspect.SetHatchStyle(Handle(Graphic3d_HatchStyle)());*/
         }
         //! Returns textures map.

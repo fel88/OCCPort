@@ -33,11 +33,19 @@ namespace TKService
         }
         //! Return TRUE if camera should calculate projection matrix for [0, 1] depth range or for [-1, 1] range.
         //! FALSE by default.
-        public bool IsZeroToOneDepth()  { return myIsZeroToOneDepth; }
+        public bool IsZeroToOneDepth() { return myIsZeroToOneDepth; }
 
-        
+        public Graphic3d_Mat4 ProjectionStereoLeftF()
+        {
+            return UpdateProjection(myMatricesF).LProjection;
+        }
+        public  Graphic3d_Mat4 ProjectionStereoRightF() 
+{
+  return UpdateProjection(myMatricesF).RProjection;
+}
+
         //! Return TRUE if custom projection matrix is set.
-       public bool IsCustomMonoProjection()  { return myIsCustomProjMatM; }
+        public bool IsCustomMonoProjection() { return myIsCustomProjMatM; }
 
         //! Set using [0, 1] depth range or [-1, 1] range.
         public void SetZeroToOneDepth(bool theIsZeroToOne)
@@ -94,19 +102,19 @@ namespace TKService
                 SetCustomMonoProjection(theOtherCamera.myCustomProjMatM);
             }
         }
-        public void SetCustomStereoProjection( Graphic3d_Mat4d theProjL,
+        public void SetCustomStereoProjection(Graphic3d_Mat4d theProjL,
                                                    Graphic3d_Mat4d theHeadToEyeL,
                                                    Graphic3d_Mat4d theProjR,
                                                    Graphic3d_Mat4d theHeadToEyeR)
-{
-  myCustomProjMatL = theProjL;
-  myCustomProjMatR = theProjR;
-  myCustomHeadToEyeMatL = theHeadToEyeL;
-  myCustomHeadToEyeMatR = theHeadToEyeR;
-  myIsCustomProjMatLR = true;
-  myIsCustomFrustomLR = false;
-  InvalidateProjection();
-}
+        {
+            myCustomProjMatL = theProjL;
+            myCustomProjMatR = theProjR;
+            myCustomHeadToEyeMatL = theHeadToEyeL;
+            myCustomHeadToEyeMatR = theHeadToEyeR;
+            myIsCustomProjMatLR = true;
+            myIsCustomFrustomLR = false;
+            InvalidateProjection();
+        }
         public void ResetCustomProjection()
         {
             if (myIsCustomFrustomLR
@@ -120,15 +128,15 @@ namespace TKService
             }
         }
 
-        public void SetCustomStereoFrustums( Aspect_FrustumLRBT theFrustumL,
+        public void SetCustomStereoFrustums(Aspect_FrustumLRBT theFrustumL,
                                                  Aspect_FrustumLRBT theFrustumR)
-{
-  myCustomFrustumL = theFrustumL;
-  myCustomFrustumR = theFrustumR;
-  myIsCustomFrustomLR = true;
-  myIsCustomProjMatLR = false;
-  InvalidateProjection();
-}
+        {
+            myCustomFrustumL = theFrustumL;
+            myCustomFrustumR = theFrustumR;
+            myIsCustomFrustomLR = true;
+            myIsCustomProjMatLR = false;
+            InvalidateProjection();
+        }
         public void SetCustomMonoProjection(Graphic3d_Mat4d theProj)
         {
             myCustomProjMatM = theProj;
@@ -411,7 +419,7 @@ namespace TKService
             var anUp = new gp_Vec(OrthogonalizedUp());
             gp_Vec aSide = aProjection ^ anUp;
 
-            Exceptions. Standard_ASSERT_RAISE(
+            Exceptions.Standard_ASSERT_RAISE(
          !aProjection.IsParallel(anUp, Precision.Angular()),
           "Can not derive SIDE = PROJ x UP - directions are parallel");
 
@@ -1356,10 +1364,10 @@ namespace TKService
             throw new NotImplementedException();
         }
 
-  //! Return TRUE if custom stereo frustums are set.
+        //! Return TRUE if custom stereo frustums are set.
         public bool IsCustomStereoFrustum()
         {
-              return myIsCustomFrustomLR; 
+            return myIsCustomFrustomLR;
         }
 
         //! Return TRUE if custom stereo projection matrices are set.
@@ -1379,7 +1387,7 @@ namespace TKService
 
             if (anOldType == Projection.Projection_Orthographic)
             {
-                if (myZNear <= Standard_Real. RealEpsilon())
+                if (myZNear <= Standard_Real.RealEpsilon())
                 {
                     myZNear = DEFAULT_ZNEAR;
                 }
@@ -1423,7 +1431,7 @@ namespace TKService
         public void SetZRange(double theZNear,
                                      double theZFar)
         {
-         Exceptions.   Standard_ASSERT_RAISE(theZFar > theZNear, "ZFar should be greater than ZNear");
+            Exceptions.Standard_ASSERT_RAISE(theZFar > theZNear, "ZFar should be greater than ZNear");
 
             if (!IsOrthographic())
             {
@@ -1496,7 +1504,7 @@ namespace TKService
                                 double theZNear,
                                 double theZFar)
         {
-            Exceptions. Standard_ASSERT_RAISE(theScaleFactor > 0.0, "Zero or negative scale factor is not allowed.");
+            Exceptions.Standard_ASSERT_RAISE(theScaleFactor > 0.0, "Zero or negative scale factor is not allowed.");
 
             // Method changes zNear and zFar parameters of camera so as to fit graphical structures
             // by their graphical boundaries. It precisely fits min max boundaries of primary application

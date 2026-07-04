@@ -14,6 +14,10 @@ namespace OCCPort.OpenGL
         {
             GL.Clear((ClearBufferMask)toClear);
         }
+        internal void glClear(All toClear)
+        {
+            GL.Clear((ClearBufferMask)toClear);
+        }
 
         internal void glClearColor(float v1, float v2, float v3, float v4)
         {
@@ -36,6 +40,10 @@ namespace OCCPort.OpenGL
         }
 
         internal void glDepthFunc(All lequal)
+        {
+            GL.DepthFunc((DepthFunction)lequal);
+        }
+        internal void glDepthFunc(int lequal)
         {
             GL.DepthFunc((DepthFunction)lequal);
         }
@@ -97,6 +105,10 @@ namespace OCCPort.OpenGL
         {
             v = GL.GetBoolean(n);
         }
+        internal void glGetBooleanv(All n, ref bool v)
+        {
+            v = GL.GetBoolean((GetPName)n);
+        }
 
         internal ErrorCode  glGetError()
         {
@@ -116,6 +128,11 @@ namespace OCCPort.OpenGL
         internal string glGetString(All extensions)
         {
             return GL.GetString((StringName)extensions);
+        }
+
+        public bool glIsEnabled(All depthClamp)
+        {
+         return    GL.IsEnabled((EnableCap)depthClamp);
         }
 
         internal void glReadBuffer(int myReadBuffer)

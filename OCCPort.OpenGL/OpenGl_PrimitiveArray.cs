@@ -111,6 +111,9 @@ namespace OCCPort.OpenGL
         }
 
 
+        //! Return TRUE if primitive type generates shaded triangulation.
+        public override bool IsFillDrawMode() { return myIsFillType; }
+
         private void Release(OpenGl_Context theContext)
         {
             throw new NotImplementedException();

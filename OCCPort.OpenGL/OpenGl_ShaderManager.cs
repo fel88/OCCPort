@@ -1,5 +1,8 @@
 ﻿//! List of shader programs.
 global using OpenGl_ShaderProgramList = TKernel.NCollection_Sequence<OCCPort.OpenGL.OpenGl_ShaderProgram>;
+global using OpenGl_MapOfShaderPrograms = TKernel.NCollection_DataMap<string, OCCPort.OpenGL.OpenGl_SetOfShaderPrograms>;
+using OCCPort.OpenGL;
+
 
 using OCCPort.Common;
 using OCCPort.Enums;
@@ -20,9 +23,23 @@ namespace OCCPort.OpenGL
     //! This class is responsible for managing shader programs.
     public class OpenGl_ShaderManager : Graphic3d_ShaderManager
     {
+        public void UpdateLightSourceStateTo(Graphic3d_LightSet theLights,
+                                                     uint theSpecIBLMapLevels,
+                                                     OpenGl_ShadowMapArray theShadowMaps)
+        {
+            myLightSourceState.Set(theLights);
+            myLightSourceState.SetSpecIBLMapLevels((int)theSpecIBLMapLevels);
+            myLightSourceState.SetShadowMaps(theShadowMaps);
+            myLightSourceState.Update();
+            switchLightPrograms();
+        }
+
+
+        //! Returns current state of OCCT light sources.
+        public OpenGl_LightSourceState LightSourceState() { return myLightSourceState; }
 
         //! Returns current state of OCCT projection transform.
-        public  OpenGl_ProjectionState ProjectionState()  { return myProjectionState; }
+        public OpenGl_ProjectionState ProjectionState() { return myProjectionState; }
 
         // =======================================================================
         // function : SetProjectionState
@@ -266,7 +283,7 @@ namespace OCCPort.OpenGL
         OpenGl_ModelWorldState myModelWorldState = new OpenGl_ModelWorldState();    //!< State of OCCT model-world transformation
         OpenGl_WorldViewState myWorldViewState = new OpenGl_WorldViewState();     //!< State of OCCT world-view  transformation
         //OpenGl_ClippingState myClippingState;      //!< State of OCCT clipping planes
-        OpenGl_LightSourceState myLightSourceState;   //!< State of OCCT light sources
+        OpenGl_LightSourceState myLightSourceState = new OpenGl_LightSourceState();   //!< State of OCCT light sources
         OpenGl_MaterialState myMaterialState = new OpenGl_MaterialState();      //!< State of Front and Back materials
         //OpenGl_OitState myOitState;           //!< State of OIT uniforms
 
@@ -280,8 +297,8 @@ namespace OCCPort.OpenGL
             myShadingModel = Graphic3d_TypeOfShadingModel.Graphic3d_TypeOfShadingModel_Gouraud;
             myUnlitPrograms = new OpenGl_SetOfPrograms();
             myContext = theContext;
-            //myHasLocalOrigin(Standard_False)
-            //mySRgbState = theContext->ToRenderSRGB();
+            myHasLocalOrigin = (false);
+            mySRgbState = theContext.ToRenderSRGB();
 
             // not origin code here
             for (int i = 0; i < myBlitPrograms.Length; i++)
@@ -442,13 +459,46 @@ namespace OCCPort.OpenGL
             }
         }
 
+        public void SetShadingModel(Graphic3d_TypeOfShadingModel theModel)
+        {
+            if (theModel == Graphic3d_TypeOfShadingModel.Graphic3d_TypeOfShadingModel_DEFAULT)
+            {
+                throw new Standard_ProgramError("OpenGl_ShaderManager::SetShadingModel() - attempt to set invalid Shading Model!");
+            }
+
+            myShadingModel = theModel;
+            switchLightPrograms();
+        }
+
+        OpenGl_MapOfShaderPrograms myMapOfLightPrograms = new OpenGl_MapOfShaderPrograms(); //!< map of lighting programs depending on lights configuration
+
+        void switchLightPrograms()
+        {
+            Graphic3d_LightSet aLights = myLightSourceState.LightSources();
+            if (aLights == null)
+            {
+                if (!myMapOfLightPrograms.Find("unlit", out myLightPrograms))
+                {
+                    myLightPrograms = new OpenGl_SetOfShaderPrograms(myUnlitPrograms);
+                    myMapOfLightPrograms.Bind("unlit", myLightPrograms);
+                }
+                return;
+            }
+
+            // string  aKey = genLightKey(aLights, myLightSourceState.HasShadowMaps());
+            //  if (!myMapOfLightPrograms.Find(aKey, myLightPrograms))
+            {
+                //   myLightPrograms = new OpenGl_SetOfShaderPrograms();
+                //myMapOfLightPrograms.Bind(aKey, myLightPrograms);
+            }
+        }
 
         //! Choose Shading Model for filled primitives.
         //! Fallbacks to FACET model if there are no normal attributes.
         //! Fallbacks to corresponding non-PBR models if PBR is unavailable.
 
         internal Graphic3d_TypeOfShadingModel ChooseFaceShadingModel(
-            Graphic3d_TypeOfShadingModel theCustomModel, bool theHasNodalNormals)
+                    Graphic3d_TypeOfShadingModel theCustomModel, bool theHasNodalNormals)
         {
 
             if (!myContext.ColorMask())

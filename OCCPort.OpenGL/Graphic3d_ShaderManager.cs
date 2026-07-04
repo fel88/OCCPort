@@ -149,7 +149,7 @@ namespace OCCPort.OpenGL
         bool mySetPointSize;        //!< always set gl_PointSize variable
         bool myUseRedAlpha;         //!< use RED channel instead of ALPHA (e.g. GAPI supports only GL_RED textures and not GL_ALPHA)
         bool myToEmulateDepthClamp; //!< emulate depth clamping in GLSL program
-        bool mySRgbState;           //!< track sRGB state
+  protected      bool mySRgbState;           //!< track sRGB state
         Aspect_GraphicsLibrary myGapi;          //!< GAPI name
 
         public Graphic3d_ShaderManager(Aspect_GraphicsLibrary theGapi)

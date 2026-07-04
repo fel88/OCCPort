@@ -1,6 +1,9 @@
-﻿using OpenTK.Graphics.ES11;
+﻿using OCCPort.Common;
+using OpenTK.Graphics.ES11;
 using System;
+using System.Linq;
 using System.Reflection.Metadata;
+using TKService;
 
 namespace OCCPort.OpenGL
 {
@@ -11,9 +14,31 @@ namespace OCCPort.OpenGL
         {
 
         }
-        public OpenGl_VertexBufferT_OpenGl_VertexBuffer(int nbAttributes, object attribs) : base()
+        public Graphic3d_Attribute[] Attribs;
+        public int Stride;
+
+        
+        public OpenGl_VertexBufferT_OpenGl_VertexBuffer(int nbAttributes, Graphic3d_Buffer theAttribs ) : base()
         {
+            Stride = (theAttribs.IsInterleaved() ? theAttribs.Stride : 0);
             NbAttributes = nbAttributes;
+            Attribs=new Graphic3d_Attribute[NbAttributes];
+            //memcpy(Attribs, theAttribs.AttributesArray(), sizeof(Graphic3d_Attribute) * NbAttributes);
+            Attribs = theAttribs.AttributesArray().ToArray ();
+
+        }
+
+        public override bool HasColorAttribute()
+        {
+            for (int anAttribIter = 0; anAttribIter < NbAttributes; ++anAttribIter)
+            {
+                Graphic3d_Attribute anAttrib = Attribs[anAttribIter];
+                if (anAttrib.Id ==Graphic3d_TypeOfAttribute. Graphic3d_TOA_COLOR)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         int NbAttributes;

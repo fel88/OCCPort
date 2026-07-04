@@ -143,5 +143,15 @@ namespace TKernel
         {
             return list.Length;
         }
+
+        public class iterator
+        {
+            private object value;
+
+            public iterator(object value)
+            {
+                this.value = value;
+            }
+        }
     }
 }

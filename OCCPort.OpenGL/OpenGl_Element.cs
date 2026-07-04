@@ -3,13 +3,16 @@ using System;
 
 namespace OCCPort
 {
-	public abstract class OpenGl_Element
+    public abstract class OpenGl_Element
     {
-		public abstract void Render(OpenGl_Workspace theWorkspace);
+        public abstract void Render(OpenGl_Workspace theWorkspace);
 
-		internal bool IsFillDrawMode()
-		{
-			throw new NotImplementedException();
-		}
-	}
+
+        //! Return TRUE if primitive type generates shaded triangulation (to be used in filters).
+        public virtual bool IsFillDrawMode()
+        {
+            return false;
+        }
+
+    }
 }
