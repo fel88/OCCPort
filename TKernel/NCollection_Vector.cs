@@ -1,4 +1,5 @@
 ﻿
+
 namespace TKernel
 {
     //! Class NCollection_Vector (dynamic array of objects)
@@ -77,6 +78,11 @@ namespace TKernel
         public int Upper()
         {
             return Count - 1;
+        }
+
+        public void SetValue(int aPlaneId, bool v)
+        {
+            throw new NotImplementedException();
         }
 
         public class Iterator

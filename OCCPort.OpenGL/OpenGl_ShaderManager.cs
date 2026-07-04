@@ -35,6 +35,18 @@ namespace OCCPort.OpenGL
         }
 
 
+        // =======================================================================
+        // function : UpdateClippingState
+        // purpose  : Updates state of OCCT clipping planes
+        // =======================================================================
+        public void UpdateClippingState()
+        {
+            myClippingState.Update();
+        }
+
+        OpenGl_ClippingState myClippingState=new OpenGl_ClippingState ();      //!< State of OCCT clipping planes
+
+
         //! Returns current state of OCCT light sources.
         public OpenGl_LightSourceState LightSourceState() { return myLightSourceState; }
 
@@ -782,6 +794,49 @@ namespace OCCPort.OpenGL
         internal void UpdateMaterialState()
         {
             myMaterialState.Update();
+        }
+
+        // =======================================================================
+        // function : RevertClippingState
+        // purpose  : Reverts state of OCCT clipping planes
+        // =======================================================================
+       public  void RevertClippingState()
+        {
+            myClippingState.Revert();
+        }
+    }
+
+    //! Defines generic state of OCCT clipping state.
+    public class OpenGl_ClippingState
+    {
+        public OpenGl_ClippingState()
+        {
+            myIndex = (0);
+            myNextIndex = 1;
+        }
+        int myIndex;      //!< Current state index
+        int myNextIndex;  //!< Next    state index
+        NCollection_List<int> myStateStack=new NCollection_List<int> (); //!< Stack of previous states
+
+       public   void Revert()
+        {
+            if (!myStateStack.IsEmpty())
+            {
+                myIndex = myStateStack.First();
+                myStateStack.RemoveFirst();
+            }
+            else
+            {
+                myIndex = 0;
+            }
+        }
+
+
+        public void Update()
+        {
+            myStateStack.Prepend(myIndex);
+            myIndex = myNextIndex; // use myNextIndex here to handle properly Update() after Revert()
+            ++myNextIndex;
         }
     }
 }

@@ -144,5 +144,20 @@ namespace OCCPort.OpenGL
         {
             GL.Viewport(x, y, w, h);
         }
+
+        internal void glTexSubImage2D(All texture2D, int v1, int v2, int v3, int v4, int v5, int v6, int v7, byte[] aDataPtr)
+        {
+            GL.TexSubImage2D((TextureTarget)texture2D, v1, v2, v3, v4, v5, (PixelFormat)v6, (PixelType)v7, aDataPtr);
+        }
+
+        internal void glTexImage2D(All texture2D, int v1, int anIntFormat, int v2, int v3, int v4, int v5, int v6, byte[] aDataPtr)
+        {
+            GL.TexImage2D((TextureTarget)texture2D, v1,(PixelInternalFormat) anIntFormat, v2, v3, v4, (PixelFormat)v5, (PixelType)v6, aDataPtr);
+        }
+
+        internal void glGetTexLevelParameteriv(All proxyTexture2D, int v, All textureWidth, ref int aTestWidth)
+        {
+            GL.GetTexLevelParameter((TextureTarget)proxyTexture2D, v, (GetTextureParameter)textureWidth, out aTestWidth);
+        }
     }
 }

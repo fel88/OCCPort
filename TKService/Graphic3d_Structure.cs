@@ -699,9 +699,6 @@ namespace TKService
 
 
     }
-    public class Graphic3d_SequenceOfHClipPlane
-    {
-    }
 
     public class Graphic3d_BndBox3d : BVH_Box<Graphic3d_Vec3d, Graphic3d_Vec3d_BoxMinMax>
     {

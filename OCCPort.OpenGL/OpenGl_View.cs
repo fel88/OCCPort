@@ -104,7 +104,8 @@ namespace OCCPort.OpenGL
             myOpenGlFBO = new OpenGl_FrameBuffer("fbo_gl");
             myOpenGlFBO2 = new OpenGl_FrameBuffer("fbo_gl2");
 
-
+            myFboDepthFormat = (int)All.Depth24Stencil8;
+            myFboColorFormat = (int)All.Srgb8Alpha8;//// note that GL_SRGB8 is not required to be renderable, unlike GL_RGB8, GL_RGBA8, GL_SRGB8_ALPHA8
             myTextureParams = new OpenGl_Aspects();
 
             for (int i = 0; i < (int)Graphic3d_TypeOfBackground.Graphic3d_TypeOfBackground_NB; ++i)
@@ -1568,23 +1569,61 @@ namespace OCCPort.OpenGL
              */
 
 
-            // aCtx->BindTextures(Handle(OpenGl_TextureSet)(), Handle(OpenGl_ShaderProgram)());
+            aCtx.BindTextures(null, null);
 
-            //   const Graphic3d_TypeOfTextureFilter aFilter = (aDrawSizeX == aReadSizeX && aDrawSizeY == aReadSizeY) ? Graphic3d_TOTF_NEAREST : Graphic3d_TOTF_BILINEAR;
-            //    const GLint aFilterGl = aFilter == Graphic3d_TOTF_NEAREST ? GL_NEAREST : GL_LINEAR;
+            Graphic3d_TypeOfTextureFilter aFilter = (aDrawSizeX == aReadSizeX && aDrawSizeY == aReadSizeY) ? Graphic3d_TypeOfTextureFilter.Graphic3d_TOTF_NEAREST : Graphic3d_TypeOfTextureFilter.Graphic3d_TOTF_BILINEAR;
+            var aFilterGl = aFilter == Graphic3d_TypeOfTextureFilter.Graphic3d_TOTF_NEAREST ? All.Nearest : All.Linear;
 
             OpenGl_VertexBuffer aVerts = initBlitQuad(theToFlip);
             OpenGl_ShaderManager aManager = aCtx.ShaderManager();
             if (aVerts.IsValid()
              && aManager.BindFboBlitProgram(theReadFbo != null ? theReadFbo.NbSamples() : 0, toApplyGamma))
             {
+                aCtx.SetSampleAlphaToCoverage(false);
+                theReadFbo.ColorTexture().Bind(aCtx, Graphic3d_TextureUnit.Graphic3d_TextureUnit_0);
+                if (theReadFbo.ColorTexture().Sampler().Parameters().Filter() != aFilter)
+                {
+                    theReadFbo.ColorTexture().Sampler().Parameters().SetFilter(aFilter);
+                    aCtx.core20fwd.glTexParameteri(All.Texture2D, All.TextureMinFilter, aFilterGl);
+                    aCtx.core20fwd.glTexParameteri(All.Texture2D, All.TextureMagFilter, aFilterGl);
+                }
+
+                theReadFbo.DepthStencilTexture().Bind(aCtx, Graphic3d_TextureUnit.Graphic3d_TextureUnit_1);
+                if (theReadFbo.DepthStencilTexture().Sampler().Parameters().Filter() != aFilter)
+                {
+                    theReadFbo.DepthStencilTexture().Sampler().Parameters().SetFilter(aFilter);
+                    aCtx.core20fwd.glTexParameteri(All.Texture2D, All.TextureMinFilter, aFilterGl);
+                    aCtx.core20fwd.glTexParameteri(All.Texture2D, All.TextureMagFilter, aFilterGl);
+                }
+
+                aVerts.BindVertexAttrib(aCtx, (int)Graphic3d_TypeOfAttribute.Graphic3d_TOA_POS);
+
+                aCtx.core20fwd.glDrawArrays(All.TriangleStrip, 0, 4);
+
+                aVerts.UnbindVertexAttrib(aCtx, (int)Graphic3d_TypeOfAttribute.Graphic3d_TOA_POS);
+                theReadFbo.DepthStencilTexture().Unbind(aCtx, Graphic3d_TextureUnit.Graphic3d_TextureUnit_1);
+                theReadFbo.ColorTexture().Unbind(aCtx, Graphic3d_TextureUnit.Graphic3d_TextureUnit_0);
+                aCtx.BindProgram(null);
+
             }
-            /*
-             code here 
-             */
+            else
+            {
+                string aMsg =
+        "Error! FBO blitting has failed";
+                /*aCtx->PushMessage(GL_DEBUG_SOURCE_APPLICATION,
+                                   GL_DEBUG_TYPE_ERROR,
+                                   0,
+                                   GL_DEBUG_SEVERITY_HIGH,
+                                   aMsg);*/
+                myHasFboBlit = false;
+                //theReadFbo.Release(aCtx.operator->());
+                return true;
+            }
+
             return true;
         }
 
+        //! Initialize blit quad.
         OpenGl_VertexBuffer initBlitQuad(bool theToFlip)
         {
             OpenGl_VertexBuffer aVerts = null;
@@ -1788,6 +1827,10 @@ namespace OCCPort.OpenGL
             aCtx.SetReadBuffer(aCtx.DrawBuffer());
             return true;
         }
+        Graphic3d_SequenceOfHClipPlane myClipPlanes;
+
+        //! Sets list of clip planes for the view.
+        public override void SetClipPlanes(Graphic3d_SequenceOfHClipPlane thePlanes) { myClipPlanes = thePlanes; }
 
         public void renderScene(Graphic3d_Camera.Projection theProjection,
                              OpenGl_FrameBuffer theReadDrawFbo,
@@ -1795,8 +1838,28 @@ namespace OCCPort.OpenGL
                               bool theToDrawImmediate)
         {
             OpenGl_Context aContext = myWorkspace.GetGlContext();
+
+
+            // Specify clipping planes in view transformation space
+            aContext.ChangeClipping().Reset(myClipPlanes);
+            if (myClipPlanes!=null
+             && !myClipPlanes.IsEmpty())
+            {
+                aContext.ShaderManager().UpdateClippingState();
+            }
+
             renderStructs(theProjection, theReadDrawFbo, theOitAccumFbo, theToDrawImmediate);
-            //aContext->BindTextures(Handle(OpenGl_TextureSet)(), Handle(OpenGl_ShaderProgram)());
+            aContext.BindTextures(null, null);
+
+            // Apply restored view matrix.
+            aContext.ApplyWorldViewMatrix();
+
+            aContext.ChangeClipping().Reset(null);
+            if (myClipPlanes!=null
+             && !myClipPlanes.IsEmpty())
+            {
+                aContext.ShaderManager().RevertClippingState();
+            }
 
         }
         bool checkPBRAvailability()

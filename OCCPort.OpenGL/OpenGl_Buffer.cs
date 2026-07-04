@@ -52,11 +52,11 @@ namespace OCCPort.OpenGL
         //! Helpful constants
         const uint NO_BUFFER = 0;
 
-        int myOffset;       //!< offset to data
-        uint myBufferId;     //!< VBO name (index)
-        uint myComponentsNb; //!< Number of components per generic vertex attribute, must be 1, 2, 3, or 4
-        int myElemsNb;      //!< Number of vertex attributes / number of vertices
-        All myDataType;     //!< Data type (GL_FLOAT, GL_UNSIGNED_INT, GL_UNSIGNED_BYTE etc.)
+        protected int myOffset;       //!< offset to data
+        protected uint myBufferId;     //!< VBO name (index)
+        protected uint myComponentsNb; //!< Number of components per generic vertex attribute, must be 1, 2, 3, or 4
+        protected int myElemsNb;      //!< Number of vertex attributes / number of vertices
+        protected All myDataType;     //!< Data type (GL_FLOAT, GL_UNSIGNED_INT, GL_UNSIGNED_BYTE etc.)
 
         //! Overrides the number of vertex attributes / number of vertexes.
         //! It is up to user specifying this number correct (e.g. below initial value)!

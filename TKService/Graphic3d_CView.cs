@@ -15,6 +15,11 @@ namespace TKService
     //! computed (HLR or "view-dependent") structures.
     public abstract class Graphic3d_CView : Graphic3d_DataStructureManager
     {
+
+
+        //! Sets list of clip planes for the view.
+        public abstract void SetClipPlanes(Graphic3d_SequenceOfHClipPlane thePlanes);
+
         //! Sets list of lights for the view.
         public abstract void SetLights(Graphic3d_LightSet theLights);
         protected Quantity_ColorRGBA myBgColor = new Quantity_ColorRGBA();
@@ -897,46 +902,14 @@ namespace TKService
     {
     }
 
-    public class Graphic3d_TextureParams
+    //! Type of the texture filter.
+    //! Notice that for textures without mipmaps linear interpolation will be used instead of TOTF_BILINEAR and TOTF_TRILINEAR.
+    public enum Graphic3d_TypeOfTextureFilter
     {
-        //! Return modification counter of parameters related to sampler state.
-        public uint SamplerRevision()  { return mySamplerRevision; }
-
-        public void SetModulate(bool theToModulate)
-        {
-            myToModulate = theToModulate;
-        }
-
-        //! Default texture unit to be used, default is Graphic3d_TextureUnit_BaseColor.
-        public Graphic3d_TextureUnit TextureUnit() { return myTextureUnit; }
-        Graphic3d_TextureUnit myTextureUnit;     //!< default texture unit to bind texture; Graphic3d_TextureUnit_BaseColor by default
-
-        public void SetGenMode(Graphic3d_TypeOfTextureMode theMode,
-                                            Graphic3d_Vec4 thePlaneS,
-                                            Graphic3d_Vec4 thePlaneT)
-        {
-            myGenMode = theMode;
-            myGenPlaneS = thePlaneS;
-            myGenPlaneT = thePlaneT;
-        }
-
-        Graphic3d_Vec4 myGenPlaneS;       //!< texture coordinates generation plane S
-        Graphic3d_Vec4 myGenPlaneT;       //!< texture coordinates generation plane T
-        Graphic3d_Vec2 myScale;           //!< texture coordinates scale factor vector; (1,1) by default
-        Graphic3d_Vec2 myTranslation;     //!< texture coordinates translation vector;  (0,0) by default
-        uint mySamplerRevision; //!< modification counter of parameters related to sampler state
-                                //  Graphic3d_TextureUnit myTextureUnit;     //!< default texture unit to bind texture; Graphic3d_TextureUnit_BaseColor by default
-                                // Graphic3d_TypeOfTextureFilter myFilter;          //!< texture filter, Graphic3d_TOTF_NEAREST by default
-                                //   Graphic3d_LevelOfTextureAnisotropy myAnisoLevel;      //!< level of anisotropy filter, Graphic3d_LOTA_OFF by default
-        Graphic3d_TypeOfTextureMode myGenMode;         //!< texture coordinates generation mode, Graphic3d_TOTM_MANUAL by default
-        int myBaseLevel;       //!< base texture mipmap level (0 by default)
-        int myMaxLevel;        //!< maximum texture mipmap array level (1000 by default)
-        float myRotAngle;        //!< texture coordinates rotation angle in degrees, 0 by default
-        bool myToModulate;      //!< flag to modulate texture with material color, FALSE by default
-        bool myToRepeat;        //!< flag to repeat (true) or wrap (false) texture coordinates out of [0,1] range
-
-
-    } //! Type of the texture projection.
+        Graphic3d_TOTF_NEAREST,
+        Graphic3d_TOTF_BILINEAR,
+        Graphic3d_TOTF_TRILINEAR
+    };
 
     public enum Graphic3d_TypeOfTextureMode
     {
@@ -949,7 +922,7 @@ namespace TKService
 
 
     //! Type of the texture file format.
- public   enum Graphic3d_TypeOfTexture
+    public enum Graphic3d_TypeOfTexture
     {
         //! 1D texture (array).
         //! Note that this texture type might be unsupported by graphics API (emulated by 2D texture with 1 pixel height).
@@ -972,8 +945,30 @@ namespace TKService
         Graphic3d_TOT_2D = Graphic3d_TypeOfTexture_2D,
         Graphic3d_TOT_CUBEMAP = Graphic3d_TypeOfTexture_CUBEMAP
     };
+
+    //! Class represents packed image plane.
     public class Image_PixMap
     {
+
+
+        //! Return data pointer for low-level operations (copying entire buffer, parsing with extra tools etc.).
+        public  byte[] Data()  { return myData.Data(); }
+
+        //! Return pixel format.
+        public Image_Format Format() { return myImgFormat; }
+        Image_PixMapData myData;      //!< data buffer
+        Image_Format myImgFormat; //!< pixel format
+                                  //! Returns TRUE if image data is stored from Top to the Down.
+                                  //! By default Bottom Up order is used instead
+                                  //! (topmost scanlines starts from the bottom in memory).
+                                  //! which is most image frameworks naturally support.
+                                  //!
+                                  //! Notice that access methods within this class automatically
+                                  //! convert input row-index to apply this flag!
+                                  //! You should use this flag only if interconnect with alien APIs and buffers.
+                                  //! @return true if image data is top-down
+        public bool IsTopDown() { return myData.TopToDown == 1; }
+
     }
 
     //! Base class for cubemaps.
@@ -1053,6 +1048,46 @@ namespace TKService
         Aspect_TOR_BOTTOM_AND_LEFT_BORDER,
         Aspect_TOR_LEFT_AND_TOP_BORDER
     };
+
+
+    public enum Image_Format
+    {
+        Image_Format_UNKNOWN = 0, //!< unsupported or unknown format
+        Image_Format_Gray = 1, //!< 1 byte per pixel, intensity of the color
+        Image_Format_Alpha,       //!< 1 byte per pixel, transparency
+        Image_Format_RGB,         //!< 3 bytes packed RGB image plane
+        Image_Format_BGR,         //!< same as RGB but with different components order
+        Image_Format_RGB32,       //!< 4 bytes packed RGB image plane (1 extra byte for alignment, may have undefined value)
+        Image_Format_BGR32,       //!< same as RGB but with different components order
+        Image_Format_RGBA,        //!< 4 bytes packed RGBA image plane
+        Image_Format_BGRA,        //!< same as RGBA but with different components order
+        Image_Format_GrayF,       //!< 1 float  (4-bytes) per pixel (1-component plane), intensity of the color
+        Image_Format_AlphaF,      //!< 1 float  (4-bytes) per pixel (1-component plane), transparency
+        Image_Format_RGF,         //!< 2 floats (8-bytes) RG image plane
+        Image_Format_RGBF,        //!< 3 floats (12-bytes) RGB image plane
+        Image_Format_BGRF,        //!< same as RGBF but with different components order
+        Image_Format_RGBAF,       //!< 4 floats (16-bytes) RGBA image plane
+        Image_Format_BGRAF,       //!< same as RGBAF but with different components order
+        Image_Format_GrayF_half,  //!< 1 half-float  (2-bytes) intensity of color
+        Image_Format_RGF_half,    //!< 2 half-floats (4-bytes) RG   image plane
+        Image_Format_RGBAF_half,  //!< 4 half-floats (8-bytes) RGBA image plane
+        Image_Format_Gray16,      //!< 2 bytes per pixel (unsigned short integer), intensity of the color
+    };
+
+    //! Structure to manage image buffer.
+    public class Image_PixMapData : NCollection_Buffer
+    {
+        public Image_PixMapData() : base(null)
+        {
+            
+
+            TopToDown = -1;
+
+        
+        }
+       public  int TopToDown;      //!< image scanlines direction in memory from Top to the Down
+
+    }
 }
 
 

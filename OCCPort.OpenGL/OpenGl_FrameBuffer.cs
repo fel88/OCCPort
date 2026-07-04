@@ -17,9 +17,14 @@ namespace OCCPort
         //! Number of multisampling samples.
         public int NbSamples() { return myNbSamples; }
 
+        //! Returns the color texture for the given color buffer index.
+        public OpenGl_Texture ColorTexture(int theColorBufferIndex = 0)
+        {
+            return myColorTextures.Value(theColorBufferIndex);
+        }
 
         //! Returns the depth-stencil texture.
-        public OpenGl_Texture DepthStencilTexture()  { return myDepthStencilTexture; }
+        public OpenGl_Texture DepthStencilTexture() { return myDepthStencilTexture; }
 
 
         //! Return true if FBO has been created with color attachment.

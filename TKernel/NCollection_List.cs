@@ -1,6 +1,7 @@
 ﻿
 
 
+
 namespace TKernel
 {//! Generic matrix of 4 x 4 elements.
     public class NCollection_List<T> : List<T>
@@ -90,6 +91,11 @@ namespace TKernel
         {
             var index = IndexOf(aLayerIter);
             Insert(index + 1, aNewLayer);
+        }
+
+        public void RemoveFirst()
+        {
+            RemoveAt(0);
         }
     }
 }

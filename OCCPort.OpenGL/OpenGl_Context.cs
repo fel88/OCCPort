@@ -1,6 +1,10 @@
-﻿using OpenTK.Audio.OpenAL;
+﻿using OCCPort;
+using OCCPort.Common;
+using OCCPort.OpenGL;
+using OpenTK.Audio.OpenAL;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
+using OpenTK.Windowing.GraphicsLibraryFramework;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -8,10 +12,10 @@ using System.Reflection.Metadata;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Runtime.Intrinsics.Arm;
-using static System.Net.Mime.MediaTypeNames;
 using TKernel;
 using TKService;
-using OCCPort.Common;
+using static System.Net.Mime.MediaTypeNames;
+using ErrorCode = OpenTK.Graphics.OpenGL.ErrorCode;
 
 
 namespace OCCPort.OpenGL
@@ -78,11 +82,11 @@ namespace OCCPort.OpenGL
             myFuncs = (new OpenGl_GlFunctions());
             myGapi = Aspect_GraphicsLibrary.Aspect_GraphicsLibrary_OpenGL;
             /*
-               mySupportedFormats (new Image_SupportedFormats()),
-  myAnisoMax   (1),
-  myTexClamp   (GL_CLAMP_TO_EDGE),
-  myMaxTexDim  (1024),
-  myMaxTexCombined (1),
+               mySupportedFormats (new Image_SupportedFormats()),*/
+            myAnisoMax=(1);
+  //myTexClamp=.(GL_CLAMP_TO_EDGE);
+  myMaxTexDim = (1024);
+            myMaxTexCombined = (1);/*
   myMaxTexUnitsFFP (1),
   myMaxDumpSizeX (1024),
   myMaxDumpSizeY (1024),
@@ -125,9 +129,10 @@ myPointSpriteOrig (GL_UPPER_LEFT),*/
             myDrawBuffers = new NCollection_Array1<int>(0, 7);
 
             myDefaultVao = (0);
-            //myColorMask = (true);
+            myColorMask = new NCollection_Vec4<bool>(true);
+
+            myAlphaToCoverage = (false);
             /*
-myAlphaToCoverage (false),
 myIsGlDebugCtx (false),
 myIsWindowDeepColor (false),
 myIsSRgbWindow (false),
@@ -157,8 +162,158 @@ myLineFeather (1.0f),*/
             myShaderManager = new OpenGl_ShaderManager(this);
             mySharedResources = (new OpenGl_ResourcesMap());
 
-        }        
-        
+        }
+
+       public  bool arbTexFloat;        //!< GL_ARB_texture_float (on desktop OpenGL - since 3.0 or as extension GL_ARB_texture_float; on OpenGL ES - since 3.0); @sa hasTexFloatLinear for linear filtering support
+
+        bool myAlphaToCoverage; //!< flag indicating GL_SAMPLE_ALPHA_TO_COVERAGE state
+        public bool extAnis;            //!< GL_EXT_texture_filter_anisotropic
+
+        //! Either GL_CLAMP_TO_EDGE (1.2+) or GL_CLAMP (1.1).
+        public int TextureWrapClamp() { return myTexClamp; }
+
+        //! @return maximum degree of anisotropy texture filter
+        public int MaxDegreeOfAnisotropy() { return myAnisoMax; }
+
+        public bool SetSampleAlphaToCoverage(bool theToEnable)
+        {
+            bool toEnable = myAllowAlphaToCov && theToEnable;
+            if (myAlphaToCoverage == toEnable)
+            {
+                return myAlphaToCoverage;
+            }
+
+            if (core15fwd != null)
+            {
+                if (toEnable)
+                {
+                    //core15fwd->core15fwd->glSampleCoverage (1.0f, GL_FALSE);
+                    core15fwd.glEnable(All.SampleAlphaToCoverage);
+                }
+                else
+                {
+                    core15fwd.glDisable(All.SampleAlphaToCoverage);
+                }
+            }
+
+            bool anOldValue = myAlphaToCoverage;
+            myAlphaToCoverage = toEnable;
+            return anOldValue;
+        }
+
+
+        OpenGl_Texture myTextureRgbaBlack;//!< mock black texture returning (0, 0, 0, 0)
+        OpenGl_Texture myTextureRgbaWhite;//!< mock white texture returning (1, 1, 1, 1)
+
+        //! Bind specified texture set to current context, or unbind previous one when NULL specified.
+        //! @param theTextures [in] texture set to bind
+        //! @param theProgram  [in] program attributes; when not NULL,
+        //!                         mock textures will be bound to texture units expected by GLSL program, but undefined by texture set
+        //! @return previous texture set
+        public OpenGl_TextureSet BindTextures(OpenGl_TextureSet theTextures,
+                                                        OpenGl_ShaderProgram theProgram)
+        {
+            int aTextureSetBits = theTextures != null ? theTextures.TextureSetBits() : 0;
+            int aProgramBits = theProgram != null ? theProgram.TextureSetBits() : 0;
+            int aMissingBits = aProgramBits & ~aTextureSetBits;
+            if (aMissingBits != 0
+             && myTextureRgbaBlack == null)
+            {
+                // allocate mock textures
+                myTextureRgbaBlack = new OpenGl_Texture();
+                myTextureRgbaWhite = new OpenGl_Texture();
+                Image_PixMap anImage;
+                //   anImage.InitZero(Image_Format_RGBA, 2, 2, 0, (Standard_Byte)0);
+                //   if (!myTextureRgbaBlack->Init(this, OpenGl_TextureFormat::Create < GLubyte, 4 > (), Graphic3d_Vec2i(2, 2), Graphic3d_TypeOfTexture_2D, &anImage))
+                {
+                    //PushMessage(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_PORTABILITY, 0, GL_DEBUG_SEVERITY_HIGH,
+                    //     "Error: unable to create unit mock PBR texture map.");
+                }
+                //anImage.InitZero(Image_Format_RGBA, 2, 2, 0, (Standard_Byte)255);
+                //  if (!myTextureRgbaWhite->Init(this, OpenGl_TextureFormat::Create < GLubyte, 4 > (), Graphic3d_Vec2i(2, 2), Graphic3d_TypeOfTexture_2D, &anImage))
+                {
+                    //PushMessage(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_PORTABILITY, 0, GL_DEBUG_SEVERITY_HIGH,
+                    //  "Error: unable to create normal mock PBR texture map.");
+                }
+            }
+
+            OpenGl_TextureSet anOldTextures = myActiveTextures;
+            if (myActiveTextures != theTextures)
+            {
+                OpenGl_Context aThisCtx = (this);
+                for (OpenGl_TextureSetPairIterator aSlotIter = new OpenGl_TextureSetPairIterator(myActiveTextures, theTextures); aSlotIter.More(); aSlotIter.Next())
+                {
+                    Graphic3d_TextureUnit aTexUnit = aSlotIter.Unit();
+                    OpenGl_Texture aTextureOld = aSlotIter.Texture1();
+                    OpenGl_Texture aTextureNew = aSlotIter.Texture2();
+                    if (aTextureNew == aTextureOld)
+                    {
+                        continue;
+                    }
+
+                    if (aTextureNew != null
+                     && aTextureNew.IsValid())
+                    {
+                        if ((int)aTexUnit >= myMaxTexCombined)
+                        {
+                            //PushMessage(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_HIGH,
+                            //        TCollection_AsciiString("Texture unit ") + aTexUnit + " for " + aTextureNew->ResourceId() + " exceeds hardware limit " + myMaxTexCombined);
+                            continue;
+                        }
+
+                        aTextureNew.Bind(aThisCtx, aTexUnit);
+                        if (aTextureNew.Sampler().ToUpdateParameters())
+                        {
+                            if (aTextureNew.Sampler().IsImmutable())
+                            {
+                                aTextureNew.Sampler().Init(aThisCtx, aTextureNew);
+                            }
+                            else
+                            {
+                                //  OpenGl_Sampler.applySamplerParams(aThisCtx, aTextureNew->Sampler()->Parameters(), aTextureNew->Sampler().get(), aTextureNew->GetTarget(), aTextureNew->MaxMipmapLevel());
+                            }
+                        }
+                        if (core11ffp != null)
+                        {
+                            // OpenGl_Sampler.applyGlobalTextureParams(aThisCtx, *aTextureNew, aTextureNew->Sampler()->Parameters());
+                        }
+                    }
+                    else if (aTextureOld != null
+                          && aTextureOld.IsValid())
+                    {
+                        aTextureOld.Unbind(aThisCtx, aTexUnit);
+                        if (core11ffp != null)
+                        {
+                            //OpenGl_Sampler.resetGlobalTextureParams(aThisCtx, *aTextureOld, aTextureOld->Sampler()->Parameters());
+                        }
+                    }
+                }
+                myActiveTextures = theTextures;
+            }
+
+            //if (myActiveMockTextures != aMissingBits)
+            //{
+            //    myActiveMockTextures = aMissingBits;
+            //    for (int aBitIter = 0; aMissingBits != 0; ++aBitIter)
+            //    {
+            //        int aUnitMask = 1 << aBitIter;
+            //        if ((aUnitMask & aMissingBits) != 0)
+            //        {
+            //            aMissingBits = aMissingBits & ~aUnitMask;
+            //            if (aBitIter == Graphic3d_TextureUnit_Normal)
+            //            {
+            //                myTextureRgbaBlack.Bind(this, static_cast<Graphic3d_TextureUnit>(aBitIter));
+            //            }
+            //            else
+            //            {
+            //                myTextureRgbaWhite.Bind(this, static_cast<Graphic3d_TextureUnit>(aBitIter));
+            //            }
+            //        }
+            //    }
+            //}
+
+            return anOldTextures;
+        }
 
         public void DisableFeatures()
         {
@@ -219,12 +374,13 @@ myLineFeather (1.0f),*/
                 }
             }
         }
+        public bool arbNPTW;            //!< GL_ARB_texture_non_power_of_two
 
         //! Get maximum number of clip planes supported by OpenGl.
         //! This value is implementation dependent. At least 6
         //! planes should be supported by OpenGl (see specs).
         //! @return value for GL_MAX_CLIP_PLANES
-        public int MaxClipPlanes()  { return myMaxClipPlanes; }
+        public int MaxClipPlanes() { return myMaxClipPlanes; }
 
         //! Returns TRUE if PBR shading model is supported.
         //! Basically, feature requires OpenGL 3.0+ / OpenGL ES 3.0+ hardware; more precisely:
@@ -234,12 +390,12 @@ myLineFeather (1.0f),*/
         //! - GL_RG32F texture format (arbTexRG + arbTexFloat)
         //! - Cubemap texture lookup textureCubeLod()/textureLod() with LOD index within Fragment Shader,
         //!   which requires GLSL OpenGL 3.0+ / OpenGL ES 3.0+ or OpenGL 2.1 + GL_EXT_gpu_shader4 extension.
-        public bool HasPBR()  { return myHasPBR; }
+        public bool HasPBR() { return myHasPBR; }
         bool myHasPBR;                      //!< indicates whether PBR shading model is supported
 
 
         bool myIsGlNormalizeEnabled; //!< GL_NORMALIZE flag
-                                                 //!< Used to tell OpenGl that normals should be normalized
+                                     //!< Used to tell OpenGl that normals should be normalized
         public bool SetGlNormalizeEnabled(bool isEnabled)
         {
             if (isEnabled == myIsGlNormalizeEnabled)
@@ -1041,12 +1197,14 @@ myLineFeather (1.0f),*/
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool SwapBuffers(IntPtr hdc);
 
-        public void SwapBuffers()
+        public unsafe void SwapBuffers()
         {
 
             if (myDisplay != null)
             {
-               
+                GLFW.SwapBuffers((Window*)myDisplay.ToPointer());
+                GLFW.PollEvents();
+
                 SwapBuffers(myDisplay);
                 core11fwd.glFlush();
             }
@@ -1283,8 +1441,21 @@ myLineFeather (1.0f),*/
 
         internal void EnableFeatures()
         {
-            
+
         }
+
+        //! @return true if texture parameters GL_TEXTURE_BASE_LEVEL/GL_TEXTURE_MAX_LEVEL are supported.
+        public bool HasTextureBaseLevel()
+        {
+            return myGapi == Aspect_GraphicsLibrary.Aspect_GraphicsLibrary_OpenGLES
+                 ? IsGlGreaterEqual(3, 0)
+                 : IsGlGreaterEqual(1, 2);
+        }
+
+
+        //! @return tool for management of clippings within this context.
+        public OpenGl_Clipping ChangeClipping() { return myClippingState; }
+
 
         bool myIsSRgbActive;    //!< flag indicating GL_FRAMEBUFFER_SRGB state
 
@@ -1320,15 +1491,6 @@ myLineFeather (1.0f),*/
         //! Empty constructor. You should call Init() to perform initialization with bound GL context.
 
 
-    }
-
-
-    //! Provide Sampler Object functionality (texture parameters stored independently from texture itself).
-    //! Available since OpenGL 3.3+ (GL_ARB_sampler_objects extension) and OpenGL ES 3.0+.
-    public interface IOpenGl_ArbSamplerObject
-    {
-        void glBindSampler(Graphic3d_TextureUnit theUnit, uint mySamplerID);
-        void glDeleteSamplers(int v, uint[] mySamplerID);
     }
 
 }

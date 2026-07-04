@@ -4,7 +4,7 @@
     {
         public static void Standard_ASSERT_RETURN(bool v1, string v2)
         {
-            if (v1)
+            if (!v1)
                 throw new Exception(v2);
         }
 

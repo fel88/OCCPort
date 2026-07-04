@@ -5,17 +5,17 @@ using TKService;
 namespace OCCPort.OpenGL
 {
     //! Mega structure defines the complete list of OpenGL functions.
-    public class OpenGl_GlFunctions: IOpenGl_ArbSamplerObject
+    public class OpenGl_GlFunctions : IOpenGl_ArbSamplerObject
     {
         void IOpenGl_ArbSamplerObject.glBindSampler(Graphic3d_TextureUnit theUnit, uint mySamplerID)
         {
             OpenGl_GlFunctions.glBindSampler(theUnit, mySamplerID);
         }
-        public Func<All,int,string> glGetStringi;
+        public Func<All, int, string> glGetStringi;
 
-        public static  void glBindSampler(Graphic3d_TextureUnit theUnit, uint mySamplerID)
+        public static void glBindSampler(Graphic3d_TextureUnit theUnit, uint mySamplerID)
         {
-            
+
             GL.BindSampler((int)theUnit, (int)mySamplerID);
         }
 
@@ -122,7 +122,8 @@ namespace OCCPort.OpenGL
 
         internal FramebufferErrorCode glCheckFramebufferStatus(All framebuffer)
         {
-           return GL.CheckFramebufferStatus((FramebufferTarget)framebuffer);
+            var ret = GL.CheckFramebufferStatus((FramebufferTarget)framebuffer);
+            return ret;
         }
 
         internal void glFramebufferTexture2D(All target, All attachment, uint textarget, uint texture, int level)
@@ -153,7 +154,7 @@ namespace OCCPort.OpenGL
         }
         internal void glRenderbufferStorage(All renderbuffer, All aDepthStencilFormat, int aSizeX, int aSizeY)
         {
-            GL.RenderbufferStorage((RenderbufferTarget)renderbuffer,(RenderbufferStorage)aDepthStencilFormat, aSizeX, aSizeY);
+            GL.RenderbufferStorage((RenderbufferTarget)renderbuffer, (RenderbufferStorage)aDepthStencilFormat, aSizeX, aSizeY);
         }
 
         internal void glRenderbufferStorageMultisample(All renderbuffer, int theNbSamples, int myDepthFormat, int aSizeX, int aSizeY)
@@ -166,23 +167,35 @@ namespace OCCPort.OpenGL
             GL.FramebufferRenderbuffer((FramebufferTarget)framebuffer, (FramebufferAttachment)colorAttachment0, (RenderbufferTarget)renderbuffer, myGlColorRBufferId);
         }
 
-        public void glDeleteSamplers(int v,  uint[] mySamplerID)
+        public void glDeleteSamplers(int v, uint[] mySamplerID)
         {
             GL.DeleteSamplers(v, mySamplerID);
         }
 
         internal void glDeleteFramebuffers(int v, uint[] value)
         {
-            throw new NotImplementedException();
+            GL.DeleteFramebuffers(v, value);
         }
 
         internal void glDeleteRenderbuffers(int v, uint[] value)
         {
-            throw new NotImplementedException();
+            GL.DeleteRenderbuffers(v, value);
         }
 
-        internal Action <uint , int , int , int , int , bool> glTexImage2DMultisample;
+        public void glGenSamplers(int v, uint[] mySamplerID)
+        {
+            GL.GenSamplers(v, mySamplerID);
+        }
 
-        public Action <uint , int , int , int , int , bool > glTexStorage2DMultisample;
+        public void glGenSampler(ref uint mySamplerID)
+        {
+            mySamplerID = (uint)GL.GenSampler();
+        }
+
+
+
+        internal Action<uint, int, int, int, int, bool> glTexImage2DMultisample;
+
+        public Action<uint, int, int, int, int, bool> glTexStorage2DMultisample;
     }
 }

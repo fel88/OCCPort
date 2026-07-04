@@ -62,6 +62,9 @@ namespace OCCPort.OpenGL
         {
         }
 
+        //! Return texture units declared within the program, @sa Graphic3d_TextureSetBits.
+        public int TextureSetBits() { return myTextureSetBits; }
+
         //! Specifies the value of the float uniform 4x4 matrix.
         //! Wrapper for glUniformMatrix4fv()
         public bool SetUniform(OpenGl_Context theCtx,

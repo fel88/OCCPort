@@ -74,9 +74,24 @@ namespace OCCPort.OpenGL
             GL.Disable((EnableCap)depthTest);
         }
 
+        internal void glDisableVertexAttribArray(uint theAttribLoc)
+        {
+            GL.DisableVertexAttribArray(theAttribLoc);
+        }
+
+        internal void glDrawArrays(All triangleStrip, int v1, int v2)
+        {
+            GL.DrawArrays((PrimitiveType)triangleStrip, v1, v2);
+        }
+
         internal void glEnable(All depthTest)
         {
             GL.Enable((EnableCap)depthTest);
+        }
+
+        internal void glEnableVertexAttribArray(uint theAttribLoc)
+        {
+            GL.EnableVertexAttribArray(theAttribLoc);
         }
 
         internal void glGetProgramInfoLog(int myProgramID, int aLength, out int len, out string aLog)
@@ -110,6 +125,11 @@ namespace OCCPort.OpenGL
             GL.ShaderSource(myShaderID,  code);
         }
 
+        internal void glTexParameteri(All texture2D, All textureMinFilter, All aFilterGl)
+        {
+            GL.TextureParameter((int)texture2D,(TextureParameterName)textureMinFilter, (int)aFilterGl);
+        }
+
         internal void glUniform1i(int theLocation, Graphic3d_TextureUnit theTextureUnit)
         {
             GL.Uniform1(theLocation, (int)theTextureUnit);
@@ -135,6 +155,11 @@ namespace OCCPort.OpenGL
         internal void glUseProgram(int v)
         {
             GL.UseProgram(v);
+        }
+
+        internal void glVertexAttribPointer(uint index, uint size, All type, bool normalized, int stride, int pointer)
+        {
+            GL.VertexAttribPointer((int)index, (int)size, (VertexAttribPointerType)type, normalized, stride, pointer);
         }
     }
 }

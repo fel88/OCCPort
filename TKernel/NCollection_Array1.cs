@@ -143,8 +143,31 @@ namespace TKernel
         {
             return list.Length;
         }
+        //! Implementation of the Iterator interface.
+        public class Iterator
+        {
 
-        public class iterator
+            NCollection_Array1<T> col;
+            int index = 0;
+            //! Constant value access
+            public  T ChangeValue()
+            {
+                return Value();
+            }
+            public  T Value() 
+            { return col[index]; }
+
+
+        public void Next()
+            {
+index++;
+            }
+        public bool More()
+            {
+                return index < col.Length();
+            }
+        }
+            public class iterator
         {
             private object value;
 

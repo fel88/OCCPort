@@ -53,5 +53,16 @@ namespace OCCPort.OpenGL
             return (int)GL.GetError();
 
         }
+
+        internal void glDisable(All sampleAlphaToCoverage)
+        {
+            GL.Disable((EnableCap)sampleAlphaToCoverage);
+
+        }
+
+        internal void glEnable(All sampleAlphaToCoverage)
+        {
+            GL.Enable((EnableCap)sampleAlphaToCoverage);
+        }
     }
 }

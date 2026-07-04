@@ -82,6 +82,13 @@ namespace TKernel
             v[2] = theZ;
         }
 
+        //! Assign new values to the vector.
+        public void SetValues(NCollection_Vec2<T> theVec2, T theZ)
+        {
+            v[0] = theVec2.x();
+            v[1] = theVec2.y();
+            v[2] = theZ;
+        }
         //! Initialize ALL components of vector within specified value.
         public NCollection_Vec3(T theValue)
         {
@@ -93,9 +100,15 @@ namespace TKernel
 
         }
 
-        public NCollection_Vec3(Graphic3d_Vec2i theSizeXY, int v1) : this()
+        //! Constructor from 2-components vector + optional 3rd value.
+        public NCollection_Vec3(NCollection_Vec2<T> theVec2, T theZ = default)
         {
+            v[0] = theVec2[0];
+            v[1] = theVec2[1];
+            v[2] = theZ;
         }
+
+
 
 
         //! Computes the square of vector modulus(magnitude, length).
@@ -206,13 +219,12 @@ namespace TKernel
 
         }
 
-        //! Constructor from 2-components vector + optional 3rd value.
-        public NCollection_Vec3(NCollection_Vec2<T> theVec2, T theZ = default)
+        public NCollection_Vec2<T> xy()
         {
-            v[0] = theVec2[0];
-            v[1] = theVec2[1];
-            v[2] = theZ;
+            return new NCollection_Vec2<T>(x(), y());
         }
+
+
         //public void Normalize()
         //{
         //    T aModulus = Modulus();
