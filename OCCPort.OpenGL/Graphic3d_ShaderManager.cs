@@ -149,7 +149,7 @@ namespace OCCPort.OpenGL
         bool mySetPointSize;        //!< always set gl_PointSize variable
         bool myUseRedAlpha;         //!< use RED channel instead of ALPHA (e.g. GAPI supports only GL_RED textures and not GL_ALPHA)
         bool myToEmulateDepthClamp; //!< emulate depth clamping in GLSL program
-  protected      bool mySRgbState;           //!< track sRGB state
+        protected bool mySRgbState;           //!< track sRGB state
         Aspect_GraphicsLibrary myGapi;          //!< GAPI name
 
         public Graphic3d_ShaderManager(Aspect_GraphicsLibrary theGapi)
@@ -178,6 +178,7 @@ namespace OCCPort.OpenGL
         }
         protected Graphic3d_Vec2i myGapiVersion = new TKernel.NCollection_Vec2<int>();         //!< GAPI version major/minor number pair
 
+        //! Prepare standard GLSL program for FBO blit operation.
         protected Graphic3d_ShaderProgram getStdProgramFboBlit(int theNbSamples,
                                                                                  bool theIsFallback_sRGB)
         {
@@ -207,25 +208,25 @@ namespace OCCPort.OpenGL
 
                 aSrcFrag =
                 "#define THE_NUM_SAMPLES " + theNbSamples
-                + (theIsFallback_sRGB ? "#define THE_SHIFT_sRGB" : "")
-    + "void main()"
-               + "{"
-               + "  ivec2 aSize  = textureSize (uColorSampler);"
-               + "  ivec2 anUV   = ivec2 (vec2 (aSize) * TexCoord);"
-               + "  gl_FragDepth = texelFetch (uDepthSampler, anUV, THE_NUM_SAMPLES / 2 - 1).r;"
-               +
+               + Environment.NewLine + (theIsFallback_sRGB ? "#define THE_SHIFT_sRGB" : "")
+    + Environment.NewLine + "void main()"
+             + Environment.NewLine + "{"
+              + Environment.NewLine + "  ivec2 aSize  = textureSize (uColorSampler);"
+              + Environment.NewLine + "  ivec2 anUV   = ivec2 (vec2 (aSize) * TexCoord);"
+              + Environment.NewLine + "  gl_FragDepth = texelFetch (uDepthSampler, anUV, THE_NUM_SAMPLES / 2 - 1).r;"
+              + Environment.NewLine +
       "  vec4 aColor = vec4 (0.0);"
-                + "  for (int aSample = 0; aSample < THE_NUM_SAMPLES; ++aSample)"
-                + "  {"
-                + "    vec4 aVal = texelFetch (uColorSampler, anUV, aSample);"
-                + "    aColor += aVal;"
-                + "  }"
-                + "  aColor /= float(THE_NUM_SAMPLES);"
-                + "#ifdef THE_SHIFT_sRGB"
-                + "  aColor.rgb = pow (aColor.rgb, vec3 (1.0 / 2.2));"
-                + "#endif"
-                + "  occSetFragColor (aColor);"
-                + "}";
+             + Environment.NewLine + "  for (int aSample = 0; aSample < THE_NUM_SAMPLES; ++aSample)"
+            + Environment.NewLine + "  {"
+            + Environment.NewLine + "    vec4 aVal = texelFetch (uColorSampler, anUV, aSample);"
+             + Environment.NewLine + "    aColor += aVal;"
+             + Environment.NewLine + "  }"
+             + Environment.NewLine + "  aColor /= float(THE_NUM_SAMPLES);"
+             + Environment.NewLine + "#ifdef THE_SHIFT_sRGB"
+              + Environment.NewLine + "  aColor.rgb = pow (aColor.rgb, vec3 (1.0 / 2.2));"
+              + Environment.NewLine + "#endif"
+               + Environment.NewLine + "  occSetFragColor (aColor);"
+                + Environment.NewLine + "}";
             }
             else
             {
@@ -233,14 +234,14 @@ namespace OCCPort.OpenGL
                 aUniforms.Append(new Graphic3d_ShaderObject.ShaderVariable("sampler2D uDepthSampler", Graphic3d_TypeOfShaderObject.Graphic3d_TOS_FRAGMENT));
                 aSrcFrag =
                  (theIsFallback_sRGB ? "#define THE_SHIFT_sRGB" : "")
-    + "void main()"
-              + "{"
-              + "  gl_FragDepth = occTexture2D (uDepthSampler, TexCoord).r;"
-              + "  vec4  aColor = occTexture2D (uColorSampler, TexCoord);"
-              + "#ifdef THE_SHIFT_sRGB"
-              + "  aColor.rgb = pow (aColor.rgb, vec3 (1.0 / 2.2));"
-              + "#endif"
-              + "  occSetFragColor (aColor);"
+     + Environment.NewLine + "void main()"
+       + Environment.NewLine + "{"
+         + Environment.NewLine + "  gl_FragDepth = occTexture2D (uDepthSampler, TexCoord).r;"
+         + Environment.NewLine + "  vec4  aColor = occTexture2D (uColorSampler, TexCoord);"
+          + Environment.NewLine + "#ifdef THE_SHIFT_sRGB"
+           + Environment.NewLine + "  aColor.rgb = pow (aColor.rgb, vec3 (1.0 / 2.2));"
+            + Environment.NewLine + "#endif"
+            + Environment.NewLine + "  occSetFragColor (aColor);"
               + "}";
             }
 
@@ -266,22 +267,19 @@ namespace OCCPort.OpenGL
                         {
                             aProgramSrc.SetHeader("#version 300 es");
                         }
-                        /*else if (myGlslExtensions[Graphic3d_GlslExtension_GL_EXT_frag_depth])
+                        else if (myGlslExtensions[(int)Graphic3d_GlslExtension.Graphic3d_GlslExtension_GL_EXT_frag_depth])
                         {
                             aProgramSrc.SetHeader("#extension GL_EXT_frag_depth : enable"
-
-
-
                                                     +"#define gl_FragDepth gl_FragDepthEXT");
-                        }*/
+                        }
                         else
                         {
                             // there is no way to draw into depth buffer
                             aSrcFrag =
                               "void main()"
-                            + "{"
-                            + "  occSetFragColor (occTexture2D (uColorSampler, TexCoord));"
-                            + "}";
+                           + Environment.NewLine + "{"
+                          + Environment.NewLine + "  occSetFragColor (occTexture2D (uColorSampler, TexCoord));"
+                           + Environment.NewLine + "}";
                         }
                         break;
                     }
@@ -402,10 +400,13 @@ namespace OCCPort.OpenGL
        : Environment.NewLine + "float getAlpha(void) { return occTexture2D(occSamplerPointSprite, " + THE_VEC2_glPointCoord + ").a; }";
         }
 
-        // =======================================================================
-        // function : getStdProgramPhong
-        // purpose  :
-        // =======================================================================
+
+        //! Prepare standard GLSL program with per-pixel lighting.
+        //! @param theLights [in] list of light sources
+        //! @param theBits   [in] program bits
+        //! @param theIsFlatNormal [in] when TRUE, the Vertex normals will be ignored and Face normal will be computed instead
+        //! @param theIsPBR  [in] when TRUE, the PBR pipeline will be activated
+        //! @param theNbShadowMaps [in] number of shadow maps
         public Graphic3d_ShaderProgram getStdProgramPhong(Graphic3d_LightSet theLights,
                                                                               int theBits,
                                                                               bool theIsFlatNormal,
@@ -659,12 +660,12 @@ namespace OCCPort.OpenGL
         }
         //! Auxiliary function to transform normal from model to view coordinate system.
         static string THE_FUNC_transformNormal_view =
-          "vec3 transformNormal (in vec3 theNormal)"+
-  "{"+
-  "  vec4 aResult = occWorldViewMatrixInverseTranspose"+
-  "               * occModelWorldMatrixInverseTranspose"+
-  "               * vec4 (theNormal, 0.0);"+
-  "  return normalize (aResult.xyz);"+
+          "vec3 transformNormal (in vec3 theNormal)" +
+  "{" +
+  "  vec4 aResult = occWorldViewMatrixInverseTranspose" +
+  "               * occModelWorldMatrixInverseTranspose" +
+  "               * vec4 (theNormal, 0.0);" +
+  "  return normalize (aResult.xyz);" +
   "}";
 
         public object Graphic3d_ShaderFlags_TextureEnv { get; private set; }
@@ -693,17 +694,17 @@ namespace OCCPort.OpenGL
             {
                 if ((theBits & (int)Graphic3d_ShaderFlags.Graphic3d_ShaderFlags_HasTextures) != 0)
                 {
-                    aUniforms.Append(new Graphic3d_ShaderObject.ShaderVariable("sampler2D occSamplerBaseColor",Graphic3d_TypeOfShaderObject. Graphic3d_TOS_FRAGMENT));
-                    aStageInOuts.Append(new Graphic3d_ShaderObject.ShaderVariable("vec4 TexCoord",Graphic3d_TypeOfShaderObject. Graphic3d_TOS_VERTEX | Graphic3d_TypeOfShaderObject.Graphic3d_TOS_FRAGMENT));
-                    if ((theBits &(int)Graphic3d_ShaderFlags.Graphic3d_ShaderFlags_HasTextures) ==(int) Graphic3d_ShaderFlags. Graphic3d_ShaderFlags_TextureEnv)
+                    aUniforms.Append(new Graphic3d_ShaderObject.ShaderVariable("sampler2D occSamplerBaseColor", Graphic3d_TypeOfShaderObject.Graphic3d_TOS_FRAGMENT));
+                    aStageInOuts.Append(new Graphic3d_ShaderObject.ShaderVariable("vec4 TexCoord", Graphic3d_TypeOfShaderObject.Graphic3d_TOS_VERTEX | Graphic3d_TypeOfShaderObject.Graphic3d_TOS_FRAGMENT));
+                    if ((theBits & (int)Graphic3d_ShaderFlags.Graphic3d_ShaderFlags_HasTextures) == (int)Graphic3d_ShaderFlags.Graphic3d_ShaderFlags_TextureEnv)
                     {
                         aSrcVertExtraFunc = THE_FUNC_transformNormal_view;
 
                         aSrcVertExtraMain +=
-                          "  vec4 aPosition = occWorldViewMatrix * occModelWorldMatrix * occVertex;"+
-          "  vec3 aNormal   = transformNormal (occNormal);"+
-          "  vec3 aReflect  = reflect (normalize (aPosition.xyz), aNormal);"+
-          "  aReflect.z += 1.0;"+
+                          "  vec4 aPosition = occWorldViewMatrix * occModelWorldMatrix * occVertex;" +
+          "  vec3 aNormal   = transformNormal (occNormal);" +
+          "  vec3 aReflect  = reflect (normalize (aPosition.xyz), aNormal);" +
+          "  aReflect.z += 1.0;" +
           "  TexCoord = vec4(aReflect.xy * inversesqrt (dot (aReflect, aReflect)) * 0.5 + vec2 (0.5), 0.0, 1.0);";
 
                         aSrcFragGetColor =
@@ -721,7 +722,7 @@ namespace OCCPort.OpenGL
             }
             if ((theBits & (int)Graphic3d_ShaderFlags.Graphic3d_ShaderFlags_VertColor) != 0)
             {
-                aStageInOuts.Append(new Graphic3d_ShaderObject.ShaderVariable("vec4 VertColor", Graphic3d_TypeOfShaderObject.Graphic3d_TOS_VERTEX |Graphic3d_TypeOfShaderObject. Graphic3d_TOS_FRAGMENT));
+                aStageInOuts.Append(new Graphic3d_ShaderObject.ShaderVariable("vec4 VertColor", Graphic3d_TypeOfShaderObject.Graphic3d_TOS_VERTEX | Graphic3d_TypeOfShaderObject.Graphic3d_TOS_FRAGMENT));
                 aSrcVertExtraMain += "  VertColor = occVertColor;";
                 aSrcFragGetColor = "vec4 getColor(void) { return VertColor; }";
             }
@@ -738,16 +739,16 @@ namespace OCCPort.OpenGL
 + "}";
 
             string aSrcGeom = prepareGeomMainSrc(aUniforms, aStageInOuts, theBits);
-            aSrcFragGetColor += (theBits & (int)Graphic3d_ShaderFlags.Graphic3d_ShaderFlags_MeshEdges) != 0
+            aSrcFragGetColor += Environment.NewLine+(((theBits & (int)Graphic3d_ShaderFlags.Graphic3d_ShaderFlags_MeshEdges) != 0)
               ? THE_FRAG_WIREFRAME_COLOR
-              : "#define getFinalColor getColor";
+              : "#define getFinalColor getColor");
 
 
 
             aSrcFrag =
                 aSrcFragGetColor
-              + aSrcGetAlpha
-              + "void main()" +
+           +Environment.NewLine   + aSrcGetAlpha
+             + Environment.NewLine + "void main()" +
         "{" +
         "  if (occFragEarlyReturn()) { return; }"
         + aSrcFragExtraMain

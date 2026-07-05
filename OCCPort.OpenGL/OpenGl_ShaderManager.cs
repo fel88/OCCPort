@@ -386,6 +386,10 @@ namespace OCCPort.OpenGL
                 aProg = new OpenGl_ShaderProgram(); // just mark as invalid
                 return false;
             }
+            else
+            {
+                aList[aNbSamples] = aProg;
+            }
 
             myContext.BindProgram(aProg);
             aProg.SetSampler(myContext, "uColorSampler", Graphic3d_TextureUnit.Graphic3d_TextureUnit_0);
@@ -694,10 +698,9 @@ namespace OCCPort.OpenGL
             PushOitState(aProgram);*/
 
             if (theProgram != null)
-
             {
                 OpenGl_ShaderUniformLocation aLocViewPort = theProgram.GetStateLocation(OpenGl_StateVariable.OpenGl_OCCT_VIEWPORT);
-                if (aLocViewPort != null)
+                if (aLocViewPort)
                 {
                     theProgram.SetUniform(myContext, aLocViewPort, new Vector4((float)myContext.Viewport()[0], (float)myContext.Viewport()[1],
                                                                                 (float)myContext.Viewport()[2], (float)myContext.Viewport()[3]));

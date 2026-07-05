@@ -113,6 +113,8 @@ namespace OCCPort.OpenGL
                 {
                     //theCtx->PushMessage(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_HIGH, theSource);
                 }
+                theCtx.PushMessage("Error! Failed to set ");
+
                 //   theCtx->PushMessage(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_HIGH,
                 //                        ("Error! Failed to set ") + getShaderTypeString(myType) + " [" + theId + "] source");
                 return false;
@@ -130,19 +132,20 @@ namespace OCCPort.OpenGL
                 {
                     aLog = "Compilation log is empty.";
                 }
-                //    theCtx->PushMessage(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_HIGH,
-                //                       ("Failed to compile ") + getShaderTypeString(myType) + " [" + theId + "]. Compilation log:\n" + aLog);
+                theCtx.PushMessage(aLog);
+                    //theCtx.PushMessage(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_HIGH,
+                                     //  ("Failed to compile ") + getShaderTypeString(myType) + " [" + theId + "]. Compilation log:\n" + aLog);
                 return false;
             }
             else if (theCtx.caps.glslWarnings)
             {
-                string aLog;
-                //   FetchInfoLog(theCtx, aLog);
-                //   if (!aLog.IsEmpty()
-                //    && !aLog.IsEqual("No errors.\n"))
+                string aLog = "";
+                FetchInfoLog(theCtx, ref aLog);
+                   if (!string.IsNullOrEmpty(aLog)
+                    && !aLog.Contains("No errors."))
                 {
-                    //       theCtx->PushMessage(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_PORTABILITY, 0, GL_DEBUG_SEVERITY_LOW,
-                    //                          getShaderTypeString(myType) + " [" + theId + "] compilation log:\n" + aLog);
+                           //theCtx.PushMessage(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_PORTABILITY, 0, GL_DEBUG_SEVERITY_LOW,
+                                            //  getShaderTypeString(myType) + " [" + theId + "] compilation log:\n" + aLog);
                 }
             }
             return true;

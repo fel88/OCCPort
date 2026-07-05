@@ -1396,8 +1396,38 @@ myLineFeather (1.0f),*/
                 core11fwd.glGetIntegerv(All.MaxClipPlanes, ref myMaxClipPlanes);
             }
 
+            if (arbFBO != null
+  && hasFboSRGB)
+            {
+                // Detect if window buffer is considered by OpenGL as sRGB-ready
+                // (linear RGB color written by shader is automatically converted into sRGB)
+                // or not (offscreen FBO should be blit into window buffer with gamma correction).
+
+                // On desktop OpenGL, pixel formats are almost always sRGB-ready, even when not requested;
+                // it is safe behavior on desktop where GL_FRAMEBUFFER_SRGB is disabled by default
+                // (contrary to OpenGL ES, where it is enabled by default).
+                // NVIDIA drivers, however, always return GL_LINEAR even for sRGB-ready pixel formats on Windows platform,
+                // while AMD and Intel report GL_SRGB as expected.
+                // macOS drivers seems to be also report GL_LINEAR even for [NSColorSpace sRGBColorSpace].
+                if (myGapi != Aspect_GraphicsLibrary.Aspect_GraphicsLibrary_OpenGLES)
+                {
+                    if (!myIsSRgbWindow
+                      && myVendor.ToLower().Contains("nvidia") )
+                    {
+                        myIsSRgbWindow = true;
+                    }
+
+                }
+                if (!myIsSRgbWindow)
+                {
+                    Message.SendTrace("OpenGl_Context, warning: window buffer is not sRGB-ready.\n"+
+              
+                                        "Check OpenGL window creation parameters for optimal performance.");
+                }
+            }
+
         }
-        OpenGl_GlFunctions myFuncs;                //!< mega structure for all GL functions
+            OpenGl_GlFunctions myFuncs;                //!< mega structure for all GL functions
 
         string myVendor;          //!< Graphics Driver's vendor
 

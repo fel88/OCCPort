@@ -109,7 +109,7 @@ namespace TKernel
             int index = -1;
             public bool More()
             {
-                return index < target.Count;
+                return index <= target.Upper();
             }
 
             public void Next()

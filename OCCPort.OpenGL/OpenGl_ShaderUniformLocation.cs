@@ -1,10 +1,23 @@
-﻿namespace OCCPort.OpenGL
+﻿using OCCPort.Tester;
+using TKBRep;
+
+namespace OCCPort.OpenGL
 {
     //! Simple class represents GLSL program variable location.
 
     public class OpenGl_ShaderUniformLocation
     {
+        public override string ToString()
+        {
+            return $"OpenGl_ShaderUniformLocation : {myLocation}";
+        }
         int myLocation;
+
+        //! Return TRUE for non-invalid location.
+        public static implicit operator bool(OpenGl_ShaderUniformLocation f)
+        {
+            return f.myLocation != INVALID_LOCATION;
+        }
         public int ToInt()
         {
             return myLocation;
@@ -22,7 +35,7 @@
         {
             return f.myLocation;
         }
-  
+
         //! Constructor with initialization.
         public OpenGl_ShaderUniformLocation(int theLocation)
         {

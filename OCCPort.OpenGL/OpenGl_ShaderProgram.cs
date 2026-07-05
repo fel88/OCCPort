@@ -60,6 +60,10 @@ namespace OCCPort.OpenGL
         }
         public OpenGl_ShaderProgram()
         {
+            for (int i = 0; i < myStateLocations.Length; i++)
+            {
+                myStateLocations[i] = new OpenGl_ShaderUniformLocation();
+            }
         }
 
         //! Return texture units declared within the program, @sa Graphic3d_TextureSetBits.
@@ -276,7 +280,7 @@ namespace OCCPort.OpenGL
                          ("Failed to link program object [") + myResourceId + "]! Linker log:\n" + aLog);
                 return false;
             }
-            //   else if (theCtx->caps->glslWarnings)
+               else if (theCtx.caps.glslWarnings)
             {
                 // TCollection_AsciiString aLog;
                 //     FetchInfoLog(theCtx, aLog);
@@ -722,23 +726,23 @@ namespace OCCPort.OpenGL
             OpenGl_ShaderProgram anOldProgram = theCtx.ActiveProgram();
             theCtx.core20fwd.glUseProgram(myProgramID);
             OpenGl_ShaderUniformLocation aLocTexEnable = GetStateLocation(OpenGl_StateVariable.OpenGl_OCCT_TEXTURE_ENABLE);
-            if (aLocTexEnable != null)
+            if (aLocTexEnable)
             {
                 SetUniform(theCtx, aLocTexEnable, 0); // Off
             }
             OpenGl_ShaderUniformLocation aLocSampler = GetUniformLocation(theCtx, "occActiveSampler");
-            if (aLocSampler != null)
+            if (aLocSampler)
             {
                 SetUniform(theCtx, aLocSampler, (int)Graphic3d_TextureUnit.Graphic3d_TextureUnit_0);
             }
             aLocSampler = GetUniformLocation(theCtx, "occSamplerBaseColor");
-            if (aLocSampler != null)
+            if (aLocSampler)
             {
                 myTextureSetBits |= (int)Graphic3d_TextureSetBits.Graphic3d_TextureSetBits_BaseColor;
                 SetUniform(theCtx, aLocSampler, (int)(Graphic3d_TextureUnit.Graphic3d_TextureUnit_BaseColor));
             }
             aLocSampler = GetUniformLocation(theCtx, "occSamplerPointSprite");
-            if (aLocSampler != null)
+            if (aLocSampler)
             {
                 // Graphic3d_TextureUnit_PointSprite
                 //myTextureSetBits |= Graphic3d_TextureSetBits_PointSprite;
@@ -802,7 +806,7 @@ namespace OCCPort.OpenGL
             {
                 string aName = aSamplerNamePrefix + aUnitIter;
                 aLocSampler = GetUniformLocation(theCtx, aName);
-                if (aLocSampler != null)
+                if (aLocSampler)
                 {
                     SetUniform(theCtx, aLocSampler, aUnitIter);
                 }
@@ -837,7 +841,7 @@ namespace OCCPort.OpenGL
             return myProgramID;
         }
 
-        internal void Release(OpenGl_Context theCtx)
+        public override void Release(OpenGl_Context theCtx)
         {
             if (myProgramID == NO_PROGRAM)
             {
