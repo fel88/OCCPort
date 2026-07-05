@@ -66,13 +66,39 @@ namespace OCCPort
             }
         }
 
-
-
-        internal void InitLazy(OpenGl_Context aCtx, Graphic3d_Vec2i aSizeXY, int myFboColorFormat, int myFboDepthFormat, int v)
+        //! (Re-)initialize FBO with properties taken from another FBO.
+        public bool InitLazy(OpenGl_Context theGlCtx,
+                              OpenGl_FrameBuffer theFbo,
+                              bool theToKeepMsaa = true)
         {
-            throw new NotImplementedException();
+            return InitLazy(theGlCtx, new Graphic3d_Vec2i(theFbo.myVPSizeX, theFbo.myVPSizeY), theFbo.myColorFormats, theFbo.myDepthFormat, theToKeepMsaa ? theFbo.myNbSamples : 0);
         }
 
+        //! (Re-)initialize FBO with specified dimensions.
+        internal bool InitLazy(OpenGl_Context theGlContext, Graphic3d_Vec2i theViewportSize, int theColorFormat, int theDepthFormat, int theNbSamples = 0)
+        {
+
+            OpenGl_ColorFormats aColorFormats = new NCollection_Vector<int>();
+            aColorFormats.Append(theColorFormat);
+            return InitLazy(theGlContext, theViewportSize, aColorFormats, theDepthFormat, theNbSamples);
+        }
+        public bool InitLazy(OpenGl_Context theGlContext,
+                                                Graphic3d_Vec2i theViewportSize,
+                                                OpenGl_ColorFormats theColorFormats,
+                                                int theDepthFormat,
+                                                int theNbSamples)
+        {
+            if (myVPSizeX == theViewportSize.x()
+             && myVPSizeY == theViewportSize.y()
+             && myColorFormats == theColorFormats
+             && myDepthFormat == theDepthFormat
+             && myNbSamples == theNbSamples)
+            {
+                return IsValid();
+            }
+
+            return Init(theGlContext, theViewportSize, theColorFormats, theDepthFormat, theNbSamples);
+        }
         public bool IsValid()
         {
             return isValidFrameBuffer();
@@ -501,7 +527,7 @@ namespace OCCPort
 
         }
 
-        private void Release(OpenGl_Context theGlCtx)
+        public void Release(OpenGl_Context theGlCtx)
         {
             if (isValidFrameBuffer())
             {

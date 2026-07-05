@@ -655,6 +655,11 @@ namespace OCCPort.OpenGL
                 {
                     toSwap = false;
                 }
+                if (anImmFbo != null
+    && anImmFbo != aFrameBuffer)
+                {
+                    blitBuffers(anImmFbo, aFrameBuffer, myToFlipOutput);                    
+                }
             }
 
             /*
@@ -756,80 +761,82 @@ namespace OCCPort.OpenGL
             //// while render buffers could be resolved only into non-MSAA targets.
             //// As result, within obsolete OpenGL ES 3.0 context, we may create only one MSAA render buffer for main scene content
             //// and blit it into non-MSAA immediate FBO.
-            //    bool hasTextureMsaa = aCtx.HasTextureMultisampling();
+            bool hasTextureMsaa = aCtx.HasTextureMultisampling();
 
-            //bool toUseOit = myRenderParams.TransparencyMethod != Graphic3d_RTM_BLEND_UNORDERED
-            //             && !myIsSubviewComposer
-            //             && checkOitCompatibility(aCtx, aNbSamples > 0);
+            bool toUseOit = myRenderParams.TransparencyMethod != Graphic3d_RenderTransparentMethod.Graphic3d_RTM_BLEND_UNORDERED
+                         && !myIsSubviewComposer
+                         && checkOitCompatibility(aCtx, aNbSamples > 0);
 
-            //   bool toInitImmediateFbo = myTransientDrawToFront && !myIsSubviewComposer
-            //               && (!aCtx.caps.useSystemBuffer || (toUseOit && HasImmediateStructures()));
+            bool toInitImmediateFbo = myTransientDrawToFront && !myIsSubviewComposer
+                        && (!aCtx.caps.useSystemBuffer || (toUseOit && HasImmediateStructures()));
 
-            //if (aFrameBuffer == null
-            // && !aCtx->DefaultFrameBuffer().IsNull()
-            // && aCtx->DefaultFrameBuffer()->IsValid())
-            //{
-            //    aFrameBuffer = aCtx->DefaultFrameBuffer().operator->();
-            //}
-
-            //if (myHasFboBlit
-            // && (myTransientDrawToFront
-            //  || theProj == Graphic3d_Camera.Projection.Projection_Stereo
-            //  || aNbSamples != 0
-            //  || toUseOit
-            //  || aSizeX != aRendSize.x()))
-            //{
-            //    if (myMainSceneFbos[0].GetVPSize() != aRendSize
-            //     || myMainSceneFbos[0].NbSamples() != aNbSamples)
-            //    {
-            if (!myTransientDrawToFront)
+            if (aFrameBuffer == null
+             && aCtx.DefaultFrameBuffer() != null
+             && aCtx.DefaultFrameBuffer().IsValid())
             {
-                //myImmediateSceneFbos[0].Release(aCtx);
-                //  myImmediateSceneFbos[1].Release(aCtx);
-                //myImmediateSceneFbos[0].ChangeViewport(0, 0);
-                //  myImmediateSceneFbos[1].ChangeViewport(0, 0);
+                aFrameBuffer = aCtx.DefaultFrameBuffer();
             }
 
-            // prepare FBOs containing main scene
-            // for further blitting and rendering immediate presentations on top
-            if (aCtx.core20fwd != null)
+            if (myHasFboBlit
+             && (myTransientDrawToFront
+              || theProj == Graphic3d_Camera.Projection.Projection_Stereo
+              || aNbSamples != 0
+              || toUseOit
+              || aSizeX != aRendSize.x()))
             {
-                bool wasFailedMain0 = checkWasFailedFbo(myMainSceneFbos[0], aRendSize.x(), aRendSize.y(), aNbSamples);
-                if (!myMainSceneFbos[0].Init(aCtx, aRendSize, myFboColorFormat, myFboDepthFormat, aNbSamples)
-                 && !wasFailedMain0)
+                if (myMainSceneFbos[0].GetVPSize() != aRendSize
+                 || myMainSceneFbos[0].NbSamples() != aNbSamples)
                 {
-                    string aMsg = "Error! Main FBO "
-                                                    + printFboFormat(myMainSceneFbos[0]) + " initialization has failed";
-                    //aCtx.PushMessage(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_HIGH, aMsg);
+                    if (!myTransientDrawToFront)
+                    {
+                        myImmediateSceneFbos[0].Release(aCtx);
+                        myImmediateSceneFbos[1].Release(aCtx);
+                        myImmediateSceneFbos[0].ChangeViewport(0, 0);
+                        myImmediateSceneFbos[1].ChangeViewport(0, 0);
+                    }
+
+                    // prepare FBOs containing main scene
+                    // for further blitting and rendering immediate presentations on top
+                    if (aCtx.core20fwd != null)
+                    {
+                        bool wasFailedMain0 = checkWasFailedFbo(myMainSceneFbos[0], aRendSize.x(), aRendSize.y(), aNbSamples);
+                        if (!myMainSceneFbos[0].Init(aCtx, aRendSize, myFboColorFormat, myFboDepthFormat, aNbSamples)
+                         && !wasFailedMain0)
+                        {
+                            string aMsg = "Error! Main FBO "
+                                                            + printFboFormat(myMainSceneFbos[0]) + " initialization has failed";
+                            
+                            aCtx.PushMessage(All. DebugSourceApplication, All.DebugTypeError, 0, All.DebugSeverityHigh, aMsg);
+                        }
+                    }
+                }
+
+                if (myMainSceneFbos[0].IsValid() && (toInitImmediateFbo || myImmediateSceneFbos[0].IsValid()))
+                {
+                    bool wasFailedImm0 = checkWasFailedFbo(myImmediateSceneFbos[0], myMainSceneFbos[0]);
+                    if (!myImmediateSceneFbos[0].InitLazy(aCtx, myMainSceneFbos[0], hasTextureMsaa)
+                     && !wasFailedImm0)
+                    {
+                        string aMsg = "Error! Immediate FBO "
+                                                        + printFboFormat(myImmediateSceneFbos[0]) + " initialization has failed";
+                        aCtx.PushMessage(All.DebugSourceApplication, All.DebugTypeError, 0, All.DebugSeverityHigh, aMsg);
+                        
+                    }
                 }
             }
-            //    }
-
-            //    if (myMainSceneFbos[0]->IsValid() && (toInitImmediateFbo || myImmediateSceneFbos[0]->IsValid()))
-            //    {
-            //        const bool wasFailedImm0 = checkWasFailedFbo(myImmediateSceneFbos[0], myMainSceneFbos[0]);
-            //        if (!myImmediateSceneFbos[0]->InitLazy(aCtx, *myMainSceneFbos[0], hasTextureMsaa)
-            //         && !wasFailedImm0)
-            //        {
-            //            TCollection_ExtendedString aMsg = TCollection_ExtendedString() + "Error! Immediate FBO "
-            //                                            + printFboFormat(myImmediateSceneFbos[0]) + " initialization has failed";
-            //            aCtx->PushMessage(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_HIGH, aMsg);
-            //        }
-            //    }
-            //}
-            //else
-            //{
-            //    myMainSceneFbos[0]->Release(aCtx.operator->());
-            //    myMainSceneFbos[1]->Release(aCtx.operator->());
-            //    myImmediateSceneFbos[0]->Release(aCtx.operator->());
-            //    myImmediateSceneFbos[1]->Release(aCtx.operator->());
-            //    myXrSceneFbo->Release(aCtx.operator->());
-            //    myMainSceneFbos[0]->ChangeViewport(0, 0);
-            //    myMainSceneFbos[1]->ChangeViewport(0, 0);
-            //    myImmediateSceneFbos[0]->ChangeViewport(0, 0);
-            //    myImmediateSceneFbos[1]->ChangeViewport(0, 0);
-            //    myXrSceneFbo->ChangeViewport(0, 0);
-            //}
+            else
+            {
+                //    myMainSceneFbos[0]->Release(aCtx.operator->());
+                //    myMainSceneFbos[1]->Release(aCtx.operator->());
+                //    myImmediateSceneFbos[0]->Release(aCtx.operator->());
+                //    myImmediateSceneFbos[1]->Release(aCtx.operator->());
+                //    myXrSceneFbo->Release(aCtx.operator->());
+                //    myMainSceneFbos[0]->ChangeViewport(0, 0);
+                //    myMainSceneFbos[1]->ChangeViewport(0, 0);
+                //    myImmediateSceneFbos[0]->ChangeViewport(0, 0);
+                //    myImmediateSceneFbos[1]->ChangeViewport(0, 0);
+                //    myXrSceneFbo->ChangeViewport(0, 0);
+            }
 
             //bool hasXRBlitFbo = false;
             //if (theProj == Graphic3d_Camera::Projection_Stereo
@@ -1189,6 +1196,47 @@ namespace OCCPort.OpenGL
 
             return true;
         }
+
+        bool checkOitCompatibility(OpenGl_Context theGlContext,
+                                                      bool theMSAA)
+        {
+            // determine if OIT is supported by current OpenGl context
+            bool aToDisableOIT = theMSAA ? myToDisableMSAA : myToDisableOIT;
+            if (aToDisableOIT)
+            {
+                return false;
+            }
+
+            string aCompatibilityMsg = "";
+            if (theGlContext.hasFloatBuffer == OpenGl_FeatureFlag.OpenGl_FeatureNotAvailable
+             && theGlContext.hasHalfFloatBuffer == OpenGl_FeatureFlag.OpenGl_FeatureNotAvailable)
+            {
+                aCompatibilityMsg += "OpenGL context does not support floating-point RGBA color buffer format.\n";
+            }
+            if (theMSAA && theGlContext.hasSampleVariables == OpenGl_FeatureFlag.OpenGl_FeatureNotAvailable)
+            {
+                aCompatibilityMsg += "Current version of GLSL does not support built-in sample variables.\n";
+            }
+            if (theGlContext.hasDrawBuffers == OpenGl_FeatureFlag.OpenGl_FeatureNotAvailable)
+            {
+                aCompatibilityMsg += "OpenGL context does not support multiple draw buffers.\n";
+            }
+            if (aCompatibilityMsg.IsEmpty())
+            {
+                return true;
+            }
+
+            aCompatibilityMsg += "  Blended order-independent transparency will not be available.\n";
+            /*theGlContext->PushMessage(GL_DEBUG_SOURCE_APPLICATION,
+                                    GL_DEBUG_TYPE_ERROR,
+                                    0,
+                                    GL_DEBUG_SEVERITY_HIGH,
+                                    aCompatibilityMsg);
+            */
+            aToDisableOIT = true;
+            return false;
+        }
+
         //! Return TRUE if Frame Buffer initialized has failed with the same parameters.
         static bool checkWasFailedFbo(OpenGl_FrameBuffer theFboToCheck,
                                   OpenGl_FrameBuffer theFboRef)
@@ -1560,64 +1608,57 @@ namespace OCCPort.OpenGL
                 {
                     aCtx.core20fwd.glDisable(All.DepthTest);
                 }
-                /*
-                 more code here
-                 */
-            }
-            /*
-             more code here
-             */
 
+                aCtx.BindTextures(null, null);
 
-            aCtx.BindTextures(null, null);
+                Graphic3d_TypeOfTextureFilter aFilter = (aDrawSizeX == aReadSizeX && aDrawSizeY == aReadSizeY) ? Graphic3d_TypeOfTextureFilter.Graphic3d_TOTF_NEAREST : Graphic3d_TypeOfTextureFilter.Graphic3d_TOTF_BILINEAR;
+                var aFilterGl = aFilter == Graphic3d_TypeOfTextureFilter.Graphic3d_TOTF_NEAREST ? All.Nearest : All.Linear;
 
-            Graphic3d_TypeOfTextureFilter aFilter = (aDrawSizeX == aReadSizeX && aDrawSizeY == aReadSizeY) ? Graphic3d_TypeOfTextureFilter.Graphic3d_TOTF_NEAREST : Graphic3d_TypeOfTextureFilter.Graphic3d_TOTF_BILINEAR;
-            var aFilterGl = aFilter == Graphic3d_TypeOfTextureFilter.Graphic3d_TOTF_NEAREST ? All.Nearest : All.Linear;
-
-            OpenGl_VertexBuffer aVerts = initBlitQuad(theToFlip);
-            OpenGl_ShaderManager aManager = aCtx.ShaderManager();
-            if (aVerts.IsValid()
-             && aManager.BindFboBlitProgram(theReadFbo != null ? theReadFbo.NbSamples() : 0, toApplyGamma))
-            {
-                aCtx.SetSampleAlphaToCoverage(false);
-                theReadFbo.ColorTexture().Bind(aCtx, Graphic3d_TextureUnit.Graphic3d_TextureUnit_0);
-                if (theReadFbo.ColorTexture().Sampler().Parameters().Filter() != aFilter)
+                OpenGl_VertexBuffer aVerts = initBlitQuad(theToFlip);
+                OpenGl_ShaderManager aManager = aCtx.ShaderManager();
+                if (aVerts.IsValid()
+                 && aManager.BindFboBlitProgram(theReadFbo != null ? theReadFbo.NbSamples() : 0, toApplyGamma))
                 {
-                    theReadFbo.ColorTexture().Sampler().Parameters().SetFilter(aFilter);
-                    aCtx.core20fwd.glTexParameteri(All.Texture2D, All.TextureMinFilter, aFilterGl);
-                    aCtx.core20fwd.glTexParameteri(All.Texture2D, All.TextureMagFilter, aFilterGl);
-                }
+                    aCtx.SetSampleAlphaToCoverage(false);
+                    theReadFbo.ColorTexture().Bind(aCtx, Graphic3d_TextureUnit.Graphic3d_TextureUnit_0);
+                    if (theReadFbo.ColorTexture().Sampler().Parameters().Filter() != aFilter)
+                    {
+                        theReadFbo.ColorTexture().Sampler().Parameters().SetFilter(aFilter);
+                        aCtx.core20fwd.glTexParameteri(All.Texture2D, All.TextureMinFilter, aFilterGl);
+                        aCtx.core20fwd.glTexParameteri(All.Texture2D, All.TextureMagFilter, aFilterGl);
+                    }
 
-                theReadFbo.DepthStencilTexture().Bind(aCtx, Graphic3d_TextureUnit.Graphic3d_TextureUnit_1);
-                if (theReadFbo.DepthStencilTexture().Sampler().Parameters().Filter() != aFilter)
+                    theReadFbo.DepthStencilTexture().Bind(aCtx, Graphic3d_TextureUnit.Graphic3d_TextureUnit_1);
+                    if (theReadFbo.DepthStencilTexture().Sampler().Parameters().Filter() != aFilter)
+                    {
+                        theReadFbo.DepthStencilTexture().Sampler().Parameters().SetFilter(aFilter);
+                        aCtx.core20fwd.glTexParameteri(All.Texture2D, All.TextureMinFilter, aFilterGl);
+                        aCtx.core20fwd.glTexParameteri(All.Texture2D, All.TextureMagFilter, aFilterGl);
+                    }
+
+                    aVerts.BindVertexAttrib(aCtx, (int)Graphic3d_TypeOfAttribute.Graphic3d_TOA_POS);
+
+                    aCtx.core20fwd.glDrawArrays(All.TriangleStrip, 0, 4);
+
+                    aVerts.UnbindVertexAttrib(aCtx, (int)Graphic3d_TypeOfAttribute.Graphic3d_TOA_POS);
+                    theReadFbo.DepthStencilTexture().Unbind(aCtx, Graphic3d_TextureUnit.Graphic3d_TextureUnit_1);
+                    theReadFbo.ColorTexture().Unbind(aCtx, Graphic3d_TextureUnit.Graphic3d_TextureUnit_0);
+                    aCtx.BindProgram(null);
+
+                }
+                else
                 {
-                    theReadFbo.DepthStencilTexture().Sampler().Parameters().SetFilter(aFilter);
-                    aCtx.core20fwd.glTexParameteri(All.Texture2D, All.TextureMinFilter, aFilterGl);
-                    aCtx.core20fwd.glTexParameteri(All.Texture2D, All.TextureMagFilter, aFilterGl);
+                    string aMsg =
+            "Error! FBO blitting has failed";
+                    /*aCtx->PushMessage(GL_DEBUG_SOURCE_APPLICATION,
+                                       GL_DEBUG_TYPE_ERROR,
+                                       0,
+                                       GL_DEBUG_SEVERITY_HIGH,
+                                       aMsg);*/
+                    myHasFboBlit = false;
+                    //theReadFbo.Release(aCtx.operator->());
+                    return true;
                 }
-
-                aVerts.BindVertexAttrib(aCtx, (int)Graphic3d_TypeOfAttribute.Graphic3d_TOA_POS);
-
-                aCtx.core20fwd.glDrawArrays(All.TriangleStrip, 0, 4);
-
-                aVerts.UnbindVertexAttrib(aCtx, (int)Graphic3d_TypeOfAttribute.Graphic3d_TOA_POS);
-                theReadFbo.DepthStencilTexture().Unbind(aCtx, Graphic3d_TextureUnit.Graphic3d_TextureUnit_1);
-                theReadFbo.ColorTexture().Unbind(aCtx, Graphic3d_TextureUnit.Graphic3d_TextureUnit_0);
-                aCtx.BindProgram(null);
-
-            }
-            else
-            {
-                string aMsg =
-        "Error! FBO blitting has failed";
-                /*aCtx->PushMessage(GL_DEBUG_SOURCE_APPLICATION,
-                                   GL_DEBUG_TYPE_ERROR,
-                                   0,
-                                   GL_DEBUG_SEVERITY_HIGH,
-                                   aMsg);*/
-                myHasFboBlit = false;
-                //theReadFbo.Release(aCtx.operator->());
-                return true;
             }
 
             return true;
@@ -1842,7 +1883,7 @@ namespace OCCPort.OpenGL
 
             // Specify clipping planes in view transformation space
             aContext.ChangeClipping().Reset(myClipPlanes);
-            if (myClipPlanes!=null
+            if (myClipPlanes != null
              && !myClipPlanes.IsEmpty())
             {
                 aContext.ShaderManager().UpdateClippingState();
@@ -1855,7 +1896,7 @@ namespace OCCPort.OpenGL
             aContext.ApplyWorldViewMatrix();
 
             aContext.ChangeClipping().Reset(null);
-            if (myClipPlanes!=null
+            if (myClipPlanes != null
              && !myClipPlanes.IsEmpty())
             {
                 aContext.ShaderManager().RevertClippingState();
@@ -1931,12 +1972,11 @@ namespace OCCPort.OpenGL
             }
 
             // Switch off lighting by default
-            /*if (aContext.core11ffp != null
+            if (aContext.core11ffp != null
              && aContext.caps.ffpEnable)
-            {
-                GL.Disable(EnableCap.Lighting);
-                //aContext.core11fwd.glDisable(GL_LIGHTING);
-            }*/
+            {                
+                aContext.core11fwd.glDisable(EnableCap.Lighting);
+            }
 
             // =================================
             //      Step 3: Redraw main plane
@@ -1968,6 +2008,8 @@ namespace OCCPort.OpenGL
                 aContext.ProjectionState.SetCurrent(aContext.Camera().ProjectionStereoRightF());
                 aContext.ApplyProjectionMatrix();
             }
+
+            myWorkspace.SetEnvironmentTexture(myTextureEnv);
 
 
             bool hasShadowMap = aContext.ShaderManager().LightSourceState().HasShadowMaps();
@@ -2016,7 +2058,7 @@ namespace OCCPort.OpenGL
 
             myWorkspace.ResetAppliedAspect();
             aContext.SetAllowSampleAlphaToCoverage(false);
-            // aContext.SetSampleAlphaToCoverage(false);
+             aContext.SetSampleAlphaToCoverage(false);
 
             // reset FFP state for safety
             aContext.BindProgram(null);

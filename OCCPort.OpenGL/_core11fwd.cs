@@ -57,6 +57,10 @@ namespace OCCPort.OpenGL
         {
             GL.Disable((EnableCap)v);
         }
+        internal void glDisable(EnableCap v)
+        {
+            GL.Disable(v);
+        }
         internal void glDisable(All v)
         {
             GL.Disable((EnableCap)v);
@@ -120,6 +124,10 @@ namespace OCCPort.OpenGL
             GL.GetInteger((GetPName)drawBuffer, out aDrawBuffer);
         }
 
+        internal void glGetIntegerv(All drawBuffer,  int []aDrawBuffer)
+        {
+            GL.GetInteger((GetPName)drawBuffer,  aDrawBuffer);
+        }
         internal void glGetIntegerv(GetPName drawBuffer, ref int aDrawBuffer)
         {            
             GL.GetInteger(drawBuffer, out aDrawBuffer);

@@ -83,9 +83,9 @@ namespace OCCPort.OpenGL
             myGapi = Aspect_GraphicsLibrary.Aspect_GraphicsLibrary_OpenGL;
             /*
                mySupportedFormats (new Image_SupportedFormats()),*/
-            myAnisoMax=(1);
-  //myTexClamp=.(GL_CLAMP_TO_EDGE);
-  myMaxTexDim = (1024);
+            myAnisoMax = (1);
+            //myTexClamp=.(GL_CLAMP_TO_EDGE);
+            myMaxTexDim = (1024);
             myMaxTexCombined = (1);/*
   myMaxTexUnitsFFP (1),
   myMaxDumpSizeX (1024),
@@ -163,8 +163,10 @@ myLineFeather (1.0f),*/
             mySharedResources = (new OpenGl_ResourcesMap());
 
         }
+        public OpenGl_FeatureFlag hasHalfFloatBuffer; //!< Complex flag indicating support of half-float color buffer format (desktop OpenGL 3.0, GL_ARB_color_buffer_float, GL_EXT_color_buffer_half_float)
+        public OpenGl_FeatureFlag hasFloatBuffer;     //!< Complex flag indicating support of float color buffer format (desktop OpenGL 3.0, GL_ARB_color_buffer_float, GL_EXT_color_buffer_float)
 
-       public  bool arbTexFloat;        //!< GL_ARB_texture_float (on desktop OpenGL - since 3.0 or as extension GL_ARB_texture_float; on OpenGL ES - since 3.0); @sa hasTexFloatLinear for linear filtering support
+        public bool arbTexFloat;        //!< GL_ARB_texture_float (on desktop OpenGL - since 3.0 or as extension GL_ARB_texture_float; on OpenGL ES - since 3.0); @sa hasTexFloatLinear for linear filtering support
 
         bool myAlphaToCoverage; //!< flag indicating GL_SAMPLE_ALPHA_TO_COVERAGE state
         public bool extAnis;            //!< GL_EXT_texture_filter_anisotropic
@@ -1089,8 +1091,53 @@ myLineFeather (1.0f),*/
 
 
             myFuncs.load(this, theIsCoreProfile);
+            if (!caps.ffpEnable
+   && !IsGlGreaterEqual(2, 0))
+            {
+                caps.ffpEnable = true;
+                /* string aMsg =
+                   ("OpenGL driver is too old! Context info:\n")
+                                            + "    Vendor:   " + (const char* )core11fwd->glGetString(GL_VENDOR) + "\n"
+                                            + "    Renderer: " + (const char* )core11fwd->glGetString(GL_RENDERER) + "\n"
+                                            + "    Version:  " + (const char* )core11fwd->glGetString(GL_VERSION) + "\n"
+                                            + "  Fallback using deprecated fixed-function pipeline.\n"
+                                            + "  Visualization might work incorrectly.\n"
+                                  "  Consider upgrading the graphics driver.";*/
+                //PushMessage(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_PORTABILITY, 0, GL_DEBUG_SEVERITY_HIGH, aMsg);
+            }
+            myVendor = core11fwd.glGetString(All.Vendor);
 
+            core11fwd.glGetIntegerv(All.MaxTextureSize, ref myMaxTexDim);
+            if (IsGlGreaterEqual(1, 3) && core11ffp != null)
+            {
+                // this is a maximum of texture units for FFP functionality,
+                // usually smaller than combined texture units available for GLSL
+                core11fwd.glGetIntegerv(All.MaxTextureUnits, ref myMaxTexUnitsFFP);
+                myMaxTexCombined = myMaxTexUnitsFFP;
+            }
+            if (IsGlGreaterEqual(2, 0))
+            {
+                core11fwd.glGetIntegerv(All.MaxCombinedTextureImageUnits, ref myMaxTexCombined);
+            }
+            mySpriteTexUnit = myMaxTexCombined >= 2
+                  ? Graphic3d_TextureUnit.Graphic3d_TextureUnit_PointSprite
+                  : Graphic3d_TextureUnit.Graphic3d_TextureUnit_0;
 
+            int[] aMaxVPortSize = { 0, 0 };
+            core11fwd.glGetIntegerv(All.MaxViewportDims, aMaxVPortSize);
+            myMaxDumpSizeX = Math.Min(aMaxVPortSize[0], myMaxTexDim);
+            myMaxDumpSizeY = Math.Min(aMaxVPortSize[1], myMaxTexDim);
+            if (myVendor == "intel")
+            {
+                // Intel drivers have known bug with empty dump for images with width>=5462
+                myMaxDumpSizeX = Math.Min(myMaxDumpSizeX, 4096);
+            }
+            if (extAnis)
+            {
+                core11fwd.glGetIntegerv(All.MaxTextureMaxAnisotropyExt, ref myAnisoMax);
+            }
+
+            myClippingState.Init();
             if (hasDrawBuffers != OpenGl_FeatureFlag.OpenGl_FeatureNotAvailable)
             {
                 core11fwd.glGetIntegerv(All.MaxDrawBuffers, ref myMaxDrawBuffers);
@@ -1123,6 +1170,7 @@ myLineFeather (1.0f),*/
         }
         OpenGl_GlFunctions myFuncs;                //!< mega structure for all GL functions
 
+        string myVendor;          //!< Graphics Driver's vendor
 
         internal bool MakeCurrent()
         {
@@ -1170,7 +1218,7 @@ myLineFeather (1.0f),*/
 
         internal void PushMessage(All debugSourceApplication, All debugTypePerformance, int v, All debugSeverityLow, string aMsg)
         {
-            //throw new NotImplementedException();
+            throw new Exception(aMsg);
         }
         internal void PushMessage(int debugSourceApplication, int debugTypePerformance, int v, int debugSeverityLow, string aMsg)
         {
@@ -1197,15 +1245,11 @@ myLineFeather (1.0f),*/
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool SwapBuffers(IntPtr hdc);
 
-        public unsafe void SwapBuffers()
+        public void SwapBuffers()
         {
-
             if (myDisplay != null)
             {
-                GLFW.SwapBuffers((Window*)myDisplay.ToPointer());
-                GLFW.PollEvents();
-
-                SwapBuffers(myDisplay);
+                SwapBuffers(RenderingContext());
                 core11fwd.glFlush();
             }
 

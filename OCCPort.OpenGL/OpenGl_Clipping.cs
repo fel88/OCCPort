@@ -131,6 +131,18 @@ namespace OCCPort.OpenGL
             }
         }
 
+        internal void Init()
+        {
+            myPlanesGlobal=null;
+            myPlanesLocal = null;
+
+            myNbClipping = 0;
+            myNbCapping = 0;
+            myNbChains = 0;
+            myNbDisabled = 0;
+            myCappedSubPlane = 0;
+            myCappedChain = null;
+        }
 
         Graphic3d_SequenceOfHClipPlane myPlanesGlobal;   //!< global clipping planes
         Graphic3d_SequenceOfHClipPlane myPlanesLocal;    //!< object clipping planes

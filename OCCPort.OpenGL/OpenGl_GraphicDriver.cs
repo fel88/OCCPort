@@ -32,7 +32,7 @@ namespace OCCPort.OpenGL
         }
 
         //! Perform initialization of default OpenGL context.
-        public   bool InitContext()
+        public bool InitContext()
         {
             ReleaseContext();
 
@@ -48,7 +48,7 @@ namespace OCCPort.OpenGL
 
         private void ReleaseContext()
         {
-          //  throw new NotImplementedException();
+            //  throw new NotImplementedException();
         }
 
         OpenGl_Caps myCaps;
@@ -56,6 +56,7 @@ namespace OCCPort.OpenGL
         NCollection_DataMap<int, OpenGl_Structure> myMapOfStructure = new();
         bool myIsOwnContext; //!< indicates that shared context has been created within OpenGl_GraphicDriver
 
+        //! Specify swap buffer behavior.
         public void SetBuffersNoSwap(bool theIsNoSwap)
         {
             myCaps.buffersNoSwap = theIsNoSwap;

@@ -102,7 +102,7 @@ namespace OCCPort.Tester
             myAISContext.EnableDrawHiddenLine();
 
             Graphic3d_RenderingParams aParams = myView.ChangeRenderingParams();
-            aParams.RenderResolutionScale = 2;
+            //aParams.RenderResolutionScale = 2;
             aParams.IsShadowEnabled = false;
             // enable specular reflections
             aParams.IsReflectionEnabled = false;

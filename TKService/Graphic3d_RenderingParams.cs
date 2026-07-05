@@ -9,7 +9,7 @@
         {
             Method = Graphic3d_RenderingMode.Graphic3d_RM_RASTERIZATION;
             ShadingModel = Graphic3d_TypeOfShadingModel.Graphic3d_TypeOfShadingModel_Phong;
-            //TransparencyMethod=(Graphic3d_RTM_BLEND_UNORDERED),
+            TransparencyMethod = Graphic3d_RenderTransparentMethod.Graphic3d_RTM_BLEND_UNORDERED;
             Resolution = (THE_DEFAULT_RESOLUTION);
             //FontHinting(Font_Hinting_Off),
             //LineFeather(1.0f),
@@ -76,6 +76,7 @@
             ToShowStats(Standard_False)*/
         }
         public FrustumCulling FrustumCullingState;         //!< state of frustum culling optimization; FrustumCulling_On by default
+       public  Graphic3d_RenderTransparentMethod TransparencyMethod;          //!< specifies rendering method for transparent graphics
 
         //! State of frustum culling optimization.
         public enum FrustumCulling
