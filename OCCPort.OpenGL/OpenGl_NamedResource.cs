@@ -16,7 +16,12 @@ namespace OCCPort
         }  //! Return resource name.
         public string ResourceId() { return myResourceId; }
 
-      public   string myResourceId; //!< resource name
+        public override void Release(OpenGl_Context theGlCtx)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public   string myResourceId; //!< resource name
 
     }
 }

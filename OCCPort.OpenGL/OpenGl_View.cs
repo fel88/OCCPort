@@ -21,6 +21,9 @@ namespace OCCPort.OpenGL
         OpenGl_FrameBuffer[] myMainSceneFbosOit;
         gp_XYZ myLocalOrigin;
 
+        //! Two framebuffers (left and right views) store cached main presentation
+        //! of the view (without presentation of immediate layers).
+        int mySRgbState;             //!< track sRGB state
 
         //! Returns selector for BVH tree, providing a possibility to store information
         //! about current view volume and to detect which objects are overlapping it.
@@ -76,6 +79,7 @@ namespace OCCPort.OpenGL
         {
             myDriver = theDriver;
             myCaps = theCaps;
+            mySRgbState = -1;
 
 
             myHasFboBlit = (true);
@@ -527,7 +531,7 @@ namespace OCCPort.OpenGL
             aCtx.core11fwd.glClearDepth(1.0);
 
             OpenGl_Vec4 aBgColor = aCtx.Vec4FromQuantityColor(myBgColor);
-            aCtx.SetColorMaskRGBA(new NCollection_Vec4<bool>(true)); // force writes into all components, including alpha
+            aCtx.SetColorMaskRGBA(new bool[4] { true, true, true, true }); // force writes into all components, including alpha
             aCtx.core11fwd.glClearColor(aBgColor.r(), aBgColor.g(), aBgColor.b(), aCtx.caps.buffersOpaqueAlpha ? 1.0f : 0.0f);
             aCtx.core11fwd.glClear(toClear);
 
@@ -583,21 +587,21 @@ namespace OCCPort.OpenGL
             //aCtx->FrameStats()->FrameStart(myWorkspace->View(), false);
             //aCtx->SetLineFeather(myRenderParams.LineFeather);
 
-            //const Standard_Integer anSRgbState = aCtx->ToRenderSRGB() ? 1 : 0;
-            //if (mySRgbState != -1
-            // && mySRgbState != anSRgbState)
-            //{
-            //    releaseSrgbResources(aCtx);
-            //    initTextureEnv(aCtx);
-            //}
-            //mySRgbState = anSRgbState;
-            //aCtx->ShaderManager()->UpdateSRgbState();
+            int anSRgbState = aCtx.ToRenderSRGB() ? 1 : 0;
+            if (mySRgbState != -1
+             && mySRgbState != anSRgbState)
+            {
+                //releaseSrgbResources(aCtx);
+                initTextureEnv(aCtx);
+            }
+            mySRgbState = anSRgbState;
+            aCtx.ShaderManager().UpdateSRgbState();
 
-            //// release pending GL resources
-            //aCtx->ReleaseDelayed();
+            // release pending GL resources
+            aCtx.ReleaseDelayed();
 
-            //// fetch OpenGl context state
-            //aCtx->FetchState();
+            // fetch OpenGl context state
+            aCtx.FetchState();
 
             Graphic3d_Camera.Projection aProjectType = myCamera.ProjectionType();
 
@@ -621,6 +625,7 @@ namespace OCCPort.OpenGL
 
             if (aProjectType == Graphic3d_Camera.Projection.Projection_Stereo)
             {
+                throw new NotImplementedException();
             }
             else
             {
@@ -658,14 +663,17 @@ namespace OCCPort.OpenGL
                 if (anImmFbo != null
     && anImmFbo != aFrameBuffer)
                 {
-                    blitBuffers(anImmFbo, aFrameBuffer, myToFlipOutput);                    
+                    blitBuffers(anImmFbo, aFrameBuffer, myToFlipOutput);
                 }
             }
 
             /*
              
-             
-             ............
+               if (myRenderParams.Method == Graphic3d_RM_RAYTRACING
+   && myRenderParams.IsGlobalIlluminationEnabled)
+  {
+    myAccumFrames++;
+  }             
              */
 
             // bind default FBO
@@ -712,7 +720,42 @@ namespace OCCPort.OpenGL
         {
             return "" + theFbo.GetInitVPSizeX() + "x" + theFbo.GetInitVPSizeY() + "@" + theFbo.NbSamples();
         }
+        public void SetTextureEnv(Graphic3d_TextureEnv theTextureEnv)
+        {
+            OpenGl_Context aCtx = myWorkspace.GetGlContext();
+            if (aCtx != null && myTextureEnv != null)
+            {
+                for (OpenGl_TextureSet.Iterator aTextureIter = new OpenGl_TextureSet.Iterator(myTextureEnv); aTextureIter.More(); aTextureIter.Next())
+                {
+                    //aCtx.DelayedRelease(aTextureIter.TRef());
+                    aTextureIter.Nullify();
+                }
+            }
 
+            myToUpdateEnvironmentMap = true;
+            myTextureEnvData = theTextureEnv;
+            myTextureEnv = null;
+            initTextureEnv(aCtx);
+        }
+
+        //! Marks if environment map should be updated.
+        bool myToUpdateEnvironmentMap;
+
+        //! Initializes OpenGl resource for environment texture.
+        void initTextureEnv(OpenGl_Context theContext)
+        {
+            if (myTextureEnvData == null
+              || theContext == null
+              || !theContext.MakeCurrent())
+                return;
+
+
+            OpenGl_Texture aTextureEnv = new OpenGl_Texture(myTextureEnvData.GetId(), myTextureEnvData.GetParams());
+            aTextureEnv.Init(theContext, myTextureEnvData);
+
+            myTextureEnv = new OpenGl_TextureSet(aTextureEnv);
+            myTextureEnv.ChangeTextureSetBits((int)Graphic3d_TextureSetBits.Graphic3d_TextureSetBits_BaseColor);
+        }
 
         bool prepareFrameBuffers(Graphic3d_Camera.Projection theProj)
         {
@@ -805,8 +848,8 @@ namespace OCCPort.OpenGL
                         {
                             string aMsg = "Error! Main FBO "
                                                             + printFboFormat(myMainSceneFbos[0]) + " initialization has failed";
-                            
-                            aCtx.PushMessage(All. DebugSourceApplication, All.DebugTypeError, 0, All.DebugSeverityHigh, aMsg);
+
+                            aCtx.PushMessage(All.DebugSourceApplication, All.DebugTypeError, 0, All.DebugSeverityHigh, aMsg);
                         }
                     }
                 }
@@ -820,7 +863,7 @@ namespace OCCPort.OpenGL
                         string aMsg = "Error! Immediate FBO "
                                                         + printFboFormat(myImmediateSceneFbos[0]) + " initialization has failed";
                         aCtx.PushMessage(All.DebugSourceApplication, All.DebugTypeError, 0, All.DebugSeverityHigh, aMsg);
-                        
+
                     }
                 }
             }
@@ -1316,15 +1359,15 @@ namespace OCCPort.OpenGL
                 OpenGl_FrameBuffer anImmFboOit = null;
                 if (myImmediateSceneFbos[0].IsValid())
                 {
-                    //anImmFbo = myImmediateSceneFbos[0].operator->();
-                    // anImmFboOit = myImmediateSceneFbosOit[0]->IsValid() ? myImmediateSceneFbosOit[0].operator->() : NULL;
+                    anImmFbo = myImmediateSceneFbos[0];
+                    anImmFboOit = myImmediateSceneFbosOit[0].IsValid() ? myImmediateSceneFbosOit[0] : null;
                 }
                 if (aMainFbo == null)
                 {
-                    //aCtx.SetReadDrawBuffer(GL_BACK);
+                    aCtx.SetReadDrawBuffer((int)All.Back);
                 }
-                // aCtx->SetResolution(myRenderParams.Resolution, myRenderParams.ResolutionRatio(),
-                //                    anImmFbo != aFrameBuffer ? myRenderParams.RenderResolutionScale : 1.0f);
+                aCtx.SetResolution(myRenderParams.Resolution, myRenderParams.ResolutionRatio(),
+                                   anImmFbo != aFrameBuffer ? myRenderParams.RenderResolutionScale : 1.0f);
                 toSwap = redrawImmediate(aProjectType,
                                           aMainFbo,
                                           anImmFbo,
@@ -1507,9 +1550,9 @@ namespace OCCPort.OpenGL
             int[] aViewport = { 0, 0, aDrawSizeX, aDrawSizeY };
             aCtx.ResizeViewport(aViewport);
 
-            //  aCtx.SetColorMaskRGBA(NCollection_Vec4<bool>(true)); // force writes into all components, including alpha
+            aCtx.SetColorMaskRGBA(new bool[4] { true, true, true, true }); // force writes into all components, including alpha
             aCtx.core20fwd.glClearDepth(1.0);
-            aCtx.core20fwd.glClearColor(0.0f, 0.0f, 0.0f, aCtx.caps.buffersOpaqueAlpha ? 1.0f : 0.0f);
+            aCtx.core20fwd.glClearColor(.0f, 0.0f, 0.0f, aCtx.caps.buffersOpaqueAlpha ? 1.0f : 0.0f);
             aCtx.core20fwd.glClear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit);
             aCtx.SetColorMask(true); // restore default alpha component write state
 
@@ -1584,7 +1627,8 @@ namespace OCCPort.OpenGL
                         myToDisableMSAA = true;
                         aMsg += "\n  MSAA settings should not be overridden by driver!";
                     }
-                    // aCtx.PushMessage(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_HIGH, aMsg);
+
+                    aCtx.PushMessage(All.DebugSourceApplication, All.DebugTypeError, 0, All.DebugSeverityHigh, aMsg);
                 }
                 if (theDrawFbo != null
      && theDrawFbo.IsValid())
@@ -1650,13 +1694,14 @@ namespace OCCPort.OpenGL
                 {
                     string aMsg =
             "Error! FBO blitting has failed";
+                    aCtx.PushMessage(aMsg);
                     /*aCtx->PushMessage(GL_DEBUG_SOURCE_APPLICATION,
                                        GL_DEBUG_TYPE_ERROR,
                                        0,
                                        GL_DEBUG_SEVERITY_HIGH,
                                        aMsg);*/
                     myHasFboBlit = false;
-                    //theReadFbo.Release(aCtx.operator->());
+                    theReadFbo.Release(aCtx);
                     return true;
                 }
             }
@@ -1974,7 +2019,7 @@ namespace OCCPort.OpenGL
             // Switch off lighting by default
             if (aContext.core11ffp != null
              && aContext.caps.ffpEnable)
-            {                
+            {
                 aContext.core11fwd.glDisable(EnableCap.Lighting);
             }
 
@@ -2058,7 +2103,7 @@ namespace OCCPort.OpenGL
 
             myWorkspace.ResetAppliedAspect();
             aContext.SetAllowSampleAlphaToCoverage(false);
-             aContext.SetSampleAlphaToCoverage(false);
+            aContext.SetSampleAlphaToCoverage(false);
 
             // reset FFP state for safety
             aContext.BindProgram(null);

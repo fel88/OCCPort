@@ -90,6 +90,10 @@ namespace OCCPort.OpenGL
         {
             GL.Enable((EnableCap)v);
         }
+        internal void glEnable(EnableCap v)
+        {
+            GL.Enable(v);
+        }
         internal void glEnable(int v)
         {
             GL.Enable((EnableCap)v);
@@ -166,6 +170,16 @@ namespace OCCPort.OpenGL
         internal void glGetTexLevelParameteriv(All proxyTexture2D, int v, All textureWidth, ref int aTestWidth)
         {
             GL.GetTexLevelParameter((TextureTarget)proxyTexture2D, v, (GetTextureParameter)textureWidth, out aTestWidth);
+        }
+
+        internal void glPolygonOffset(float factor, float units)
+        {
+            GL.PolygonOffset(factor, units);
+        }
+
+        internal void glCullFace(TriangleFace front)
+        {
+            GL.CullFace(front);
         }
     }
 }

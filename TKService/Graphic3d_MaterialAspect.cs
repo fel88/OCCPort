@@ -5,13 +5,18 @@ namespace TKService
 {
     public class Graphic3d_MaterialAspect
     {
+        public Graphic3d_MaterialAspect()
+        {
+            myRequestedMaterialName = Graphic3d_NameOfMaterial.Graphic3d_NameOfMaterial_DEFAULT;
+            init(Graphic3d_NameOfMaterial.Graphic3d_NameOfMaterial_DEFAULT);
+        }
         public Graphic3d_MaterialAspect(Graphic3d_NameOfMaterial theName)
         {
             myRequestedMaterialName = (theName);
             init(theName);
         }
         //! Name list of standard materials (defined within enumeration).
-        static  RawMaterial []THE_MATERIALS =
+        static RawMaterial[] THE_MATERIALS =
         {
   new   RawMaterial (Graphic3d_NameOfMaterial.Graphic3d_NameOfMaterial_Brass,       "Brass"),
  new  RawMaterial (Graphic3d_NameOfMaterial.Graphic3d_NameOfMaterial_Bronze,      "Bronze"),
@@ -42,9 +47,9 @@ namespace TKService
   };
         void init(Graphic3d_NameOfMaterial theName)
         {
-             RawMaterial aMat = THE_MATERIALS[(int)theName];
-          //  myBSDF = aMat.BSDF;
-          //  myPBRMaterial = aMat.PBRMaterial;
+            RawMaterial aMat = THE_MATERIALS[(int)theName];
+            //  myBSDF = aMat.BSDF;
+            //  myPBRMaterial = aMat.PBRMaterial;
             //myStringName = aMat.StringName;
             myColors[(int)Graphic3d_TypeOfReflection.Graphic3d_TOR_AMBIENT] = aMat.Colors[(int)Graphic3d_TypeOfReflection.Graphic3d_TOR_AMBIENT];
             myColors[(int)Graphic3d_TypeOfReflection.Graphic3d_TOR_DIFFUSE] = aMat.Colors[(int)Graphic3d_TypeOfReflection.Graphic3d_TOR_DIFFUSE];
@@ -57,7 +62,7 @@ namespace TKService
             myMaterialName = theName;
             myRequestedMaterialName = theName;
         }
-        float  myTransparencyCoef;
+        float myTransparencyCoef;
         float myRefractionIndex;
         string myStringName;
         float myShininess;
@@ -66,10 +71,13 @@ namespace TKService
 
         Graphic3d_NameOfMaterial myRequestedMaterialName;
 
-        public float Alpha()
-        {
-            throw new NotImplementedException();
-        }
+        //! Returns the transparency coefficient of the surface (1.0 - Alpha); 0.0 means opaque.
+        public float Transparency() { return myTransparencyCoef; }
+
+
+        //! Returns the alpha coefficient of the surface (1.0 - Transparency); 1.0 means opaque.
+        public float Alpha()  { return 1.0f - myTransparencyCoef; }
+
         //! Returns TRUE if the reflection mode is active, FALSE otherwise.
         public bool ReflectionMode(Graphic3d_TypeOfReflection theType)
         {
@@ -95,7 +103,7 @@ namespace TKService
         //  Graphic3d_BSDF BSDF;
         //Graphic3d_PBRMaterial PBRMaterial;
         const int Graphic3d_TypeOfReflection_NB = 4;
-        public Quantity_Color []Colors=new Quantity_Color[Graphic3d_TypeOfReflection_NB];
+        public Quantity_Color[] Colors = new Quantity_Color[Graphic3d_TypeOfReflection_NB];
         public float TransparencyCoef;
         public float RefractionIndex;
         public float Shininess;

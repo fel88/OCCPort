@@ -1,6 +1,8 @@
 ﻿using OCCPort.Common;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Xml.Linq;
 
@@ -143,31 +145,70 @@ namespace TKernel
         {
             return list.Length;
         }
+
+        public T ChangeFirst()
+        {
+            return list.First();
+        }
+
+        public class TRef: ITref<T>
+        {
+
+            public NCollection_Array1<T> Array;
+            public int Index;
+
+            public T Get()
+            {
+                return Array.list[Index];
+            }
+
+            public void Set(T obj)
+            {
+                Array.list[Index] = obj;
+            }
+        }
+
         //! Implementation of the Iterator interface.
         public class Iterator
         {
+            public Iterator(NCollection_Array1<T> ar)
+            {
+                col = ar;
+            }
 
             NCollection_Array1<T> col;
             int index = 0;
             //! Constant value access
-            public  T ChangeValue()
+            public T ChangeValue()
             {
                 return Value();
             }
-            public  T Value() 
+            public TRef TRef()
+            {
+                return new TRef() { Array = col, Index = index };
+            }
+            public void ChangeValue(T val)
+            {
+                col[index] = val;
+            }
+            public void Nullify()
+            {
+                col[index] = default(T);
+            }
+            public T Value()
             { return col[index]; }
 
 
-        public void Next()
+            public void Next()
             {
-index++;
+                index++;
             }
-        public bool More()
+            public bool More()
             {
                 return index < col.Length();
             }
         }
-            public class iterator
+        public class iterator
         {
             private object value;
 
@@ -176,5 +217,11 @@ index++;
                 this.value = value;
             }
         }
+    }
+
+    public interface ITref<T>
+    {
+        void Set(T obj);
+        T Get();
     }
 }

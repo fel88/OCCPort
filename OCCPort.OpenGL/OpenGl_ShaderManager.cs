@@ -23,6 +23,29 @@ namespace OCCPort.OpenGL
     //! This class is responsible for managing shader programs.
     public class OpenGl_ShaderManager : Graphic3d_ShaderManager
     {
+        //! Updates state of material.
+        public void UpdateMaterialStateTo(OpenGl_Material theMat,
+                                   float theAlphaCutoff,
+                                   bool theToDistinguish,
+                                   bool theToMapTexture)
+        {
+            myMaterialState.Set(theMat, theAlphaCutoff, theToDistinguish, theToMapTexture);
+            myMaterialState.Update();
+        }
+
+        public void UpdateSRgbState()
+        {
+            if (mySRgbState == myContext.ToRenderSRGB())
+            {
+                return;
+            }
+
+            mySRgbState = myContext.ToRenderSRGB();
+
+            // special cases - GLSL programs dealing with sRGB/linearRGB internally
+            //myStereoPrograms[(int)Graphic3d_StereoMode.Graphic3d_StereoMode_Anaglyph] = null;
+        }
+
         public void UpdateLightSourceStateTo(Graphic3d_LightSet theLights,
                                                      uint theSpecIBLMapLevels,
                                                      OpenGl_ShadowMapArray theShadowMaps)
@@ -44,7 +67,7 @@ namespace OCCPort.OpenGL
             myClippingState.Update();
         }
 
-        OpenGl_ClippingState myClippingState=new OpenGl_ClippingState ();      //!< State of OCCT clipping planes
+        OpenGl_ClippingState myClippingState = new OpenGl_ClippingState();      //!< State of OCCT clipping planes
 
 
         //! Returns current state of OCCT light sources.
@@ -800,7 +823,7 @@ namespace OCCPort.OpenGL
         // function : RevertClippingState
         // purpose  : Reverts state of OCCT clipping planes
         // =======================================================================
-       public  void RevertClippingState()
+        public void RevertClippingState()
         {
             myClippingState.Revert();
         }
@@ -816,9 +839,9 @@ namespace OCCPort.OpenGL
         }
         int myIndex;      //!< Current state index
         int myNextIndex;  //!< Next    state index
-        NCollection_List<int> myStateStack=new NCollection_List<int> (); //!< Stack of previous states
+        NCollection_List<int> myStateStack = new NCollection_List<int>(); //!< Stack of previous states
 
-       public   void Revert()
+        public void Revert()
         {
             if (!myStateStack.IsEmpty())
             {

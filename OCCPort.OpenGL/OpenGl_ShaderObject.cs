@@ -148,6 +148,11 @@ namespace OCCPort.OpenGL
             return true;
         }
 
+        public override void Release(OpenGl_Context theGlCtx)
+        {
+            throw new NotImplementedException();
+        }
+
         DateTime myDumpDate; //!< The recent date of the shader dump
         GLenum myType;     //!< Type of OpenGL shader object
         public int myShaderID; //!< Handle of OpenGL shader object

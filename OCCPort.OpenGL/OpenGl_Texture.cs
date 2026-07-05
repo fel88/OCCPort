@@ -171,10 +171,59 @@ namespace OCCPort
             mySize.SetValues(0, 0, 0);
         }
 
+        //! Initialize the texture with Graphic3d_TextureMap.
+        //! It is an universal way to initialize.
+        //! Suitable initialization method will be chosen.
+        public bool Init(OpenGl_Context theCtx,
+                            Graphic3d_TextureRoot theTextureMap)
+        {
+            if (theTextureMap == null)
+            {
+                return false;
+            }
+
+            switch (theTextureMap.Type())
+            {
+                case Graphic3d_TypeOfTexture.Graphic3d_TypeOfTexture_CUBEMAP:
+                    {
+                        return true;
+                        //return InitCubeMap(theCtx, (Graphic3d_CubeMap)(theTextureMap),
+                                            //0, Image_Format_RGB, false, theTextureMap.IsColorMap());
+                    }
+                default:
+                    {
+        //                if (theCtx->SupportedTextureFormats()->HasCompressed()
+        //                && !theCtx->caps->compressedTexturesDisable)
+        //                {
+        //                    if (Handle(Image_CompressedPixMap) aCompressed = theTextureMap->GetCompressedImage(theCtx->SupportedTextureFormats()))
+        //{
+        //                        return InitCompressed(theCtx, *aCompressed, theTextureMap->IsColorMap());
+        //                    }
+        //                }
+
+        //                Handle(Image_PixMap) anImage = theTextureMap->GetImage(theCtx->SupportedTextureFormats());
+        //                if (anImage.IsNull())
+        //                {
+        //                    return false;
+        //                }
+        //                if (!Init(theCtx, *anImage, theTextureMap->Type(), theTextureMap->IsColorMap()))
+        //                {
+        //                    return false;
+        //                }
+        //                if (theTextureMap->HasMipmaps())
+        //                {
+        //                    GenerateMipmaps(theCtx);
+        //                }
+                        return true;
+                    }
+            }
+        }
+
+        
         //! Initialize the 2D texture with specified format, size and texture type.
         //! If theImage is empty the texture data will contain trash.
         //! Notice that texture will be unbound after this call.
-        internal bool Init(OpenGl_Context theCtx,
+        public bool Init(OpenGl_Context theCtx,
             OpenGl_TextureFormat theFormat,
             Graphic3d_Vec2i theSizeXY,
             Graphic3d_TypeOfTexture theType,
@@ -530,7 +579,7 @@ namespace OCCPort
         protected int myRevision;   //!< revision of associated data source
         protected uint myTextureId;  //!< GL resource ID
         protected uint myTarget;     //!< GL_TEXTURE_1D/GL_TEXTURE_2D/GL_TEXTURE_3D
-        protected Graphic3d_Vec3i mySize=new NCollection_Vec3<int> ();       //!< texture width x height x depth
+        protected Graphic3d_Vec3i mySize = new NCollection_Vec3<int>();       //!< texture width x height x depth
         protected uint myTextFormat; //!< texture format - GL_RGB, GL_RGBA,...
         protected int mySizedFormat;//!< internal (sized) texture format
         protected int myNbSamples;  //!< number of MSAA samples

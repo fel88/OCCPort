@@ -1,4 +1,9 @@
-﻿using OCCPort;
+﻿
+
+global using OpenGl_ResourcesStack = TKernel.NCollection_List<OCCPort.OpenGL.OpenGl_Resource>;
+
+
+using OCCPort;
 using OCCPort.Common;
 using OCCPort.OpenGL;
 using OpenTK.Audio.OpenAL;
@@ -116,9 +121,9 @@ myDepthPeelingDepthTexUnit (Graphic3d_TextureUnit_DepthPeelingDepth),
 myDepthPeelingFrontColorTexUnit (Graphic3d_TextureUnit_DepthPeelingFrontColor),*/
             myFrameStats = new OpenGl_FrameStats();
             /*
-myActiveMockTextures (0),
-myActiveHatchType (Aspect_HS_SOLID),
-myHatchIsEnabled (false),
+myActiveMockTextures (0),*/
+            myActiveHatchType = (int)Aspect_HatchStyle.Aspect_HS_SOLID;
+            myHatchIsEnabled = (false);/*
 myPointSpriteOrig (GL_UPPER_LEFT),*/
             myRenderMode = (int)All.Render;
             myShadeModel = (int)All.Smooth;
@@ -129,7 +134,8 @@ myPointSpriteOrig (GL_UPPER_LEFT),*/
             myDrawBuffers = new NCollection_Array1<int>(0, 7);
 
             myDefaultVao = (0);
-            myColorMask = new NCollection_Vec4<bool>(true);
+            myColorMask = new bool[4] { true, true, true, true };
+
 
             myAlphaToCoverage = (false);
             /*
@@ -162,7 +168,186 @@ myLineFeather (1.0f),*/
             myShaderManager = new OpenGl_ShaderManager(this);
             mySharedResources = (new OpenGl_ResourcesMap());
 
+            myUnusedResources = (new OpenGl_ResourcesStack());
+
+
         }
+        OpenGl_ResourcesStack myUnusedResources; //!< stack of resources for delayed clean up
+
+        //! Append resource to queue for delayed clean up.
+        //! Resources in this queue will be released at next redraw call.
+
+        public void DelayedRelease(ITref<OpenGl_Resource> theResource)
+        {
+            myUnusedResources.Prepend(theResource.Get());
+            theResource.Set(null);
+        }
+        public void SetFaceCulling(Graphic3d_TypeOfBackfacingModel theMode)
+        {
+            if (myFaceCulling == theMode)
+            {
+                return;
+            }
+
+            if (theMode == Graphic3d_TypeOfBackfacingModel.Graphic3d_TypeOfBackfacingModel_BackCulled)
+            {
+                if (myFaceCulling == Graphic3d_TypeOfBackfacingModel.Graphic3d_TypeOfBackfacingModel_FrontCulled)
+                {
+                    core11fwd.glCullFace(TriangleFace.Back);
+                }
+                core11fwd.glEnable(EnableCap.CullFace);
+            }
+            else if (theMode == Graphic3d_TypeOfBackfacingModel.Graphic3d_TypeOfBackfacingModel_FrontCulled)
+            {
+                core11fwd.glCullFace(TriangleFace.Front);
+                core11fwd.glEnable(EnableCap.CullFace);
+            }
+            else
+            {
+                core11fwd.glCullFace(TriangleFace.Back);
+                core11fwd.glDisable(EnableCap.CullFace);
+            }
+            myFaceCulling = theMode;
+        }
+
+        public void SetShadingMaterial(OpenGl_Aspects theAspect,
+                                           Graphic3d_PresentationAttributes theHighlight)
+        {
+            Graphic3d_Aspects anAspect = (theHighlight != null && theHighlight.BasicFillAreaAspect() != null)
+                                                     ? (Graphic3d_Aspects)theHighlight.BasicFillAreaAspect()
+                                            : theAspect.Aspect();
+
+            bool toDistinguish = anAspect.Distinguish();
+            bool toMapTexture = anAspect.ToMapTexture();
+            Graphic3d_MaterialAspect aMatFrontSrc = anAspect.FrontMaterial();
+            Graphic3d_MaterialAspect aMatBackSrc = toDistinguish
+                                                        ? anAspect.BackMaterial()
+                                                        : aMatFrontSrc;
+            Quantity_Color aFrontIntColor = anAspect.InteriorColor();
+            Quantity_Color aBackIntColor = toDistinguish
+                                                ? anAspect.BackInteriorColor()
+                                                : aFrontIntColor;
+
+            //  myMaterial.Init(this, aMatFrontSrc, aFrontIntColor, aMatBackSrc, aBackIntColor);
+            // if (!theHighlight.IsNull()
+            //    && theHighlight.BasicFillAreaAspect().IsNull())
+            {
+                // myMaterial.SetColor(theHighlight.ColorRGBA().GetRGB());
+                //    myMaterial.SetColor(theHighlight.ColorRGBA().GetRGB());
+            }
+
+            float anAlphaFront = 1.0f, anAlphaBack = 1.0f;
+            if (CheckIsTransparent(theAspect, theHighlight, anAlphaFront, anAlphaBack))
+            {
+                //   myMaterial.Common[0].Diffuse.a() = anAlphaFront;
+                //  myMaterial.Common[1].Diffuse.a() = anAlphaBack;
+
+                //myMaterial.Pbr[0].BaseColor.a() = anAlphaFront;
+                //   myMaterial.Pbr[1].BaseColor.a() = anAlphaBack;
+            }
+
+            // do not update material properties in case of zero reflection mode,
+            // because GL lighting will be disabled by OpenGl_PrimitiveArray::DrawArray() anyway.
+            OpenGl_MaterialState aMatState = myShaderManager.MaterialState();
+            float anAlphaCutoff = (anAspect.AlphaMode() == Graphic3d_AlphaMode.Graphic3d_AlphaMode_Mask
+                                || anAspect.AlphaMode() == Graphic3d_AlphaMode.Graphic3d_AlphaMode_MaskBlend)
+                                ? anAspect.AlphaCutoff()
+                                : ShortRealLast()
+                              ;
+            if (anAspect.ToDrawEdges())
+            {
+                if (anAspect.InteriorStyle() == Aspect_InteriorStyle.Aspect_IS_EMPTY
+                 || (anAspect.InteriorStyle() == Aspect_InteriorStyle.Aspect_IS_SOLID
+                  && anAspect.EdgeColorRGBA().Alpha() < 1.0f))
+                {
+                    anAlphaCutoff = 0.285f;
+                }
+            }
+            if (theAspect.ShadingModel() == Graphic3d_TypeOfShadingModel.Graphic3d_TypeOfShadingModel_Unlit)
+            {
+                if (anAlphaCutoff == aMatState.AlphaCutoff())
+                {
+                    return;
+                }
+            }
+            /*else if (myMaterial.IsEqual(aMatState.Material())
+                  && toDistinguish == aMatState.ToDistinguish()
+                  && toMapTexture == aMatState.ToMapTexture()
+                  && anAlphaCutoff == aMatState.AlphaCutoff())
+            {
+                return;
+            }*/
+
+            myShaderManager.UpdateMaterialStateTo(myMaterial, anAlphaCutoff, toDistinguish, toMapTexture);
+        }
+
+        private float ShortRealLast()
+        {
+            const float FLT_MAX = 3.402823466e+38F;// max value
+
+            return FLT_MAX;
+        }
+
+        public OpenGl_Material myMaterial;        //!< current front/back material state (cached to reduce GL context updates)
+
+        //! Sets and applies current polygon offset.
+        public void SetPolygonOffset(Graphic3d_PolygonOffset theOffset)
+        {
+            bool toFillOld = (myPolygonOffset.Mode & Aspect_PolygonOffsetMode.Aspect_POM_Fill) == Aspect_PolygonOffsetMode.Aspect_POM_Fill;
+            bool toFillNew = (theOffset.Mode & Aspect_PolygonOffsetMode.Aspect_POM_Fill) == Aspect_PolygonOffsetMode.Aspect_POM_Fill;
+            if (toFillNew != toFillOld)
+            {
+                if (toFillNew)
+                {
+                    core11fwd.glEnable(EnableCap.PolygonOffsetFill);
+                }
+                else
+                {
+                    core11fwd.glDisable(EnableCap.PolygonOffsetFill);
+                }
+            }
+
+            if (myGapi != Aspect_GraphicsLibrary.Aspect_GraphicsLibrary_OpenGLES)
+            {
+                bool toLineOld = (myPolygonOffset.Mode & Aspect_PolygonOffsetMode.Aspect_POM_Line) == Aspect_PolygonOffsetMode.Aspect_POM_Line;
+                bool toLineNew = (theOffset.Mode & Aspect_PolygonOffsetMode.Aspect_POM_Line) == Aspect_PolygonOffsetMode.Aspect_POM_Line;
+                if (toLineNew != toLineOld)
+                {
+                    if (toLineNew)
+                    {
+                        core11fwd.glEnable(EnableCap.PolygonOffsetLine);
+                    }
+                    else
+                    {
+                        core11fwd.glDisable(EnableCap.PolygonOffsetLine);
+                    }
+                }
+
+                bool toPointOld = (myPolygonOffset.Mode & Aspect_PolygonOffsetMode.Aspect_POM_Point) == Aspect_PolygonOffsetMode.Aspect_POM_Point;
+                bool toPointNew = (theOffset.Mode & Aspect_PolygonOffsetMode.Aspect_POM_Point) == Aspect_PolygonOffsetMode.Aspect_POM_Point;
+                if (toPointNew != toPointOld)
+                {
+                    if (toPointNew)
+                    {
+                        core11fwd.glEnable(EnableCap.PolygonOffsetPoint);
+                    }
+                    else
+                    {
+                        core11fwd.glDisable(EnableCap.PolygonOffsetPoint);
+                    }
+                }
+            }
+
+            if (myPolygonOffset.Factor != theOffset.Factor
+             || myPolygonOffset.Units != theOffset.Units)
+            {
+                core11fwd.glPolygonOffset(theOffset.Factor, theOffset.Units);
+            }
+            myPolygonOffset = theOffset;
+        }
+
+        Graphic3d_PolygonOffset myPolygonOffset = new Graphic3d_PolygonOffset();   //!< currently applied polygon offset
+
         public OpenGl_FeatureFlag hasHalfFloatBuffer; //!< Complex flag indicating support of half-float color buffer format (desktop OpenGL 3.0, GL_ARB_color_buffer_float, GL_EXT_color_buffer_half_float)
         public OpenGl_FeatureFlag hasFloatBuffer;     //!< Complex flag indicating support of float color buffer format (desktop OpenGL 3.0, GL_ARB_color_buffer_float, GL_EXT_color_buffer_float)
 
@@ -221,6 +406,7 @@ myLineFeather (1.0f),*/
             if (aMissingBits != 0
              && myTextureRgbaBlack == null)
             {
+                throw new NotImplementedException();
                 // allocate mock textures
                 myTextureRgbaBlack = new OpenGl_Texture();
                 myTextureRgbaWhite = new OpenGl_Texture();
@@ -439,12 +625,12 @@ myLineFeather (1.0f),*/
 
         public bool extFragDepth;       //!< GL_EXT_frag_depth on OpenGL ES 2.0 (gl_FragDepthEXT built-in variable, before OpenGL ES 3.0)
 
-        public void SetColorMaskRGBA(NCollection_Vec4<bool> theVal)
+        public void SetColorMaskRGBA(bool[] theVal)
         {
-            core11fwd.glColorMask(theVal.r() ? true : false,
-                         theVal.g() ? true : false,
-                         theVal.b() ? true : false,
-                         theVal.a() ? true : false);
+            core11fwd.glColorMask(theVal[0] ? true : false,
+                         theVal[1] ? true : false,
+                         theVal[2] ? true : false,
+                         theVal[3] ? true : false);
             myColorMask = theVal;
         }
         //! @return value for GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS
@@ -545,8 +731,8 @@ myLineFeather (1.0f),*/
                && hasFboSRGB;
         }
 
-        bool hasTexSRGB;         //!< sRGB texture    formats (desktop OpenGL 2.1, OpenGL ES 3.0 or OpenGL ES 2.0 + GL_EXT_sRGB)
-        bool hasFboSRGB;         //!< sRGB FBO render targets (desktop OpenGL 2.1, OpenGL ES 3.0)
+        public bool hasTexSRGB;         //!< sRGB texture    formats (desktop OpenGL 2.1, OpenGL ES 3.0 or OpenGL ES 2.0 + GL_EXT_sRGB)
+        public bool hasFboSRGB;         //!< sRGB FBO render targets (desktop OpenGL 2.1, OpenGL ES 3.0)
 
         public OpenGl_FeatureFlag hasGeometryStage;   //!< Complex flag indicating support of Geometry shader (desktop OpenGL 3.2, OpenGL ES 3.2, GL_EXT_geometry_shader)
 
@@ -742,7 +928,12 @@ myLineFeather (1.0f),*/
             return mySharedResources.Bind(theKey, theResource);
         }
 
-        internal int SetPolygonMode(int theMode)
+        public int SetPolygonMode(All theMode)
+        {
+            return SetPolygonMode((int)theMode);
+        }
+
+        public int SetPolygonMode(int theMode)
         {
             if (myPolygonMode == theMode)
             {
@@ -902,8 +1093,8 @@ myLineFeather (1.0f),*/
             }
         }
 
-        bool myIsSRgbWindow;    //!< indicates that window buffer is sRGB-ready
-        bool hasSRGBControl;     //!< sRGB write control (any desktop OpenGL, OpenGL ES + GL_EXT_sRGB_write_control extension)
+        public bool myIsSRgbWindow;    //!< indicates that window buffer is sRGB-ready
+        public bool hasSRGBControl;     //!< sRGB write control (any desktop OpenGL, OpenGL ES + GL_EXT_sRGB_write_control extension)
         //! @return tool for management of clippings within this context.
         internal OpenGl_Clipping Clipping()
         {
@@ -922,10 +1113,10 @@ myLineFeather (1.0f),*/
         //! Return cached flag indicating writing into color buffer is enabled or disabled (glColorMask).
         internal bool ColorMask()
         {
-            return myColorMask.r();
+            return myColorMask[0];
         }
 
-        NCollection_Vec4<bool> myColorMask = new NCollection_Vec4<bool>();       //!< flag indicating writing into color buffer is enabled or disabled (glColorMask)
+        bool[] myColorMask = new bool[4];       //!< flag indicating writing into color buffer is enabled or disabled (glColorMask)
 
         internal static bool CheckIsTransparent(OpenGl_Aspects theAspect,
             Graphic3d_PresentationAttributes theHighlight)
@@ -1083,7 +1274,45 @@ myLineFeather (1.0f),*/
             myDefaultVao = 0;
             OpenGl_GlFunctions.readGlVersion(ref myGlVerMajor, ref myGlVerMinor);
             //mySupportedFormats.Clear();
-
+            if (caps.contextMajorVersionUpper != -1)
+            {
+                // synthetically restrict OpenGL version for testing
+                int[] aCtxVer = { myGlVerMajor, myGlVerMinor };
+                bool isLowered = false;
+                if (myGlVerMajor > caps.contextMajorVersionUpper)
+                {
+                    isLowered = true;
+                    myGlVerMajor = caps.contextMajorVersionUpper;
+                    if (myGapi == Aspect_GraphicsLibrary.Aspect_GraphicsLibrary_OpenGLES)
+                    {
+                        switch (myGlVerMajor)
+                        {
+                            case 2: myGlVerMinor = 0; break;
+                        }
+                    }
+                    else
+                    {
+                        switch (myGlVerMajor)
+                        {
+                            case 1: myGlVerMinor = 5; break;
+                            case 2: myGlVerMinor = 1; break;
+                            case 3: myGlVerMinor = 3; break;
+                        }
+                    }
+                }
+                if (caps.contextMinorVersionUpper != -1
+                 && myGlVerMinor > caps.contextMinorVersionUpper)
+                {
+                    isLowered = true;
+                    myGlVerMinor = caps.contextMinorVersionUpper;
+                }
+                if (isLowered)
+                {
+                    PushMessage(All.DebugSourceApplication, All.DebugTypePortability, 0, All.DebugSeverityMedium,
+                                 ("OpenGL version ") + aCtxVer[0] + "." + aCtxVer[1]
+                                 + " has been lowered to " + myGlVerMajor + "." + myGlVerMinor);
+                }
+            }
 
             // setup shader generator
             myShaderManager.SetGapiVersion(myGlVerMajor, myGlVerMinor);
@@ -1222,7 +1451,7 @@ myLineFeather (1.0f),*/
         }
         internal void PushMessage(int debugSourceApplication, int debugTypePerformance, int v, int debugSeverityLow, string aMsg)
         {
-            //throw new NotImplementedException();
+            throw new Exception(aMsg);
         }
         Aspect_RenderingContext myGContext; //!< rendering context EGLContext | HGLRC | GLXContext | EAGLContext* | NSOpenGLContext*
 
@@ -1499,7 +1728,50 @@ myLineFeather (1.0f),*/
 
         //! @return tool for management of clippings within this context.
         public OpenGl_Clipping ChangeClipping() { return myClippingState; }
+        public bool myHatchIsEnabled;  //!< current enabled state of polygon hatching rasterization
 
+        public int myActiveHatchType; //!< currently activated type of polygon hatch
+
+        public bool SetPolygonHatchEnabled(bool theIsEnabled)
+        {
+            if (core11ffp == null)
+            {
+                return false;
+            }
+            else if (myHatchIsEnabled == theIsEnabled)
+            {
+                return theIsEnabled;
+            }
+
+            bool anOldIsEnabled = myHatchIsEnabled;
+            if (theIsEnabled
+             && myActiveHatchType != (int)Aspect_HatchStyle.Aspect_HS_SOLID)
+            {
+                core11fwd.glEnable(EnableCap.PolygonStipple);
+            }
+            else
+            {
+                core11fwd.glDisable(EnableCap.PolygonStipple);
+            }
+
+            myHatchIsEnabled = theIsEnabled;
+            return anOldIsEnabled;
+        }
+
+        internal void PushMessage(string aMsg)
+        {
+            throw new Exception(aMsg);
+        }
+
+        public void ReleaseDelayed()
+        {
+            // release queued elements
+            while (!myUnusedResources.IsEmpty())
+            {
+                myUnusedResources.First().Release(this);
+                myUnusedResources.RemoveFirst();
+            }
+        }
 
         bool myIsSRgbActive;    //!< flag indicating GL_FRAMEBUFFER_SRGB state
 

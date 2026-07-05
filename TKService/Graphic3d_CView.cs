@@ -16,6 +16,13 @@ namespace TKService
     public abstract class Graphic3d_CView : Graphic3d_DataStructureManager
     {
 
+        //! Returns default Shading Model of the view; Graphic3d_TypeOfShadingModel_Phong by default.
+        public Graphic3d_TypeOfShadingModel ShadingModel() { return myRenderParams.ShadingModel; }
+
+        //! Return backfacing model used for the view; Graphic3d_TypeOfBackfacingModel_Auto by default,
+        //! which means that backface culling is defined by each presentation.
+        public Graphic3d_TypeOfBackfacingModel BackfacingModel() { return myBackfacing; }
+
 
         //! Sets list of clip planes for the view.
         public abstract void SetClipPlanes(Graphic3d_SequenceOfHClipPlane thePlanes);
@@ -900,6 +907,11 @@ namespace TKService
 
     public class Graphic3d_TextureRoot
     {
+        Graphic3d_TypeOfTexture myType;       //!< texture type
+
+        //! @return the texture type.
+        public Graphic3d_TypeOfTexture Type() { return myType; }
+
     }
 
     //! Type of the texture filter.
@@ -952,7 +964,7 @@ namespace TKService
 
 
         //! Return data pointer for low-level operations (copying entire buffer, parsing with extra tools etc.).
-        public  byte[] Data()  { return myData.Data(); }
+        public byte[] Data() { return myData.Data(); }
 
         //! Return pixel format.
         public Image_Format Format() { return myImgFormat; }
@@ -990,16 +1002,42 @@ namespace TKService
     internal class Graphic3d_CubeMapSide
     {
     }
-    public class Graphic3d_TextureEnv
+
+    //! This class provides environment texture.
+    public class Graphic3d_TextureEnv : Graphic3d_TextureRoot
     {
-    }
+        Graphic3d_TextureParams myParams;     //!< associated texture parameters
+        string myTexId;      //!< unique identifier of this resource (for sharing graphic resource); should never be modified outside constructor
+
+        //! @return low-level texture parameters
+        public Graphic3d_TextureParams GetParams() { return myParams; }
+
+        //! This ID will be used to manage resource in graphic driver.
+        //!
+        //! Default implementation generates unique ID within constructor;
+        //! inheritors may re-initialize it within their constructor,
+        //! but should never modify it afterwards.
+        //!
+        //! Multiple Graphic3d_TextureRoot instances with same ID
+        //! will be treated as single texture with different parameters
+        //! to optimize memory usage though this will be more natural
+        //! to use same instance of Graphic3d_TextureRoot when possible.
+        //!
+        //! If this ID is set to empty string by inheritor,
+        //! then independent graphical resource will be created
+        //! for each instance of Graphic3d_AspectFillArea3d where texture will be used.
+        //!
+        //! @return texture identifier.
+        public  string  GetId()  { return myTexId; }
+
+}
 
 
 
-    //! Defines the class of a graduated trihedron.
-    //! It contains main style parameters for implementation of graduated trihedron
-    //! @sa OpenGl_GraduatedTrihedron    
-    public class Graphic3d_GraduatedTrihedron
+//! Defines the class of a graduated trihedron.
+//! It contains main style parameters for implementation of graduated trihedron
+//! @sa OpenGl_GraduatedTrihedron    
+public class Graphic3d_GraduatedTrihedron
     {
     }
 
@@ -1079,13 +1117,13 @@ namespace TKService
     {
         public Image_PixMapData() : base(null)
         {
-            
+
 
             TopToDown = -1;
 
-        
+
         }
-       public  int TopToDown;      //!< image scanlines direction in memory from Top to the Down
+        public int TopToDown;      //!< image scanlines direction in memory from Top to the Down
 
     }
 }

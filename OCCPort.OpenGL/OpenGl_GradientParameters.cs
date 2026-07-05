@@ -1,5 +1,6 @@
 ﻿
 global using OpenGl_Vec4 = TKernel.NCollection_Vec4<float>;
+global using OpenGl_Vec3 = TKernel.NCollection_Vec3<float>;
 using TKService;
 
 namespace OCCPort.OpenGL

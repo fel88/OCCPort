@@ -190,7 +190,7 @@ namespace OCCPort
         public bool ToUpdateParameters() { return mySamplerRevision != myParams.SamplerRevision(); }
 
 
-        public void Release(OpenGl_Context theCtx)
+        public override void Release(OpenGl_Context theCtx)
         {
             myIsImmutable = false;
             mySamplerRevision = myParams.SamplerRevision() - 1;
@@ -243,6 +243,7 @@ namespace OCCPort
         //! Immutable flag might be set when Sampler Object is used within Bindless Texture.
         public bool IsImmutable() { return myIsImmutable; }
 
+        
         //! Helpful constant defining invalid sampler identifier
         const uint NO_SAMPLER = 0;
 

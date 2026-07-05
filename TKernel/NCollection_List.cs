@@ -27,6 +27,11 @@ namespace TKernel
             return this;
         }
 
+        public void Prepend(T a)
+        {
+            Insert(0, a);
+        }
+
 
         public class Iterator
         {

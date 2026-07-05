@@ -19,6 +19,35 @@ namespace TKService
             //myAlphaMode(Graphic3d_AlphaMod*/
         }
 
+        //! Sets polygon offsets settings.
+        public void SetPolygonOffset(Graphic3d_PolygonOffset theOffset) { myPolygonOffset = theOffset; }
+
+        //! Returns alpha cutoff threshold, for discarding fragments within Graphic3d_AlphaMode_Mask mode (0.5 by default).
+        //! If the alpha value is greater than or equal to this value then it is rendered as fully opaque, otherwise, it is rendered as fully transparent.
+        public float AlphaCutoff() { return myAlphaCutoff; }
+
+        //! Return color of edges.
+        public Quantity_ColorRGBA EdgeColorRGBA() { return myEdgeColor; }
+
+        //! Returns true if mesh edges should be drawn (false by default).
+        public bool ToDrawEdges() { return myToDrawEdges && myLineType != Aspect_TypeOfLine.Aspect_TOL_EMPTY; }
+
+        //! Return interior color.
+        public Quantity_Color InteriorColor() { return myInteriorColor.GetRGB(); }
+
+        //! Return back interior color.
+        public Quantity_Color BackInteriorColor() { return myBackInteriorColor.GetRGB(); }
+
+        //! Returns current polygon offsets settings.
+        public Graphic3d_PolygonOffset PolygonOffset() { return myPolygonOffset; }
+        Graphic3d_PolygonOffset myPolygonOffset = new Graphic3d_PolygonOffset();
+
+
+        //! Return face culling mode; Graphic3d_FaceCulling_BackClosed by default.
+        //! A back-facing polygon is defined as a polygon whose
+        //! vertices are in a clockwise order with respect to screen coordinates.
+        public Graphic3d_TypeOfBackfacingModel FaceCulling() { return myFaceCulling; }
+
         //! Modifies the interior type used for rendering
         public void SetInteriorStyle(Aspect_InteriorStyle theStyle) { myInteriorStyle = theStyle; }
 
@@ -65,8 +94,8 @@ namespace TKService
                 && myIsTextZoomable == theOther.myIsTextZoomable;
         }
 
-        Graphic3d_MaterialAspect myFrontMaterial;
-        Graphic3d_MaterialAspect myBackMaterial;
+        Graphic3d_MaterialAspect myFrontMaterial = new Graphic3d_MaterialAspect();
+        Graphic3d_MaterialAspect myBackMaterial = new Graphic3d_MaterialAspect();
         Aspect_InteriorStyle myInteriorStyle;
 
         //! Return true if texture mapping is enabled (false by default).
@@ -149,9 +178,10 @@ namespace TKService
         //! Graphic3d_TOSM_DEFAULT means that Shading Model set as default for entire Viewer will be used.
         public Graphic3d_TypeOfShadingModel ShadingModel() { return myShadingModel; }
 
+        //! Return interior rendering style; Aspect_IS_SOLID by default.
         public Aspect_InteriorStyle InteriorStyle()
         {
-            throw new NotImplementedException();
+            return myInteriorStyle;
         }
 
 

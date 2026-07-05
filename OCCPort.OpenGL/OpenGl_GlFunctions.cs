@@ -33,6 +33,18 @@ namespace OCCPort.OpenGL
                 GL.GetInteger(GetPName.MajorVersion, out aMajor);
                 GL.GetInteger(GetPName.MinorVersion, out aMinor);
 
+                // glGetError() sometimes does not report an error here even if
+                // GL does not know GL_MAJOR_VERSION and GL_MINOR_VERSION constants.
+                // This happens on some renderers like e.g. Cygwin MESA.
+                // Thus checking additionally if GL has put anything to
+                // the output variables.
+                if (GL.GetError() == ErrorCode.NoError && aMajor != 0 && aMinor != 0)
+                {
+                    theGlVerMajor = aMajor;
+                    theGlVerMinor = aMinor;
+                    return;
+                }
+
             }
             if (theGlVerMajor <= 0)
             {
@@ -93,6 +105,12 @@ namespace OCCPort.OpenGL
                 //theCtx.extPDS = true; // extension for EXT, but part of ARB
             }
 
+            //theCtx.hasTexRGBA8 = true;
+            theCtx.hasTexSRGB = theCtx.IsGlGreaterEqual(2, 1);
+            theCtx.hasFboSRGB = theCtx.IsGlGreaterEqual(2, 1);
+            theCtx.hasSRGBControl = theCtx.hasFboSRGB;
+         //   theCtx.hasFboRenderMipmap = true;
+            theCtx.arbDrawBuffers = theCtx.CheckExtension("GL_ARB_draw_buffers");
             bool hasSamplerObjects = (theCtx.IsGlGreaterEqual(3, 3) || theCtx.CheckExtension("GL_ARB_sampler_objects"))
       //&& FindProcShort(glGenSamplers)
       //&& FindProcShort(glDeleteSamplers)

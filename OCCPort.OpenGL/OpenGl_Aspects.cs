@@ -4,7 +4,7 @@ using TKService;
 
 namespace OCCPort.OpenGL
 {
-    internal class OpenGl_Aspects : OpenGl_Element
+    public class OpenGl_Aspects : OpenGl_Element
     {
         //! OpenGl resources
         OpenGl_AspectsProgram myResProgram = new OpenGl_AspectsProgram();

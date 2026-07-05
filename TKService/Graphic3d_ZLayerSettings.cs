@@ -1,4 +1,5 @@
-﻿using System.Reflection.Metadata;
+﻿using OCCPort.Common;
+using System.Reflection.Metadata;
 using TKMath;
 
 namespace TKService
@@ -56,8 +57,5 @@ namespace TKService
         Graphic3d_PolygonOffset myPolygonOffset;         //!< glPolygonOffset() arguments
         bool myIsImmediate;           //!< immediate layer will be drawn after all normal layers
 
-    }
-    internal class Graphic3d_PolygonOffset
-    {
     }
 }

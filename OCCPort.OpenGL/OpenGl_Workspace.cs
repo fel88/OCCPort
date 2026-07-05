@@ -118,11 +118,115 @@ namespace OCCPort.OpenGL
                 myGlContext.core15fwd.glActiveTexture(All.Texture0);
             }
         }
+        Graphic3d_Aspects myAspectsApplied;
 
-        private void ApplyAspects()
+        public Graphic3d_PolygonOffset SetDefaultPolygonOffset(Graphic3d_PolygonOffset theOffset)
         {
-            //throw new NotImplementedException();
+            Graphic3d_PolygonOffset aPrev = myDefaultAspects.Aspect().PolygonOffset();
+            myDefaultAspects.Aspect().SetPolygonOffset(theOffset);
+            if (myAspectsApplied == myDefaultAspects.Aspect()
+             || myAspectsApplied==null
+             || (myAspectsApplied.PolygonOffset().Mode & Aspect_PolygonOffsetMode.Aspect_POM_None) == Aspect_PolygonOffsetMode.Aspect_POM_None)
+            {
+                myGlContext.SetPolygonOffset(theOffset);
+            }
+            return aPrev;
         }
+
+        //! Apply aspects.
+        //! @param theToBindTextures flag to bind texture set defined by applied aspect
+        //! @return aspect set by SetAspects()
+        public OpenGl_Aspects ApplyAspects(bool theToBindTextures = true)
+        {
+            //bool toSuppressBackFaces = myView->BackfacingModel() == Graphic3d_TypeOfBackfacingModel_BackCulled;
+            Graphic3d_TypeOfBackfacingModel aCullFacesMode = myView.BackfacingModel();
+            if (aCullFacesMode == Graphic3d_TypeOfBackfacingModel.Graphic3d_TypeOfBackfacingModel_Auto)
+            {
+                aCullFacesMode = myAspectsSet.Aspect().FaceCulling();
+                if (aCullFacesMode == Graphic3d_TypeOfBackfacingModel.Graphic3d_TypeOfBackfacingModel_Auto)
+                {
+                    aCullFacesMode = Graphic3d_TypeOfBackfacingModel.Graphic3d_TypeOfBackfacingModel_DoubleSided;
+                    if (myToAllowFaceCulling)
+                    {
+                        if (myAspectsSet.Aspect().InteriorStyle() == Aspect_InteriorStyle.Aspect_IS_HATCH
+                         || myAspectsSet.Aspect().AlphaMode() == Graphic3d_AlphaMode.Graphic3d_AlphaMode_Blend
+                         || myAspectsSet.Aspect().AlphaMode() == Graphic3d_AlphaMode.Graphic3d_AlphaMode_Mask
+                         || myAspectsSet.Aspect().AlphaMode() == Graphic3d_AlphaMode.Graphic3d_AlphaMode_MaskBlend
+                         || (myAspectsSet.Aspect().AlphaMode() == Graphic3d_AlphaMode.Graphic3d_AlphaMode_BlendAuto
+                          && myAspectsSet.Aspect().FrontMaterial().Transparency() != 0.0f))
+                        {
+                            // disable culling in case of translucent shading aspect
+                            aCullFacesMode = Graphic3d_TypeOfBackfacingModel.Graphic3d_TypeOfBackfacingModel_DoubleSided;
+                        }
+                        else
+                        {
+                            aCullFacesMode = Graphic3d_TypeOfBackfacingModel.Graphic3d_TypeOfBackfacingModel_BackCulled;
+                        }
+                    }
+                }
+            }
+            myGlContext.SetFaceCulling(aCullFacesMode);
+
+          //  if (myAspectsSet.Aspect() == myAspectsApplied
+           //  && myHighlightStyle == myAspectFaceAppliedWithHL)
+            {
+            //    return myAspectsSet;
+            }
+           // myAspectFaceAppliedWithHL = myHighlightStyle;
+
+            // Aspect_POM_None means: do not change current settings
+            if ((myAspectsSet.Aspect().PolygonOffset().Mode & Aspect_PolygonOffsetMode.Aspect_POM_None) != Aspect_PolygonOffsetMode.Aspect_POM_None)
+            {
+                myGlContext.SetPolygonOffset(myAspectsSet.Aspect().PolygonOffset());
+            }
+
+            Aspect_InteriorStyle anIntstyle = myAspectsSet.Aspect().InteriorStyle();
+            if (myAspectsApplied == null
+             || myAspectsApplied.InteriorStyle() != anIntstyle)
+            {
+                myGlContext.SetPolygonMode(anIntstyle == Aspect_InteriorStyle.Aspect_IS_POINT ? All.Point : All.Fill);
+                myGlContext.SetPolygonHatchEnabled(anIntstyle == Aspect_InteriorStyle.Aspect_IS_HATCH);
+            }
+
+            if (anIntstyle == Aspect_InteriorStyle.Aspect_IS_HATCH)
+            {
+               // myGlContext.SetPolygonHatchStyle(myAspectsSet.Aspect().HatchStyle());
+            }
+
+            // Case of hidden line
+            if (anIntstyle == Aspect_InteriorStyle.Aspect_IS_HIDDENLINE)
+            {
+                // copy all values including line edge aspect
+                /**myAspectFaceHl.Aspect() = *myAspectsSet->Aspect();
+                myAspectFaceHl.Aspect()->SetShadingModel(Graphic3d_TypeOfShadingModel_Unlit);
+                myAspectFaceHl.Aspect()->SetInteriorColor(myView->BackgroundColor().GetRGB());
+                myAspectFaceHl.Aspect()->SetDistinguish(false);
+                myAspectFaceHl.SetNoLighting();
+                myAspectsSet = &myAspectFaceHl;*/
+            }
+            else
+            {
+                myGlContext.SetShadingMaterial(myAspectsSet, myHighlightStyle);
+            }
+
+            if (theToBindTextures)
+            {
+                OpenGl_TextureSet aTextureSet = TextureSet();
+                myGlContext.BindTextures(aTextureSet, null);
+            }
+
+            //if ((myView.ShadingModel() ==Graphic3d_TypeOfShadingModel. Graphic3d_TypeOfShadingModel_Pbr
+            //  || myView.ShadingModel() ==Graphic3d_TypeOfShadingModel. Graphic3d_TypeOfShadingModel_PbrFacet)
+            // && !myView.myPBREnvironment.IsNull()
+            // && myView.myPBREnvironment->IsNeededToBeBound())
+            //{
+            //    myView->myPBREnvironment->Bind(myGlContext);
+            //}
+
+            myAspectsApplied = myAspectsSet.Aspect();
+            return myAspectsSet;
+        }
+        OpenGl_Aspects myAspectFaceHl; //!< Hiddenline aspect
 
         internal void SetAllowFaceCulling(object value)
         {

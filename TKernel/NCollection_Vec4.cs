@@ -53,7 +53,7 @@ namespace TKernel
 
 
     //}
-    public struct NCollection_Vec4<Element_t> where Element_t : struct
+    public struct NCollection_Vec4<Element_t> where Element_t : struct, INumber<Element_t>, IMultiplyOperators<Element_t, Element_t, Element_t>
     {
         public NCollection_Vec4()
         {
@@ -77,6 +77,14 @@ namespace TKernel
             v[3] = theW;
         }
 
+        //! Assign new values as 3-component vector and a 4-th value.
+       public  void SetValues( NCollection_Vec3<Element_t> theVec3,  Element_t theW)
+  {
+    v[0] = theVec3.x();
+    v[1] = theVec3.y();
+    v[2] = theVec3.z();
+    v[3] = theW;
+  }
         public NCollection_Vec4(Element_t[] array)
         {
             v = new Element_t[4];
