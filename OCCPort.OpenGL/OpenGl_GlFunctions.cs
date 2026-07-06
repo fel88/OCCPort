@@ -61,6 +61,7 @@ namespace OCCPort.OpenGL
         {
             GL.BindFramebuffer((FramebufferTarget)framebuffer, v);
         }
+
         internal void glGenFramebuffers(int v, ref uint myGlFBufferId)
         {
             if (v == 1)
@@ -109,8 +110,30 @@ namespace OCCPort.OpenGL
             theCtx.hasTexSRGB = theCtx.IsGlGreaterEqual(2, 1);
             theCtx.hasFboSRGB = theCtx.IsGlGreaterEqual(2, 1);
             theCtx.hasSRGBControl = theCtx.hasFboSRGB;
-         //   theCtx.hasFboRenderMipmap = true;
+            theCtx.hasFboRenderMipmap = true;
+
+            theCtx.arbDepthClamp = theCtx.IsGlGreaterEqual(3, 2)
+                  || theCtx.CheckExtension("GL_ARB_depth_clamp")
+                  || theCtx.CheckExtension("NV_depth_clamp");
+
+            theCtx.hasDrawBuffers = isGlGreaterEqualShort(theCtx, 2, 0) ? OpenGl_FeatureFlag.OpenGl_FeatureInCore :
+                                    theCtx.arbDrawBuffers ? OpenGl_FeatureFlag.OpenGl_FeatureInExtensions
+                                                          : OpenGl_FeatureFlag.OpenGl_FeatureNotAvailable;
+
             theCtx.arbDrawBuffers = theCtx.CheckExtension("GL_ARB_draw_buffers");
+            theCtx.hasFloatBuffer = theCtx.hasHalfFloatBuffer =
+  isGlGreaterEqualShort(theCtx, 3, 0) ? OpenGl_FeatureFlag.OpenGl_FeatureInCore :
+  checkExtensionShort(theCtx,"GL_ARB_color_buffer_float") ? OpenGl_FeatureFlag.OpenGl_FeatureInExtensions
+                                                    : OpenGl_FeatureFlag.OpenGl_FeatureNotAvailable;
+
+            theCtx.hasGeometryStage = isGlGreaterEqualShort( theCtx, 3, 2)
+                                    ? OpenGl_FeatureFlag.OpenGl_FeatureInCore
+                                    : OpenGl_FeatureFlag.OpenGl_FeatureNotAvailable;
+
+            theCtx.hasSampleVariables = isGlGreaterEqualShort(theCtx, 4, 0) ?OpenGl_FeatureFlag. OpenGl_FeatureInCore :
+                                        theCtx.arbSampleShading ? OpenGl_FeatureFlag.OpenGl_FeatureInExtensions
+                                                                : OpenGl_FeatureFlag.OpenGl_FeatureNotAvailable;
+
             bool hasSamplerObjects = (theCtx.IsGlGreaterEqual(3, 3) || theCtx.CheckExtension("GL_ARB_sampler_objects"))
       //&& FindProcShort(glGenSamplers)
       //&& FindProcShort(glDeleteSamplers)
@@ -131,6 +154,17 @@ namespace OCCPort.OpenGL
             {
                 theCtx.arbSamplerObject = this;
             }
+        }
+
+        private bool checkExtensionShort(OpenGl_Context ctx, string v)
+        {
+            return ctx.CheckExtension(v);
+
+        }
+
+        private bool isGlGreaterEqualShort(OpenGl_Context theCtx, int theMaj, int theMin)
+        {
+            return theCtx.IsGlGreaterEqual(theMaj, theMin);
         }
 
         internal void glBlitFramebuffer(GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1, GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1, ClearBufferMask mask, BlitFramebufferFilter filter)

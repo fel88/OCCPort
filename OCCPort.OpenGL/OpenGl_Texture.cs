@@ -16,6 +16,10 @@ namespace OCCPort
     public class OpenGl_Texture : OpenGl_NamedResource
     {
 
+        //! Return if 2D surface is defined top-down (TRUE) or bottom-up (FALSE).
+        //! Normally set from Image_PixMap::IsTopDown() within texture initialization.
+      public   bool IsTopDown()  { return myIsTopDown; }
+
         //! Return texture sampler.
         public OpenGl_Sampler Sampler() { return mySampler; }
 

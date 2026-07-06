@@ -66,5 +66,12 @@ namespace OCCPort.OpenGL
         public int ChangeTextureSetBits() { return myTextureSetBits; }
         public void ChangeTextureSetBits(int v) { myTextureSetBits = v; }
 
+
+        //! Return TRUE if texture array is empty.
+        public bool IsEmpty()  { return myTextures.IsEmpty(); }
+
+        //! Return the first texture.
+        public OpenGl_Texture First() { return myTextures.First().Texture; }
+
     }
 }

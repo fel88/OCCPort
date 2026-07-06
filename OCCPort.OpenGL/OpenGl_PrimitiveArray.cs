@@ -199,7 +199,7 @@ namespace OCCPort.OpenGL
             if (theHasVertColor && toHilight)
             {
                 // disable per-vertex color
-                //OpenGl_VertexBuffer.unbindAttribute(aGlContext, Graphic3d_TOA_COLOR);
+                OpenGl_VertexBuffer.unbindAttribute(aGlContext, Graphic3d_TypeOfAttribute.Graphic3d_TOA_COLOR);
             }
             if (myVboIndices != null)
             {
@@ -264,6 +264,46 @@ namespace OCCPort.OpenGL
 
             bool toDrawArray = true, toSetLinePolygMode = false;
             int toDrawInteriorEdges = 0; // 0 - no edges, 1 - glsl edges, 2 - polygonMode
+            if (myIsFillType)
+            {
+                toDrawArray = anAspectFace.Aspect().InteriorStyle() != Aspect_InteriorStyle.Aspect_IS_EMPTY;
+                if (anAspectFace.Aspect().ToDrawEdges())
+                {
+                    toDrawInteriorEdges = 1;
+                    toDrawArray = true;
+                    if (aCtx.GraphicsLibrary() != Aspect_GraphicsLibrary.Aspect_GraphicsLibrary_OpenGLES
+                     && (anAspectFace.Aspect().EdgeLineType() != Aspect_TypeOfLine.Aspect_TOL_SOLID
+                      || aCtx.hasGeometryStage == OpenGl_FeatureFlag.OpenGl_FeatureNotAvailable
+                      || aCtx.caps.usePolygonMode))
+                    {
+                        toDrawInteriorEdges = 2;
+                        if (anAspectFace.Aspect().InteriorStyle() == Aspect_InteriorStyle.Aspect_IS_EMPTY)
+                        {
+                            if (anAspectFace.Aspect().EdgeLineType() != Aspect_TypeOfLine.Aspect_TOL_SOLID)
+                            {
+                                toDrawArray = false;
+                            }
+                            else
+                            {
+                                toSetLinePolygMode = true;
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (myDrawMode == (int)All.Points)
+                {
+                    if (anAspectFace.Aspect().MarkerType() == Aspect_TypeOfMarker.Aspect_TOM_EMPTY)
+                        return;
+                }
+                else
+                {
+                    if (anAspectFace.Aspect().LineType() == Aspect_TypeOfLine.Aspect_TOL_EMPTY)
+                        return;
+                }
+            }
 
             // create VBOs on first render call
             if (!myIsVboInit)
@@ -323,12 +363,75 @@ namespace OCCPort.OpenGL
                         }
                 }
 
+                // bind textures after GLSL program to set mock textures to slots used by program
+                aCtx.BindTextures(aTextureSet, aCtx.ActiveProgram());
+                if (aTextureSet != null
+                 && !aTextureSet.IsEmpty()
+                 && myDrawMode != (int)All.Points) // transformation is not supported within point sprites
+                {
+                    OpenGl_Texture aFirstTexture = aTextureSet.First();
+                    if (aFirstTexture != null)
+                    {
+                        aCtx.SetTextureMatrix(aFirstTexture.Sampler().Parameters(), aFirstTexture.IsTopDown());
+                    }
+                }
+
+                aCtx.SetSampleAlphaToCoverage(aCtx.ShaderManager().MaterialState().HasAlphaCutoff());
+
+                bool isForcedBlend = anAspectFace.Aspect().AlphaMode() == Graphic3d_AlphaMode.Graphic3d_AlphaMode_MaskBlend;
+                if (isForcedBlend)
+                {
+                    aCtx.core11fwd.glEnable(EnableCap.Blend);
+                    aCtx.core11fwd.glBlendFunc(BlendingFactor.SrcAlpha , BlendingFactor.OneMinusSrcAlpha );
+                }
+
                 var aFaceColors = myBounds != null && !toHilight && anAspectFace.Aspect().InteriorStyle() != Aspect_InteriorStyle.Aspect_IS_HIDDENLINE
                                      ? myBounds.Colors
                                      : null;
+                OpenGl_Vec4 anInteriorColor = theWorkspace.InteriorColor();
+                aCtx.SetColor4fv(anInteriorColor);
+                if (!myIsFillType)
+                {
+                    if (myDrawMode == (int)All.Lines
+                     || myDrawMode == (int)All.LineStrip)
+                    {
+                     //   aCtx.SetLineStipple((float)anAspectFace.Aspect().LineStippleFactor(), anAspectFace.Aspect().LinePattern());
+                        //aCtx.SetLineWidth(anAspectFace.Aspect().LineWidth());
+                    }
+
+                    drawArray(theWorkspace, aFaceColors, hasColorAttrib);
+                    if (isForcedBlend)
+                    {
+                        aCtx.core11fwd.glDisable(EnableCap.Blend);
+                    }
+                    return;
+                }
 
                 drawArray(theWorkspace, aFaceColors, hasColorAttrib);
+                /*
+                 * more code here
+                 */
+
+                if (isForcedBlend)
+                {
+                    aCtx.core11fwd.glDisable(EnableCap.Blend);
+                }
             }
+
+            // draw triangulation edges using Polygon Mode
+            //if (toDrawInteriorEdges == 2)
+            //{
+            //    if (anAspectFace->Aspect()->InteriorStyle() == Aspect_IS_HOLLOW
+            //     && anAspectFace->Aspect()->EdgeLineType() == Aspect_TOL_SOLID)
+            //    {
+            //        aCtx->SetPolygonMode(GL_FILL);
+            //    }
+            //    else
+            //    {
+            //        drawEdges(theWorkspace);
+            //    }
+            //}
+
         }
 
         //! Rebuilds the array of vertex attributes so that it can be drawn without indices.

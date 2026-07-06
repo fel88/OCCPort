@@ -181,5 +181,10 @@ namespace OCCPort.OpenGL
         {
             GL.CullFace(front);
         }
+
+        internal void glBlendFunc(BlendingFactor srcAlpha, BlendingFactor oneMinusSrcAlpha)
+        {
+            GL.BlendFunc(srcAlpha, oneMinusSrcAlpha);
+        }
     }
 }

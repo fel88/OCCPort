@@ -511,6 +511,7 @@ namespace OCCPort.OpenGL
                 if (!anIter.Value().IsDone())
                 {
                     string aMsg = "Error! Failed to get shader source";
+                    theCtx.PushMessage(aMsg);
                     // theCtx.PushMessage(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_HIGH, aMsg);
                     return false;
                 }
@@ -548,6 +549,7 @@ namespace OCCPort.OpenGL
                     }
                     else
                     {
+                        theCtx.PushMessage(" \"Error! Multiple draw buffers required by the program, but aren't supported by OpenGL\"");
                         //theCtx->PushMessage(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_HIGH,
                         //                   "Error! Multiple draw buffers required by the program, but aren't supported by OpenGL");
                         return false;

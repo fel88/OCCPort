@@ -16,9 +16,33 @@ namespace OCCPort.OpenGL
             GL.Color4([theColor.X, theColor.Y, theColor.Z, theColor.W]);
         }
 
+        internal void glColorMaterial(TriangleFace frontAndBack, ColorMaterialParameter ambientAndDiffuse)
+        {
+            GL.ColorMaterial(frontAndBack, ambientAndDiffuse);
+        }
+
+        internal void glColorPointer(int theNbComp, int theDataType, int theStride, int theOffset)
+        {
+            GL.ColorPointer(theNbComp, (ColorPointerType)theDataType, theStride, theOffset);
+        }
+
         internal void glCopyPixels(int v1, int v2, int v3, int v4, All color)
         {
             GL.CopyPixels(v1, v2, v3, v4, (PixelCopyType)color);
+        }
+
+        
+        internal void glDisableClientState(ArrayCap vertexArray)
+        {
+            GL.DisableClientState(vertexArray);
+        }
+        internal void glEnableClientState(ArrayCap vertexArray)
+        {
+            GL.EnableClientState(vertexArray);
+        }
+        internal void glEnableClientState(All vertexArray)
+        {
+            GL.EnableClientState((ArrayCap)vertexArray);
         }
 
         internal void glLoadMatrixf(Matrix4 matrix4)
@@ -35,6 +59,11 @@ namespace OCCPort.OpenGL
             GL.MatrixMode((MatrixMode)projection);
         }
 
+        internal void glNormalPointer(int theDataType, int theStride, int theOffset)
+        {
+            GL.NormalPointer((NormalPointerType)theDataType, theStride, theOffset);
+        }
+
         internal void glPixelTransferi(All mapColor, int v)
         {
             GL.PixelTransfer((PixelTransferParameter)mapColor, v);
@@ -48,6 +77,16 @@ namespace OCCPort.OpenGL
         internal void glShadeModel(int aModel)
         {
             GL.ShadeModel((ShadingModel)aModel);
+        }
+
+        internal void glTexCoordPointer(int theNbComp, int theDataType, int theStride, int theOffset)
+        {
+            GL.TexCoordPointer(theNbComp, (TexCoordPointerType)theDataType, theStride, theOffset);
+        }
+
+        internal void glVertexPointer(int theNbComp, int theDataType, int theStride, int theOffset)
+        {
+            GL.VertexPointer(theNbComp, (VertexPointerType) theDataType, theStride, theOffset);
         }
     }
 }

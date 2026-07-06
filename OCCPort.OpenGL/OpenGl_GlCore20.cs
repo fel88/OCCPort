@@ -78,6 +78,10 @@ namespace OCCPort.OpenGL
         {
             GL.DisableVertexAttribArray(theAttribLoc);
         }
+        internal void glDisableVertexAttribArray(int theAttribLoc)
+        {
+            GL.DisableVertexAttribArray(theAttribLoc);
+        }
 
         internal void glDrawArrays(All triangleStrip, int v1, int v2)
         {
@@ -90,6 +94,10 @@ namespace OCCPort.OpenGL
         }
 
         internal void glEnableVertexAttribArray(uint theAttribLoc)
+        {
+            GL.EnableVertexAttribArray(theAttribLoc);
+        }
+        internal void glEnableVertexAttribArray(int theAttribLoc)
         {
             GL.EnableVertexAttribArray(theAttribLoc);
         }
@@ -156,7 +164,10 @@ namespace OCCPort.OpenGL
         {
             GL.UseProgram(v);
         }
-
+        internal void glVertexAttribPointer(int index, int size, int type, bool normalized, int stride, int pointer)
+        {
+            GL.VertexAttribPointer(index, size, (VertexAttribPointerType)type, normalized, stride, pointer);
+        }
         internal void glVertexAttribPointer(uint index, uint size, All type, bool normalized, int stride, int pointer)
         {
             GL.VertexAttribPointer((int)index, (int)size, (VertexAttribPointerType)type, normalized, stride, pointer);

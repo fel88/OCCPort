@@ -241,10 +241,8 @@ namespace OCCPort.OpenGL
         OpenGl_TextureSet myTextureEnv;
         OpenGl_Texture mySkydomeTexture;
 
-        //=======================================================================
-        //function : drawBackground
-        //purpose  :
-        //=======================================================================
+
+        //! Draw background (gradient / image / cubemap)
         void drawBackground(OpenGl_Workspace theWorkspace,
                                   Graphic3d_Camera.Projection theProjection)
         {
@@ -385,7 +383,12 @@ namespace OCCPort.OpenGL
             myZLayers.AddStructure(aStruct, aZLayer, thePriority);
         }
 
-        //=======================================================================
+
+        //! Render set of structures presented in the view.
+        //! @param theProjection [in] the projection that is used for rendering.
+        //! @param theReadDrawFbo [in] the framebuffer for rendering graphics.
+        //! @param theOitAccumFbo [in] the framebuffer for accumulating color and coverage for OIT process.
+        //! @param theToDrawImmediate [in] the flag indicates whether the rendering performs in immediate mode.
         public void renderStructs(Graphic3d_Camera.Projection theProjection,
                                          OpenGl_FrameBuffer theReadDrawFbo,
                                          OpenGl_FrameBuffer theOitAccumFbo,
@@ -1918,6 +1921,11 @@ namespace OCCPort.OpenGL
         //! Sets list of clip planes for the view.
         public override void SetClipPlanes(Graphic3d_SequenceOfHClipPlane thePlanes) { myClipPlanes = thePlanes; }
 
+        //! Renders the graphical scene.
+        //! @param theProjection [in] the projection that is used for rendering.
+        //! @param theReadDrawFbo [in] the framebuffer for rendering graphics.
+        //! @param theOitAccumFbo [in] the framebuffer for accumulating color and coverage for OIT process.
+        //! @param theToDrawImmediate [in] the flag indicates whether the rendering performs in immediate mode.
         public void renderScene(Graphic3d_Camera.Projection theProjection,
                              OpenGl_FrameBuffer theReadDrawFbo,
                              OpenGl_FrameBuffer theOitAccumFbo,

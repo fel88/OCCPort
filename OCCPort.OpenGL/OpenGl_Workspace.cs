@@ -12,7 +12,13 @@ namespace OCCPort.OpenGL
     public class OpenGl_Workspace
     {
 
-
+        //! Return Interior color taking into account highlight flag.
+        public OpenGl_Vec4 InteriorColor()
+        {
+            return myHighlightStyle != null
+                 ? myHighlightStyle.ColorRGBA()
+                 : myAspectsSet.Aspect().InteriorColorRGBA();
+        }
 
         public OpenGl_Context GetGlContext() { return myGlContext; }
 
@@ -125,7 +131,7 @@ namespace OCCPort.OpenGL
             Graphic3d_PolygonOffset aPrev = myDefaultAspects.Aspect().PolygonOffset();
             myDefaultAspects.Aspect().SetPolygonOffset(theOffset);
             if (myAspectsApplied == myDefaultAspects.Aspect()
-             || myAspectsApplied==null
+             || myAspectsApplied == null
              || (myAspectsApplied.PolygonOffset().Mode & Aspect_PolygonOffsetMode.Aspect_POM_None) == Aspect_PolygonOffsetMode.Aspect_POM_None)
             {
                 myGlContext.SetPolygonOffset(theOffset);
@@ -167,12 +173,12 @@ namespace OCCPort.OpenGL
             }
             myGlContext.SetFaceCulling(aCullFacesMode);
 
-          //  if (myAspectsSet.Aspect() == myAspectsApplied
-           //  && myHighlightStyle == myAspectFaceAppliedWithHL)
+            //  if (myAspectsSet.Aspect() == myAspectsApplied
+            //  && myHighlightStyle == myAspectFaceAppliedWithHL)
             {
-            //    return myAspectsSet;
+                //    return myAspectsSet;
             }
-           // myAspectFaceAppliedWithHL = myHighlightStyle;
+            // myAspectFaceAppliedWithHL = myHighlightStyle;
 
             // Aspect_POM_None means: do not change current settings
             if ((myAspectsSet.Aspect().PolygonOffset().Mode & Aspect_PolygonOffsetMode.Aspect_POM_None) != Aspect_PolygonOffsetMode.Aspect_POM_None)
@@ -190,7 +196,7 @@ namespace OCCPort.OpenGL
 
             if (anIntstyle == Aspect_InteriorStyle.Aspect_IS_HATCH)
             {
-               // myGlContext.SetPolygonHatchStyle(myAspectsSet.Aspect().HatchStyle());
+                // myGlContext.SetPolygonHatchStyle(myAspectsSet.Aspect().HatchStyle());
             }
 
             // Case of hidden line

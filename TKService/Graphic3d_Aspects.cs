@@ -1,5 +1,6 @@
 ﻿using OCCPort;
 using OCCPort.Common;
+using System;
 using TKernel;
 
 namespace TKService
@@ -11,13 +12,32 @@ namespace TKService
         public Graphic3d_Aspects()
         {
             myInteriorColor = new Quantity_ColorRGBA(new Quantity_Color(Quantity_NameOfColor.Quantity_NOC_CYAN1));
-            /*myBackInteriorColor(Quantity_NOC_CYAN1),
-            myEdgeColor(Quantity_NOC_WHITE),*/
+            myBackInteriorColor = new Quantity_ColorRGBA(new Quantity_Color(Quantity_NameOfColor.Quantity_NOC_CYAN1));
+            //myEdgeColor(Quantity_NOC_WHITE),*/
             myInteriorStyle = Aspect_InteriorStyle.Aspect_IS_SOLID;
             myShadingModel = Graphic3d_TypeOfShadingModel.Graphic3d_TypeOfShadingModel_DEFAULT;
-            //myFaceCulling= (Graphic3d_TypeOfBackfacingModel_Auto),
-            //myAlphaMode(Graphic3d_AlphaMod*/
+            myFaceCulling = Graphic3d_TypeOfBackfacingModel.Graphic3d_TypeOfBackfacingModel_Auto;
+            myAlphaMode = Graphic3d_AlphaMode.Graphic3d_AlphaMode_BlendAuto;
+            myMarkerType = Aspect_TypeOfMarker.Aspect_TOM_POINT;
+
         }
+
+        //! Return line type; Aspect_TOL_SOLID by default.
+        public Aspect_TypeOfLine LineType() { return myLineType; }
+
+        //! Return marker type; Aspect_TOM_POINT by default.
+        public Aspect_TypeOfMarker MarkerType() { return myMarkerType; }
+
+        //! Return interior color.
+        public Quantity_ColorRGBA InteriorColorRGBA() { return myInteriorColor; }
+
+        //! Return a multiplier for each bit in the line stipple pattern within [1, 256] range; 1 by default.
+        public ushort LineStippleFactor()  { return myLineFactor; }
+
+        Aspect_TypeOfMarker myMarkerType;
+
+        //! Return edges line type (same as LineType()).
+        public Aspect_TypeOfLine EdgeLineType() { return myLineType; }
 
         //! Sets polygon offsets settings.
         public void SetPolygonOffset(Graphic3d_PolygonOffset theOffset) { myPolygonOffset = theOffset; }
@@ -77,11 +97,11 @@ namespace TKService
                 && myLineWidth == theOther.myLineWidth
                 && myLineFactor == theOther.myLineFactor
                 && myLinePattern == theOther.myLinePattern
-            //    && myMarkerType == theOther.myMarkerType
+                && myMarkerType == theOther.myMarkerType
                 && myMarkerScale == theOther.myMarkerScale
                 // && myHatchStyle == theOther.myHatchStyle
                 && myTextFont == theOther.myTextFont
-                //&& myPolygonOffset == theOther.myPolygonOffset
+                && myPolygonOffset == theOther.myPolygonOffset
                 //  && myTextStyle == theOther.myTextStyle
                 //   && myTextDisplayType == theOther.myTextDisplayType
                 //  && myTextFontAspect == theOther.myTextFontAspect

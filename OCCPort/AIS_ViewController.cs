@@ -313,10 +313,12 @@ namespace OCCPort
                 {
                     myGL.Selection.Points[i] -= aDelta;
                 }
-                //    for (Aspect_ScrollDelta & aZoomIter : myGL.ZoomActions)
-                //    {
-                //        aZoomIter.Point -= aDelta;
-                //    }
+
+                for (int i = 0; i < myGL.ZoomActions.Count; i++)
+                {
+                    //Aspect_ScrollDelta aZoomIter = myGL.ZoomActions[i];
+                 //   myGL.ZoomActions[i].Point =  aDelta;
+                }
             }
 
             if (theToHandle)

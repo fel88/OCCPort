@@ -172,6 +172,107 @@ myLineFeather (1.0f),*/
 
 
         }
+        //! Setup stipple line pattern with 1.0f factor; wrapper for glLineStipple().
+        public void SetLineStipple(ushort thePattern) { SetLineStipple(1.0f, thePattern); }
+        public void SetLineStipple(float theFactor,
+                                         ushort thePattern)
+        {
+            if (myActiveProgram != null)
+            {
+                //OpenGl_ShaderUniformLocation aPatternLoc = myActiveProgram->GetStateLocation(OpenGl_OCCT_LINE_STIPPLE_PATTERN);
+                // if (aPatternLoc)
+                {
+                    //  if (hasGlslBitwiseOps != OpenGl_FeatureNotAvailable)
+                    {
+                        //    myActiveProgram->SetUniform(this, aPatternLoc, (Standard_Integer)thePattern);
+                    }
+                    //  else
+                    {
+                        int[] aPatArr = new int[16];
+                        for (uint aBit = 0; aBit < 16; ++aBit)
+                        {
+                            //  aPatArr[aBit] = ((uint)(thePattern) & (1U << aBit)) != 0 ? 1 : 0;
+                        }
+                        // myActiveProgram.SetUniform(this, aPatternLoc, 16, aPatArr);
+                    }
+                    //myActiveProgram.SetUniform(this, myActiveProgram.GetStateLocation(OpenGl_OCCT_LINE_STIPPLE_FACTOR), theFactor);
+                }
+                return;
+            }
+
+            if (core11ffp != null)
+            {
+                if (thePattern != 0xFFFF)
+                {
+                    core11fwd.glEnable(EnableCap.LineStipple);
+                    //core11ffp->glLineStipple(static_cast<GLint>(theFactor),
+                      //                        static_cast<GLushort>(thePattern));
+                }
+                else
+                {
+                    core11fwd.glDisable(EnableCap.LineStipple);
+                }
+            }
+        }
+
+        public void SetTextureMatrix(Graphic3d_TextureParams theParams,
+                                       bool theIsTopDown)
+        {
+            if (theParams == null)
+                return;
+
+  //          Graphic3d_Vec2 aScale = theParams.Scale();
+  //          Graphic3d_Vec2 aTrans = theParams.Translation();
+  //          if (!myActiveProgram.IsNull())
+  //          {
+  //              GLint aUniLoc = myActiveProgram.GetStateLocation(OpenGl_OCCT_TEXTURE_TRSF2D);
+  //              if (aUniLoc == OpenGl_ShaderProgram.INVALID_LOCATION)
+  //              {
+  //                  return;
+  //              }
+
+  //              // pack transformation parameters
+  //              OpenGl_Vec4[] aTrsf =
+  //              {
+  //new    OpenGl_Vec4 (-aTrans.x(), -aTrans.y(), aScale.x(), aScale.y()),
+  // new   OpenGl_Vec4 (static_cast<float> (std::sin (-theParams->Rotation() * M_PI / 180.0)),
+  //                 static_cast<float> (std::cos (-theParams->Rotation() * M_PI / 180.0)),
+  //                 0.0f, 0.0f)
+  //  };
+  //              if (caps.isTopDownTextureUV != theIsTopDown)
+  //              {
+  //                  // flip V
+  //                  aTrsf[0].y() = -aTrans.y() + 1.0f / aScale.y();
+  //                  aTrsf[0].w() = -aScale.y();
+  //              }
+  //              myActiveProgram.SetUniform(this, aUniLoc, 2, aTrsf);
+  //              return;
+  //          }
+
+  //          if (core11ffp != null)
+  //          {
+  //              int aMatrixMode = All.Texture;
+  //              core11fwd.glGetIntegerv(GL_MATRIX_MODE, &aMatrixMode);
+
+  //              core11ffp.glMatrixMode(GL_TEXTURE);
+  //              OpenGl_Mat4 aTextureMat;
+  //              if (caps.isTopDownTextureUV != theIsTopDown)
+  //              {
+  //                  // flip V
+  //                  Graphic3d_TransformUtils.Scale(aTextureMat, aScale.x(), -aScale.y(), 1.0f);
+  //                  Graphic3d_TransformUtils.Translate(aTextureMat, -aTrans.x(), -aTrans.y() + 1.0f / aScale.y(), 0.0f);
+  //              }
+  //              else
+  //              {
+  //                  Graphic3d_TransformUtils::Scale(aTextureMat, aScale.x(), aScale.y(), 1.0f);
+  //                  Graphic3d_TransformUtils::Translate(aTextureMat, -aTrans.x(), -aTrans.y(), 0.0f);
+  //              }
+  //              Graphic3d_TransformUtils::Rotate(aTextureMat, -theParams->Rotation(), 0.0f, 0.0f, 1.0f);
+  //              core11ffp.glLoadMatrixf(aTextureMat.GetData());
+  //              core11ffp.glMatrixMode(aMatrixMode);
+  //          }
+        }
+
         OpenGl_ResourcesStack myUnusedResources; //!< stack of resources for delayed clean up
 
         //! Append resource to queue for delayed clean up.
@@ -953,10 +1054,10 @@ myLineFeather (1.0f),*/
 
         int myReadBuffer;      //!< current read buffer
         Aspect_GraphicsLibrary myGapi;           //!< GAPI name
-        // =======================================================================
-        // function : SetReadBuffer
-        // purpose  :
-        // =======================================================================
+                                                 // =======================================================================
+                                                 // function : SetReadBuffer
+                                                 // purpose  :
+                                                 // =======================================================================
         public void SetReadBuffer(int theReadBuffer)
         {
             if (myGapi == Aspect_GraphicsLibrary.Aspect_GraphicsLibrary_OpenGLES)
@@ -1092,10 +1193,11 @@ myLineFeather (1.0f),*/
                 core11fwd.glDisable(All.FramebufferSrgb);
             }
         }
+        public bool hasFboRenderMipmap; //!< FBO render target could be non-zero mipmap level of texture
 
         public bool myIsSRgbWindow;    //!< indicates that window buffer is sRGB-ready
         public bool hasSRGBControl;     //!< sRGB write control (any desktop OpenGL, OpenGL ES + GL_EXT_sRGB_write_control extension)
-        //! @return tool for management of clippings within this context.
+                                        //! @return tool for management of clippings within this context.
         internal OpenGl_Clipping Clipping()
         {
             return myClippingState;
@@ -1321,7 +1423,7 @@ myLineFeather (1.0f),*/
 
             myFuncs.load(this, theIsCoreProfile);
             if (!caps.ffpEnable
-   && !IsGlGreaterEqual(2, 0))
+        && !IsGlGreaterEqual(2, 0))
             {
                 caps.ffpEnable = true;
                 /* string aMsg =
@@ -1397,7 +1499,7 @@ myLineFeather (1.0f),*/
             }
 
             if (arbFBO != null
-  && hasFboSRGB)
+        && hasFboSRGB)
             {
                 // Detect if window buffer is considered by OpenGL as sRGB-ready
                 // (linear RGB color written by shader is automatically converted into sRGB)
@@ -1412,7 +1514,7 @@ myLineFeather (1.0f),*/
                 if (myGapi != Aspect_GraphicsLibrary.Aspect_GraphicsLibrary_OpenGLES)
                 {
                     if (!myIsSRgbWindow
-                      && myVendor.ToLower().Contains("nvidia") )
+                      && myVendor.ToLower().Contains("nvidia"))
                     {
                         myIsSRgbWindow = true;
                     }
@@ -1420,14 +1522,14 @@ myLineFeather (1.0f),*/
                 }
                 if (!myIsSRgbWindow)
                 {
-                    Message.SendTrace("OpenGl_Context, warning: window buffer is not sRGB-ready.\n"+
-              
+                    Message.SendTrace("OpenGl_Context, warning: window buffer is not sRGB-ready.\n" +
+
                                         "Check OpenGL window creation parameters for optimal performance.");
                 }
             }
 
         }
-            OpenGl_GlFunctions myFuncs;                //!< mega structure for all GL functions
+        OpenGl_GlFunctions myFuncs;                //!< mega structure for all GL functions
 
         string myVendor;          //!< Graphics Driver's vendor
 
