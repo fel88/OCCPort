@@ -1,5 +1,7 @@
 ﻿using OpenTK.Graphics.OpenGL;
 using System;
+using System.Drawing;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace OCCPort.OpenGL
 {
@@ -7,19 +9,27 @@ namespace OCCPort.OpenGL
     {
         internal void glActiveTexture(All texture0)
         {
+            ILog.Log(System.Reflection.MethodBase.GetCurrentMethod().Name, [texture0]);
+
             GL.ActiveTexture((TextureUnit)texture0);
         }
         internal void glActiveTexture(int texture0)
         {
+            ILog.Log(System.Reflection.MethodBase.GetCurrentMethod().Name, [texture0]);
+
             GL.ActiveTexture((TextureUnit)texture0);
         }
         internal void glBindBuffer(BufferTarget bufferTarget, uint myBufferId)
         {
+            ILog.Log(System.Reflection.MethodBase.GetCurrentMethod().Name, [bufferTarget, myBufferId]);
+
             GL.BindBuffer(bufferTarget, myBufferId);
         }
 
         internal void glBufferData<T>(BufferTarget target, int size, T[] data, BufferUsageHint usage) where T : struct
         {
+            ILog.Log(System.Reflection.MethodBase.GetCurrentMethod().Name, [target, size,data,usage]);
+
             GL.BufferData(target, size, data, usage);
         }
 
@@ -36,15 +46,21 @@ namespace OCCPort.OpenGL
 
                 //GL.GenBuffers(v, ref)
             }
+            ILog.Log(System.Reflection.MethodBase.GetCurrentMethod().Name, [v, myBufferId]);
+
         }
 
         internal void glGenBuffer(ref int myBufferId)
         {
             myBufferId = GL.GenBuffer();
+            ILog.Log(System.Reflection.MethodBase.GetCurrentMethod().Name, [ myBufferId]);
+
         }
 
         internal void glDeleteBuffers(int v,ref uint myBufferId)
         {
+            ILog.Log(System.Reflection.MethodBase.GetCurrentMethod().Name, [v, myBufferId]);
+
             GL.DeleteBuffers(v,ref myBufferId);
         }
 
@@ -54,15 +70,19 @@ namespace OCCPort.OpenGL
 
         }
 
-        internal void glDisable(All sampleAlphaToCoverage)
+        internal void glDisable(All cap)
         {
-            GL.Disable((EnableCap)sampleAlphaToCoverage);
+            ILog.Log(System.Reflection.MethodBase.GetCurrentMethod().Name, [ cap]);
+
+            GL.Disable((EnableCap)cap);
 
         }
 
-        internal void glEnable(All sampleAlphaToCoverage)
+        internal void glEnable(All cap)
         {
-            GL.Enable((EnableCap)sampleAlphaToCoverage);
+            ILog.Log(System.Reflection.MethodBase.GetCurrentMethod().Name, [cap]);
+
+            GL.Enable((EnableCap)cap);
         }
     }
 }

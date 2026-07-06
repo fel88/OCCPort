@@ -5,8 +5,17 @@ using TKService;
 namespace OCCPort.OpenGL
 {
     //! Mega structure defines the complete list of OpenGL functions.
-    public class OpenGl_GlFunctions : IOpenGl_ArbSamplerObject
+    public class OpenGl_GlFunctions : IOpenGl_ArbSamplerObject, IOpenGl_GlCore32
     {
+        public void glBindVertexArray(uint myDefaultVao)
+        {
+            GL.BindVertexArray(myDefaultVao);
+        }
+
+        public void glGenVertexArrays(int v, uint[] myDefaultVao)
+        {
+            GL.GenVertexArrays(v, myDefaultVao);
+        }
         void IOpenGl_ArbSamplerObject.glBindSampler(Graphic3d_TextureUnit theUnit, uint mySamplerID)
         {
             OpenGl_GlFunctions.glBindSampler(theUnit, mySamplerID);
@@ -55,19 +64,24 @@ namespace OCCPort.OpenGL
 
         public void glBindFramebuffer(All framebuffer, int v)
         {
+            ILog.Log(System.Reflection.MethodBase.GetCurrentMethod().Name, [framebuffer, v]);
             GL.BindFramebuffer((FramebufferTarget)framebuffer, v);
         }
         public void glBindFramebuffer(All framebuffer, uint v)
         {
+            ILog.Log(System.Reflection.MethodBase.GetCurrentMethod().Name, [framebuffer, v]);
             GL.BindFramebuffer((FramebufferTarget)framebuffer, v);
         }
 
         internal void glGenFramebuffers(int v, ref uint myGlFBufferId)
         {
+
             if (v == 1)
             {
                 myGlFBufferId = (uint)GL.GenFramebuffer();
             }
+            ILog.Log(System.Reflection.MethodBase.GetCurrentMethod().Name, [v, myGlFBufferId]);
+
             //GL.GenFramebuffers(v,)
         }
 
@@ -154,6 +168,42 @@ namespace OCCPort.OpenGL
             {
                 theCtx.arbSamplerObject = this;
             }
+            bool has12 = false, has13 = false, has14 = false, has15 = false;
+            bool has20 = false, has21 = false;
+            bool has30 = false, has31 = false, has32 = false, has33 = false;
+            bool has40 = false, has41 = false, has42 = false, has43 = false, has44 = false, has45 = false, has46 = false;
+
+            // load OpenGL 3.2 new functions
+            has32 = isGlGreaterEqualShort(theCtx, 3, 2)
+                 /*&& hasDrawElemsBaseVert
+                 && hasProvokingVert
+                 && hasSync
+                 && hasTextureMultisample
+                 && FindProcShort(glGetInteger64i_v)
+                 && FindProcShort(glGetBufferParameteri64v)
+                 && FindProcShort(glFramebufferTexture)*/
+          ;
+            if (has32)
+            {
+                theCtx.core32 = (IOpenGl_GlCore32)this;
+            }
+            else
+            {
+                //theCtx.checkWrongVersion(3, 2, aLastFailedProc);
+            }
+
+            has45 = isGlGreaterEqualShort(theCtx, 4, 5);
+            if (has45)
+            {
+                //theCtx.core45 = (OpenGl_GlCore45*)this;
+                theCtx.arbClipControl = true;
+            }
+            else
+            {
+                // theCtx.checkWrongVersion(4, 5, aLastFailedProc);
+            }
+            theCtx.extTexR16 = true;
+            theCtx.extAnis = checkExtensionShort(theCtx, "GL_EXT_texture_filter_anisotropic");
         }
 
         private bool checkExtensionShort(OpenGl_Context ctx, string v)
@@ -244,7 +294,15 @@ namespace OCCPort.OpenGL
             mySamplerID = (uint)GL.GenSampler();
         }
 
+        public void glSamplerParameteri(uint mySamplerID, uint theParam, int theValue)
+        {
+            GL.SamplerParameter(mySamplerID, (SamplerParameterName)theParam, theValue);
+        }
 
+        internal void glClipControl(ClipOrigin lowerLeft, ClipDepthMode all)
+        {
+            GL.ClipControl(lowerLeft, all);
+        }
 
         internal Action<uint, int, int, int, int, bool> glTexImage2DMultisample;
 

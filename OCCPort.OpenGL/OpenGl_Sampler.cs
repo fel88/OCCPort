@@ -12,19 +12,26 @@ namespace OCCPort
     public class OpenGl_Sampler : OpenGl_Resource
     {
         //! Returns true if current object was initialized.
-        public bool IsValid() 
+        public bool IsValid()
         {
-    return isValidSampler();
-  }
+            return isValidSampler();
+        }
 
         //! Sets specific sampler parameter.
-        public static void setParameter(OpenGl_Context theContext,
+        public static void setParameter(OpenGl_Context theCtx,
                                             OpenGl_Sampler theSampler,
                                             uint theTarget,
                                             uint theParam,
                                             int theValue)
         {
-
+            if (theSampler != null && theSampler.isValidSampler())
+            {
+                theCtx.arbSamplerObject.glSamplerParameteri(theSampler.mySamplerID, theParam, theValue);
+            }
+            else
+            {
+                theCtx.core11fwd.glTexParameteri(theTarget, theParam, theValue);
+            }
         }
 
         //! Apply sampler parameters.
@@ -61,20 +68,20 @@ namespace OCCPort
                 }
             }
 
-            setParameter(theCtx, theSampler, theTarget, (int)All.TextureMinFilter , (int) aFilterMin);
-            setParameter(theCtx, theSampler, theTarget, (int)All.TextureMagFilter , (int)aFilter);
+            setParameter(theCtx, theSampler, theTarget, (int)All.TextureMinFilter, (int)aFilterMin);
+            setParameter(theCtx, theSampler, theTarget, (int)All.TextureMagFilter, (int)aFilter);
 
             // setup texture wrapping
-            var aWrapMode = theParams.IsRepeat() ?(int) All.Repeat : theCtx.TextureWrapClamp();
-            setParameter(theCtx, theSampler, theTarget,(int) All.TextureWrapS , aWrapMode);
+            var aWrapMode = theParams.IsRepeat() ? (int)All.Repeat : theCtx.TextureWrapClamp();
+            setParameter(theCtx, theSampler, theTarget, (int)All.TextureWrapS, aWrapMode);
             if (theTarget == (int)All.Texture1D)
             {
                 return;
             }
 
             setParameter(theCtx, theSampler, theTarget, (int)All.TextureWrapT, aWrapMode);
-            if (theTarget == (int)All.Texture3D 
-             || theTarget ==  (int)All.TextureCubeMap)
+            if (theTarget == (int)All.Texture3D
+             || theTarget == (int)All.TextureCubeMap)
             {
                 if (theCtx.HasTextureBaseLevel())
                 {
@@ -113,15 +120,15 @@ namespace OCCPort
                         }
                 }
 
-                setParameter(theCtx, theSampler, theTarget, (int)All.TextureMaxAnisotropyExt , aDegree);
+                setParameter(theCtx, theSampler, theTarget, (int)All.TextureMaxAnisotropyExt, aDegree);
             }
 
             if (theCtx.HasTextureBaseLevel()
              && (theSampler == null || !theSampler.isValidSampler()))
             {
                 int aMaxLevel = Math.Min(theMaxMipLevels, theParams.MaxLevel());
-                setParameter(theCtx, theSampler, theTarget, (int)All.TextureBaseLevel , theParams.BaseLevel());
-                setParameter(theCtx, theSampler, theTarget, (int)All.TextureMaxLevel , aMaxLevel);
+                setParameter(theCtx, theSampler, theTarget, (int)All.TextureBaseLevel, theParams.BaseLevel());
+                setParameter(theCtx, theSampler, theTarget, (int)All.TextureMaxLevel, aMaxLevel);
             }
         }
 
@@ -156,7 +163,7 @@ namespace OCCPort
 
 
         //! Creates an uninitialized sampler object.
-        public  bool Create(OpenGl_Context theCtx)
+        public bool Create(OpenGl_Context theCtx)
         {
             if (isValidSampler())
             {
@@ -243,7 +250,7 @@ namespace OCCPort
         //! Immutable flag might be set when Sampler Object is used within Bindless Texture.
         public bool IsImmutable() { return myIsImmutable; }
 
-        
+
         //! Helpful constant defining invalid sampler identifier
         const uint NO_SAMPLER = 0;
 

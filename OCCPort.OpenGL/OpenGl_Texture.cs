@@ -4,6 +4,7 @@ using OpenTK.Compute.OpenCL;
 using OpenTK.Graphics.OpenGL;
 using System;
 using System.Drawing;
+using System.IO.Compression;
 using System.Reflection.Metadata;
 using System.Security.AccessControl;
 using System.Security.Cryptography;
@@ -557,6 +558,9 @@ namespace OCCPort
                         Release(theCtx);
                         return false;
                     }
+                default:
+                    throw new NotImplementedException();
+                    break;
             }
             Unbind(theCtx);
             return true;

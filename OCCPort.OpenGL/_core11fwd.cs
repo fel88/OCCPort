@@ -186,5 +186,10 @@ namespace OCCPort.OpenGL
         {
             GL.BlendFunc(srcAlpha, oneMinusSrcAlpha);
         }
+
+        internal void glTexParameteri(uint theTarget, uint theParam, int theValue)
+        {
+            GL.TexParameter((TextureTarget)theTarget,(TextureParameterName) theParam, theValue);
+        }
     }
 }

@@ -40,17 +40,17 @@ namespace OCCPort.OpenGL
                 }
             }
 
-            //if (myGlContext->caps->useZeroToOneDepth
-            //&& !myGlContext->arbClipControl)
-            //{
-            //    Message::SendWarning("Warning: glClipControl() requires OpenGL 4.5 or GL_ARB_clip_control extension");
-            //    myGlContext->caps->useZeroToOneDepth = false;
-            //}
-            //myView->Camera()->SetZeroToOneDepth(myGlContext->caps->useZeroToOneDepth);
-            //if (myGlContext->arbClipControl)
-            //{
-            //    myGlContext->Functions()->glClipControl(GL_LOWER_LEFT, myGlContext->caps->useZeroToOneDepth ? GL_ZERO_TO_ONE : GL_NEGATIVE_ONE_TO_ONE);
-            //}
+            if (myGlContext.caps.useZeroToOneDepth
+            && !myGlContext.arbClipControl)
+            {
+                Message.SendWarning("Warning: glClipControl() requires OpenGL 4.5 or GL_ARB_clip_control extension");
+                myGlContext.caps.useZeroToOneDepth = false;
+            }
+            myView.Camera().SetZeroToOneDepth(myGlContext.caps.useZeroToOneDepth);
+            if (myGlContext.arbClipControl)
+            {
+                myGlContext.Functions().glClipControl(ClipOrigin.LowerLeft, myGlContext.caps.useZeroToOneDepth ? ClipDepthMode.ZeroToOne : ClipDepthMode.NegativeOneToOne );
+            }
 
             ResetAppliedAspect();
 

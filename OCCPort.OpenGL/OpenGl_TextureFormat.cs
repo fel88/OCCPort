@@ -197,38 +197,41 @@ namespace OCCPort.OpenGL
                         aFormat.SetDataType(All.UnsignedInt248);
                         return aFormat;
                     }
-                    //case GL_DEPTH32F_STENCIL8:
-                    //    {
-                    //        aFormat.SetNbComponents(2);
-                    //        aFormat.SetInternalFormat(theSizedFormat);
-                    //        aFormat.SetPixelFormat(GL_DEPTH_STENCIL);
-                    //        aFormat.SetDataType(GL_FLOAT_32_UNSIGNED_INT_24_8_REV);
-                    //        return aFormat;
-                    //    }
-                    //case GL_DEPTH_COMPONENT16:
-                    //    {
-                    //        aFormat.SetNbComponents(1);
-                    //        aFormat.SetInternalFormat(theSizedFormat);
-                    //        aFormat.SetPixelFormat(GL_DEPTH_COMPONENT);
-                    //        aFormat.SetDataType(GL_UNSIGNED_SHORT);
-                    //        return aFormat;
-                    //    }
-                    //case GL_DEPTH_COMPONENT24:
-                    //    {
-                    //        aFormat.SetNbComponents(1);
-                    //        aFormat.SetInternalFormat(theSizedFormat);
-                    //        aFormat.SetPixelFormat(GL_DEPTH_COMPONENT);
-                    //        aFormat.SetDataType(GL_UNSIGNED_INT);
-                    //        return aFormat;
-                    //    }
-                    //case GL_DEPTH_COMPONENT32F:
-                    //    {
-                    //        aFormat.SetNbComponents(1);
-                    //        aFormat.SetInternalFormat(theSizedFormat);
-                    //        aFormat.SetPixelFormat(GL_DEPTH_COMPONENT);
-                    //        aFormat.SetDataType(GL_FLOAT);
-                    //        return aFormat;
-                    //    }
+                //case GL_DEPTH32F_STENCIL8:
+                //    {
+                //        aFormat.SetNbComponents(2);
+                //        aFormat.SetInternalFormat(theSizedFormat);
+                //        aFormat.SetPixelFormat(GL_DEPTH_STENCIL);
+                //        aFormat.SetDataType(GL_FLOAT_32_UNSIGNED_INT_24_8_REV);
+                //        return aFormat;
+                //    }
+                //case GL_DEPTH_COMPONENT16:
+                //    {
+                //        aFormat.SetNbComponents(1);
+                //        aFormat.SetInternalFormat(theSizedFormat);
+                //        aFormat.SetPixelFormat(GL_DEPTH_COMPONENT);
+                //        aFormat.SetDataType(GL_UNSIGNED_SHORT);
+                //        return aFormat;
+                //    }
+                //case GL_DEPTH_COMPONENT24:
+                //    {
+                //        aFormat.SetNbComponents(1);
+                //        aFormat.SetInternalFormat(theSizedFormat);
+                //        aFormat.SetPixelFormat(GL_DEPTH_COMPONENT);
+                //        aFormat.SetDataType(GL_UNSIGNED_INT);
+                //        return aFormat;
+                //    }
+                //case GL_DEPTH_COMPONENT32F:
+                //    {
+                //        aFormat.SetNbComponents(1);
+                //        aFormat.SetInternalFormat(theSizedFormat);
+                //        aFormat.SetPixelFormat(GL_DEPTH_COMPONENT);
+                //        aFormat.SetDataType(GL_FLOAT);
+                //        return aFormat;
+                //    }
+                default:
+                    throw new NotImplementedException();
+                    break;
             }
             return aFormat;
         }

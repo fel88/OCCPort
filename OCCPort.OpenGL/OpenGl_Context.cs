@@ -206,7 +206,7 @@ myLineFeather (1.0f),*/
                 {
                     core11fwd.glEnable(EnableCap.LineStipple);
                     //core11ffp->glLineStipple(static_cast<GLint>(theFactor),
-                      //                        static_cast<GLushort>(thePattern));
+                    //                        static_cast<GLushort>(thePattern));
                 }
                 else
                 {
@@ -221,56 +221,56 @@ myLineFeather (1.0f),*/
             if (theParams == null)
                 return;
 
-  //          Graphic3d_Vec2 aScale = theParams.Scale();
-  //          Graphic3d_Vec2 aTrans = theParams.Translation();
-  //          if (!myActiveProgram.IsNull())
-  //          {
-  //              GLint aUniLoc = myActiveProgram.GetStateLocation(OpenGl_OCCT_TEXTURE_TRSF2D);
-  //              if (aUniLoc == OpenGl_ShaderProgram.INVALID_LOCATION)
-  //              {
-  //                  return;
-  //              }
+            //          Graphic3d_Vec2 aScale = theParams.Scale();
+            //          Graphic3d_Vec2 aTrans = theParams.Translation();
+            //          if (!myActiveProgram.IsNull())
+            //          {
+            //              GLint aUniLoc = myActiveProgram.GetStateLocation(OpenGl_OCCT_TEXTURE_TRSF2D);
+            //              if (aUniLoc == OpenGl_ShaderProgram.INVALID_LOCATION)
+            //              {
+            //                  return;
+            //              }
 
-  //              // pack transformation parameters
-  //              OpenGl_Vec4[] aTrsf =
-  //              {
-  //new    OpenGl_Vec4 (-aTrans.x(), -aTrans.y(), aScale.x(), aScale.y()),
-  // new   OpenGl_Vec4 (static_cast<float> (std::sin (-theParams->Rotation() * M_PI / 180.0)),
-  //                 static_cast<float> (std::cos (-theParams->Rotation() * M_PI / 180.0)),
-  //                 0.0f, 0.0f)
-  //  };
-  //              if (caps.isTopDownTextureUV != theIsTopDown)
-  //              {
-  //                  // flip V
-  //                  aTrsf[0].y() = -aTrans.y() + 1.0f / aScale.y();
-  //                  aTrsf[0].w() = -aScale.y();
-  //              }
-  //              myActiveProgram.SetUniform(this, aUniLoc, 2, aTrsf);
-  //              return;
-  //          }
+            //              // pack transformation parameters
+            //              OpenGl_Vec4[] aTrsf =
+            //              {
+            //new    OpenGl_Vec4 (-aTrans.x(), -aTrans.y(), aScale.x(), aScale.y()),
+            // new   OpenGl_Vec4 (static_cast<float> (std::sin (-theParams->Rotation() * M_PI / 180.0)),
+            //                 static_cast<float> (std::cos (-theParams->Rotation() * M_PI / 180.0)),
+            //                 0.0f, 0.0f)
+            //  };
+            //              if (caps.isTopDownTextureUV != theIsTopDown)
+            //              {
+            //                  // flip V
+            //                  aTrsf[0].y() = -aTrans.y() + 1.0f / aScale.y();
+            //                  aTrsf[0].w() = -aScale.y();
+            //              }
+            //              myActiveProgram.SetUniform(this, aUniLoc, 2, aTrsf);
+            //              return;
+            //          }
 
-  //          if (core11ffp != null)
-  //          {
-  //              int aMatrixMode = All.Texture;
-  //              core11fwd.glGetIntegerv(GL_MATRIX_MODE, &aMatrixMode);
+            //          if (core11ffp != null)
+            //          {
+            //              int aMatrixMode = All.Texture;
+            //              core11fwd.glGetIntegerv(GL_MATRIX_MODE, &aMatrixMode);
 
-  //              core11ffp.glMatrixMode(GL_TEXTURE);
-  //              OpenGl_Mat4 aTextureMat;
-  //              if (caps.isTopDownTextureUV != theIsTopDown)
-  //              {
-  //                  // flip V
-  //                  Graphic3d_TransformUtils.Scale(aTextureMat, aScale.x(), -aScale.y(), 1.0f);
-  //                  Graphic3d_TransformUtils.Translate(aTextureMat, -aTrans.x(), -aTrans.y() + 1.0f / aScale.y(), 0.0f);
-  //              }
-  //              else
-  //              {
-  //                  Graphic3d_TransformUtils::Scale(aTextureMat, aScale.x(), aScale.y(), 1.0f);
-  //                  Graphic3d_TransformUtils::Translate(aTextureMat, -aTrans.x(), -aTrans.y(), 0.0f);
-  //              }
-  //              Graphic3d_TransformUtils::Rotate(aTextureMat, -theParams->Rotation(), 0.0f, 0.0f, 1.0f);
-  //              core11ffp.glLoadMatrixf(aTextureMat.GetData());
-  //              core11ffp.glMatrixMode(aMatrixMode);
-  //          }
+            //              core11ffp.glMatrixMode(GL_TEXTURE);
+            //              OpenGl_Mat4 aTextureMat;
+            //              if (caps.isTopDownTextureUV != theIsTopDown)
+            //              {
+            //                  // flip V
+            //                  Graphic3d_TransformUtils.Scale(aTextureMat, aScale.x(), -aScale.y(), 1.0f);
+            //                  Graphic3d_TransformUtils.Translate(aTextureMat, -aTrans.x(), -aTrans.y() + 1.0f / aScale.y(), 0.0f);
+            //              }
+            //              else
+            //              {
+            //                  Graphic3d_TransformUtils::Scale(aTextureMat, aScale.x(), aScale.y(), 1.0f);
+            //                  Graphic3d_TransformUtils::Translate(aTextureMat, -aTrans.x(), -aTrans.y(), 0.0f);
+            //              }
+            //              Graphic3d_TransformUtils::Rotate(aTextureMat, -theParams->Rotation(), 0.0f, 0.0f, 1.0f);
+            //              core11ffp.glLoadMatrixf(aTextureMat.GetData());
+            //              core11ffp.glMatrixMode(aMatrixMode);
+            //          }
         }
 
         OpenGl_ResourcesStack myUnusedResources; //!< stack of resources for delayed clean up
@@ -456,6 +456,7 @@ myLineFeather (1.0f),*/
 
         bool myAlphaToCoverage; //!< flag indicating GL_SAMPLE_ALPHA_TO_COVERAGE state
         public bool extAnis;            //!< GL_EXT_texture_filter_anisotropic
+        public bool  extTexR16;          //!< GL_EXT_texture_norm16 on OpenGL ES; always available on desktop
 
         //! Either GL_CLAMP_TO_EDGE (1.2+) or GL_CLAMP (1.1).
         public int TextureWrapClamp() { return myTexClamp; }
@@ -872,7 +873,7 @@ myLineFeather (1.0f),*/
         public OpenGl_MatrixState<float> ModelWorldState = new OpenGl_MatrixState<float>(); //!< state of orientation matrix
         public OpenGl_MatrixState<float> WorldViewState = new OpenGl_MatrixState<float>();  //!< state of orientation matrix
         public OpenGl_MatrixState<float> ProjectionState = new OpenGl_MatrixState<float>(); //!< state of projection  matrix
-        OpenGl_GlCore32 core32;     //!< OpenGL 3.2 core profile
+        public IOpenGl_GlCore32 core32;     //!< OpenGL 3.2 core profile
 
         internal bool GetResource<TheHandleType>(string theKey, ref TheHandleType theValue) where TheHandleType : class
         {
@@ -1532,14 +1533,16 @@ myLineFeather (1.0f),*/
         OpenGl_GlFunctions myFuncs;                //!< mega structure for all GL functions
 
         string myVendor;          //!< Graphics Driver's vendor
+        [DllImport("opengl32.dll", SetLastError = true)]
+        public static extern int wglMakeCurrent(IntPtr hdc, IntPtr hglrc);
 
         internal bool MakeCurrent()
         {
-            /*if (myDisplay == null || myGContext == null)
+            if (myDisplay == null || myGContext == null)
             {
-                Standard_ProgramError_Raise_if(myIsInitialized, "OpenGl_Context::Init() should be called before!");
+                Exceptions.Standard_ProgramError_Raise_if(myIsInitialized, "OpenGl_Context::Init() should be called before!");
                 return false;
-            }*/
+            }
 
             // technically it should be safe to activate already bound GL context
             // however some drivers (Intel etc.) may FAIL doing this for unknown reason
@@ -1548,10 +1551,11 @@ myLineFeather (1.0f),*/
                 myShaderManager.SetContext(this);
                 return true;
             }
-            /*else if (wglMakeCurrent((HDC)myDisplay, (HGLRC)myGContext) != TRUE)
+            else if (wglMakeCurrent(myDisplay, myGContext) != 0)
             {
                 // notice that glGetError() couldn't be used here!
-                wchar_t* aMsgBuff = NULL;
+                //GetLastError
+                /*wchar_t* aMsgBuff = NULL;
                 DWORD anErrorCode = GetLastError();
                 FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
                                 NULL, anErrorCode, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (wchar_t*)&aMsgBuff, 0, NULL);
@@ -1560,11 +1564,11 @@ myLineFeather (1.0f),*/
                 {
                     aMsg += (Standard_ExtString)aMsgBuff;
                     LocalFree(aMsgBuff);
-                }
-                PushMessage(GL_DEBUG_SOURCE_WINDOW_SYSTEM, GL_DEBUG_TYPE_ERROR, (unsigned int)anErrorCode, GL_DEBUG_SEVERITY_HIGH, aMsg);
-                myIsInitialized = Standard_False;
-                return Standard_False;
-            }*/
+                }*/
+                //PushMessage(GL_DEBUG_SOURCE_WINDOW_SYSTEM, GL_DEBUG_TYPE_ERROR, (unsigned int)anErrorCode, GL_DEBUG_SEVERITY_HIGH, aMsg);
+                myIsInitialized = false;
+                return false;
+            }
 
             myShaderManager.SetContext(this);
             return true;
@@ -1739,9 +1743,13 @@ myLineFeather (1.0f),*/
             return Quantity_ColorRGBA.Convert_LinearRGB_To_sRGB(theColor);
         }
 
-        internal void SetColorMask(bool v)
+        public bool SetColorMask(bool theToWriteColor)
         {
-
+            bool anOldValue = myColorMask[0];
+            myColorMask=[theToWriteColor, theToWriteColor, theToWriteColor, caps.buffersOpaqueAlpha ? false : theToWriteColor];
+            bool toWrite = theToWriteColor ? true : false;
+            core11fwd.glColorMask(toWrite, toWrite, toWrite, myColorMask[3] ? true : false);
+            return anOldValue;
         }
 
         internal void Share(OpenGl_Context theShareCtx)

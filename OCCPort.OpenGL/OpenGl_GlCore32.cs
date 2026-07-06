@@ -3,16 +3,11 @@ using System;
 
 namespace OCCPort.OpenGL
 {
-    internal class OpenGl_GlCore32
+    public  interface IOpenGl_GlCore32
     {
-        internal void glBindVertexArray(uint myDefaultVao)
-        {
-            GL.BindVertexArray(myDefaultVao);
-        }
 
-        internal void glGenVertexArrays(int v, uint [] myDefaultVao)
-        {
-            GL.GenVertexArrays(v, myDefaultVao);
-        }
+        void glBindVertexArray(uint myDefaultVao);
+
+        void glGenVertexArrays(int v, uint[] myDefaultVao);
     }
 }

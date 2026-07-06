@@ -11,6 +11,7 @@ namespace OCCPort.OpenGL
         void glDeleteSamplers(int v, uint[] mySamplerID);
         void glGenSampler(ref uint mySamplerID);
         void glGenSamplers(int v,  uint[] mySamplerID);
+        void glSamplerParameteri(uint mySamplerID, uint theParam, int theValue);
     }
 
 }
