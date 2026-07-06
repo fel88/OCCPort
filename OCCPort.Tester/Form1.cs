@@ -33,11 +33,11 @@ namespace OCCPort.Tester
             glControl = new GLControl(new GLControlSettings()
             {
                 Profile = OpenTK.Windowing.Common.ContextProfile.Compatability,
-                NumberOfSamples = 8
+                //NumberOfSamples = 8
             });
             Shown += Form1_Shown;
             v3d_viewer = new V3d_Viewer(new OpenGl_GraphicDriver(new Aspect_DisplayConnection()));
-
+            SizeChanged += Form1_SizeChanged;
             aIS_ViewController = new AIS_ViewController();
             //myAISContext = new AIS_InteractiveContext(v3d_viewer);
 
@@ -63,6 +63,12 @@ namespace OCCPort.Tester
             Controls.Add(glControl);
             glControl.Dock = DockStyle.Fill;
         }
+
+        private void Form1_SizeChanged(object sender, EventArgs e)
+        {
+            GravityViewManager?.View?.MustBeResized();
+        }
+
         OCCTProxy proxy;
         public IOCCTProxyInterface Proxy => proxy;
         [DllImport("opengl32.dll")]
@@ -131,7 +137,7 @@ namespace OCCPort.Tester
                 //GravityViewManager.View = v3d_viewer.CreateView();
                 GravityViewManager.View = proxy.gview.myView;
                 //GravityViewManager.View.SetWindow(new Aspect_NeutralWindow() { Width = glControl.Width, Height = glControl.Height }, IntPtr.Zero);
-                //GravityViewManager.View.MustBeResized();
+                GravityViewManager.View.MustBeResized();
 
             }
             /*try
@@ -148,9 +154,9 @@ namespace OCCPort.Tester
 
         void Redraw()
         {
-           //GL.ClearColor(Color.Green);
+            //GL.ClearColor(Color.Green);
             //GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-
+            GravityViewManager.View.Redraw();
             proxy.iterate();
             glControl.SwapBuffers();
             return;

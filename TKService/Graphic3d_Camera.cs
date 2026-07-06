@@ -39,10 +39,10 @@ namespace TKService
         {
             return UpdateProjection(myMatricesF).LProjection;
         }
-        public  Graphic3d_Mat4 ProjectionStereoRightF() 
-{
-  return UpdateProjection(myMatricesF).RProjection;
-}
+        public Graphic3d_Mat4 ProjectionStereoRightF()
+        {
+            return UpdateProjection(myMatricesF).RProjection;
+        }
 
         //! Return TRUE if custom projection matrix is set.
         public bool IsCustomMonoProjection() { return myIsCustomProjMatM; }
@@ -1158,9 +1158,9 @@ namespace TKService
             return aLeft.Crossed(aDir);
         }
 
-        public void computeProjection(NCollection_Mat4<double> theProjM,
-                                        NCollection_Mat4<double> theProjL,
-                                        NCollection_Mat4<double> theProjR,
+        public void computeProjection(ref NCollection_Mat4<double> theProjM,
+                                      ref NCollection_Mat4<double> theProjL,
+                                     ref NCollection_Mat4<double> theProjR,
                                         bool theToAddHeadToEye)
         {
             theProjM.InitIdentity();
@@ -1309,7 +1309,7 @@ namespace TKService
             if (!theMatrices.IsProjectionValid())
             {
                 theMatrices.InitProjection();
-                computeProjection(theMatrices.MProjection, theMatrices.LProjection, theMatrices.RProjection, true);
+                computeProjection(ref theMatrices.MProjection, ref theMatrices.LProjection, ref theMatrices.RProjection, true);
             }
             return theMatrices;
         }
@@ -1322,7 +1322,10 @@ namespace TKService
                 var projD = ToMat4d(theMatrices.MProjection);
                 var d2 = ToMat4d(theMatrices.LProjection);
                 var d3 = ToMat4d(theMatrices.RProjection);
-                computeProjection(projD, d2, d3, true);
+                computeProjection(ref projD, ref d2, ref d3, true);
+                theMatrices.MProjection = ToMat4(projD);
+                theMatrices.LProjection = ToMat4(d2);
+                theMatrices.RProjection = ToMat4(d3);
             }
             return theMatrices;
         }
@@ -1336,7 +1339,15 @@ namespace TKService
             }
             return ret;
         }
-
+        private Graphic3d_Mat4 ToMat4(Graphic3d_Mat4d mProjection)
+        {
+            var ret = new Graphic3d_Mat4();
+            for (int i = 0; i < ret.myMat.Length; i++)
+            {
+                ret.myMat[i] = (float)mProjection.myMat[i];
+            }
+            return ret;
+        }
         public gp_Pnt ConvertProj2View(gp_Pnt thePnt)
         {
             var aProjMx = ProjectionMatrix();

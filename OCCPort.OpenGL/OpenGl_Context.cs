@@ -162,9 +162,9 @@ myLineFeather (1.0f),*/
             myViewportVirt[3] = 0;
 
 
-            /*myPolygonOffset.Mode = Aspect_POM_Off;
+            myPolygonOffset.Mode =Aspect_PolygonOffsetMode. Aspect_POM_Off;
             myPolygonOffset.Factor = 0.0f;
-            myPolygonOffset.Units = 0.0f;*/
+            myPolygonOffset.Units = 0.0f;
             myShaderManager = new OpenGl_ShaderManager(this);
             mySharedResources = (new OpenGl_ResourcesMap());
 
@@ -1468,8 +1468,6 @@ myLineFeather (1.0f),*/
             {
                 core11fwd.glGetIntegerv(All.MaxTextureMaxAnisotropyExt, ref myAnisoMax);
             }
-
-            myClippingState.Init();
             if (hasDrawBuffers != OpenGl_FeatureFlag.OpenGl_FeatureNotAvailable)
             {
                 core11fwd.glGetIntegerv(All.MaxDrawBuffers, ref myMaxDrawBuffers);
@@ -1478,6 +1476,40 @@ myLineFeather (1.0f),*/
                 {
                     myDrawBuffers.Resize(0, myMaxDrawBuffers - 1, false);
                 }
+            }
+            myClippingState.Init();
+
+            //if (myGapi == Aspect_GraphicsLibrary.Aspect_GraphicsLibrary_OpenGLES)
+            //{
+            //    if (IsGlGreaterEqual(3, 0))
+            //    {
+            //        // MSAA RenderBuffers have been defined in OpenGL ES 3.0, but MSAA Textures - only in OpenGL ES 3.1+
+            //        myHasMsaaTextures = IsGlGreaterEqual(3, 1)
+            //                         && myFuncs->glTexStorage2DMultisample != NULL;
+            //        core11fwd->glGetIntegerv(GL_MAX_SAMPLES, &myMaxMsaaSamples);
+            //    }
+            //}
+            //else if (core30 != null)
+            {
+                // MSAA RenderBuffers have been defined in OpenGL 3.0, but MSAA Textures - only in OpenGL 3.2+
+                if (core32 != null)
+                {
+                    myHasMsaaTextures = true;
+                    core11fwd.glGetIntegerv(All.MaxSamples, ref myMaxMsaaSamples);
+                }
+                //else if (CheckExtension("GL_ARB_texture_multisample")
+                //      && myFuncs->glTexImage2DMultisample != NULL)
+                //{
+                //    myHasMsaaTextures = true;
+                //    GLint aNbColorSamples = 0, aNbDepthSamples = 0;
+                //    core11fwd.glGetIntegerv(GL_MAX_COLOR_TEXTURE_SAMPLES, &aNbColorSamples);
+                //    core11fwd.glGetIntegerv(GL_MAX_DEPTH_TEXTURE_SAMPLES, &aNbDepthSamples);
+                //    myMaxMsaaSamples = Math.Min(aNbColorSamples, aNbDepthSamples);
+                //}
+            }
+            if (myMaxMsaaSamples <= 1)
+            {
+                myHasMsaaTextures = false;
             }
 
             if (myGapi != Aspect_GraphicsLibrary.Aspect_GraphicsLibrary_OpenGLES)
@@ -1708,7 +1740,7 @@ myLineFeather (1.0f),*/
             if (myActiveProgram != null)
             {
                 OpenGl_ShaderUniformLocation aLoc = myActiveProgram.GetStateLocation(OpenGl_StateVariable.OpenGl_OCCT_COLOR);
-                if (aLoc != null)
+                if (aLoc)
                 {
                     myActiveProgram.SetUniform(this, aLoc, Vec4FromQuantityColor(theColor));
                 }

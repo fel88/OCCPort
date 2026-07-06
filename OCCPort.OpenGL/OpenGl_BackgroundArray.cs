@@ -136,16 +136,16 @@ namespace OCCPort.OpenGL
                     }
                     else
                     {
-                        //     aWorldView.SetColumn(3, OpenGl_Vec4(-1.0f + (float)aViewSizeX / aTileSize.x() - 2.0f * aTileOffset.x() / aTileSize.x(),
-                        //                                    -1.0f + (float)aViewSizeY / aTileSize.y() - 2.0f * aTileOffset.y() / aTileSize.y(), 0.0f, 1.0f));
+                        aWorldView.SetColumn(3, new OpenGl_Vec4(-1.0f + (float)aViewSizeX / aTileSize.x() - 2.0f * aTileOffset.x() / aTileSize.x(),
+                                                       -1.0f + (float)aViewSizeY / aTileSize.y() - 2.0f * aTileOffset.y() / aTileSize.y(), 0.0f, 1.0f));
                     }
                 }
-                //   else
+                else
                 {
-                    // aWorldView.SetDiagonal(OpenGl_Vec4(2.0f / myViewWidth, 2.0f / myViewHeight, 1.0f, 1.0f));
+                    aWorldView.SetDiagonal(new OpenGl_Vec4(2.0f / myViewWidth, 2.0f / myViewHeight, 1.0f, 1.0f));
                     if (myType == Graphic3d_TypeOfBackground.Graphic3d_TOB_GRADIENT)
                     {
-                        //  aWorldView.SetColumn(3, OpenGl_Vec4(-1.0f, -1.0f, 0.0f, 1.0f));
+                        aWorldView.SetColumn(3, new OpenGl_Vec4(-1.0f, -1.0f, 0.0f, 1.0f));
                     }
                 }
             }
@@ -379,8 +379,8 @@ namespace OCCPort.OpenGL
             {
                 var b1 = BitConverter.GetBytes(aVertices[anIt][0]);
                 var b2 = BitConverter.GetBytes(aVertices[anIt][1]);
-                myAttribs.changeValue(anIt, b1.Concat(b2).ToArray());                                
-                
+                myAttribs.changeValue(anIt, b1.Concat(b2).ToArray());
+
                 var color = theCtx.Vec4FromQuantityColor(new OpenGl_Vec4(aCorners[anIt][0], aCorners[anIt][1], aCorners[anIt][2], 1.0f)).rgb();
                 List<byte> data = new List<byte>();
                 for (int i = 0; i < color.v.Length; i++)
@@ -389,7 +389,7 @@ namespace OCCPort.OpenGL
                 }
                 myAttribs.changeValue(anIt, data.ToArray(), myAttribs.AttributeOffset(1));
                 //OpenGl_Vec3* aColorData = reinterpret_cast<OpenGl_Vec3*>(myAttribs->changeValue(anIt) + myAttribs.AttributeOffset(1));
-                
+
             }
 
             return true;

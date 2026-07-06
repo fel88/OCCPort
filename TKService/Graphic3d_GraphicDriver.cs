@@ -7,12 +7,14 @@ namespace TKService
     {
         public Graphic3d_GraphicDriver(Aspect_DisplayConnection theDisp)
         {
+            // default layers are always presented in display layer sequence and cannot be removed
+
             myDisplayConnection = (theDisp);
             {
                 Graphic3d_ZLayerSettings aSettings = new Graphic3d_ZLayerSettings();
-                /*aSettings.SetName("DEFAULT");
-				aSettings.SetImmediate(Standard_False);
-				aSettings.SetRaytracable(Standard_True);
+                //aSettings.SetName("DEFAULT");
+				aSettings.SetImmediate(false);
+				/*aSettings.SetRaytracable(Standard_True);
 				aSettings.SetEnvironmentTexture(Standard_True);
 				aSettings.SetEnableDepthTest(Standard_True);
 				aSettings.SetEnableDepthWrite(Standard_True);

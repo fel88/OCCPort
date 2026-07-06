@@ -229,7 +229,7 @@ namespace OCCPort.OpenGL
         }
 
         internal void glFramebufferTexture2D(All target, All attachment, uint textarget, uint texture, int level)
-        {
+        {            
             GL.FramebufferTexture2D((FramebufferTarget)target, (FramebufferAttachment)attachment, (TextureTarget)textarget, texture, level);
         }
 

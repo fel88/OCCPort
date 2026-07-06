@@ -224,6 +224,7 @@ namespace OCCPort
             if (theNbSamples > theGlCtx.MaxMsaaSamples()
              || theNbSamples < 0)
             {
+                theGlCtx.PushMessage("Error: FBO creation failed - MSAA");
                 //theGlCtx.PushMessage(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_HIGH,
                 //   TCollection_AsciiString("Error: FBO creation failed - MSAA") + theNbSamples
                 //    + " render buffer exceeds samples limit: " + theGlCtx->MaxMsaaSamples() + ").");
@@ -527,7 +528,7 @@ namespace OCCPort
 
         }
 
-        public void Release(OpenGl_Context theGlCtx)
+        public override void Release(OpenGl_Context theGlCtx)
         {
             if (isValidFrameBuffer())
             {

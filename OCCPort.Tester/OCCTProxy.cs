@@ -116,7 +116,7 @@ namespace OCCPort.Tester
         private void SetDefaultGradient()
         {
             myView.SetBgGradientColors(
-            new Quantity_Color(0xAD / (float)0xFF - 0.2f, 0xD8 / (float)0xFF - 0.2f, 0xE6 / (float)0xFF, Quantity_TypeOfColor.Quantity_TOC_RGB),
+            new Quantity_Color(0xAD / (float)0xFF - 0.2f, 0xD8 / (float)0xFF - 0.2f, 0xE6 / (float)0xFF, Quantity_TypeOfColor.Quantity_TOC_RGB),            
   new Quantity_Color(0xF0 / (float)0xFF - 0.3f, 0xF8 / (float)0xFF - 0.3f, 0xFF / (float)0xFF - 0.3f, Quantity_TypeOfColor.Quantity_TOC_RGB),
           Aspect_GradientFillMethod.Aspect_GFM_DIAG2);
         }

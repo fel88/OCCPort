@@ -545,15 +545,16 @@ namespace OCCPort.OpenGL
                             return false;
                         }
                 }
-                //todo!!myVboIndices = aVboIndices;
+
+                //myVboIndices = aVboIndices;
             }
-            //todo!!myVboAttribs = aVboAttribs;
+
+          //  myVboAttribs = aVboAttribs;
             if (!theCtx.caps.keepArrayData
              && !theToKeepData)
             {
                 // does not make sense for compatibility mode
-                //myIndices.Nullify();
-                //myAttribs.Nullify();
+                
             }
 
             return true;

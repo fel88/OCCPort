@@ -124,7 +124,7 @@ namespace OCCPort
             if (myToAskNextFrame)
             {
                 // ask more frames
-                //??aParentView.Window().InvalidateContent(Handle(Aspect_DisplayConnection)());
+                //aParentView.Window().InvalidateContent(Handle(Aspect_DisplayConnection)());
             }
 
         }
@@ -393,7 +393,7 @@ namespace OCCPort
 
             //// make sure to not process the same events twice
             myGL.Reset();
-            //myToAskNextFrame = false;
+            myToAskNextFrame = false;
         }
 
         AIS_Point myAnchorPointPrs1;          //!< anchor point presentation (Graphic3d_ZLayerId_Top)

@@ -1547,7 +1547,7 @@ namespace OCCPort.OpenGL
             }
             else
             {
-                aCtx.arbFBO.glBindFramebuffer(All.Framebuffer, OpenGl_FrameBuffer.NO_FRAMEBUFFER);
+                aCtx.arbFBO.glBindFramebuffer(All.Framebuffer, OpenGl_FrameBuffer.NO_FRAMEBUFFER);                
                 aCtx.SetFrameBufferSRGB(false);
             }
             int[] aViewport = { 0, 0, aDrawSizeX, aDrawSizeY };
@@ -1683,13 +1683,11 @@ namespace OCCPort.OpenGL
                         aCtx.core20fwd.glTexParameteri(All.Texture2D, All.TextureMagFilter, aFilterGl);
                     }
 
-                    aVerts.BindVertexAttrib(aCtx, (int)Graphic3d_TypeOfAttribute.Graphic3d_TOA_POS);
-
-                    aCtx.core20fwd.glDrawArrays(All.TriangleStrip, 0, 4);
-
+                    aVerts.BindVertexAttrib(aCtx, (int)Graphic3d_TypeOfAttribute.Graphic3d_TOA_POS);                    
+                    aCtx.core20fwd.glDrawArrays(All.TriangleStrip, 0, 4);                     
                     aVerts.UnbindVertexAttrib(aCtx, (int)Graphic3d_TypeOfAttribute.Graphic3d_TOA_POS);
-                    theReadFbo.DepthStencilTexture().Unbind(aCtx, Graphic3d_TextureUnit.Graphic3d_TextureUnit_1);
-                    theReadFbo.ColorTexture().Unbind(aCtx, Graphic3d_TextureUnit.Graphic3d_TextureUnit_0);
+                    theReadFbo.DepthStencilTexture().Unbind(aCtx, Graphic3d_TextureUnit.Graphic3d_TextureUnit_1);                     
+                    theReadFbo.ColorTexture().Unbind(aCtx, Graphic3d_TextureUnit.Graphic3d_TextureUnit_0);                     
                     aCtx.BindProgram(null);
 
                 }

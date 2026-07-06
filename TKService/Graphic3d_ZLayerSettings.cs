@@ -25,6 +25,9 @@ namespace TKService
         public bool ToRenderInDepthPrepass() { return myToRenderInDepthPrepass; }
         bool myToRenderInDepthPrepass;//!< option to render layer within depth pre-pass
 
+        //! Set the flag indicating the immediate layer, which should be drawn after all normal (non-immediate) layers.
+        public void SetImmediate(bool theValue) { myIsImmediate = theValue; }
+
         //! Return true if this layer should be drawn after all normal (non-immediate) layers.
         public bool IsImmediate() { return myIsImmediate; }
 

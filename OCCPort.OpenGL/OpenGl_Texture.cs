@@ -36,7 +36,7 @@ namespace OCCPort
             mySampler = new OpenGl_Sampler(theParams);
             myRevision = (0);
             myTextureId = (NO_TEXTURE);
-            myTarget = (uint)All.Texture2D;
+            myTarget = (uint)TextureTarget.Texture2D;
             myTextFormat = (uint)All.Rgba;
             mySizedFormat = (int)All.Rgba8;
             myNbSamples = (1);
