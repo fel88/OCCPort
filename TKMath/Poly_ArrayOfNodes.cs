@@ -1,17 +1,27 @@
-﻿namespace TKMath
+﻿using OCCPort.Common;
+
+namespace TKMath
 {
     //! Defines an array of 3D nodes of single/double precision configurable at construction time.
     public class Poly_ArrayOfNodes : NCollection_AliasedArray
     {
+        //! Empty constructor of double-precision array.
+       // Poly_ArrayOfNodes() : NCollection_AliasedArray((Standard_Integer )sizeof(gp_Pnt))
+        public Poly_ArrayOfNodes() : base(sizeof(double)*3)
+        {
+
+        }
         public gp_Pnt Value(int theIndex)
         {
             if (myStride == (int)sizeof(double) * 3)
             {
-                return base.Value<gp_Pnt>(theIndex);
+                return pnts[theIndex];
+                //return base.Value<gp_Pnt>(theIndex);
             }
             else
             {
-                gp_Vec3f aVec3 = base.Value<gp_Vec3f>(theIndex);
+                var aVec3=pnts3[theIndex];
+                //gp_Vec3f aVec3 = base.Value<gp_Vec3f>(theIndex);
                 return new gp_Pnt(aVec3.x(), aVec3.y(), aVec3.z());
             }
         }
@@ -25,7 +35,7 @@
 
         public void SetValue(int theIndex, gp_Pnt theValue)
         {
-            if (myStride == 2)
+            if (myStride == sizeof(double)*3)
             {
                 //NCollection_AliasedArray::ChangeValue<gp_Pnt>(theIndex) = theValue;
                 pnts[theIndex] = theValue;
@@ -59,24 +69,25 @@
         }
 
 
-        public T Value<T>(int theIndex)
-        {
-            dynamic t = null;
-            if (typeof(T)==typeof(gp_Pnt) || myStride == (int)sizeof(double) * 3)
-            {
-                t = pnts[theIndex];
+        //public T Value<T>(int theIndex)
+        //{
+            
+        //    dynamic t = null;
+        //    if (typeof(T)==typeof(gp_Pnt) || myStride == (int)sizeof(double) * 3)
+        //    {
+        //        t = pnts[theIndex];
 
-                //return NCollection_AliasedArray::Value<gp_Pnt>(theIndex);
-            }
-            else if(typeof(T) == typeof(gp_Vec3f))
-            {
-                t = pnts3[theIndex];
-                //	gp_Vec3 aVec3 = vecs[theIndex]; ;
-                //const gp_Vec3f&aVec3 = NCollection_AliasedArray::Value<gp_Vec3f>(theIndex);
-                //return new gp_Pnt(aVec3.x(), aVec3.y(), aVec3.z());
-            }
-            return (T)t;
-        }
+        //        //return NCollection_AliasedArray::Value<gp_Pnt>(theIndex);
+        //    }
+        //    else if(typeof(T) == typeof(gp_Vec3f))
+        //    {
+        //        t = pnts3[theIndex];
+        //        //	gp_Vec3 aVec3 = vecs[theIndex]; ;
+        //        //const gp_Vec3f&aVec3 = NCollection_AliasedArray::Value<gp_Vec3f>(theIndex);
+        //        //return new gp_Pnt(aVec3.x(), aVec3.y(), aVec3.z());
+        //    }
+        //    return (T)t;
+        //}
 
         internal int Size()
         {

@@ -72,9 +72,13 @@
             StatsTextHeight(16),
             StatsNbFrames(1),
             StatsMaxChartTime(0.1f),
-            CollectedStats(PerfCounters_Basic),
-            ToShowStats(Standard_False)*/
+            CollectedStats(PerfCounters_Basic),*/
+            ToShowStats = (false);
         }
+        public bool ToShowStats;                 //!< display performance statistics, FALSE by default;
+                                                      //!  note that counters specified within CollectedStats will be updated nevertheless
+                                                      //!  of visibility of widget managed by ToShowStats flag (e.g. stats can be retrieved by application for displaying using other methods)
+
         public FrustumCulling FrustumCullingState;         //!< state of frustum culling optimization; FrustumCulling_On by default
        public  Graphic3d_RenderTransparentMethod TransparencyMethod;          //!< specifies rendering method for transparent graphics
 

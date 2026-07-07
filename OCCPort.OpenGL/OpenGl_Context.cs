@@ -172,6 +172,11 @@ myLineFeather (1.0f),*/
 
 
         }
+
+
+        //! @return cached state of GL_NORMALIZE.
+        public bool IsGlNormalizeEnabled() { return myIsGlNormalizeEnabled; }
+
         //! Setup stipple line pattern with 1.0f factor; wrapper for glLineStipple().
         public void SetLineStipple(ushort thePattern) { SetLineStipple(1.0f, thePattern); }
         public void SetLineStipple(float theFactor,

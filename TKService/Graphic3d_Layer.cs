@@ -301,10 +301,11 @@ namespace TKService
                                        bool theToIncludeAuxiliary)
         {
             updateBVH();
-            return new Bnd_Box();
+
             int aBoxId = !theToIncludeAuxiliary ? 0 : 1;
-            //          Graphic3d_Mat4d aProjectionMat = theCamera.ProjectionMatrix();
-            //          Graphic3d_Mat4d aWorldViewMat = theCamera.OrientationMatrix();
+            Graphic3d_Mat4d aProjectionMat = theCamera.ProjectionMatrix();
+            Graphic3d_Mat4d aWorldViewMat = theCamera.OrientationMatrix();
+            return new Bnd_Box();
             //          if (myIsBoundingBoxNeedsReset[aBoxId])
             //          {
             //              // Recompute layer bounding box
@@ -523,6 +524,6 @@ namespace TKService
     public class Graphic3d_CullingTool
     {
     }
-    }
+}
 
 

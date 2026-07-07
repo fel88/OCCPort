@@ -1,4 +1,6 @@
-﻿namespace TKMath
+﻿using OCCPort.Common;
+
+namespace TKMath
 {
     //! Defines an array of values of configurable size.
     //! For instance, this class allows defining an array of 32-bit or 64-bit integer values with bitness determined in runtime.
@@ -7,7 +9,20 @@
     //! As actual type of element varies at runtime, element accessors are defined as templates.
     //! Memory for array is allocated with the given alignment (template parameter).
     public class NCollection_AliasedArray
-    {
+    {  //! Empty constructor.
+        public NCollection_AliasedArray(int theStride)
+        {
+            myData = (null);
+            myStride = (theStride);
+            mySize = (0);
+            //myDeletable = (false);
+            myDeletable = (0);
+
+            if (theStride <= 0)
+            {
+                throw new ArgumentOutOfRangeException("NCollection_AliasedArray, stride should be positive");
+            }
+        }
         protected byte[] myData;      //!< data pointer
         protected int myStride;    //!< element size
         protected int mySize;      //!< number of elements

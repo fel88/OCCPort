@@ -147,6 +147,17 @@ namespace OCCPort.OpenGL
             if (visible == 0)
                 return;
 
+             OpenGl_Context aCtx = theWorkspace.GetGlContext();
+
+            // Apply local transformation
+            aCtx.ModelWorldState.Push();
+            OpenGl_Mat4  aModelWorld = aCtx.ModelWorldState.ChangeCurrent();
+            aModelWorld = myRenderTrsf;
+
+            bool anOldGlNormalize = aCtx.IsGlNormalizeEnabled();
+
+            // Take into account transform persistence
+            aCtx.ApplyModelViewMatrix();
 
             // True if structure is fully clipped
             bool isClipped = false;
@@ -157,6 +168,11 @@ namespace OCCPort.OpenGL
             {
                 renderGeometry(theWorkspace, ref hasClosedPrims);
             }
+
+
+            // Restore local transformation
+            aCtx.ModelWorldState.Pop();
+            aCtx.SetGlNormalizeEnabled(anOldGlNormalize);
         }
 
         public OpenGl_GraphicDriver GlDriver()

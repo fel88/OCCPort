@@ -46,7 +46,7 @@ namespace TKService
             return myWorldViewProjState;
         }
 
-        Graphic3d_WorldViewProjState myWorldViewProjState = new Graphic3d_WorldViewProjState(); 
+        Graphic3d_WorldViewProjState myWorldViewProjState = new Graphic3d_WorldViewProjState();
 
         public Graphic3d_Mat4 ProjectionStereoRightF()
         {
@@ -663,20 +663,59 @@ namespace TKService
 
             myZNear = (DEFAULT_ZNEAR);
             myZFar = (DEFAULT_ZFAR);
-            myAspect = (1.0);/*
-            myIsZeroToOneDepth(false),*/
-            myScale = (1000.0);/*
-            myZFocus(1.0),
-            myZFocusType(FocusType_Relative),*/
+            myAspect = (1.0);
+            myIsZeroToOneDepth = (false);
+            myScale = (1000.0);
+            myZFocus = (1.0);
+            myZFocusType = FocusType.FocusType_Relative;
             myIOD = (0.05);
             myIODType = IODType.IODType_Relative;
             myIsCustomProjMatM = (false);
             myIsCustomProjMatLR = (false);
             myIsCustomFrustomLR = (false);
+
+            myWorldViewProjState.Initialize(Interlocked.Increment(ref THE_STATE_COUNTER),
+                                  Interlocked.Increment(ref THE_STATE_COUNTER),
+                                  this);
         }
 
-        public Graphic3d_Camera(Graphic3d_Camera graphic3d_Camera)
+        // atomic state counter
+        static volatile int THE_STATE_COUNTER = 0;
+
+        public Graphic3d_Camera(Graphic3d_Camera theOther)
         {
+            myUp = new gp_Dir(0.0, 1.0, 0.0);
+            myDirection = new gp_Dir(0.0, 0.0, 1.0);
+            myEye = new gp_Pnt(0.0, 0.0, -1500.0);
+            myDistance = (1500.0);
+            myAxialScale = new gp_XYZ(1.0, 1.0, 1.0);
+            myProjType = Projection.Projection_Orthographic;
+            myFOVy = (45.0);
+            myFOVx = (45.0);
+            myFOV2d = (180.0);
+            myFOVyTan = (Math.Tan(DTR_HALF * 45.0));
+            myZNear = (DEFAULT_ZNEAR);
+            myZFar = (DEFAULT_ZFAR);
+            myAspect = (1.0);
+            myIsZeroToOneDepth = (false);
+            myScale = (1000.0);
+            myZFocus = (1.0);
+            myZFocusType = FocusType.FocusType_Relative;
+            myIOD = (0.05);
+                myIODType=IODType.IODType_Relative;
+               //myIsCustomProjMatM(false);
+            // myIsCustomProjMatLR(false);
+            //     myIsCustomFrustomLR(false);
+
+            myWorldViewProjState.Initialize(this);
+
+            Copy(theOther);
+        }
+
+        void Copy(Graphic3d_Camera theOther)
+        {
+            CopyMappingData(theOther);
+            CopyOrientationData(theOther);
         }
 
         Graphic3d_CameraTile myTile;
@@ -989,7 +1028,7 @@ namespace TKService
                                                   (myAxialScale.Y()),
                                                   (myAxialScale.Z()));
 
-            LookOrientation(anEye, aViewDir, anUp, anAxialScale, theMatrices.Orientation);
+            LookOrientation(anEye, aViewDir, anUp, anAxialScale, ref theMatrices.Orientation);
 
             return theMatrices; // for inline accessors
 
@@ -1020,7 +1059,7 @@ namespace TKService
                                                   (myAxialScale.Y()),
                                                   (myAxialScale.Z()));
 
-            LookOrientation(anEye.ToFloat(), aViewDir.ToFloat(), anUp.ToFloat(), anAxialScale.ToFloat(), theMatrices.Orientation);
+            LookOrientation(anEye.ToFloat(), aViewDir.ToFloat(), anUp.ToFloat(), anAxialScale.ToFloat(), ref theMatrices.Orientation);
 
             return theMatrices; // for inline accessors
 
@@ -1030,7 +1069,7 @@ namespace TKService
 
                NCollection_Vec3<double> theUpDir, NCollection_Vec3<double> theAxialScale,
 
-            Graphic3d_Mat4d theOutMx)
+            ref Graphic3d_Mat4d theOutMx)
         {
 
             NCollection_Vec3<double> aForward = theFwdDir;
@@ -1064,7 +1103,7 @@ namespace TKService
 
              NCollection_Vec3<float> theUpDir, NCollection_Vec3<float> theAxialScale,
 
-          Graphic3d_Mat4 theOutMx)
+          ref Graphic3d_Mat4 theOutMx)
         {
 
             NCollection_Vec3<float> aForward = theFwdDir;

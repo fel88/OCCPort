@@ -143,7 +143,7 @@ namespace TKMath
         //! Returns a node at the given index.
         //! @param[in] theIndex node index within [1, NbNodes()] range
         //! @return 3D point coordinates
-        public gp_Pnt Node(int theIndex) { return myNodes.Value<gp_Pnt>(theIndex - 1); }
+        public gp_Pnt Node(int theIndex) { return myNodes.Value(theIndex - 1); }
 
         double myDeflection;
 

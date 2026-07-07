@@ -193,8 +193,8 @@ namespace TKService
             int anAttribDummy = 0;
             myAttribs.AttributeData(Graphic3d_TypeOfAttribute.Graphic3d_TOA_POS, ref anAttribDummy, ref myPosStride);
             myNormData = myAttribs.AttributeData(Graphic3d_TypeOfAttribute.Graphic3d_TOA_NORM, ref anAttribDummy, ref myNormStride);
-            //myTexData = myAttribs->ChangeAttributeData(Graphic3d_TOA_UV, anAttribDummy, myTexStride);
-            //myColData = myAttribs->ChangeAttributeData(Graphic3d_TOA_COLOR, anAttribDummy, myColStride);
+            //myTexData = myAttribs.AttributeData(Graphic3d_TOA_UV, anAttribDummy, myTexStride);
+            // myColData = myAttribs->ChangeAttributeData(Graphic3d_TOA_COLOR, anAttribDummy, myColStride);
 
             //memset(myAttribs->ChangeData(), 0, size_t(myAttribs->Stride) * size_t(myAttribs->NbMaxElements()));
             if ((theArrayOptions & Graphic3d_ArrayFlags.Graphic3d_ArrayFlags_AttribsMutable) == 0
@@ -248,7 +248,7 @@ namespace TKService
             SetVertexNormal(anIndex, theNX, theNY, theNZ);
             return anIndex;
         }
-        byte[] myNormData;
+        InternalArrayPointer myNormData;
 
         //! Change the vertex normal in the array.
         //! @param[in] theIndex node index within [1, VertexNumberAllocated()] range
@@ -260,15 +260,16 @@ namespace TKService
             Exceptions.Standard_OutOfRange_Raise_if(theIndex < 1 || theIndex > myAttribs.NbMaxElements(), "BAD VERTEX index");
             if (myNormData != null)
             {
+                var offset = myNormData.Offset + myNormStride * (theIndex - 1);
                 //Graphic3d_Vec3 aVec = (Graphic3d_Vec3)(myNormData + myNormStride * ((Standard_Size)theIndex - 1));
-                var aVec3 = BinaryHelper.Get_Vec3(myNormData, myNormStride);
+                var aVec3 = BinaryHelper.Get_Vec3(myNormData.Data, offset);
                 aVec3.SetValues((float)(theNX),
                  (float)(theNY),
                  (float)(theNZ));
                 var data = aVec3.ToBytes();
                 for (int i = 0; i < data.Length; i++)
                 {
-                    myNormData[myNormStride + i] = data[i];
+                    myNormData.Data[offset + i] = data[i];
                 }
             }
             myAttribs.NbElements = Math.Max(theIndex, myAttribs.NbElements);

@@ -719,9 +719,10 @@ namespace TKV3d
             ImmediateUpdate();
         }
 
-        private void SetCamera(Graphic3d_Camera aCamera)
+        private void SetCamera(Graphic3d_Camera theCamera)
         {
-            _camera = aCamera;
+            myView.SetCamera(theCamera);
+            ImmediateUpdate();
         }
 
         public void Init()
@@ -742,11 +743,10 @@ namespace TKV3d
 
         //! Returns camera object of the view.
         //! @return: handle to camera object, or NULL if 3D view does not use
-        //! the camera approach.
-        Graphic3d_Camera _camera;
+        //! the camera approach.        
         public Graphic3d_Camera Camera()
         {
-            return _camera;
+            return myView.Camera();
         }
 
         gp_Vec myXscreenAxis;

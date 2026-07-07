@@ -12,25 +12,18 @@ namespace OCCPort.OpenGL
 
         public OpenGl_MatrixState()
         {
-            myStack = new Graphic3d_Mat4[8];
-            myStackHead = (-1);
+            myStack = new Stack<TKernel.NCollection_Mat4<float>>();
+            
 
         }
         //! Pushes current matrix into stack.
         public void Push()
         {
-            if (++myStackHead >= myStack.Length)
-            {
-                myStack.Append(myCurrent);
-            }
-            else
-            {
-                //myStack.SetValue(myStackHead, myCurrent);
-                myStack[myStackHead] = myCurrent;
-            }
+            myStack.Push(myCurrent);
+
         }
 
-        Graphic3d_Mat4[] myStack;     //!< Collection used to maintenance matrix stack
+        Stack<Graphic3d_Mat4> myStack = new Stack<TKernel.NCollection_Mat4<float>>();     //!< Collection used to maintenance matrix stack
         Graphic3d_Mat4 myCurrent = new TKernel.NCollection_Mat4<float>();   //!< Current matrix
 
         int myStackHead; //!< Index of stack head
@@ -49,8 +42,10 @@ namespace OCCPort.OpenGL
         //! Pops matrix from stack to current.
         public void Pop()
         {
-            Exceptions.Standard_ASSERT_RETURN(myStackHead != -1, "Matrix stack already empty when MatrixState.Pop() called." );
-            myCurrent = myStack[myStackHead--];
+            if (myStack.Count == 0)
+                //Exceptions.Standard_ASSERT_RETURN(myStackHead != -1, "Matrix stack already empty when MatrixState.Pop() called." );
+                Exceptions.Standard_ASSERT_RETURN(myStack.Count > 0, "Matrix stack already empty when MatrixState.Pop() called.");
+            myCurrent = myStack.Pop();            
         }
 
 
@@ -60,5 +55,9 @@ namespace OCCPort.OpenGL
             return myCurrent;
         }
 
+        internal Graphic3d_Mat4 ChangeCurrent()
+        {
+            return myCurrent;
+        }
     }
 }

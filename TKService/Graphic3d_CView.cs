@@ -24,6 +24,9 @@ namespace TKService
         public Graphic3d_TypeOfBackfacingModel BackfacingModel() { return myBackfacing; }
 
 
+        //! Sets camera used by the view.
+        public virtual void SetCamera(Graphic3d_Camera theCamera) { myCamera = theCamera; }
+
         //! Sets list of clip planes for the view.
         public abstract void SetClipPlanes(Graphic3d_SequenceOfHClipPlane thePlanes);
 
@@ -366,15 +369,18 @@ namespace TKService
         //! Returns True if the window associated to the view is defined.
         public abstract bool IsDefined();
 
-        public Bnd_Box MinMaxValues()
-        {
-            return new Bnd_Box();
-        }
+     
 
         //! Returns camera object of the view.
-        public Graphic3d_Camera Camera() { return myCamera; }
+        public override Graphic3d_Camera Camera() { return myCamera; }
 
-        public Bnd_Box MinMaxValues(bool theToIncludeAuxiliary)
+
+        //! Returns the bounding box of all structures displayed in the view.
+        //! If theToIncludeAuxiliary is TRUE, then the boundary box also includes minimum and maximum limits
+        //! of graphical elements forming parts of infinite and other auxiliary structures.
+        //! @param theToIncludeAuxiliary consider also auxiliary presentations (with infinite flag or with trihedron transformation persistence)
+        //! @return computed bounding box
+        public virtual Bnd_Box MinMaxValues(bool theToIncludeAuxiliary = false)
         {
             if (!IsDefined())
             {
@@ -1028,16 +1034,16 @@ namespace TKService
         //! for each instance of Graphic3d_AspectFillArea3d where texture will be used.
         //!
         //! @return texture identifier.
-        public  string  GetId()  { return myTexId; }
+        public string GetId() { return myTexId; }
 
-}
+    }
 
 
 
-//! Defines the class of a graduated trihedron.
-//! It contains main style parameters for implementation of graduated trihedron
-//! @sa OpenGl_GraduatedTrihedron    
-public class Graphic3d_GraduatedTrihedron
+    //! Defines the class of a graduated trihedron.
+    //! It contains main style parameters for implementation of graduated trihedron
+    //! @sa OpenGl_GraduatedTrihedron    
+    public class Graphic3d_GraduatedTrihedron
     {
     }
 

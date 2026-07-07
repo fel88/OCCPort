@@ -38,12 +38,23 @@ namespace TKMath
             Ymax = -Standard_Real.RealLast();
             Zmin = Standard_Real.RealLast();
             Zmax = -Standard_Real.RealLast();
-  Gap = (0.0);
+            Gap = (0.0);
 
 
 
             SetVoid();
         }
+
+        //! Creates a bounding box, it contains:
+        //! -   minimum/maximum point of bounding box,
+        //! The constructed box is qualified Void. Its gap is null.
+        public Bnd_Box(gp_Pnt theMin, gp_Pnt theMax)
+        {
+            Gap = (0.0);
+            SetVoid();
+            Update(theMin.X(), theMin.Y(), theMin.Z(), theMax.X(), theMax.Y(), theMax.Z());
+        }
+
 
         //! Returns true if this bounding box is empty (Void flag).
         public bool IsVoid()

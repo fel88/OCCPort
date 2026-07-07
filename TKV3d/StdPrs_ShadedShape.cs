@@ -75,7 +75,7 @@ namespace TKV3d
                                 theVolume == StdPrs_Volume.StdPrs_Volume_Closed);
             }
 
-            // if (theDrawer.FaceBoundaryDraw())
+            if (theDrawer.FaceBoundaryDraw())
             {
                 Graphic3d_ArrayOfSegments aBndSegments = fillFaceBoundaries(theShape, theDrawer.FaceBoundaryUpperContinuity());
                 if (aBndSegments != null)
@@ -87,9 +87,9 @@ namespace TKV3d
             }
         }
         //! Computes special wireframe presentation for faces without triangulation.
-       static void wireframeNoTriangFacesFromShape(Prs3d_Presentation thePrs,
-                                         TopoDS_Shape theShape,
-                                         Prs3d_Drawer theDrawer)
+        static void wireframeNoTriangFacesFromShape(Prs3d_Presentation thePrs,
+                                          TopoDS_Shape theShape,
+                                          Prs3d_Drawer theDrawer)
         {
             TopoDS_Compound aCompoundWF = new TopoDS_Compound();
             BRep_Builder aBuilder = new BRep_Builder();

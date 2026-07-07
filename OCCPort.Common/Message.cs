@@ -5,7 +5,7 @@ namespace OCCPort.Common
     {
         public static void SendFail(string v)
         {
-
+            throw new Exception(v);
         }
 
         public static void SendTrace(string v1)

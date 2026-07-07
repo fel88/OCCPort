@@ -9,6 +9,7 @@ using TKService;
 
 namespace OCCPort.OpenGL
 {
+    //! Class for rendering of arbitrary primitive array.
     public class OpenGl_PrimitiveArray : OpenGl_Element
     {
         public void InitBuffers(OpenGl_Context theContext,

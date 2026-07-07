@@ -39,7 +39,7 @@ namespace TKService
 
         //! Return true if Projection was not invalidated.
         public bool IsProjectionValid() { return myIsProjectionValid; }
-        public NCollection_Mat4<Elem_t> Orientation { get; internal set; }
+        public NCollection_Mat4<Elem_t> Orientation;
 
         public NCollection_Mat4<Elem_t> MProjection;
         public NCollection_Mat4<Elem_t> LProjection;

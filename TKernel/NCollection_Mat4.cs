@@ -216,7 +216,7 @@ namespace TKernel
         public void Multiply(NCollection_Mat4<Element_t> theMat)
         {
             var r = Multiply(this, theMat);
-            Array.Copy(r.myMat, r.myMat, 16);
+            Array.Copy(r.myMat, myMat, 16);
         }
 
         //! Multiply by the vector (M * V).
@@ -229,6 +229,7 @@ namespace TKernel
               mat.GetValue(2, 0) * theVec.x() + mat.GetValue(2, 1) * theVec.y() + mat.GetValue(2, 2) * theVec.z() + mat.GetValue(2, 3) * theVec.w(),
               mat.GetValue(3, 0) * theVec.x() + mat.GetValue(3, 1) * theVec.y() + mat.GetValue(3, 2) * theVec.z() + mat.GetValue(3, 3) * theVec.w());
         }
+
         public static bool operator !=(NCollection_Mat4<Element_t> mat, NCollection_Mat4<Element_t> theVec)
         {
             for (int i = 0; i < mat.myMat.Length; i++)

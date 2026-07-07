@@ -91,7 +91,7 @@ namespace TKService
             int aNbVerts = theAttribs.NbElements;
             int anAttribIndex = 0;
             int anAttribStride = 0;
-            byte[] aDataPtr = theAttribs.AttributeData(Graphic3d_TypeOfAttribute.Graphic3d_TOA_POS, ref anAttribIndex, ref anAttribStride);
+            var aDataPtr = theAttribs.AttributeData(Graphic3d_TypeOfAttribute.Graphic3d_TOA_POS, ref anAttribIndex, ref anAttribStride);
             if (aDataPtr == null)
             {
                 Update();
@@ -105,7 +105,7 @@ namespace TKService
                         for (int aVertIter = 0; aVertIter < aNbVerts; ++aVertIter)
                         {
                             var offset = anAttribStride * aVertIter;
-                            Graphic3d_Vec2 aVert = new Graphic3d_Vec2(aDataPtr, offset, new FloatExtractor());
+                            Graphic3d_Vec2 aVert = new Graphic3d_Vec2(aDataPtr.Data, aDataPtr.Offset+  offset, new FloatExtractor());
 
                             myBounds.Add(new Graphic3d_Vec4(aVert.x(), aVert.y(), 0.0f, 1.0f));
                         }
@@ -117,7 +117,7 @@ namespace TKService
                         for (int aVertIter = 0; aVertIter < aNbVerts; ++aVertIter)
                         {
                             var offset = anAttribStride * aVertIter;
-                            Graphic3d_Vec3 aVert = BinaryHelper.Get_Vec3(aDataPtr, offset);
+                            Graphic3d_Vec3 aVert = BinaryHelper.Get_Vec3(aDataPtr.Data, aDataPtr.Offset + offset);
 
                             myBounds.Add(new Graphic3d_Vec4(aVert.x(), aVert.y(), aVert.z(), 1.0f));
                         }

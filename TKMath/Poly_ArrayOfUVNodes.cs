@@ -1,11 +1,17 @@
-﻿using TKernel;
+﻿using OCCPort.Common;
+using TKernel;
 
 namespace TKMath
 {
     //! Defines an array of 2D nodes of single/double precision configurable at construction time.
 
     internal class Poly_ArrayOfUVNodes : NCollection_AliasedArray
-    {
+    {  //! Empty constructor of double-precision array.
+       // Poly_ArrayOfUVNodes() : NCollection_AliasedArray((Standard_Integer )sizeof(gp_Pnt2d))
+       public  Poly_ArrayOfUVNodes() : base(sizeof(double)*2)
+        {
+            //
+        }
         //! Resizes the array to specified bounds.
         //! No re-allocation will be done if length of array does not change,
         //! but existing values will not be discarded if theToCopyData set to FALSE.

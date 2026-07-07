@@ -436,12 +436,12 @@ namespace OCCPort.OpenGL
             switch (theShadingModel)
             {
                 case Graphic3d_TypeOfShadingModel.Graphic3d_TypeOfShadingModel_Unlit: return prepareStdProgramUnlit(ref theProgram, theBits, false);
-                case Graphic3d_TypeOfShadingModel.Graphic3d_TypeOfShadingModel_PhongFacet: return prepareStdProgramPhong(theProgram, theBits, true);
+                case Graphic3d_TypeOfShadingModel.Graphic3d_TypeOfShadingModel_PhongFacet: return prepareStdProgramPhong(ref theProgram, theBits, true);
                 case Graphic3d_TypeOfShadingModel.Graphic3d_TypeOfShadingModel_Gouraud: return prepareStdProgramGouraud(theProgram, theBits);
                 case Graphic3d_TypeOfShadingModel.Graphic3d_TypeOfShadingModel_DEFAULT:
-                case Graphic3d_TypeOfShadingModel.Graphic3d_TypeOfShadingModel_Phong: return prepareStdProgramPhong(theProgram, theBits, false);
-                case Graphic3d_TypeOfShadingModel.Graphic3d_TypeOfShadingModel_Pbr: return prepareStdProgramPhong(theProgram, theBits, false, true);
-                case Graphic3d_TypeOfShadingModel.Graphic3d_TypeOfShadingModel_PbrFacet: return prepareStdProgramPhong(theProgram, theBits, true, true);
+                case Graphic3d_TypeOfShadingModel.Graphic3d_TypeOfShadingModel_Phong: return prepareStdProgramPhong(ref theProgram, theBits, false);
+                case Graphic3d_TypeOfShadingModel.Graphic3d_TypeOfShadingModel_Pbr: return prepareStdProgramPhong(ref theProgram, theBits, false, true);
+                case Graphic3d_TypeOfShadingModel.Graphic3d_TypeOfShadingModel_PbrFacet: return prepareStdProgramPhong(ref theProgram, theBits, true, true);
             }
             return false;
         }
@@ -455,7 +455,7 @@ namespace OCCPort.OpenGL
         // function : prepareStdProgramPhong
         // purpose  :
         // =======================================================================
-        bool prepareStdProgramPhong(OpenGl_ShaderProgram theProgram,
+        bool prepareStdProgramPhong(ref OpenGl_ShaderProgram theProgram,
                                                                 int theBits,
                                                                 bool theIsFlatNormal = false,
                                                                 bool theIsPBR = false)

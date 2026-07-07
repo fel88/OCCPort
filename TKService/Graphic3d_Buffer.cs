@@ -67,8 +67,9 @@ namespace TKService
         //! Requires sub-classing for creating a non-interleaved buffer (advanced usage).
         public virtual bool IsInterleaved() { return true; }
 
+        
         //! Return the attribute data with stride size specific to this attribute.
-        public byte[] AttributeData(Graphic3d_TypeOfAttribute theAttrib,
+        public InternalArrayPointer AttributeData(Graphic3d_TypeOfAttribute theAttrib,
            ref int theAttribIndex, ref int theAttribStride)
         {
             int aDataPtr = 0;
@@ -82,7 +83,7 @@ namespace TKService
                     {
                         theAttribIndex = anAttribIter;
                         theAttribStride = Stride;
-                        return Data().Skip(aDataPtr).ToArray();
+                        return new InternalArrayPointer() { Data = myData, Offset = aDataPtr };
                     }
 
                     aDataPtr += anAttribStride;
@@ -99,7 +100,9 @@ namespace TKService
                     {
                         theAttribIndex = anAttribIter;
                         theAttribStride = anAttribStride;
-                        return Data().Skip(aDataPtr).ToArray();
+                        return new InternalArrayPointer() { Data = myData, Offset = aDataPtr };
+
+                        //return Data().Skip(aDataPtr).ToArray();
                     }
 
                     aDataPtr += anAttribStride * aNbMaxVerts;
@@ -192,6 +195,13 @@ namespace TKService
         }
 
     }
+    public class InternalArrayPointer
+    {
+        public byte[] Data;
+        public int Offset;
+        public int Stride;
+    }
+
 }
 
 

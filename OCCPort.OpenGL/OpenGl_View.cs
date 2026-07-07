@@ -208,7 +208,33 @@ namespace OCCPort.OpenGL
 
         }
 
+        //! Returns the bounding box of all structures displayed in the view.
+        //! If theToIncludeAuxiliary is TRUE, then the boundary box also includes minimum and maximum limits
+        //! of graphical elements forming parts of infinite and other auxiliary structures.
+        //! @param theToIncludeAuxiliary consider also auxiliary presentations (with infinite flag or with trihedron transformation persistence)
+        //! @return computed bounding box
+        public override Bnd_Box MinMaxValues(bool theToIncludeAuxiliary)
+        {
+            if (!IsDefined())
+            {
+                return new Bnd_Box();
+            }
 
+            Bnd_Box aBox = base.MinMaxValues(theToIncludeAuxiliary);
+
+            // make sure that stats overlay isn't clamped on hardware with unavailable depth clamping
+            if (theToIncludeAuxiliary
+            && myRenderParams.ToShowStats
+            && !myWorkspace.GetGlContext().arbDepthClamp)
+            {
+                Bnd_Box aStatsBox = new Bnd_Box(new gp_Pnt((float)(myWindow.Width() / 2.0), (float)(myWindow.Height() / 2.0), 0.0),
+                       new gp_Pnt((float)(myWindow.Width() / 2.0), (float)(myWindow.Height() / 2.0), 0.0));
+                //myRenderParams.StatsPosition.Apply(myCamera, myCamera.ProjectionMatrix(), myCamera.OrientationMatrix(),
+                //                                myWindow.Width(), myWindow.Height(), aStatsBox);
+                aBox.Add(aStatsBox);
+            }
+            return aBox;
+        }
         OpenGl_GraphicDriver myDriver;
         OpenGl_Window myWindow;
         OpenGl_Workspace myWorkspace;
@@ -1550,7 +1576,7 @@ namespace OCCPort.OpenGL
             }
             else
             {
-                aCtx.arbFBO.glBindFramebuffer(All.Framebuffer, OpenGl_FrameBuffer.NO_FRAMEBUFFER);                
+                aCtx.arbFBO.glBindFramebuffer(All.Framebuffer, OpenGl_FrameBuffer.NO_FRAMEBUFFER);
                 aCtx.SetFrameBufferSRGB(false);
             }
             int[] aViewport = { 0, 0, aDrawSizeX, aDrawSizeY };
@@ -1686,11 +1712,11 @@ namespace OCCPort.OpenGL
                         aCtx.core20fwd.glTexParameteri(All.Texture2D, All.TextureMagFilter, aFilterGl);
                     }
 
-                    aVerts.BindVertexAttrib(aCtx, (int)Graphic3d_TypeOfAttribute.Graphic3d_TOA_POS);                    
-                    aCtx.core20fwd.glDrawArrays(All.TriangleStrip, 0, 4);                     
+                    aVerts.BindVertexAttrib(aCtx, (int)Graphic3d_TypeOfAttribute.Graphic3d_TOA_POS);
+                    aCtx.core20fwd.glDrawArrays(All.TriangleStrip, 0, 4);
                     aVerts.UnbindVertexAttrib(aCtx, (int)Graphic3d_TypeOfAttribute.Graphic3d_TOA_POS);
-                    theReadFbo.DepthStencilTexture().Unbind(aCtx, Graphic3d_TextureUnit.Graphic3d_TextureUnit_1);                     
-                    theReadFbo.ColorTexture().Unbind(aCtx, Graphic3d_TextureUnit.Graphic3d_TextureUnit_0);                     
+                    theReadFbo.DepthStencilTexture().Unbind(aCtx, Graphic3d_TextureUnit.Graphic3d_TextureUnit_1);
+                    theReadFbo.ColorTexture().Unbind(aCtx, Graphic3d_TextureUnit.Graphic3d_TextureUnit_0);
                     aCtx.BindProgram(null);
 
                 }
@@ -1963,7 +1989,7 @@ namespace OCCPort.OpenGL
                 && myPBREnvironment != null;
         }
         (int, int) myLastLightSourceState;
-        Graphic3d_WorldViewProjState myWorldViewProjState; //!< camera modification state
+        Graphic3d_WorldViewProjState myWorldViewProjState=new Graphic3d_WorldViewProjState (); //!< camera modification state
 
         //! Number of accumulated frames (for progressive rendering).
         int myAccumFrames;
@@ -2006,9 +2032,9 @@ namespace OCCPort.OpenGL
              myBVHSelector.CacheClipPtsProjections();*/
 
             OpenGl_ShaderManager aManager = aContext.ShaderManager();
-             Graphic3d_LightSet aLights = myRenderParams.ShadingModel ==Graphic3d_TypeOfShadingModel. Graphic3d_TypeOfShadingModel_Unlit ? myNoShadingLight : myLights;
+            Graphic3d_LightSet aLights = myRenderParams.ShadingModel == Graphic3d_TypeOfShadingModel.Graphic3d_TypeOfShadingModel_Unlit ? myNoShadingLight : myLights;
             int aLightsRevision = 0;
-            if (aLights!=null)
+            if (aLights != null)
             {
                 aLightsRevision = aLights.UpdateRevision();
             }
@@ -2216,6 +2242,6 @@ namespace OCCPort.OpenGL
     }
 
 
-  
 
-    }
+
+}
