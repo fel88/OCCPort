@@ -505,7 +505,7 @@ namespace TKService
         }
 
 
-        public void orthoProj(NCollection_Mat4<double> theOutMx,
+        public void orthoProj(ref NCollection_Mat4<double> theOutMx,
 
                                              Aspect_FrustumLRBT theLRBT,
                                              double theNear,
@@ -702,8 +702,8 @@ namespace TKService
             myZFocus = (1.0);
             myZFocusType = FocusType.FocusType_Relative;
             myIOD = (0.05);
-                myIODType=IODType.IODType_Relative;
-               //myIsCustomProjMatM(false);
+            myIODType = IODType.IODType_Relative;
+            //myIsCustomProjMatM(false);
             // myIsCustomProjMatLR(false);
             //     myIsCustomFrustomLR(false);
 
@@ -964,7 +964,7 @@ namespace TKService
         {
             myMatricesD.ResetProjection();
             myMatricesF.ResetProjection();
-            //myWorldViewProjState.ProjectionState() = (Standard_Size)Standard_Atomic_Increment(&THE_STATE_COUNTER);
+            myWorldViewProjState.ProjectionState(Interlocked.Increment(ref THE_STATE_COUNTER));
 
         }
 
@@ -1277,7 +1277,7 @@ namespace TKService
                     {
                         if (!myIsCustomProjMatM)
                         {
-                            orthoProj(theProjM, anLRBT, aZNear, aZFar);
+                            orthoProj(ref theProjM, anLRBT, aZNear, aZFar);
                         }
                         break;
                     }
@@ -1535,9 +1535,10 @@ namespace TKService
         public void ZFitAll(double theScaleFactor, Bnd_Box theMinMax, Bnd_Box theGraphicBB)
         {
             double aZNear = 0.0, aZFar = 1.0;
-            ZFitAll(theScaleFactor, theMinMax, theGraphicBB, aZNear, aZFar);
+            ZFitAll(theScaleFactor, theMinMax, theGraphicBB, ref aZNear, ref aZFar);
             SetZRange(aZNear, aZFar);
         }
+
         // (degrees -> radians) * 0.5
         const double DTR_HALF = 0.5 * 0.0174532925;
 
@@ -1560,8 +1561,8 @@ namespace TKService
         public bool ZFitAll(double theScaleFactor,
                                  Bnd_Box theMinMax,
                                  Bnd_Box theGraphicBB,
-                                double theZNear,
-                                double theZFar)
+                              ref double theZNear,
+                             ref double theZFar)
         {
             Exceptions.Standard_ASSERT_RAISE(theScaleFactor > 0.0, "Zero or negative scale factor is not allowed.");
 

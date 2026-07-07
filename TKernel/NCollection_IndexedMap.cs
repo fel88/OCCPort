@@ -6,8 +6,34 @@ using System.Linq;
 
 namespace TKernel
 {
+    public class NCollection_IndexedMap<T> : NCollection_IndexedMap<T, NCollection_DefaultHasher<T>>
+    {
+      
+    }
+
     public class NCollection_IndexedMap<T, Hasher> : List<T> where Hasher : IEqualityComparer<T>, new()
     {
+        public class Iterator
+        {
+            public Iterator(NCollection_IndexedMap<T> myAlwaysRenderedMap)
+            {
+            }
+
+            public bool More()
+            {
+                throw new NotImplementedException();
+            }
+
+            public object Next()
+            {
+                throw new NotImplementedException();
+            }
+
+            public T Value()
+            {
+                throw new NotImplementedException();
+            }
+        }
         public NCollection_IndexedMap()
         {
 

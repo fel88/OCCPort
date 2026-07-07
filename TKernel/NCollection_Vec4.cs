@@ -78,18 +78,18 @@ namespace TKernel
         }
 
         //! Assign new values as 3-component vector and a 4-th value.
-       public  void SetValues( NCollection_Vec3<Element_t> theVec3,  Element_t theW)
-  {
-    v[0] = theVec3.x();
-    v[1] = theVec3.y();
-    v[2] = theVec3.z();
-    v[3] = theW;
+        public void SetValues(NCollection_Vec3<Element_t> theVec3, Element_t theW)
+        {
+            v[0] = theVec3.x();
+            v[1] = theVec3.y();
+            v[2] = theVec3.z();
+            v[3] = theW;
         }
         public void SetValues(Element_t x, Element_t y, Element_t z, Element_t w)
         {
             v[0] = x;
             v[1] = y;
-            v[2] = z;                
+            v[2] = z;
             v[3] = w;
         }
         public NCollection_Vec4(Element_t[] array)
@@ -131,19 +131,24 @@ namespace TKernel
 
         //! Alias to 4th component as ALPHA channel in RGBA.
         public Element_t a() { return v[3]; }
-        public void a(Element_t  val) {  v[3]=val; }
+        public void a(Element_t val) { v[3] = val; }
 
         public Element_t[] ChangeData()
         {
             return v;
         }
+        public NCollection_Vec3<Element_t> xyz()
+        {
+            return new NCollection_Vec3<Element_t>(x(), y(), z());
+        }
+
         public static NCollection_Vec4<Element_t> operator +(NCollection_Vec4<Element_t> temp, NCollection_Vec4<Element_t> temp2)
         {
             return new NCollection_Vec4<Element_t>(temp.x() + temp2.x(), temp.y() + temp2.y(), temp.z() + temp2.z(), temp.w() + temp2.w());
         }
         public static NCollection_Vec4<Element_t> operator *(NCollection_Vec4<Element_t> temp, Element_t temp2)
         {
-            return new NCollection_Vec4<Element_t>(temp.x() * temp2, temp.y() * temp2, temp.z() * temp2,temp.w()*temp2);
+            return new NCollection_Vec4<Element_t>(temp.x() * temp2, temp.y() * temp2, temp.z() * temp2, temp.w() * temp2);
         }
 
     }

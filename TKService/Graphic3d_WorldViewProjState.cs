@@ -20,6 +20,16 @@ namespace TKService
             myWorldViewState = 0;
         }
 
+        //! @return projection state counter.
+        public int ProjectionState()
+        {
+            return myProjectionState;
+        }
+        public void ProjectionState(int val)
+        {
+            myProjectionState = val;
+        }
+
         //! Initialize world view projection state.
         public void Initialize(int theProjectionState,
                         int theWorldViewState,

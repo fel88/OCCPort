@@ -1,4 +1,9 @@
-﻿using OCCPort.Common;
+﻿
+
+
+global using Graphic3d_SequenceOfGroup = TKernel.NCollection_Sequence<TKService.Graphic3d_Group>;
+
+using OCCPort.Common;
 using System.Reflection.Metadata;
 using TKernel;
 using TKMath;
@@ -11,16 +16,19 @@ namespace TKService
         public Graphic3d_BndBox3d myBndBox;
         internal int highlight;
         public int visible;
-        
+
         int myId;
         Graphic3d_SequenceOfHClipPlane myClipPlanes;
 
         //! Create shadow link to this structure
-        public abstract Graphic3d_CStructure ShadowLink( Graphic3d_StructureManager theManager) ;
+        public abstract Graphic3d_CStructure ShadowLink(Graphic3d_StructureManager theManager);
 
         //! Set transformation persistence.
         public virtual void SetTransformPersistence(Graphic3d_TransformPers theTrsfPers) { myTrsfPers = theTrsfPers; }
 
+
+        //! Return TRUE if some groups might have transform persistence; FALSE by default.
+        public bool HasGroupTransformPersistence() { return myHasGroupTrsf; }
 
 
         //! Set z layer ID to display the structure in specified layer
@@ -32,7 +40,7 @@ namespace TKService
         //! Return transformation.
         public TopLoc_Datum3D Transformation() { return myTrsf; }
 
-protected         TopLoc_Datum3D myTrsf;
+        protected TopLoc_Datum3D myTrsf;
         //! Connect other structure to this one
         public abstract void Connect(Graphic3d_CStructure theStructure);
 
@@ -154,7 +162,7 @@ protected         TopLoc_Datum3D myTrsf;
 
         public virtual void updateLayerTransformation()
         {
-            
+
         }
 
         internal void ChangeBoundingBox(Graphic3d_BndBox3d aBox)
@@ -166,7 +174,7 @@ protected         TopLoc_Datum3D myTrsf;
 
         //! Returns valid handle to highlight style of the structure in case if
         //! highlight flag is set to true
-        public Graphic3d_PresentationAttributes HighlightStyle()  { return myHighlightStyle; }
+        public Graphic3d_PresentationAttributes HighlightStyle() { return myHighlightStyle; }
 
 
         Graphic3d_DisplayPriority myPriority;
@@ -174,25 +182,7 @@ protected         TopLoc_Datum3D myTrsf;
 
 
     }
-    public class Graphic3d_SequenceOfGroup : List<Graphic3d_Group>
-    {
 
-
-        public bool IsEmpty()
-        {
-            return Count == 0;
-        }
-        public void Append(Graphic3d_Group aGroup)
-        {
-            Add(aGroup);
-        }
-
-        internal Graphic3d_Group Last()
-        {
-            return this[this.Count - 1];
-        }
-        //typedef NCollection_Sequence<Handle(Graphic3d_Group)> Graphic3d_SequenceOfGroup;
-    }
 
     //! Structure display state.
     public class Graphic3d_ViewAffinity
@@ -248,6 +238,15 @@ protected         TopLoc_Datum3D myTrsf;
         public static bool IsZoomOrRotate(Graphic3d_TransModeFlags theMode)
         {
             return (theMode & (Graphic3d_TransModeFlags.Graphic3d_TMF_ZoomPers | Graphic3d_TransModeFlags.Graphic3d_TMF_RotatePers)) != 0;
+        }
+        public void Apply(Graphic3d_Camera theCamera,
+                                             NCollection_Mat4<double> theProjection,
+                                             NCollection_Mat4<double> theWorldView,
+                                             int theViewportWidth,
+                                             int theViewportHeight,
+                                           ref Graphic3d_BndBox3d theBoundingBox) 
+            
+        {
         }
         //template<class T>
         public void Apply<T, MinMax>(Graphic3d_Camera theCamera,

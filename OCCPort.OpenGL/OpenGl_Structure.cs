@@ -1,4 +1,6 @@
-﻿using OCCPort.Common;
+﻿global using Graphic3d_SequenceOfGroup = TKernel.NCollection_Sequence<TKService.Graphic3d_Group>;
+
+using OCCPort.Common;
 using OCCPort.Tester;
 using OpenTK.Graphics.OpenGL;
 using System;

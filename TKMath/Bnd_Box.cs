@@ -262,6 +262,7 @@ namespace TKMath
             }
             else if (IsVoid())
             {
+                Copy(Other);
                 //*this = Other;//??
                 return;
             }
@@ -291,6 +292,19 @@ namespace TKMath
             if (Other.IsOpenZmin()) OpenZmin();
             if (Other.IsOpenZmax()) OpenZmax();
         }
+
+        private void Copy(Bnd_Box other)
+        {
+            Gap = other.Gap;
+            Flags = other.Flags;
+            Ymin = other.Ymin;
+            Ymax = other.Ymax;
+            Zmin = other.Zmin;
+            Zmax = other.Zmax;
+            Xmin = other.Xmin;
+            Xmax = other.Xmax;
+        }
+
         //! Sets this bounding box so that it covers the whole of 3D space.
         //! It is infinitely long in all directions.
         public void SetWhole() { Flags = MaskFlags.WholeMask; }
