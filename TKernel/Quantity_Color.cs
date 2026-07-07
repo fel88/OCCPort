@@ -29,7 +29,11 @@ namespace TKernel
             SetValues(theC1, theC2, theC3, theType);
 
         }
-
+        public Quantity_Color(NCollection_Vec3<float> theRgb)
+        {
+            myRgb = new NCollection_Vec3<float> (theRgb);        
+            Quantity_ColorValidateRgbRange(theRgb.r(), theRgb.g(), theRgb.b());
+        }
 
         // Throw exception if RGB values are out of range.
         void Quantity_ColorValidateRgbRange(double theR, double theG, double theB)

@@ -14,7 +14,8 @@ namespace OCCPort.OpenGL
         {
         }
 
-
+        //! Is the group ray-tracable (contains ray-tracable elements)?
+        public bool IsRaytracable()  { return myIsRaytracable; }
         public override void SetGroupPrimitivesAspect(Graphic3d_Aspects theAspect)
         {
 

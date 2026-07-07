@@ -174,7 +174,7 @@ namespace TKernel
                                           "NCollection_IndexedDataMap::Substitute : " +
                                           "Index is out of range");
 
-            dic[theIndex] = new KeyValuePair<TheKeyType, T2>(theKey1, theItem);
+            dic[theIndex - 1] = new KeyValuePair<TheKeyType, T2>(theKey1, theItem);
             // check if theKey1 is not already in the map
             //const Standard_Integer iK1 = Hasher::HashCode(theKey1, NbBuckets());
             //IndexedDataMapNode* p = (IndexedDataMapNode*)myData1[iK1];

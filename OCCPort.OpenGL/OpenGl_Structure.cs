@@ -165,9 +165,25 @@ namespace OCCPort.OpenGL
             return (OpenGl_GraphicDriver)myGraphicDriver;
         }
 
-        internal void UpdateStateIfRaytracable(bool v)
+        internal void UpdateStateIfRaytracable(bool toCheck)
         {
-            throw new NotImplementedException();
+            myIsRaytracable = !toCheck;
+            if (!myIsRaytracable)
+            {
+                for (OpenGl_Structure.GroupIterator anIter=new GroupIterator  (myGroups); anIter.More(); anIter.Next())
+                {
+                    if (anIter.Value().IsRaytracable())
+                    {
+                        myIsRaytracable = true;
+                        break;
+                    }
+                }
+            }
+
+            if (IsRaytracable())
+            {
+                ++myModificationState;
+            }
         }
 
         public override Graphic3d_Group NewGroup(Graphic3d_Structure theStruct)

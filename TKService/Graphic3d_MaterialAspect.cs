@@ -76,7 +76,7 @@ namespace TKService
 
 
         //! Returns the alpha coefficient of the surface (1.0 - Transparency); 1.0 means opaque.
-        public float Alpha()  { return 1.0f - myTransparencyCoef; }
+        public float Alpha() { return 1.0f - myTransparencyCoef; }
 
         //! Returns TRUE if the reflection mode is active, FALSE otherwise.
         public bool ReflectionMode(Graphic3d_TypeOfReflection theType)
@@ -114,6 +114,33 @@ namespace TKService
 
         public RawMaterial(Graphic3d_NameOfMaterial theName, string theStringName)
         {
+            StringName = (theStringName);
+            /*BSDF(Graphic3d_BSDF::CreateDiffuse(Graphic3d_Vec3(0.0f))),
+            TransparencyCoef(0.0f),
+            RefractionIndex(1.0f),
+            Shininess(0.039f),
+            AmbientCoef(0.25f),
+            DiffuseCoef(1.0f),*/
+            MaterialType = Graphic3d_TypeOfMaterial.Graphic3d_MATERIAL_ASPECT;
+            MaterialName = (theName);
+            switch (theName)
+            {
+                default:
+                case Graphic3d_NameOfMaterial.Graphic3d_NameOfMaterial_Plastified:
+                    MaterialType = Graphic3d_TypeOfMaterial.Graphic3d_MATERIAL_ASPECT;
+
+                    Shininess = 0.0078125f;
+                    Colors[(int)Graphic3d_TypeOfReflection.Graphic3d_TOR_AMBIENT] = new Quantity_Color(new Graphic3d_Vec3(0.25f));
+                    Colors[(int)Graphic3d_TypeOfReflection.Graphic3d_TOR_DIFFUSE] = new Quantity_Color(new Graphic3d_Vec3(0.24f));
+                    Colors[(int)Graphic3d_TypeOfReflection.Graphic3d_TOR_SPECULAR] = new Quantity_Color(new Graphic3d_Vec3(0.004896f));
+                    Colors[(int)Graphic3d_TypeOfReflection.Graphic3d_TOR_EMISSION] = new Quantity_Color(new Graphic3d_Vec3(0.0f));
+
+                    //BSDF.Kd = Graphic3d_Vec3(0.2f);
+                    // BSDF.Ks = Graphic3d_Vec4(0.00784314f, 0.00784314f, 0.00784314f, 0.25f);
+                    // BSDF.Normalize();
+
+                    break;
+            }
         }
 
 

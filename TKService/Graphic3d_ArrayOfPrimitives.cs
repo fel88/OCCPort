@@ -53,7 +53,7 @@ namespace TKService
         }
 
 
-      
+
         public int AddEdge(int theVertexIndex)
         {
             Exceptions.Standard_OutOfRange_Raise_if(myIndices == null || myIndices.NbElements >= myIndices.NbMaxElements(), "TOO many EDGE");
@@ -265,6 +265,11 @@ namespace TKService
                 aVec3.SetValues((float)(theNX),
                  (float)(theNY),
                  (float)(theNZ));
+                var data = aVec3.ToBytes();
+                for (int i = 0; i < data.Length; i++)
+                {
+                    myNormData[myNormStride + i] = data[i];
+                }
             }
             myAttribs.NbElements = Math.Max(theIndex, myAttribs.NbElements);
         }
@@ -302,8 +307,10 @@ namespace TKService
         {
             Exceptions.Standard_OutOfRange_Raise_if(theIndex < 1 || theIndex > myAttribs.NbMaxElements(), "BAD VERTEX index");
             //Graphic3d_Vec3 aVec = *reinterpret_cast<Graphic3d_Vec3*>(myAttribs->ChangeData() + myPosStride * ((Standard_Size)theIndex - 1));
-            Graphic3d_Vec3 aVec = BinaryHelper.Get_Vec3(myAttribs.Data(), (theIndex-1) * myPosStride);
+            var offset = (theIndex - 1) * myPosStride;
+            Graphic3d_Vec3 aVec = BinaryHelper.Get_Vec3(myAttribs.Data(), offset);
             aVec.SetValues(theX, theY, theZ);
+            myAttribs.changeValue(0, aVec.ToBytes(), offset);
             if (myAttribs.NbElements < theIndex)
             {
                 myAttribs.NbElements = theIndex;
@@ -495,5 +502,13 @@ namespace TKService
         //! Returns the type of this primitive
         public Graphic3d_TypeOfPrimitiveArray Type() { return myType; }
 
+    }
+
+    public static class Extensions
+    {
+        public static byte[] ToBytes(this Graphic3d_Vec3 vec)
+        {
+            return BitConverter.GetBytes(vec.X).Concat(BitConverter.GetBytes(vec.Y)).Concat(BitConverter.GetBytes(vec.Z)).ToArray();
+        }
     }
 }

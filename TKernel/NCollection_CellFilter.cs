@@ -317,8 +317,20 @@ namespace TKernel
         //! Copy constructor: ensure that list is not deleted twice
         public Cell(Cell theOther)
         {
-            index = theOther.index.ToArray();
-            Objects = theOther.Objects;//clone?
+            index = new int[ theOther.index.Length];
+            Assign(theOther);
+            //Objects = new ListNode(theOther.Objects);//clone?
+        }
+        //! Assignment operator: ensure that list is not deleted twice
+        //void operator = (const Cell& theOther)
+        void Assign(Cell theOther)
+        {
+            int aDim = (int)(theOther.index.Length);
+            for (int anIdx = 0; anIdx < aDim; anIdx++)
+                index[anIdx] = theOther.index[anIdx];
+
+            Objects = theOther.Objects;
+            theOther.Objects = null;
         }
 
         public Cell(gp_XY thePnt, NCollection_Array1<double> theCellSize)

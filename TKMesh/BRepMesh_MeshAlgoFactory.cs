@@ -1,4 +1,6 @@
-﻿using OCCPort;
+﻿global using DMapOfIntegerInteger = TKernel.NCollection_DataMap<int, int>;
+
+using OCCPort;
 using OCCPort.Common;
 using System;
 using TKBRep;
@@ -355,9 +357,9 @@ namespace TKMesh
             aRes.ResizeTriangles(aTriangles.Extent(), false);
             //IteratorOfMapOfInteger aTriIt = new IteratorOfMapOfInteger(aTriangles);
 
-            for (int aTriangeId = 1; aTriangeId < aTriangles.Count; aTriangeId++)
+            for (int aTriangeId = 1; aTriangeId <= aTriangles.Count; aTriangeId++)
             {
-                int item = aTriangles.ToArray()[aTriangeId];
+                int item = aTriangles.ToArray()[aTriangeId - 1];
                 BRepMesh_Triangle aCurElem = myStructure.GetElement(item);
 
                 int[] aNode = new int[3];
@@ -597,31 +599,31 @@ namespace TKMesh
             throw new NotImplementedException();
             DelaBella_Triangle ret = null;
             DelaBella_Triangle root = null;
-           /* while (ret1 != null)
-            {
-                var old = ret;
+            /* while (ret1 != null)
+             {
+                 var old = ret;
 
-                ret = new DelaBella_Triangle();
-                if (root == null)
-                {
-                    root = ret;
-                }
-                if (old != null)
-                {
-                    old.next = ret;
-                }
-                /*for (int i = 0; i < ret1.v.Length; i++)
-                {
-                    TVert item = ret1.v[i];
-                    ret.v[i] = new DelaBella_Vertex();
-                    ret.v[i].x = item.x;
-                    ret.v[i].y = item.y;
-                    ret.v[i].i = item.index;
+                 ret = new DelaBella_Triangle();
+                 if (root == null)
+                 {
+                     root = ret;
+                 }
+                 if (old != null)
+                 {
+                     old.next = ret;
+                 }
+                 /*for (int i = 0; i < ret1.v.Length; i++)
+                 {
+                     TVert item = ret1.v[i];
+                     ret.v[i] = new DelaBella_Vertex();
+                     ret.v[i].x = item.x;
+                     ret.v[i].y = item.y;
+                     ret.v[i].i = item.index;
 
-                }
-                ret1 = ret1.Next;*/
-          //  }
-          //  return root;
+                 }
+                 ret1 = ret1.Next;*/
+            //  }
+            //  return root;
 
         }
         //DelabellaWrapper d;
@@ -632,7 +634,7 @@ namespace TKMesh
         // if advance_bytes is less than 2*sizeof coordinate type, it is treated as 2*sizeof coordinate type  
         public override int Triangulate(int points, double[] xy, int advance_bytes = 0)
         {
-          // d = new DelabellaWrapper();
+            // d = new DelabellaWrapper();
 
             if (xy == null)
                 return 0;
@@ -646,7 +648,7 @@ namespace TKMesh
             }
             //    var res = d.Triangulate(points, x, y);
             throw new NotImplementedException();
-           // return res;
+            // return res;
             //   if (y == null)
             //     y = x + 1;
         }
@@ -665,39 +667,11 @@ namespace TKMesh
         public double y; // coordinates (input copy)
         public DelaBella_Vertex next; // next silhouette vertex
 
- 
+
+
+    }
+
     
-    }
-
-    internal class DMapOfIntegerInteger : NCollection_DataMap<int, int, NCollection_DefaultHasher<int>>
-    {
-        Dictionary<int, int> map = new Dictionary<int, int>();
-        public DMapOfIntegerInteger(int v, NCollection_IncAllocator myAllocator)
-        {
-        }
-
-
-
-        internal int Extent()
-        {
-            return map.Count;
-        }
-
-        internal int Find(int v)
-        {
-            return map[v];
-        }
-
-        internal bool IsBound(int v)
-        {
-            return map.ContainsKey(v);
-        }
-
-        internal int Size()
-        {
-            return map.Count;
-        }
-    }
 
     public class VectorOfPnt : NCollection_Vector<gp_Pnt>
     {

@@ -114,9 +114,11 @@ namespace TKernel
         {
             return myUpperBound;
         }
-        public T Value(int index)
-        {//Standard_OutOfRange_Raise_if(theIndex<myLowerBound || theIndex> myUpperBound, "NCollection_Array1::Value");
-            return list[index];
+
+        public T Value(int theIndex)
+        {
+            Exceptions.Standard_OutOfRange_Raise_if(theIndex < myLowerBound || theIndex > myUpperBound, "NCollection_Array1::Value");
+            return list[theIndex - myLowerBound];
         }
 
         public int Length()
@@ -151,7 +153,7 @@ namespace TKernel
             return list.First();
         }
 
-        public class TRef: ITref<T>
+        public class TRef : ITref<T>
         {
 
             public NCollection_Array1<T> Array;

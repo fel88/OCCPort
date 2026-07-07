@@ -62,13 +62,13 @@
         public T Value<T>(int theIndex)
         {
             dynamic t = null;
-            if (myStride == (int)sizeof(double) * 3)
+            if (typeof(T)==typeof(gp_Pnt) || myStride == (int)sizeof(double) * 3)
             {
                 t = pnts[theIndex];
 
                 //return NCollection_AliasedArray::Value<gp_Pnt>(theIndex);
             }
-            else
+            else if(typeof(T) == typeof(gp_Vec3f))
             {
                 t = pnts3[theIndex];
                 //	gp_Vec3 aVec3 = vecs[theIndex]; ;
@@ -94,6 +94,14 @@
             var old2 = pnts3;
             pnts = new gp_Pnt[theNbNodes];
             pnts3 = new gp_Vec3f[theNbNodes];
+            for (int i = 0; i < pnts.Length; i++)
+            {
+                pnts[i] = new gp_Pnt();
+            }
+            for (int i = 0; i < pnts3.Length; i++)
+            {
+                pnts3[i] = new TKernel.NCollection_Vec3<float> ();
+            }
             if (theToCopyOld)
             {
                 for (int i = 0; i < Math.Min(old.Length, pnts.Length); i++)

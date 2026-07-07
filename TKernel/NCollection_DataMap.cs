@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Reflection.Emit;
 
 namespace TKernel
 {
@@ -22,7 +23,12 @@ namespace TKernel
 
     public class NCollection_DataMap<T1, T2> : NCollection_DataMap<T1, T2, NCollection_DefaultHasher<T1>>
     {
-
+        public NCollection_DataMap()
+        {
+        }
+        public NCollection_DataMap(int v, NCollection_IncAllocator myAllocator)
+        {
+        }
     }
 
     public class NCollection_DataMap<T1, T2, T3> : Dictionary<T1, T2> where T3 : IEqualityComparer<T1>, new()
@@ -100,6 +106,15 @@ namespace TKernel
         public bool IsBound(T1 key)
         {
             return ContainsKey(key);
+        }
+
+        public int Extent()
+        {
+            return Count;
+        }
+        public int Size()
+        {
+            return Count;
         }
 
         public bool Bind(T1 aFreeEdgeId, T2 v)
