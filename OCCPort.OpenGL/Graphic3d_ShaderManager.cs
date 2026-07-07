@@ -102,6 +102,32 @@ namespace OCCPort.OpenGL
   + Environment.NewLine + "  return normalize (aResult.xyz);"
   + Environment.NewLine + "}";
 
+        //! The same as Shaders_PhongDirectionalLight_glsl but for the light with zero index
+        //! (avoids limitations on some mobile devices).
+        string THE_FUNC_directionalLightFirst =
+         Environment.NewLine + "void directionalLightFirst (in vec3 theNormal,"
+ + Environment.NewLine + "                            in vec3 theView,"
+   + Environment.NewLine + "                            in bool theIsFront,"
+   + Environment.NewLine + "                            in float theShadow)"
+   + Environment.NewLine + "{"
+   + Environment.NewLine + "  vec3 aLight = occLight_Position (0);"
+
+   + Environment.NewLine + "  vec3 aHalf = normalize (aLight + theView);"
+
+   + Environment.NewLine + "  vec3  aFaceSideNormal = theIsFront ? theNormal : -theNormal;"
+   + Environment.NewLine + "  float aNdotL = max (0.0, dot (aFaceSideNormal, aLight));"
+   + Environment.NewLine + "  float aNdotH = max (0.0, dot (aFaceSideNormal, aHalf ));"
+
+   + Environment.NewLine + "  float aSpecl = 0.0;"
+   + Environment.NewLine + "  if (aNdotL > 0.0)"
+   + Environment.NewLine + "  {"
+   + Environment.NewLine + "    aSpecl = pow (aNdotH, occMaterial_Shininess(theIsFront));"
+   + Environment.NewLine + "  }"
+
+   + Environment.NewLine + "  Diffuse  += occLight_Diffuse(0)  * aNdotL * theShadow;"
+   + Environment.NewLine + "  Specular += occLight_Specular(0) * aSpecl * theShadow;"
+   + Environment.NewLine + "}";
+
         //! Process chains of clipping planes in Fragment Shader.
         string THE_FRAG_CLIP_CHAINS_N =
         Environment.NewLine + "  for (int aPlaneIter = 0; aPlaneIter < occClipPlaneCount;)"
@@ -270,7 +296,7 @@ namespace OCCPort.OpenGL
                         else if (myGlslExtensions[(int)Graphic3d_GlslExtension.Graphic3d_GlslExtension_GL_EXT_frag_depth])
                         {
                             aProgramSrc.SetHeader("#extension GL_EXT_frag_depth : enable"
-                                                    +"#define gl_FragDepth gl_FragDepthEXT");
+                                                    + "#define gl_FragDepth gl_FragDepthEXT");
                         }
                         else
                         {
@@ -391,6 +417,24 @@ namespace OCCPort.OpenGL
             return aProgSrc;
         }
 
+
+        //! Global shader variable for color definition with lighting enabled.
+        string THE_FUNC_lightDef =
+          Environment.NewLine + "vec3 Ambient;"   //!< Ambient  contribution of light sources
+  + Environment.NewLine + "vec3 Diffuse;"   //!< Diffuse  contribution of light sources
+  + Environment.NewLine + "vec3 Specular;"; //!< Specular contribution of light sources
+
+
+        string
+  //! Global shader variable for color definition with lighting enabled.
+  THE_FUNC_PBR_lightDef =
+  Environment.NewLine + "vec3  DirectLighting;" //!< Accumulator of direct lighting from light sources
+  + Environment.NewLine + "vec4  BaseColor;"      //!< Base color (albedo) of material for PBR
+  + Environment.NewLine + "float Metallic;"       //!< Metallic coefficient of material
+  + Environment.NewLine + "float NormalizedRoughness;" //!< Normalized roughness coefficient of material
+  + Environment.NewLine + "float Roughness;"      //!< Roughness coefficient of material
+  + Environment.NewLine + "vec3  Emission;"       //!< Light intensity emitted by material
+  + Environment.NewLine + "float IOR;";           //!< Material's index of refraction
         string THE_VEC2_glPointCoord = "vec2 (gl_PointCoord.x, 1.0 - gl_PointCoord.y)";
         //! Prepare standard GLSL program for accessing point sprite alpha.
         string pointSpriteAlphaSrc(int theBits)
@@ -602,7 +646,7 @@ namespace OCCPort.OpenGL
               : Environment.NewLine + "#define getFinalColor getColor";
 
             int aNbLights = 0;
-            string aLights = stdComputeLighting(aNbLights, theLights, !aSrcFragGetVertColor.IsEmpty(),
+            string aLights = stdComputeLighting(ref aNbLights, theLights, !aSrcFragGetVertColor.IsEmpty(),
                                                                         theIsPBR, toUseTexColor, theNbShadowMaps);
             aSrcFrag += ""
               + Environment.NewLine
@@ -633,10 +677,344 @@ namespace OCCPort.OpenGL
             aProgramSrc.AttachShader(Graphic3d_ShaderObject.CreateFromSource(aSrcFrag, Graphic3d_TypeOfShaderObject.Graphic3d_TOS_FRAGMENT, aUniforms, aStageInOuts, "", "", aNbGeomInputVerts));
             return aProgramSrc;
         }
+        // This file has been automatically generated from resource file src/Shaders/PBRIllumination.glsl
 
-        private string stdComputeLighting(int aNbLights, Graphic3d_LightSet theLights, bool v, bool theIsPBR, bool toUseTexColor, int theNbShadowMaps)
+         const string Shaders_PBRIllumination_glsl =
+          "//! Calculates direct illumination using Cook-Torrance BRDF.\n"
+ + "vec3 occPBRIllumination (in vec3  theView,\n"
+ + "                         in vec3  theLight,\n"
+ + "                         in vec3  theNormal,\n"
+ + "                         in vec4  theBaseColor,\n"
+ + "                         in float theMetallic,\n"
+ + "                         in float theRoughness,\n"
+ + "                         in float theIOR,\n"
+ + "                         in vec3  theLightColor,\n"
+ + "                         in float theLightIntensity)\n"
+ + "{\n"
+ + "  vec3 aHalf = normalize (theView + theLight);\n"
+ + "  float aCosVH = max(dot(theView, aHalf), 0.0);\n"
+ + "  vec3 aFresnel = occPBRFresnel (theBaseColor.rgb, theMetallic, theIOR, aCosVH);\n"
+ + "  vec3 aSpecular = occPBRCookTorrance (theView,\n"
+ + "                                       theLight,\n"
+ + "                                       theNormal,\n"
+ + "                                       theBaseColor.rgb,\n"
+ + "                                       theMetallic,\n"
+ + "                                       theRoughness,\n"
+ + "                                       theIOR);\n"
+ + "  vec3 aDiffuse = vec3(1.0) - aFresnel;\n"
+ + "  aDiffuse *= 1.0 - theMetallic;\n"
+ + "  aDiffuse *= INV_PI;\n"
+ + "  aDiffuse *= theBaseColor.rgb;\n"
+ + "  aDiffuse = mix (vec3(0.0), aDiffuse, theBaseColor.a);\n"
+ + "  return (aDiffuse + aSpecular) * theLightColor * theLightIntensity * max(0.0, dot(theLight, theNormal));\n"
+ + "}\n";
+
+        static string Shaders_PBRCookTorrance_glsl =
+  "//! Calculates Cook-Torrance BRDF.\n"
+ + "vec3 occPBRCookTorrance (in vec3  theView,\n"
+ + "                         in vec3  theLight,\n"
+ + "                         in vec3  theNormal,\n"
+ + "                         in vec3  theBaseColor,\n"
+ + "                         in float theMetallic,\n"
+ + "                         in float theRoughness,\n"
+ + "                         in float theIOR)\n"
+ + "{\n"
+ + "  vec3 aHalf = normalize (theView + theLight);\n"
+ + "  float aCosV = max(dot(theView, theNormal), 0.0);\n"
+ + "  float aCosL = max(dot(theLight, theNormal), 0.0);\n"
+ + "  float aCosH = max(dot(aHalf, theNormal), 0.0);\n"
+ + "  float aCosVH = max(dot(aHalf, theView), 0.0);\n"
+ + "  vec3 aCookTorrance = occPBRDistribution (aCosH, theRoughness)\n"
+ + "                     * occPBRGeometry     (aCosV, aCosL, theRoughness)\n"
+ + "                     * occPBRFresnel      (theBaseColor, theMetallic, theIOR, aCosVH);\n"
+ + "  aCookTorrance /= 4.0;\n"
+ + "  return aCookTorrance;\n"
+ + "}\n";
+
+        static string  Shaders_PBRFresnel_glsl =
+ "//! Functions to calculate fresnel coefficient and approximate zero fresnel value.\n"
++  "vec3 occPBRFresnel (in vec3  theBaseColor,\n"
++  "                    in float theMetallic,\n"
++  "                    in float theIOR)\n"
++  "{\n"
++  "  theIOR = (1.0 - theIOR) / (1.0 + theIOR);\n"
++  "  theIOR *= theIOR;\n"
++  "  vec3 f0 = vec3(theIOR);\n"
++  "  f0 = mix (f0, theBaseColor.rgb, theMetallic);\n"
++  "  return f0;\n"
++  "}\n"
++  "\n"
++  "vec3 occPBRFresnel (in vec3  theBaseColor,\n"
++  "                    in float theMetallic,\n"
++  "                    in float theIOR,\n"
++  "                    in float theCosVH)\n"
++  "{\n"
++  "  vec3 f0 = occPBRFresnel (theBaseColor, theMetallic, theIOR);\n"
++  "  theCosVH = 1.0 - theCosVH;\n"
++  "  theCosVH *= theCosVH;\n"
++  "  theCosVH *= theCosVH * theCosVH * theCosVH * theCosVH;\n"
++  "  return f0 + (vec3 (1.0) - f0) * theCosVH;\n"
++  "}\n"
++  "\n"
++  "vec3 occPBRFresnel (in vec3  theBaseColor,\n"
++  "                    in float theMetallic,\n"
++  "                    in float theRoughness,\n"
++  "                    in float theIOR,\n"
++  "                    in float theCosV)\n"
++  "{\n"
++  "  vec3 f0 = occPBRFresnel (theBaseColor, theMetallic, theIOR);\n"
++  "  theCosV = 1.0 - theCosV;\n"
++  "  theCosV *= theCosV;\n"
++  "  theCosV *= theCosV * theCosV * theCosV * theCosV;\n"
++  "  return f0 + (max(vec3(1.0 - theRoughness), f0) - f0) * theCosV;\n"
++  "}\n";
+
+
+
+        static string  Shaders_PBRGeometry_glsl =
+          "//! Calculates geometry factor for Cook-Torrance BRDF.\n"
+ + "float occPBRGeometry (in float theCosV,\n"
+ + "                      in float theCosL,\n"
+ + "                      in float theRoughness)\n"
+ + "{\n"
+ + "  float k = theRoughness + 1.0;\n"
+ + "  k *= 0.125 * k;\n"
+ + "  float g1 = 1.0;\n"
+ + "  g1 /= theCosV * (1.0 - k) + k;\n"
+ + "  float g2 = 1.0;\n"
+ + "  g2 /= theCosL * (1.0 - k) + k;\n"
+ + "  return g1 * g2;\n"
+ + "}\n";
+
+        static string Shaders_PBRDistribution_glsl =
+  "//! Calculates micro facet normals distribution.\n"
+ + "float occPBRDistribution (in float theCosH,\n"
++  "                          in float theRoughness)\n"
+ + "{\n"
+ + "  float aDistribution = theRoughness * theRoughness;\n"
+ + "  aDistribution = aDistribution / (theCosH * theCosH * (aDistribution * aDistribution - 1.0) + 1.0);\n"
+ + "  aDistribution = INV_PI * aDistribution * aDistribution;\n"
+ + "  return aDistribution;\n"
+ + "}\n";
+
+        private string stdComputeLighting(ref int theNbLights,
+            Graphic3d_LightSet theLights,
+            bool theHasVertColor, bool theIsPBR, bool theHasTexColor, int theNbShadowMaps)
         {
-            throw new NotImplementedException();
+            string aLightsFunc = "", aLightsLoop = "";
+            theNbLights = 0;
+            if (theLights != null)
+            {
+                theNbLights = theLights.NbEnabled();
+                if (theNbLights <= THE_NB_UNROLLED_LIGHTS_MAX)
+                {
+                    int anIndex = 0;
+                    for (Graphic3d_LightSet.Iterator aLightIter = new Graphic3d_LightSet.Iterator(theLights, IterationFilter.IterationFilter_ExcludeDisabledAndAmbient);
+                         aLightIter.More(); aLightIter.Next())
+                    {
+                        switch (aLightIter.Value().Type())
+                        {
+                            case Graphic3d_TypeOfLightSource.Graphic3d_TypeOfLightSource_Ambient:
+                                {
+                                    break; // skip ambient
+                                }
+                            case Graphic3d_TypeOfLightSource.Graphic3d_TypeOfLightSource_Directional:
+                                {
+                                    if (theNbShadowMaps > 0
+                                     && aLightIter.Value().ToCastShadows())
+                                    {
+                                        aLightsLoop = aLightsLoop +
+                                          Environment.NewLine + "    occDirectionalLight (" + anIndex + ", theNormal, theView, theIsFront,"
++ Environment.NewLine + "                         occLightShadow (occShadowMapSamplers[" + anIndex + "], " + anIndex + ", theNormal));";
+                                    }
+                                    else
+                                    {
+                                        aLightsLoop = aLightsLoop + Environment.NewLine + "    occDirectionalLight (" + anIndex + ", theNormal, theView, theIsFront, 1.0);";
+                                    }
+                                    ++anIndex;
+                                    break;
+                                }
+                            case Graphic3d_TypeOfLightSource.Graphic3d_TypeOfLightSource_Positional:
+                                {
+                                    aLightsLoop = aLightsLoop + Environment.NewLine + "    occPointLight (" + anIndex + ", theNormal, theView, aPoint, theIsFront);";
+                                    ++anIndex;
+                                    break;
+                                }
+                            case Graphic3d_TypeOfLightSource.Graphic3d_TypeOfLightSource_Spot:
+                                {
+                                    if (theNbShadowMaps > 0
+                                     && aLightIter.Value().ToCastShadows())
+                                    {
+                                        aLightsLoop = aLightsLoop
+                                        + Environment.NewLine + "    occSpotLight (" + anIndex + ", theNormal, theView, aPoint, theIsFront,"
+                                        + Environment.NewLine + "                  occLightShadow (occShadowMapSamplers[" + anIndex + "], " + anIndex + ", theNormal));";
+                                    }
+                                    else
+                                    {
+                                        aLightsLoop = aLightsLoop + Environment.NewLine + "    occSpotLight (" + anIndex + ", theNormal, theView, aPoint, theIsFront, 1.0);";
+                                    }
+                                    ++anIndex;
+                                    break;
+                                }
+                        }
+                    }
+                }
+                else
+                {
+                    theNbLights = roundUpMaxLightSources(theNbLights);
+                    bool isFirstInLoop = true;
+                    aLightsLoop = aLightsLoop
+                    + Environment.NewLine + "    for (int anIndex = 0; anIndex < occLightSourcesCount; ++anIndex)"
+                    + Environment.NewLine + "    {"
+                    + Environment.NewLine + "      int aType = occLight_Type (anIndex);";
+                    if (theLights.NbEnabledLightsOfType(Graphic3d_TypeOfLightSource.Graphic3d_TypeOfLightSource_Directional) > 0)
+                    {
+                        isFirstInLoop = false;
+                        aLightsLoop +=
+                           Environment.NewLine + "      if (aType == OccLightType_Direct)"
+                       + Environment.NewLine + "      {"
+                       + Environment.NewLine + "        occDirectionalLight (anIndex, theNormal, theView, theIsFront, 1.0);"
+                       + Environment.NewLine + "      }";
+                    }
+                    if (theLights.NbEnabledLightsOfType(Graphic3d_TypeOfLightSource.Graphic3d_TypeOfLightSource_Positional) > 0)
+                    {
+                        if (!isFirstInLoop)
+                        {
+                            aLightsLoop += Environment.NewLine + "      else ";
+                        }
+                        isFirstInLoop = false;
+                        aLightsLoop +=
+                           Environment.NewLine + "      if (aType == OccLightType_Point)"
+                        + Environment.NewLine + "      {"
+                       + Environment.NewLine + "        occPointLight (anIndex, theNormal, theView, aPoint, theIsFront);"
+                       + Environment.NewLine + "      }";
+                    }
+                    if (theLights.NbEnabledLightsOfType(Graphic3d_TypeOfLightSource.Graphic3d_TypeOfLightSource_Spot) > 0)
+                    {
+                        if (!isFirstInLoop)
+                        {
+                            aLightsLoop += Environment.NewLine + "      else ";
+                        }
+                        isFirstInLoop = false;
+                        aLightsLoop +=
+                           Environment.NewLine + "      if (aType == OccLightType_Spot)"
+                        + Environment.NewLine + "      {"
+                        + Environment.NewLine + "        occSpotLight (anIndex, theNormal, theView, aPoint, theIsFront, 1.0);"
+                        + Environment.NewLine + "      }";
+                    }
+                    aLightsLoop += Environment.NewLine + "    }";
+                }
+
+                if (theIsPBR)
+                {
+                    aLightsFunc += Shaders_PBRDistribution_glsl;
+                    aLightsFunc += Shaders_PBRGeometry_glsl;
+                    aLightsFunc += Shaders_PBRFresnel_glsl;
+                    aLightsFunc += Shaders_PBRCookTorrance_glsl;
+                    aLightsFunc += Shaders_PBRIllumination_glsl;
+                }
+
+                bool isShadowShaderAdded = false;
+                if (theLights.NbEnabledLightsOfType(Graphic3d_TypeOfLightSource.Graphic3d_TypeOfLightSource_Directional) == 1
+                 && theNbLights == 1
+                 && !theIsPBR
+                 && theNbShadowMaps == 0)
+                {
+                    // use the version with hard-coded first index
+                    aLightsLoop = Environment.NewLine + "    directionalLightFirst(theNormal, theView, theIsFront, 1.0);";
+                    aLightsFunc += THE_FUNC_directionalLightFirst;
+                }
+                else if (theLights.NbEnabledLightsOfType(Graphic3d_TypeOfLightSource.Graphic3d_TypeOfLightSource_Directional) > 0)
+                {
+                    if (theNbShadowMaps > 0 && !isShadowShaderAdded)
+                    {
+                        aLightsFunc += ShadersConstants.Shaders_LightShadow_glsl;
+                        isShadowShaderAdded = true;
+                    }
+                    aLightsFunc += theIsPBR ? ShadersConstants. Shaders_PBRDirectionalLight_glsl : ShadersConstants.Shaders_PhongDirectionalLight_glsl;
+                }
+                if (theLights.NbEnabledLightsOfType(Graphic3d_TypeOfLightSource.Graphic3d_TypeOfLightSource_Positional) > 0)
+                {
+                    aLightsFunc += theIsPBR ? ShadersConstants.Shaders_PBRPointLight_glsl : ShadersConstants.Shaders_PhongPointLight_glsl;
+                }
+                if (theLights.NbEnabledLightsOfType(Graphic3d_TypeOfLightSource.Graphic3d_TypeOfLightSource_Spot) > 0)
+                {
+                    if (theNbShadowMaps > 0 && !isShadowShaderAdded)
+                    {
+                        aLightsFunc += ShadersConstants.Shaders_LightShadow_glsl;
+                    }
+                    aLightsFunc += theIsPBR ? ShadersConstants. Shaders_PBRSpotLight_glsl : ShadersConstants.Shaders_PhongSpotLight_glsl;
+                }
+            }
+
+            if (!theIsPBR)
+            {
+                return THE_FUNC_lightDef
+                + ShadersConstants.Shaders_PointLightAttenuation_glsl
+                + aLightsFunc
+                + Environment.NewLine
+                 + Environment.NewLine + "vec4 computeLighting (in vec3 theNormal,"
+                 + Environment.NewLine + "                      in vec3 theView,"
+                 + Environment.NewLine + "                      in vec4 thePoint,"
+                 + Environment.NewLine + "                      in bool theIsFront)"
+                 + Environment.NewLine + "{"
+                 + Environment.NewLine + "  Ambient  = occLightAmbient.rgb;"
+                 + Environment.NewLine + "  Diffuse  = vec3 (0.0);"
+                 + Environment.NewLine + "  Specular = vec3 (0.0);"
+                 + Environment.NewLine + "  vec3 aPoint = thePoint.xyz / thePoint.w;"
+    + aLightsLoop
+    + Environment.NewLine + "  vec3 aMatAmbient  = occMaterial_Ambient(theIsFront);"
+                 + Environment.NewLine + "  vec4 aMatDiffuse  = occMaterial_Diffuse(theIsFront);"
+                 + Environment.NewLine + "  vec3 aMatSpecular = occMaterial_Specular(theIsFront);"
+                 + Environment.NewLine + "  vec4 aColor = vec4(Ambient * aMatAmbient + Diffuse * aMatDiffuse.rgb + Specular * aMatSpecular, aMatDiffuse.a);"
+    + (theHasVertColor ?
+       Environment.NewLine + "  aColor *= getVertColor();" : "")
+    + (theHasTexColor ? (
+       Environment.NewLine + "#if defined(THE_HAS_TEXTURE_COLOR) && defined(FRAGMENT_SHADER)"
+               + Environment.NewLine + "  aColor *= occTexture2D(occSamplerBaseColor, TexCoord.st / TexCoord.w);"
+               + Environment.NewLine + "#endif") : "") +
+     Environment.NewLine + "  occMaterialOcclusion(aColor.rgb, TexCoord.st / TexCoord.w);"
+               + Environment.NewLine + "  vec3 aMatEmission = occMaterialEmission(theIsFront, TexCoord.st / TexCoord.w);"
+              + Environment.NewLine + "  aColor.rgb += aMatEmission.rgb;"
+             + Environment.NewLine + "  return aColor;"
+              + Environment.NewLine + "}";
+            }
+            else
+            {
+                return THE_FUNC_PBR_lightDef
+                + ShadersConstants.Shaders_PointLightAttenuation_glsl
+                + aLightsFunc
+                + Environment.NewLine
+                 + Environment.NewLine + "vec4 computeLighting (in vec3 theNormal,"
+                 + Environment.NewLine + "                      in vec3 theView,"
+                 + Environment.NewLine + "                      in vec4 thePoint,"
+                 + Environment.NewLine + "                      in bool theIsFront)"
+                 + Environment.NewLine + "{"
+                 + Environment.NewLine + "  DirectLighting = vec3(0.0);"
+                 + Environment.NewLine + "  BaseColor           = occMaterialBaseColor(theIsFront, TexCoord.st / TexCoord.w)" + (theHasVertColor ? " * getVertColor()" : "") + ";"
+    + Environment.NewLine + "  Emission            = occMaterialEmission(theIsFront, TexCoord.st / TexCoord.w);"
+                 + Environment.NewLine + "  Metallic            = occMaterialMetallic(theIsFront, TexCoord.st / TexCoord.w);"
+                 + Environment.NewLine + "  NormalizedRoughness = occMaterialRoughness(theIsFront, TexCoord.st / TexCoord.w);"
+                 + Environment.NewLine + "  Roughness = occRoughness (NormalizedRoughness);"
+                 + Environment.NewLine + "  IOR       = occPBRMaterial_IOR (theIsFront);"
+                 + Environment.NewLine + "  vec3 aPoint = thePoint.xyz / thePoint.w;"
+    + aLightsLoop
+    + Environment.NewLine + "  vec3 aColor = DirectLighting;"
+                 + Environment.NewLine + "  vec3 anIndirectLightingSpec = occPBRFresnel (BaseColor.rgb, Metallic, IOR);"
+                 + Environment.NewLine + "  vec2 aCoeff = occTexture2D (occEnvLUT, vec2(abs(dot(theView, theNormal)), NormalizedRoughness)).xy;"
+                 + Environment.NewLine + "  anIndirectLightingSpec *= aCoeff.x;"
+                 + Environment.NewLine + "  anIndirectLightingSpec += aCoeff.y;"
+                 + Environment.NewLine + "  anIndirectLightingSpec *= occTextureCubeLod (occSpecIBLMap, -reflect (theView, theNormal), NormalizedRoughness * float (occNbSpecIBLLevels - 1)).rgb;"
+                 + Environment.NewLine + "  vec3 aRefractionCoeff = 1.0 - occPBRFresnel (BaseColor.rgb, Metallic, NormalizedRoughness, IOR, abs(dot(theView, theNormal)));"
+                 + Environment.NewLine + "  aRefractionCoeff *= (1.0 - Metallic);"
+                 + Environment.NewLine + "  vec3 anIndirectLightingDiff = aRefractionCoeff * BaseColor.rgb * BaseColor.a;"
+                 + Environment.NewLine + "  anIndirectLightingDiff *= occDiffIBLMap (theNormal).rgb;"
+                 + Environment.NewLine + "  aColor += occLightAmbient.rgb * (anIndirectLightingDiff + anIndirectLightingSpec);"
+                 + Environment.NewLine + "  aColor += Emission;"
+                 + Environment.NewLine + "  occMaterialOcclusion(aColor, TexCoord.st / TexCoord.w);"
+                 + Environment.NewLine + "  return vec4 (aColor, mix(1.0, BaseColor.a, aRefractionCoeff.x));"
+                 + Environment.NewLine + "}";
+            }
         }
 
         //! Generate map key for light sources configuration.
@@ -739,7 +1117,7 @@ namespace OCCPort.OpenGL
 + "}";
 
             string aSrcGeom = prepareGeomMainSrc(aUniforms, aStageInOuts, theBits);
-            aSrcFragGetColor += Environment.NewLine+(((theBits & (int)Graphic3d_ShaderFlags.Graphic3d_ShaderFlags_MeshEdges) != 0)
+            aSrcFragGetColor += Environment.NewLine + (((theBits & (int)Graphic3d_ShaderFlags.Graphic3d_ShaderFlags_MeshEdges) != 0)
               ? THE_FRAG_WIREFRAME_COLOR
               : "#define getFinalColor getColor");
 
@@ -747,7 +1125,7 @@ namespace OCCPort.OpenGL
 
             aSrcFrag =
                 aSrcFragGetColor
-           +Environment.NewLine   + aSrcGetAlpha
+           + Environment.NewLine + aSrcGetAlpha
              + Environment.NewLine + "void main()" +
         "{" +
         "  if (occFragEarlyReturn()) { return; }"

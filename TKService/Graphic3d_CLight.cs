@@ -77,6 +77,15 @@ namespace TKService
 
         gp_Pnt myPosition;    //!< light position
 
+        //! Check that the light source is turned on; TRUE by default.
+        //! This flag affects all occurrences of light sources, where it was registered and activated;
+        //! so that it is possible defining an active light in View which is actually in disabled state.
+        public bool IsEnabled()  { return myIsEnabled; }
+
+        //! Return TRUE if shadow casting is enabled; FALSE by default.
+        //! Has no effect in Ray-Tracing rendering mode.
+        public bool ToCastShadows()  { return myToCastShadows; }
+
         public void SetDirection(gp_Dir theDir)
         {
             Exceptions.Standard_ProgramError_Raise_if(myType != Graphic3d_TypeOfLightSource.Graphic3d_TypeOfLightSource_Spot

@@ -190,10 +190,10 @@ namespace TKService
             throw new NotImplementedException();
         }
 
-        public void SetPBR(bool theIsPBR)
-        {
-            throw new NotImplementedException();
-        }
+
+        //! Sets whether standard program header should define functions and variables used in PBR pipeline.
+       public  void SetPBR(bool theIsPBR) { myIsPBR = theIsPBR; }
+
 
         //! Specify the length of array of clipping planes (THE_MAX_CLIP_PLANES).
         public void SetNbClipPlanesMax(int theNbPlanes)

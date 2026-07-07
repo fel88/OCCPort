@@ -1,5 +1,7 @@
 ﻿using OCCPort.Common;
 using System;
+using System.Diagnostics.Metrics;
+using System.Reflection;
 using System.Reflection.Metadata;
 using TKernel;
 
@@ -20,6 +22,11 @@ namespace TKService
             //    memset(myLightTypesEnabled, 0, sizeof(myLightTypesEnabled));
         }
 
+        int[] myLightTypesEnabled = new int[(int)Graphic3d_TypeOfLightSource.Graphic3d_TypeOfLightSource_NB]; //!< counters per each light source type enabled in the list
+
+        //! Returns total amount of enabled lights of specified type.
+        //! @sa UpdateRevision()
+        public int NbEnabledLightsOfType(Graphic3d_TypeOfLightSource theType) { return myLightTypesEnabled[(int)theType]; }
 
         NCollection_IndexedDataMap<Graphic3d_CLight, int> myLights = new NCollection_IndexedDataMap<Graphic3d_CLight, int>();              //!< list of light sources with their cached state (revision)
         int[] myLightTypes = new int[(int)Graphic3d_TypeOfLightSource.Graphic3d_TypeOfLightSource_NB]; //!< counters per each light source type defined in the list
@@ -75,6 +82,62 @@ namespace TKService
 
         string myKeyEnabledLong;         //!< key identifying the list of enabled light sources by their type
         string myKeyEnabledShort;        //!< key identifying the list of enabled light sources by the number of sources of each type
-    }
 
+        public class Iterator
+        {
+            public Iterator(Graphic3d_LightSet theSet, IterationFilter theFilter)
+            {
+                myIter =new NCollection_IndexedDataMap<Graphic3d_CLight, int, NCollection_DefaultHasher<Graphic3d_CLight>>.Iterator  (theSet.myLights);
+                myFilter =(int) (theFilter);
+                skipFiltered();
+            }
+
+            public bool More()
+            {
+                return myIter.More();
+            }
+
+            //! Skip filtered items.
+            void skipFiltered()
+            {
+                if (myFilter == 0)
+                {
+                    return;
+                }
+
+                for (; myIter.More(); myIter.Next())
+                {
+                    if ((myFilter & (int)IterationFilter.IterationFilter_ExcludeAmbient) != 0
+                     && myIter.Key().Type() == Graphic3d_TypeOfLightSource.Graphic3d_TypeOfLightSource_Ambient)
+                    {
+                        continue;
+                    }
+                    else if ((myFilter & (int)IterationFilter.IterationFilter_ExcludeDisabled) != 0
+                          && !myIter.Key().IsEnabled())
+                    {
+                        continue;
+                    }
+                    else if ((myFilter & (int)IterationFilter.IterationFilter_ExcludeNoShadow) != 0
+                          && !myIter.Key().ToCastShadows())
+                    {
+                        continue;
+                    }
+
+                    break;
+                }
+            }
+            NCollection_IndexedDataMap<Graphic3d_CLight, int>.Iterator myIter;
+            int myFilter;
+            public void Next()
+            {
+                myIter.Next();
+                skipFiltered();
+            }
+
+            public Graphic3d_CLight Value()
+            {
+                return myIter.Key();
+            }
+        }
+    }
 }
