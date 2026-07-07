@@ -39,6 +39,15 @@ namespace TKService
         {
             return UpdateProjection(myMatricesF).LProjection;
         }
+
+        //! @return projection modification state of the camera.
+        public Graphic3d_WorldViewProjState WorldViewProjState()
+        {
+            return myWorldViewProjState;
+        }
+
+        Graphic3d_WorldViewProjState myWorldViewProjState = new Graphic3d_WorldViewProjState(); 
+
         public Graphic3d_Mat4 ProjectionStereoRightF()
         {
             return UpdateProjection(myMatricesF).RProjection;

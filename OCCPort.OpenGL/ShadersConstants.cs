@@ -5,9 +5,147 @@ namespace OCCPort.OpenGL
 {
     public static class ShadersConstants
     {
+        // This file has been automatically generated from resource file src/Shaders/PBRSpotLight.glsl
+
+        public  const string Shaders_PBRSpotLight_glsl =
+          "//! Function computes contribution of spotlight source\n"
+ + "//! into global variable DirectLighting (PBR shading).\n"
+ + "//! @param theId      light source index\n"
+ + "//! @param theNormal  surface normal\n"
+ + "//! @param theView    view direction\n"
+ + "//! @param thePoint   3D position (world space)\n"
+ + "//! @param theIsFront front/back face flag\n"
+ + "void occSpotLight (in int  theId,\n"
+ + "                   in vec3 theNormal,\n"
+ + "                   in vec3 theView,\n"
+ + "                   in vec3 thePoint,\n"
+ + "                   in bool theIsFront,\n"
+ + "                   in float theShadow)\n"
+ + "{\n"
+ + "  vec3 aLight = occLight_Position (theId) - thePoint;\n"
+ + "\n"
+ + "  float aDist = length (aLight);\n"
+ + "  float aRange = occLight_Range (theId);\n"
+ + "  float anAtten = occPointLightAttenuation (aDist, aRange);\n"
+ + "  if (anAtten <= 0.0) return;\n"
+ + "  aLight /= aDist;\n"
+ + "\n"
+ + "  vec3 aSpotDir = occLight_SpotDirection (theId);\n"
+ + "  // light cone\n"
+ + "  float aCosA = dot (aSpotDir, -aLight);\n"
+ + "  float aRelativeAngle = 2.0 * acos(aCosA) / occLight_SpotCutOff(theId);\n"
+ + "  if (aCosA >= 1.0 || aRelativeAngle > 1.0)\n"
+ + "  {\n"
+ + "    return;\n"
+ + "  }\n"
+ + "  float anExponent = occLight_SpotExponent (theId);\n"
+ + "  if ((1.0 - aRelativeAngle) <= anExponent)\n"
+ + "  {\n"
+ + "    float anAngularAttenuationOffset = cos(0.5 * occLight_SpotCutOff(theId));\n"
+ + "    float anAngularAttenuationScale = 1.0 / max(0.001, cos(0.5 * occLight_SpotCutOff(theId) * (1.0 - anExponent)) - anAngularAttenuationOffset);\n"
+ + "    anAngularAttenuationOffset *= -anAngularAttenuationScale;\n"
+ + "    float anAngularAttenuantion = clamp(aCosA * anAngularAttenuationScale + anAngularAttenuationOffset, 0.0, 1.0);\n"
+ + "    anAtten *= anAngularAttenuantion * anAngularAttenuantion;\n"
+ + "  }\n"
+ + "  theNormal = theIsFront ? theNormal : -theNormal;\n"
+ + "  DirectLighting += occPBRIllumination (theView, aLight, theNormal,\n"
+ + "                                        BaseColor, Metallic, Roughness, IOR,\n"
+ + "                                        occLight_Specular(theId),\n"
+ + "                                        occLight_Intensity(theId) * anAtten) * theShadow;\n"
+ + "}\n";
+
+        // This file has been automatically generated from resource file src/Shaders/PhongDirectionalLight.glsl
+
+        public const string Shaders_PhongDirectionalLight_glsl =
+          "//! Function computes contribution of directional light source\n"
++  "//! into global variables Diffuse and Specular (Phong shading).\n"
++  "//! @param theId      light source index\n"
++  "//! @param theNormal  surface normal\n"
++  "//! @param theView    view direction\n"
++  "//! @param theIsFront front/back face flag\n"
++  "//! @param theShadow  shadow attenuation\n"
++  "void occDirectionalLight (in int  theId,\n"
++  "                          in vec3 theNormal,\n"
++  "                          in vec3 theView,\n"
++  "                          in bool theIsFront,\n"
++  "                          in float theShadow)\n"
++  "{\n"
++  "  vec3 aLight = occLight_Position (theId);\n"
++  "  vec3 aHalf = normalize (aLight + theView);\n"
++  "\n"
++  "  vec3  aFaceSideNormal = theIsFront ? theNormal : -theNormal;\n"
++  "  float aNdotL = max (0.0, dot (aFaceSideNormal, aLight));\n"
++  "  float aNdotH = max (0.0, dot (aFaceSideNormal, aHalf ));\n"
++  "\n"
++  "  float aSpecl = 0.0;\n"
++  "  if (aNdotL > 0.0)\n"
++  "  {\n"
++  "    aSpecl = pow (aNdotH, occMaterial_Shininess (theIsFront));\n"
++  "  }\n"
++  "\n"
++  "  Diffuse  += occLight_Diffuse  (theId) * aNdotL * theShadow;\n"
++  "  Specular += occLight_Specular (theId) * aSpecl * theShadow;\n"
++  "}\n";
+
+        // This file has been automatically generated from resource file src/Shaders/PBRDirectionalLight.glsl
+
+        public const string  Shaders_PBRDirectionalLight_glsl =
+          "//! Function computes contribution of directional light source\n"
++  "//! into global variable DirectLighting (PBR shading).\n"
++  "//! @param theId      light source index\n"
++  "//! @param theNormal  surface normal\n"
++  "//! @param theView    view direction\n"
++  "//! @param theIsFront front/back face flag\n"
++  "//! @param theShadow  shadow attenuation\n"
++  "void occDirectionalLight (in int  theId,\n"
++  "                          in vec3 theNormal,\n"
++  "                          in vec3 theView,\n"
++  "                          in bool theIsFront,\n"
++  "                          in float theShadow)\n"
++  "{\n"
++  "  vec3 aLight = occLight_Position (theId);\n"
++  "  theNormal = theIsFront ? theNormal : -theNormal;\n"
++  "  DirectLighting += occPBRIllumination (theView, aLight, theNormal,\n"
++  "                                        BaseColor, Metallic, Roughness, IOR,\n"
++  "                                        occLight_Specular (theId),\n"
++  "                                        occLight_Intensity(theId)) * theShadow;\n"
++  "}\n";
+
+
+        // This file has been automatically generated from resource file src/Shaders/PBRPointLight.glsl
+
+        public const string  Shaders_PBRPointLight_glsl =
+          "//! Function computes contribution of isotropic point light source\n"
++  "//! into global variable DirectLighting (PBR shading).\n"
++  "//! @param theId      light source index\n"
++  "//! @param theNormal  surface normal\n"
++  "//! @param theView    view direction\n"
++  "//! @param thePoint   3D position (world space)\n"
++  "//! @param theIsFront front/back face flag\n"
++  "void occPointLight (in int  theId,\n"
++  "                    in vec3 theNormal,\n"
++  "                    in vec3 theView,\n"
++  "                    in vec3 thePoint,\n"
++  "                    in bool theIsFront)\n"
++  "{\n"
++  "  vec3 aLight = occLight_Position (theId) - thePoint;\n"
++  "\n"
++  "  float aDist = length (aLight);\n"
++  "  float aRange = occLight_Range (theId);\n"
++  "  float anAtten = occPointLightAttenuation (aDist, aRange);\n"
++  "  if (anAtten <= 0.0) return;\n"
++  "  aLight /= aDist;\n"
++  "\n"
++  "  theNormal = theIsFront ? theNormal : -theNormal;\n"
++  "  DirectLighting += occPBRIllumination (theView, aLight, theNormal,\n"
++  "                                        BaseColor, Metallic, Roughness, IOR,\n"
++  "                                        occLight_Specular (theId),\n"
++  "                                        occLight_Intensity(theId) * anAtten);\n"
++  "}\n";
+
         // This file has been automatically generated from resource file src/Shaders/PhongSpotLight.glsl
 
-        public  const  string Shaders_PhongSpotLight_glsl =
+        public const  string Shaders_PhongSpotLight_glsl =
           "//! Function computes contribution of spotlight source\n"                                                         +
   "//! into global variables Diffuse and Specular (Phong shading).\n"                                                        +
   "//! @param theId      light source index\n"                                                                               +

@@ -6,6 +6,7 @@ using TKService;
 
 namespace OCCPort.OpenGL
 {
+
     //! Alias to 2D programs array of predefined length
     internal class OpenGl_SetOfShaderPrograms
     {

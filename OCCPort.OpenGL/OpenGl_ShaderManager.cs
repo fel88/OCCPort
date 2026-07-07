@@ -524,11 +524,11 @@ namespace OCCPort.OpenGL
                 return;
             }
 
-            // string  aKey = genLightKey(aLights, myLightSourceState.HasShadowMaps());
-            //  if (!myMapOfLightPrograms.Find(aKey, myLightPrograms))
+            string aKey = genLightKey(aLights, myLightSourceState.HasShadowMaps());
+            if (!myMapOfLightPrograms.Find(aKey,out  myLightPrograms))
             {
-                //   myLightPrograms = new OpenGl_SetOfShaderPrograms();
-                //myMapOfLightPrograms.Bind(aKey, myLightPrograms);
+                myLightPrograms = new OpenGl_SetOfShaderPrograms();
+                myMapOfLightPrograms.Bind(aKey, myLightPrograms);
             }
         }
 

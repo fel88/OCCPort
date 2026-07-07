@@ -84,7 +84,14 @@ namespace TKernel
     v[1] = theVec3.y();
     v[2] = theVec3.z();
     v[3] = theW;
-  }
+        }
+        public void SetValues(Element_t x, Element_t y, Element_t z, Element_t w)
+        {
+            v[0] = x;
+            v[1] = y;
+            v[2] = z;                
+            v[3] = w;
+        }
         public NCollection_Vec4(Element_t[] array)
         {
             v = new Element_t[4];
@@ -124,12 +131,20 @@ namespace TKernel
 
         //! Alias to 4th component as ALPHA channel in RGBA.
         public Element_t a() { return v[3]; }
+        public void a(Element_t  val) {  v[3]=val; }
 
         public Element_t[] ChangeData()
         {
             return v;
         }
-
+        public static NCollection_Vec4<Element_t> operator +(NCollection_Vec4<Element_t> temp, NCollection_Vec4<Element_t> temp2)
+        {
+            return new NCollection_Vec4<Element_t>(temp.x() + temp2.x(), temp.y() + temp2.y(), temp.z() + temp2.z(), temp.w() + temp2.w());
+        }
+        public static NCollection_Vec4<Element_t> operator *(NCollection_Vec4<Element_t> temp, Element_t temp2)
+        {
+            return new NCollection_Vec4<Element_t>(temp.x() * temp2, temp.y() * temp2, temp.z() * temp2,temp.w()*temp2);
+        }
 
     }
 }

@@ -55,6 +55,14 @@ namespace TKernel
                 Exceptions.Standard_NoSuchObject_Raise_if(!More(), "NCollection_IndexedDataMap::Iterator::Value");
                 return myMap.FindFromIndex(myIndex);
             }
+
+            
+
+            public void ChangeValue(T2 v)
+            {
+                Exceptions.Standard_NoSuchObject_Raise_if(!More(), "NCollection_IndexedDataMap::Iterator::Value");
+                 myMap.dic[myIndex - 1]=new KeyValuePair<TheKeyType, T2>(myMap.dic[myIndex - 1].Key,v);
+            }
         }
 
         public NCollection_IndexedDataMap()

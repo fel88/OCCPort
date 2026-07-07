@@ -7,7 +7,13 @@ namespace OCCPort.OpenGL
 {
     public class OpenGl_ShadowMapArray : NCollection_Array1<OpenGl_ShadowMap>
     {
+        //! Return TRUE if defined.
+      public   bool IsValid() 
+        {
+    return !IsEmpty()
+         && First().IsValid();
     }
+}
     //! This class contains shadow mapping resources.
     public class OpenGl_ShadowMap : OpenGl_NamedResource
     {
@@ -20,6 +26,10 @@ namespace OCCPort.OpenGL
 
             //
         }
+       public  bool IsValid() 
+{
+  return myShadowMapFbo.IsValid();
+}
 
         float myShadowMapBias; //!< shadowmap bias
         Graphic3d_Camera myShadowCamera;  //!< rendering camera

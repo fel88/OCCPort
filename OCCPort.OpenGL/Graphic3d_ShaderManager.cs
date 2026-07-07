@@ -20,6 +20,27 @@ namespace OCCPort.OpenGL
         {
             myGapiVersion.SetValues(theVerMajor, theVerMinor);
         }
+        //! Generate map key for light sources configuration.
+        //! @param theLights [in] list of light sources
+        //! @param theHasShadowMap [in] flag indicating shadow maps usage
+        // =======================================================================
+        // function : genLightKey
+        // purpose  :
+        // =======================================================================
+        
+        public string genLightKey(Graphic3d_LightSet theLights,
+                                                               bool theHasShadowMap)
+        {
+            if (theLights.NbEnabled() <= THE_NB_UNROLLED_LIGHTS_MAX)
+            {
+                return theHasShadowMap
+                     ? ("ls_") + theLights.KeyEnabledLong()
+                     : ("l_") + theLights.KeyEnabledLong();
+            }
+
+            int aMaxLimit = roundUpMaxLightSources(theLights.NbEnabled());
+            return ("l_") + theLights.KeyEnabledShort() + aMaxLimit;
+        }
 
         //! Number specifying maximum number of light sources to prepare a GLSL program with unrolled loop.
         static int THE_NB_UNROLLED_LIGHTS_MAX = 32;
@@ -679,35 +700,35 @@ namespace OCCPort.OpenGL
         }
         // This file has been automatically generated from resource file src/Shaders/PBRIllumination.glsl
 
-         const string Shaders_PBRIllumination_glsl =
-          "//! Calculates direct illumination using Cook-Torrance BRDF.\n"
- + "vec3 occPBRIllumination (in vec3  theView,\n"
- + "                         in vec3  theLight,\n"
- + "                         in vec3  theNormal,\n"
- + "                         in vec4  theBaseColor,\n"
- + "                         in float theMetallic,\n"
- + "                         in float theRoughness,\n"
- + "                         in float theIOR,\n"
- + "                         in vec3  theLightColor,\n"
- + "                         in float theLightIntensity)\n"
- + "{\n"
- + "  vec3 aHalf = normalize (theView + theLight);\n"
- + "  float aCosVH = max(dot(theView, aHalf), 0.0);\n"
- + "  vec3 aFresnel = occPBRFresnel (theBaseColor.rgb, theMetallic, theIOR, aCosVH);\n"
- + "  vec3 aSpecular = occPBRCookTorrance (theView,\n"
- + "                                       theLight,\n"
- + "                                       theNormal,\n"
- + "                                       theBaseColor.rgb,\n"
- + "                                       theMetallic,\n"
- + "                                       theRoughness,\n"
- + "                                       theIOR);\n"
- + "  vec3 aDiffuse = vec3(1.0) - aFresnel;\n"
- + "  aDiffuse *= 1.0 - theMetallic;\n"
- + "  aDiffuse *= INV_PI;\n"
- + "  aDiffuse *= theBaseColor.rgb;\n"
- + "  aDiffuse = mix (vec3(0.0), aDiffuse, theBaseColor.a);\n"
- + "  return (aDiffuse + aSpecular) * theLightColor * theLightIntensity * max(0.0, dot(theLight, theNormal));\n"
- + "}\n";
+        const string Shaders_PBRIllumination_glsl =
+         "//! Calculates direct illumination using Cook-Torrance BRDF.\n"
++ "vec3 occPBRIllumination (in vec3  theView,\n"
++ "                         in vec3  theLight,\n"
++ "                         in vec3  theNormal,\n"
++ "                         in vec4  theBaseColor,\n"
++ "                         in float theMetallic,\n"
++ "                         in float theRoughness,\n"
++ "                         in float theIOR,\n"
++ "                         in vec3  theLightColor,\n"
++ "                         in float theLightIntensity)\n"
++ "{\n"
++ "  vec3 aHalf = normalize (theView + theLight);\n"
++ "  float aCosVH = max(dot(theView, aHalf), 0.0);\n"
++ "  vec3 aFresnel = occPBRFresnel (theBaseColor.rgb, theMetallic, theIOR, aCosVH);\n"
++ "  vec3 aSpecular = occPBRCookTorrance (theView,\n"
++ "                                       theLight,\n"
++ "                                       theNormal,\n"
++ "                                       theBaseColor.rgb,\n"
++ "                                       theMetallic,\n"
++ "                                       theRoughness,\n"
++ "                                       theIOR);\n"
++ "  vec3 aDiffuse = vec3(1.0) - aFresnel;\n"
++ "  aDiffuse *= 1.0 - theMetallic;\n"
++ "  aDiffuse *= INV_PI;\n"
++ "  aDiffuse *= theBaseColor.rgb;\n"
++ "  aDiffuse = mix (vec3(0.0), aDiffuse, theBaseColor.a);\n"
++ "  return (aDiffuse + aSpecular) * theLightColor * theLightIntensity * max(0.0, dot(theLight, theNormal));\n"
++ "}\n";
 
         static string Shaders_PBRCookTorrance_glsl =
   "//! Calculates Cook-Torrance BRDF.\n"
@@ -731,47 +752,47 @@ namespace OCCPort.OpenGL
  + "  return aCookTorrance;\n"
  + "}\n";
 
-        static string  Shaders_PBRFresnel_glsl =
+        static string Shaders_PBRFresnel_glsl =
  "//! Functions to calculate fresnel coefficient and approximate zero fresnel value.\n"
-+  "vec3 occPBRFresnel (in vec3  theBaseColor,\n"
-+  "                    in float theMetallic,\n"
-+  "                    in float theIOR)\n"
-+  "{\n"
-+  "  theIOR = (1.0 - theIOR) / (1.0 + theIOR);\n"
-+  "  theIOR *= theIOR;\n"
-+  "  vec3 f0 = vec3(theIOR);\n"
-+  "  f0 = mix (f0, theBaseColor.rgb, theMetallic);\n"
-+  "  return f0;\n"
-+  "}\n"
-+  "\n"
-+  "vec3 occPBRFresnel (in vec3  theBaseColor,\n"
-+  "                    in float theMetallic,\n"
-+  "                    in float theIOR,\n"
-+  "                    in float theCosVH)\n"
-+  "{\n"
-+  "  vec3 f0 = occPBRFresnel (theBaseColor, theMetallic, theIOR);\n"
-+  "  theCosVH = 1.0 - theCosVH;\n"
-+  "  theCosVH *= theCosVH;\n"
-+  "  theCosVH *= theCosVH * theCosVH * theCosVH * theCosVH;\n"
-+  "  return f0 + (vec3 (1.0) - f0) * theCosVH;\n"
-+  "}\n"
-+  "\n"
-+  "vec3 occPBRFresnel (in vec3  theBaseColor,\n"
-+  "                    in float theMetallic,\n"
-+  "                    in float theRoughness,\n"
-+  "                    in float theIOR,\n"
-+  "                    in float theCosV)\n"
-+  "{\n"
-+  "  vec3 f0 = occPBRFresnel (theBaseColor, theMetallic, theIOR);\n"
-+  "  theCosV = 1.0 - theCosV;\n"
-+  "  theCosV *= theCosV;\n"
-+  "  theCosV *= theCosV * theCosV * theCosV * theCosV;\n"
-+  "  return f0 + (max(vec3(1.0 - theRoughness), f0) - f0) * theCosV;\n"
-+  "}\n";
++ "vec3 occPBRFresnel (in vec3  theBaseColor,\n"
++ "                    in float theMetallic,\n"
++ "                    in float theIOR)\n"
++ "{\n"
++ "  theIOR = (1.0 - theIOR) / (1.0 + theIOR);\n"
++ "  theIOR *= theIOR;\n"
++ "  vec3 f0 = vec3(theIOR);\n"
++ "  f0 = mix (f0, theBaseColor.rgb, theMetallic);\n"
++ "  return f0;\n"
++ "}\n"
++ "\n"
++ "vec3 occPBRFresnel (in vec3  theBaseColor,\n"
++ "                    in float theMetallic,\n"
++ "                    in float theIOR,\n"
++ "                    in float theCosVH)\n"
++ "{\n"
++ "  vec3 f0 = occPBRFresnel (theBaseColor, theMetallic, theIOR);\n"
++ "  theCosVH = 1.0 - theCosVH;\n"
++ "  theCosVH *= theCosVH;\n"
++ "  theCosVH *= theCosVH * theCosVH * theCosVH * theCosVH;\n"
++ "  return f0 + (vec3 (1.0) - f0) * theCosVH;\n"
++ "}\n"
++ "\n"
++ "vec3 occPBRFresnel (in vec3  theBaseColor,\n"
++ "                    in float theMetallic,\n"
++ "                    in float theRoughness,\n"
++ "                    in float theIOR,\n"
++ "                    in float theCosV)\n"
++ "{\n"
++ "  vec3 f0 = occPBRFresnel (theBaseColor, theMetallic, theIOR);\n"
++ "  theCosV = 1.0 - theCosV;\n"
++ "  theCosV *= theCosV;\n"
++ "  theCosV *= theCosV * theCosV * theCosV * theCosV;\n"
++ "  return f0 + (max(vec3(1.0 - theRoughness), f0) - f0) * theCosV;\n"
++ "}\n";
 
 
 
-        static string  Shaders_PBRGeometry_glsl =
+        static string Shaders_PBRGeometry_glsl =
           "//! Calculates geometry factor for Cook-Torrance BRDF.\n"
  + "float occPBRGeometry (in float theCosV,\n"
  + "                      in float theCosL,\n"
@@ -789,7 +810,7 @@ namespace OCCPort.OpenGL
         static string Shaders_PBRDistribution_glsl =
   "//! Calculates micro facet normals distribution.\n"
  + "float occPBRDistribution (in float theCosH,\n"
-+  "                          in float theRoughness)\n"
++ "                          in float theRoughness)\n"
  + "{\n"
  + "  float aDistribution = theRoughness * theRoughness;\n"
  + "  aDistribution = aDistribution / (theCosH * theCosH * (aDistribution * aDistribution - 1.0) + 1.0);\n"
@@ -931,7 +952,7 @@ namespace OCCPort.OpenGL
                         aLightsFunc += ShadersConstants.Shaders_LightShadow_glsl;
                         isShadowShaderAdded = true;
                     }
-                    aLightsFunc += theIsPBR ? ShadersConstants. Shaders_PBRDirectionalLight_glsl : ShadersConstants.Shaders_PhongDirectionalLight_glsl;
+                    aLightsFunc += theIsPBR ? ShadersConstants.Shaders_PBRDirectionalLight_glsl : ShadersConstants.Shaders_PhongDirectionalLight_glsl;
                 }
                 if (theLights.NbEnabledLightsOfType(Graphic3d_TypeOfLightSource.Graphic3d_TypeOfLightSource_Positional) > 0)
                 {
@@ -943,7 +964,7 @@ namespace OCCPort.OpenGL
                     {
                         aLightsFunc += ShadersConstants.Shaders_LightShadow_glsl;
                     }
-                    aLightsFunc += theIsPBR ? ShadersConstants. Shaders_PBRSpotLight_glsl : ShadersConstants.Shaders_PhongSpotLight_glsl;
+                    aLightsFunc += theIsPBR ? ShadersConstants.Shaders_PBRSpotLight_glsl : ShadersConstants.Shaders_PhongSpotLight_glsl;
                 }
             }
 
@@ -1017,25 +1038,6 @@ namespace OCCPort.OpenGL
             }
         }
 
-        //! Generate map key for light sources configuration.
-        //! @param theLights [in] list of light sources
-        //! @param theHasShadowMap [in] flag indicating shadow maps usage
-        // =======================================================================
-        // function : genLightKey
-        // purpose  :
-        // =======================================================================
-        string genLightKey(Graphic3d_LightSet theLights, bool theHasShadowMap)
-        {
-            if (theLights.NbEnabled() <= THE_NB_UNROLLED_LIGHTS_MAX)
-            {
-                return theHasShadowMap
-                     ? ("ls_") + theLights.KeyEnabledLong()
-                     : ("l_") + theLights.KeyEnabledLong();
-            }
-
-            int aMaxLimit = roundUpMaxLightSources(theLights.NbEnabled());
-            return ("l_") + theLights.KeyEnabledShort() + aMaxLimit;
-        }
         //! Auxiliary function to transform normal from model to view coordinate system.
         static string THE_FUNC_transformNormal_view =
           "vec3 transformNormal (in vec3 theNormal)" +

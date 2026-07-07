@@ -22,6 +22,85 @@ namespace TKService
             //    memset(myLightTypesEnabled, 0, sizeof(myLightTypesEnabled));
         }
 
+        int myCacheRevision;          //!< revision of cached state
+        Graphic3d_Vec4 myAmbient=new NCollection_Vec4<float> ();                //!< cached value of cumulative ambient color
+
+        public int UpdateRevision()
+        {
+            if (myCacheRevision == myRevision)
+            {
+                // check implicit updates of light sources
+                for (NCollection_IndexedDataMap < Graphic3d_CLight, int >.Iterator aLightIter=new NCollection_IndexedDataMap<Graphic3d_CLight, int, NCollection_DefaultHasher<Graphic3d_CLight>>.Iterator (myLights); aLightIter.More(); aLightIter.Next())
+                {
+                    Graphic3d_CLight aLight = aLightIter.Key();
+                    if (aLightIter.Value() != aLight.Revision())
+                    {
+                        ++myRevision;
+                        break;
+                    }
+                }
+            }
+            if (myCacheRevision == myRevision)
+            {
+                return myRevision;
+            }
+
+            myCacheRevision = myRevision;
+            myNbCastShadows = 0;
+            myAmbient.SetValues(0.0f, 0.0f, 0.0f, 0.0f);
+            //memset(myLightTypesEnabled, 0, sizeof(myLightTypesEnabled));
+            char[] aKeyLong=new char[(myLights.Extent() + 1)];
+            int aLightLast = 0;
+            for (NCollection_IndexedDataMap<Graphic3d_CLight, int>.Iterator aLightIter = new NCollection_IndexedDataMap<Graphic3d_CLight, int, NCollection_DefaultHasher<Graphic3d_CLight>>.Iterator(myLights); aLightIter.More(); aLightIter.Next())
+            {
+                Graphic3d_CLight aLight = aLightIter.Key();
+                aLightIter.ChangeValue(aLight.Revision());
+                if (!aLight.IsEnabled())                
+                    continue;                
+
+                myLightTypesEnabled[(int)aLight.Type()] += 1;
+                if (aLight.Type() == Graphic3d_TypeOfLightSource.Graphic3d_TypeOfLightSource_Ambient)
+                {
+                    myAmbient += aLight.PackedColor() * aLight.Intensity();
+                }
+                else
+                {
+                    if (aLight.ToCastShadows())
+                    {
+                        ++myNbCastShadows;
+                        aKeyLong[aLightLast++] = UpperCase(THE_LIGHT_KEY_LETTERS[(int)aLight.Type()]);
+                    }
+                    else
+                    {
+                        aKeyLong[aLightLast++] = THE_LIGHT_KEY_LETTERS[(int)aLight.Type()];
+                    }
+                }
+            }
+            aKeyLong[aLightLast] = '\0';
+            myAmbient.a(1.0f);
+            myNbEnabled = myLightTypesEnabled[(int)Graphic3d_TypeOfLightSource.Graphic3d_TypeOfLightSource_Directional]
+                        + myLightTypesEnabled[(int)Graphic3d_TypeOfLightSource.Graphic3d_TypeOfLightSource_Positional]
+                        + myLightTypesEnabled[(int)Graphic3d_TypeOfLightSource.Graphic3d_TypeOfLightSource_Spot];
+            myKeyEnabledLong = new string( aKeyLong);
+            myKeyEnabledShort = ""+(myLightTypesEnabled[(int)Graphic3d_TypeOfLightSource.Graphic3d_TypeOfLightSource_Directional] > 0 ? THE_LIGHT_KEY_LETTERS[(int)Graphic3d_TypeOfLightSource.Graphic3d_TypeOfLightSource_Directional] : '\0')
+                              + (myLightTypesEnabled[(int)Graphic3d_TypeOfLightSource.Graphic3d_TypeOfLightSource_Positional] > 0 ? THE_LIGHT_KEY_LETTERS[(int)Graphic3d_TypeOfLightSource.Graphic3d_TypeOfLightSource_Positional] : '\0')
+                              + (myLightTypesEnabled[(int)Graphic3d_TypeOfLightSource.Graphic3d_TypeOfLightSource_Spot] > 0 ? THE_LIGHT_KEY_LETTERS[(int)Graphic3d_TypeOfLightSource.Graphic3d_TypeOfLightSource_Spot] : '\0');
+            return myRevision;
+        }
+
+        private char UpperCase(char v)
+        {
+            return char.ToUpper(v);            
+        }
+
+        //! Suffixes identifying light source type.
+        static char[] THE_LIGHT_KEY_LETTERS =
+        {
+    'a', // Graphic3d_TypeOfLightSource_Ambient
+    'd', // Graphic3d_TypeOfLightSource_Directional
+    'p', // Graphic3d_TypeOfLightSource_Positional
+    's'  // Graphic3d_TypeOfLightSource_Spot
+  };
         int[] myLightTypesEnabled = new int[(int)Graphic3d_TypeOfLightSource.Graphic3d_TypeOfLightSource_NB]; //!< counters per each light source type enabled in the list
 
         //! Returns total amount of enabled lights of specified type.
@@ -87,8 +166,8 @@ namespace TKService
         {
             public Iterator(Graphic3d_LightSet theSet, IterationFilter theFilter)
             {
-                myIter =new NCollection_IndexedDataMap<Graphic3d_CLight, int, NCollection_DefaultHasher<Graphic3d_CLight>>.Iterator  (theSet.myLights);
-                myFilter =(int) (theFilter);
+                myIter = new NCollection_IndexedDataMap<Graphic3d_CLight, int, NCollection_DefaultHasher<Graphic3d_CLight>>.Iterator(theSet.myLights);
+                myFilter = (int)(theFilter);
                 skipFiltered();
             }
 

@@ -118,6 +118,9 @@ namespace OCCPort.OpenGL
                 myBackgrounds[i] = new OpenGl_BackgroundArray((Graphic3d_TypeOfBackground)i);
             }
 
+            myShadowMaps = new OpenGl_ShadowMapArray();
+
+
         }
         //! Return true if view content cache has been invalidated.
         public override bool IsInvalidated() { return !myBackBufferRestored; }
@@ -1959,6 +1962,11 @@ namespace OCCPort.OpenGL
             return myWorkspace.GetGlContext().HasPBR()
                 && myPBREnvironment != null;
         }
+        (int, int) myLastLightSourceState;
+        Graphic3d_WorldViewProjState myWorldViewProjState; //!< camera modification state
+
+        //! Number of accumulated frames (for progressive rendering).
+        int myAccumFrames;
 
         //! Renders the graphical contents of the view into the preprepared window or framebuffer.
         //! @param theProjection [in] the projection that should be used for rendering.
@@ -1998,13 +2006,27 @@ namespace OCCPort.OpenGL
              myBVHSelector.CacheClipPtsProjections();*/
 
             OpenGl_ShaderManager aManager = aContext.ShaderManager();
+             Graphic3d_LightSet aLights = myRenderParams.ShadingModel ==Graphic3d_TypeOfShadingModel. Graphic3d_TypeOfShadingModel_Unlit ? myNoShadingLight : myLights;
+            int aLightsRevision = 0;
+            if (aLights!=null)
+            {
+                aLightsRevision = aLights.UpdateRevision();
+            }
+            if ((myCurrLightSourceState, aManager.LightSourceState().Index()) != myLastLightSourceState
+             || aLightsRevision != myLightsRevision)
+            {
+                myLightsRevision = aLightsRevision;
+                aManager.UpdateLightSourceStateTo(aLights, SpecIBLMapLevels(), myShadowMaps.IsValid() ? myShadowMaps : null);
+                myLastLightSourceState = (myCurrLightSourceState, aManager.LightSourceState().Index());
+            }
+
             // Update matrices if camera has changed.
-            //Graphic3d_WorldViewProjState aWVPState = myCamera.WorldViewProjState();
-            //if (myWorldViewProjState != aWVPState)
-            //{
-            //    myAccumFrames = 0;
-            //    myWorldViewProjState = aWVPState;
-            //}
+            Graphic3d_WorldViewProjState aWVPState = myCamera.WorldViewProjState();
+            if (myWorldViewProjState != aWVPState)
+            {
+                myAccumFrames = 0;
+                myWorldViewProjState = aWVPState;
+            }
 
             myLocalOrigin.SetCoord(0.0, 0.0, 0.0);
             aContext.SetCamera(myCamera);
@@ -2193,4 +2215,7 @@ namespace OCCPort.OpenGL
         void glDisable(All dither);
     }
 
-}
+
+  
+
+    }

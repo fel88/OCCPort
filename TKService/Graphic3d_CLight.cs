@@ -56,7 +56,20 @@ namespace TKService
             }
             makeId();
         }
-        void makeId()
+
+        //! Returns the intensity of light source; 1.0 by default.
+        public float Intensity()  { return myIntensity; }
+
+
+        //! Returns the color of the light source with dummy Alpha component, which should be ignored.
+        public  Graphic3d_Vec4 PackedColor()  { return myColor; }
+
+
+    //! Returns the smoothness of light source (either smoothing angle for directional light or smoothing radius in case of positional light); 0.0 by default.
+    public float Smoothness()  { return mySmoothness; }
+
+
+void makeId()
         {
             string aTypeSuffix = "";
             switch (myType)
