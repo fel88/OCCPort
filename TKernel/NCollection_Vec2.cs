@@ -38,6 +38,10 @@ namespace TKernel
         {
 
         }
+        public T[] GetData()
+        {
+            return v;
+        }
         public static bool operator ==(NCollection_Vec2<T> temp, NCollection_Vec2<T> temp2)
         {
             return temp.IsEqual(temp2);

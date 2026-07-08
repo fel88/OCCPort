@@ -2,7 +2,7 @@
 {
     public static class NCollection_Vec3_Extensions
     {
-        public static NCollection_Vec3<float>  ToFloat(this NCollection_Vec3<double> v)
+        public static NCollection_Vec3<float> ToFloat(this NCollection_Vec3<double> v)
         {
             return new NCollection_Vec3<float>((float)v.x(), (float)v.y(), (float)v.z());
         }
@@ -23,7 +23,7 @@
             var aModulus = Math.Sqrt(v.SquareModulus());
             if (aModulus != (0.0)) // just avoid divide by zero
             {
-                v[0] =(float) (v.x() / aModulus);
+                v[0] = (float)(v.x() / aModulus);
                 v[1] = (float)(v.y() / aModulus);
                 v[2] = (float)(v.z() / aModulus);
             }
@@ -41,6 +41,21 @@
         public static float Modulus(this NCollection_Vec3<float> v)
         {
             return (float)Math.Sqrt(v.x() * v.x() + v.y() * v.y() + v.z() * v.z());
+        }
+
+
+        public static NCollection_Vec3<float> Normalized(this NCollection_Vec3<float> v)
+        {
+            NCollection_Vec3<float> ret = new NCollection_Vec3<float>();
+            var aModulus = v.Modulus();
+            if (aModulus != 0) // just avoid divide by zero
+            {
+                ret = new NCollection_Vec3<float>(v.x() / aModulus,
+                    v.y() / aModulus,
+                    v.z() / aModulus
+                    );
+            }
+            return ret;
         }
 
     }

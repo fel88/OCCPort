@@ -23,14 +23,14 @@ namespace TKernel
         }
         public T ChangeValue(int i)
         {
-            return this[i ];
+            return this[i];
         }
 
         //! Constant item access by theIndex
         public T Value(int theIndex)
         {
             Exceptions.Standard_OutOfRange_Raise_if(theIndex <= 0 || theIndex > Count, "NCollection_Sequence::Value");
-            return this[theIndex ];
+            return this[theIndex];
             //NCollection_Sequence * const aLocalTHIS = (NCollection_Sequence*)this;
             //aLocalTHIS->myCurrentItem = Find(theIndex);
             //aLocalTHIS->myCurrentIndex = theIndex;
@@ -39,7 +39,7 @@ namespace TKernel
 
         public void ChangeValue(int i, T thePnt)
         {
-            this[i ] = thePnt;
+            this[i] = thePnt;
         }
 
         public int Size()
@@ -100,6 +100,15 @@ namespace TKernel
 
         public class Iterator
         {
+            //! Initialisation
+            public void Init(NCollection_Sequence<T> theSeq,
+                   bool isStart = true)
+            {
+                throw new NotImplementedException();
+                //myCurrent = (isStart ? theSeq.myFirstItem : NULL);
+              //  myPrevious = (isStart ? NULL : theSeq.myLastItem);
+            }
+
             NCollection_Sequence<T> target;
             public Iterator(NCollection_Sequence<T> list)
             {

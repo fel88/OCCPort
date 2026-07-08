@@ -16,7 +16,7 @@ namespace TKService
         public Graphic3d_CLight(Graphic3d_TypeOfLightSource theType)
         {
             myPosition = new(0.0, 0.0, 0.0);
-            myColor = new Quantity_ColorRGBA (1.0f, 1.0f, 1.0f, 1.0f);
+            myColor = new Quantity_ColorRGBA(1.0f, 1.0f, 1.0f, 1.0f);
             myDirection = new(0.0f, 0.0f, 0.0f, 0.0f);
             myParams = new(0.0f, 0.0f, 0.0f, 0.0f);
             mySmoothness = (0.0f);
@@ -29,7 +29,7 @@ namespace TKService
 
             switch (theType)
             {
-                case Graphic3d_TypeOfLightSource. Graphic3d_TypeOfLightSource_Ambient:
+                case Graphic3d_TypeOfLightSource.Graphic3d_TypeOfLightSource_Ambient:
                     {
                         break;
                     }
@@ -41,35 +41,84 @@ namespace TKService
                     }
                 case Graphic3d_TypeOfLightSource.Graphic3d_TypeOfLightSource_Positional:
                     {
-                      //  changeConstAttenuation() = 1.0f;
-                     //   changeLinearAttenuation() = 0.0f;
+                        //  changeConstAttenuation() = 1.0f;
+                        //   changeLinearAttenuation() = 0.0f;
                         break;
                     }
                 case Graphic3d_TypeOfLightSource.Graphic3d_TypeOfLightSource_Spot:
                     {
                         //changeConstAttenuation() = 1.0f;
-                      ////  changeLinearAttenuation() = 0.0f;
-                      //  changeConcentration() = 1.0f;
-                      //  changeAngle() = 0.523599f;
+                        ////  changeLinearAttenuation() = 0.0f;
+                        //  changeConcentration() = 1.0f;
+                        //  changeAngle() = 0.523599f;
                         break;
                     }
             }
             makeId();
         }
 
+        //! Returns maximum distance on which point light source affects to objects and is considered during illumination calculations.
+        //! 0.0 means disabling range considering at all without any distance limits.
+        //! Has sense only for point light sources (positional and spot).  
+        public float Range()  { return myDirection.w(); }
+
+        //! Returns an angle in radians of the cone created by the spot; 30 degrees by default.
+        public float Angle() { return myParams.z(); }
+
+        //! Returns direction of directional/spot light and range for positional/spot light in alpha channel.
+        public Graphic3d_Vec4 PackedDirectionRange()  { return myDirection; }
+
+        //! Returns location of positional/spot light; (0, 0, 0) by default.
+        public gp_Pnt Position()  { return myPosition; }
+
+
+        //! Returns constant attenuation factor of positional/spot light source; 1.0f by default.
+        //! Distance attenuation factors of reducing positional/spot light intensity depending on the distance from its position:
+        //! @code
+        //!   float anAttenuation = 1.0 / (ConstAttenuation() + LinearAttenuation() * theDistance + QuadraticAttenuation() * theDistance * theDistance);
+        //! @endcode
+        public float ConstAttenuation()   { return myParams.x(); }
+
+        //! Returns intensity distribution of the spot light, within [0.0, 1.0] range; 1.0 by default.
+        //! This coefficient should be converted into spotlight exponent within [0.0, 128.0] range:
+        //! @code
+        //!   float aSpotExponent = Concentration() * 128.0;
+        //!   anAttenuation *= pow (aCosA, aSpotExponent);"
+        //! @endcode
+        //! The concentration factor determines the dispersion of the light on the surface, the default value (1.0) corresponds to a minimum of dispersion.
+        public float Concentration()  { return myParams.w(); }
+
+  //! Returns linear attenuation factor of positional/spot light source; 0.0 by default.
+  //! Distance attenuation factors of reducing positional/spot light intensity depending on the distance from its position:
+  //! @code
+  //!   float anAttenuation = 1.0 / (ConstAttenuation() + LinearAttenuation() * theDistance + QuadraticAttenuation() * theDistance * theDistance);
+  //! @endcode
+  public float LinearAttenuation()  { return myParams.y(); }
+
+
+//! Packed light parameters.
+public Graphic3d_Vec4 PackedParams()  { return myParams; }
+
         //! Returns the intensity of light source; 1.0 by default.
-        public float Intensity()  { return myIntensity; }
+        public float Intensity() { return myIntensity; }
 
 
         //! Returns the color of the light source with dummy Alpha component, which should be ignored.
-        public  Graphic3d_Vec4 PackedColor()  { return myColor; }
+        public Graphic3d_Vec4 PackedColor() { return myColor; }
 
 
-    //! Returns the smoothness of light source (either smoothing angle for directional light or smoothing radius in case of positional light); 0.0 by default.
-    public float Smoothness()  { return mySmoothness; }
+        //! Returns direction of directional/spot light.
+        public Graphic3d_Vec3 PackedDirection() { return myDirection.xyz(); }
+
+        //! Returns the smoothness of light source (either smoothing angle for directional light or smoothing radius in case of positional light); 0.0 by default.
+        public float Smoothness() { return mySmoothness; }
+
+        //! Returns true if the light is a headlight; FALSE by default.
+        //! Headlight flag means that light position/direction are defined not in a World coordinate system, but relative to the camera orientation.
+        public bool IsHeadlight() { return myIsHeadlight; }
 
 
-void makeId()
+        void makeId()
         {
             string aTypeSuffix = "";
             switch (myType)
@@ -80,7 +129,7 @@ void makeId()
                 case Graphic3d_TypeOfLightSource.Graphic3d_TypeOfLightSource_Spot: aTypeSuffix = "spot"; break;
             }
 
-           
+
             myId = ("Graphic3d_CLight_") + aTypeSuffix
                  + (Interlocked.Increment(ref THE_LIGHT_COUNTER));
         }
@@ -93,11 +142,11 @@ void makeId()
         //! Check that the light source is turned on; TRUE by default.
         //! This flag affects all occurrences of light sources, where it was registered and activated;
         //! so that it is possible defining an active light in View which is actually in disabled state.
-        public bool IsEnabled()  { return myIsEnabled; }
+        public bool IsEnabled() { return myIsEnabled; }
 
         //! Return TRUE if shadow casting is enabled; FALSE by default.
         //! Has no effect in Ray-Tracing rendering mode.
-        public bool ToCastShadows()  { return myToCastShadows; }
+        public bool ToCastShadows() { return myToCastShadows; }
 
         public void SetDirection(gp_Dir theDir)
         {

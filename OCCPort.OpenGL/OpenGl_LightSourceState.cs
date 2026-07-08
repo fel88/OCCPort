@@ -8,6 +8,12 @@ namespace OCCPort.OpenGL
     //! Defines state of OCCT light sources.
     public class OpenGl_LightSourceState : OpenGl_StateInterface
     {
+
+        //! Returns number of mipmap levels used in specular IBL map.
+        //! 0 by default or in case of using non-PBR shading model.
+        public int SpecIBLMapLevels()  { return mySpecIBLMapLevels; }
+
+
         //! Returns TRUE if shadowmap is set.
 
         public bool HasShadowMaps()

@@ -315,7 +315,7 @@ namespace TKernel
             myMat[theCol * 4 + theRow] = val;
         }
 
-        public SetCollectionItem ChangeValue(int theCol, int theRow)
+        public SetCollectionItem ChangeValue(int theRow, int theCol)
         {
             SetCollectionItem ret = new SetCollectionItem() { Column = theCol, Row = theRow };
             ret.Mat = this;

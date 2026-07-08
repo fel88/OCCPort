@@ -15,6 +15,13 @@ namespace OCCPort.OpenGL
     public class OpenGl_Clipping
     {
 
+
+        //! Sub-plane index within filtered Chain; positive number for DisableAllExcept and negative for EnableAllExcept.
+        public int CappedSubPlane()  { return myCappedSubPlane; }
+
+        //! Chain which is either temporary disabled or the only one enabled for Capping algorithm.
+        public Graphic3d_ClipPlane CappedChain()  { return myCappedChain; }
+
         //! Return TRUE if there are clipping chains in the list (defining more than 1 sub-plane)
         public bool HasClippingChains()
         {
@@ -57,7 +64,7 @@ namespace OCCPort.OpenGL
             }
 
             int aPlaneIndex = theStartIndex;
-            for (Graphic3d_SequenceOfHClipPlane.Iterator aPlaneIt =new Graphic3d_SequenceOfHClipPlane.Iterator (thePlanes); aPlaneIt.More(); aPlaneIt.Next(), ++aPlaneIndex)
+            for (Graphic3d_SequenceOfHClipPlane.Iterator aPlaneIt = new Graphic3d_SequenceOfHClipPlane.Iterator(thePlanes); aPlaneIt.More(); aPlaneIt.Next(), ++aPlaneIndex)
             {
                 Graphic3d_ClipPlane aPlane = aPlaneIt.Value();
                 if (!aPlane.IsOn()
@@ -133,7 +140,7 @@ namespace OCCPort.OpenGL
 
         internal void Init()
         {
-            myPlanesGlobal=null;
+            myPlanesGlobal = null;
             myPlanesLocal = null;
 
             myNbClipping = 0;
@@ -144,9 +151,9 @@ namespace OCCPort.OpenGL
             myCappedChain = null;
         }
 
-        Graphic3d_SequenceOfHClipPlane myPlanesGlobal;   //!< global clipping planes
-        Graphic3d_SequenceOfHClipPlane myPlanesLocal;    //!< object clipping planes
-        NCollection_Vector<bool> myDisabledPlanes = new NCollection_Vector<bool>(); //!< ids of disabled planes
+        public Graphic3d_SequenceOfHClipPlane myPlanesGlobal;   //!< global clipping planes
+        public Graphic3d_SequenceOfHClipPlane myPlanesLocal;    //!< object clipping planes
+        public NCollection_Vector<bool> myDisabledPlanes = new NCollection_Vector<bool>(); //!< ids of disabled planes
 
         Graphic3d_ClipPlane myCappedChain;    //!< chain which is either temporary disabled or the only one enabled for Capping algorithm
         int myCappedSubPlane; //!< sub-plane index within filtered chain; positive number for DisableAllExcept and negative for EnableAllExcept

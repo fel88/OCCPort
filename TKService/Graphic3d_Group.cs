@@ -105,7 +105,7 @@ namespace TKService
                         for (int aVertIter = 0; aVertIter < aNbVerts; ++aVertIter)
                         {
                             var offset = anAttribStride * aVertIter;
-                            Graphic3d_Vec2 aVert = new Graphic3d_Vec2(aDataPtr.Data, aDataPtr.Offset+  offset, new FloatExtractor());
+                            Graphic3d_Vec2 aVert = new Graphic3d_Vec2(aDataPtr.Data, aDataPtr.Offset + offset, new FloatExtractor());
 
                             myBounds.Add(new Graphic3d_Vec4(aVert.x(), aVert.y(), 0.0f, 1.0f));
                         }
@@ -240,6 +240,7 @@ namespace TKService
 
         MinMax minMax = new MinMax();
 
+
         //! Appends new point to the bounding box.
         public void Add(BVH_VecNt thePoint)
         {
@@ -274,8 +275,8 @@ namespace TKService
                 }
                 else
                 {
-                    minMax.CwiseMin(ref myMinPoint, theBox.myMinPoint);
-                    minMax.CwiseMax(ref myMaxPoint, theBox.myMaxPoint);
+                    myMinPoint = minMax.CwiseMin(myMinPoint, theBox.myMinPoint);
+                    myMaxPoint = minMax.CwiseMax(myMaxPoint, theBox.myMaxPoint);
                 }
             }
         }
@@ -415,7 +416,7 @@ namespace TKService
         V3d_PHONG = Graphic3d_TOSM_FRAGMENT
     }
 
-    
+
 
     public enum Graphic3d_AlphaMode
     {
@@ -465,11 +466,12 @@ namespace TKService
 
         public Graphic3d_Vec4 CwiseMax(Graphic3d_Vec4 theVec1, Graphic3d_Vec4 theVec2)
         {
-            theVec1.X = Math.Max(theVec1.X, theVec2.X);
-            theVec1.Y = Math.Max(theVec1.Y, theVec2.Y);
-            theVec1.Z = Math.Max(theVec1.Z, theVec2.Z);
-            theVec1.W = Math.Max(theVec1.W, theVec2.W);
-            return theVec1;
+            var ret = new Graphic3d_Vec4();
+            ret.X = Math.Max(theVec1.X, theVec2.X);
+            ret.Y = Math.Max(theVec1.Y, theVec2.Y);
+            ret.Z = Math.Max(theVec1.Z, theVec2.Z);
+            ret.W = Math.Max(theVec1.W, theVec2.W);
+            return ret;
         }
 
         public void CwiseMin(ref Graphic3d_Vec4 theVec1, Graphic3d_Vec4 theVec2)
@@ -482,11 +484,12 @@ namespace TKService
 
         public Graphic3d_Vec4 CwiseMin(Graphic3d_Vec4 theVec1, Graphic3d_Vec4 theVec2)
         {
-            theVec1.X = Math.Min(theVec1.X, theVec2.X);
-            theVec1.Y = Math.Min(theVec1.Y, theVec2.Y);
-            theVec1.Z = Math.Min(theVec1.Z, theVec2.Z);
-            theVec1.W = Math.Min(theVec1.W, theVec2.W);
-            return theVec1;
+            var ret = new Graphic3d_Vec4();
+            ret.X = Math.Min(theVec1.X, theVec2.X);
+            ret.Y = Math.Min(theVec1.Y, theVec2.Y);
+            ret.Z = Math.Min(theVec1.Z, theVec2.Z);
+            ret.W = Math.Min(theVec1.W, theVec2.W);
+            return ret;
         }
     }
 

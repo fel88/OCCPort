@@ -22,8 +22,16 @@ namespace TKService
             //    memset(myLightTypesEnabled, 0, sizeof(myLightTypesEnabled));
         }
 
+        //! Returns cumulative ambient color, which is computed as sum of all enabled ambient light sources.
+        //! Values are NOT clamped (can be greater than 1.0f) and alpha component is fixed to 1.0f.
+        //! @sa UpdateRevision()
+        public  Graphic3d_Vec4 AmbientColor()  { return myAmbient; }
+
         int myCacheRevision;          //!< revision of cached state
         Graphic3d_Vec4 myAmbient=new NCollection_Vec4<float> ();                //!< cached value of cumulative ambient color
+
+        //! Return TRUE if lights list is empty.
+        public bool IsEmpty()  { return myLights.IsEmpty(); }
 
         public int UpdateRevision()
         {

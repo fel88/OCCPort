@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
+
 namespace TKernel
 {
     public struct NCollection_Vec3<T> where T : struct, INumber<T>, IMultiplyOperators<T, T, T>
@@ -24,6 +25,8 @@ namespace TKernel
             v[1] = vals[1];
             v[2] = vals[2];
         }
+
+       
 
         public NCollection_Vec3(NCollection_Vec3<T> vec)
         {

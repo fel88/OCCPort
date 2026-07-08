@@ -17,6 +17,8 @@ using OpenTK.Graphics.ES11;
 using OpenTK.Mathematics;
 using System;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.NetworkInformation;
 using System.Reflection.Metadata;
 using System.Reflection.Metadata;
@@ -66,15 +68,127 @@ namespace OCCPort.OpenGL
             }
         }
 
+        //! Return the length of array of light sources (THE_MAX_LIGHTS),
+        //! to be used for initialization occLightSources (OpenGl_OCC_LIGHT_SOURCE_PARAMS).
+        public int NbLightsMax() { return myNbLightsMax; }
+
+        //! Return the length of array of shadow maps (THE_NB_SHADOWMAPS); 0 by default.
+        public int NbShadowMaps() { return myNbShadowMaps; }
+
+        //! Return the length of array of clipping planes (THE_MAX_CLIP_PLANES),
+        //! to be used for initialization occClipPlaneEquations.
+        //! Default value is THE_MAX_CLIP_PLANES_DEFAULT.
+        public int NbClipPlanesMax() { return myNbClipPlanesMax; }
+
         //! Return texture units declared within the program, @sa Graphic3d_TextureSetBits.
         public int TextureSetBits() { return myTextureSetBits; }
+
+
+        // =======================================================================
+        // function : SetUniform
+        // purpose  : Specifies the value of the float4 uniform array
+        // =======================================================================
+        public bool SetUniform(OpenGl_Context theCtx,
+                                                   int theLocation,
+                                                   int theCount,
+                                                   IEnumerable< OpenGl_Vec4> theData)
+        {
+            if (myProgramID == NO_PROGRAM || theLocation == INVALID_LOCATION)
+            {
+                return false;
+            }
+            var data = theData.Take(theCount).SelectMany(z => z.GetData()).ToArray();
+
+            theCtx.core20fwd.glUniform4fv(theLocation, theCount, data);
+            return true;
+        }
+
+
+        // =======================================================================
+        // function : SetUniform
+        // purpose  : Specifies the value of the floating-point uniform 4D vector
+        // =======================================================================
+        public bool SetUniform(OpenGl_Context theCtx,
+                                                           int theLocation,
+                                                            OpenGl_Vec4 theValue)
+        {
+            if (myProgramID == NO_PROGRAM || theLocation == INVALID_LOCATION)
+            {
+                return false;
+            }
+
+            theCtx.core20fwd.glUniform4fv(theLocation, 1, theValue.GetData());
+            return true;
+        }
+
+        //! Specifies the value of the array of float uniform 4x4 matrices.
+        //! Wrapper over glUniformMatrix4fv().
+        public bool SetUniform(OpenGl_Context theCtx,
+                                                       int theLocation,
+                                                       int theCount,
+                                                        OpenGl_Mat4 theData)
+        {
+            if (myProgramID == NO_PROGRAM || theLocation == INVALID_LOCATION)
+            {
+                return false;
+            }
+
+            theCtx.core20fwd.glUniformMatrix4fv(theLocation, theCount, false, theData.GetData());
+            return true;
+        }// =======================================================================
+         // function : SetUniform
+         // purpose  : Specifies the value of the integer uniform variable
+         // =======================================================================
+        public bool SetUniform(OpenGl_Context theCtx,
+                                                   int theLocation,
+                                                   int theValue)
+        {
+            if (myProgramID == NO_PROGRAM || theLocation == INVALID_LOCATION)
+            {
+                return false;
+            }
+
+            theCtx.core20fwd.glUniform1i(theLocation, theValue);
+            return true;
+        }
+
+        public bool SetUniform(OpenGl_Context theCtx,
+                                                           int theLocation,
+                                                            OpenGl_Vec2 theValue)
+        {
+            if (myProgramID == NO_PROGRAM || theLocation == INVALID_LOCATION)
+            {
+                return false;
+            }
+
+            theCtx.core20fwd.glUniform2fv(theLocation, 1, theValue.GetData());
+            return true;
+        }
+
+        // =======================================================================
+        // function : SetUniform
+        // purpose  : Specifies the value of the float2 uniform array
+        // =======================================================================
+        public bool SetUniform(OpenGl_Context theCtx,
+                                                   int theLocation,
+                                                   int theCount,
+                                                    OpenGl_Vec2 theData)
+        {
+            if (myProgramID == NO_PROGRAM || theLocation == INVALID_LOCATION)
+            {
+                return false;
+            }
+
+            theCtx.core20fwd.glUniform2fv(theLocation, theCount, theData.GetData());
+            return true;
+        }
 
         //! Specifies the value of the float uniform 4x4 matrix.
         //! Wrapper for glUniformMatrix4fv()
         public bool SetUniform(OpenGl_Context theCtx,
-                                               GLint theLocation,
-                                                OpenGl_Mat4 theValue,
-                                               bool theTranspose = false)
+                                                       GLint theLocation,
+                                                        OpenGl_Mat4 theValue,
+                                                       bool theTranspose = false)
         {
 
             if (myProgramID == NO_PROGRAM || theLocation == INVALID_LOCATION)
@@ -280,7 +394,7 @@ namespace OCCPort.OpenGL
                          ("Failed to link program object [") + myResourceId + "]! Linker log:\n" + aLog);
                 return false;
             }
-               else if (theCtx.caps.glslWarnings)
+            else if (theCtx.caps.glslWarnings)
             {
                 // TCollection_AsciiString aLog;
                 //     FetchInfoLog(theCtx, aLog);
@@ -818,18 +932,7 @@ namespace OCCPort.OpenGL
             return true;
         }
 
-        bool SetUniform(OpenGl_Context theCtx,
-                                                   int theLocation,
-                                                   int theValue)
-        {
-            if (myProgramID == NO_PROGRAM || theLocation == INVALID_LOCATION)
-            {
-                return false;
-            }
 
-            theCtx.core20fwd.glUniform1i(theLocation, theValue);
-            return true;
-        }
 
         //! @return true if current object was initialized
         public bool IsValid()
@@ -928,5 +1031,7 @@ namespace OCCPort.OpenGL
             theCtx.core20fwd.glUniform4fv(theLocation.ToInt(), 1, theValue.v);
             return true;
         }
+
+
     }
 }

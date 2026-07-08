@@ -1643,10 +1643,17 @@ namespace TKService
                 }
 
                 // The first eight points are from theGraphicBB, the last eight points are from theMinMax (can be absent).
-                double aChangeMinDist = aCounter >= 8 ? aModelMinDist : aGraphMinDist;
-                double aChangeMaxDist = aCounter >= 8 ? aModelMaxDist : aGraphMaxDist;
-                aChangeMinDist = Math.Min(aDistance, aChangeMinDist);
-                aChangeMaxDist = Math.Max(aDistance, aChangeMaxDist);
+                if (aCounter >= 8)
+                {                    
+                    aModelMinDist = Math.Min(aDistance, aModelMinDist);
+                    aModelMaxDist = Math.Max(aDistance, aModelMaxDist);
+                }
+                else
+                {                    
+                    aGraphMinDist = Math.Min(aDistance, aGraphMinDist);
+                    aGraphMaxDist = Math.Max(aDistance, aGraphMaxDist);
+                }
+                    
                 aCounter++;
             }
 

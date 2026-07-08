@@ -1,11 +1,10 @@
 ﻿//! List of shader programs.
-global using OpenGl_ShaderProgramList = TKernel.NCollection_Sequence<OCCPort.OpenGL.OpenGl_ShaderProgram>;
 global using OpenGl_MapOfShaderPrograms = TKernel.NCollection_DataMap<string, OCCPort.OpenGL.OpenGl_SetOfShaderPrograms>;
-using OCCPort.OpenGL;
-
-
+global using OpenGl_ShaderProgramList = TKernel.NCollection_Sequence<OCCPort.OpenGL.OpenGl_ShaderProgram>;
+global using OpenGl_Vec4d = TKernel.NCollection_Vec4<double>;
 using OCCPort.Common;
 using OCCPort.Enums;
+using OCCPort.OpenGL;
 using OpenTK.Audio.OpenAL;
 using OpenTK.Compute.OpenCL;
 using OpenTK.Graphics.Egl;
@@ -13,7 +12,9 @@ using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
 using System;
 using System.Linq;
+using System.Numerics;
 using System.Reflection.Metadata;
+using System.Runtime.InteropServices;
 using TKernel;
 using TKMath;
 using TKService;
@@ -525,7 +526,7 @@ namespace OCCPort.OpenGL
             }
 
             string aKey = genLightKey(aLights, myLightSourceState.HasShadowMaps());
-            if (!myMapOfLightPrograms.Find(aKey,out  myLightPrograms))
+            if (!myMapOfLightPrograms.Find(aKey, out myLightPrograms))
             {
                 myLightPrograms = new OpenGl_SetOfShaderPrograms();
                 myMapOfLightPrograms.Bind(aKey, myLightPrograms);
@@ -680,17 +681,558 @@ namespace OCCPort.OpenGL
             }
         }
 
+        //! Pushes current state of OCCT light sources to specified program (only on state change).
+        //! Note that light sources definition depends also on WorldViewState.
+        public void PushLightSourceState(OpenGl_ShaderProgram theProgram)
+        {
+            if (myLightSourceState.Index() != theProgram.ActiveState(OpenGl_UniformStateType.OpenGl_LIGHT_SOURCES_STATE)
+             || myWorldViewState.Index() != theProgram.ActiveState(OpenGl_UniformStateType.OpenGl_WORLD_VIEW_STATE))
+            {
+                pushLightSourceState(theProgram);
+            }
+
+        }
+        static float[] THE_DEFAULT_AMBIENT = [0.0f, 0.0f, 0.0f, 1.0f];
+        static float[] THE_DEFAULT_SPOT_DIR = { 0.0f, 0.0f, -1.0f };
+        static float THE_DEFAULT_SPOT_EXPONENT = 0.0f;
+        static float THE_DEFAULT_SPOT_CUTOFF = 180.0f;
+        NCollection_Array1<int> myLightTypeArray = new NCollection_Array1<int>();
+
+        //! Bind FFP light source.
+        static void bindLight(Graphic3d_CLight theLight,
+                          GLenum theLightGlId,
+                          OpenGl_Mat4 theModelView,
+                         OpenGl_Context theCtx)
+        {
+            // the light is a headlight?
+            if (theLight.IsHeadlight())
+            {
+                theCtx.core11ffp.glMatrixMode(All.Modelview);
+                theCtx.core11ffp.glLoadIdentity();
+            }
+
+            // setup light type
+            Graphic3d_Vec4 aLightColor = theLight.PackedColor();
+            switch (theLight.Type())
+            {
+                case Graphic3d_TypeOfLightSource.Graphic3d_TypeOfLightSource_Ambient:
+                    {
+                        break; // handled by separate if-clause at beginning of method
+                    }
+                case Graphic3d_TypeOfLightSource.Graphic3d_TypeOfLightSource_Directional:
+                    {
+                        // if the last parameter of GL_POSITION, is zero, the corresponding light source is a Directional one
+                        OpenGl_Vec4 anInfDir = -theLight.PackedDirectionRange();
+
+                        // to create a realistic effect,  set the GL_SPECULAR parameter to the same value as the GL_DIFFUSE.
+                        theCtx.core11ffp.glLightfv(theLightGlId, LightParameter.Ambient, THE_DEFAULT_AMBIENT);
+                        theCtx.core11ffp.glLightfv(theLightGlId, LightParameter.Diffuse, aLightColor.GetData());
+                        theCtx.core11ffp.glLightfv(theLightGlId, LightParameter.Specular, aLightColor.GetData());
+                        theCtx.core11ffp.glLightfv(theLightGlId, LightParameter.Position, anInfDir.GetData());
+                        theCtx.core11ffp.glLightfv(theLightGlId, LightParameter.SpotDirection, THE_DEFAULT_SPOT_DIR);
+                        theCtx.core11ffp.glLightf(theLightGlId, LightParameter.SpotExponent, THE_DEFAULT_SPOT_EXPONENT);
+                        theCtx.core11ffp.glLightf(theLightGlId, LightParameter.SpotCutoff, THE_DEFAULT_SPOT_CUTOFF);
+                        break;
+                    }
+                case Graphic3d_TypeOfLightSource.Graphic3d_TypeOfLightSource_Positional:
+                    {
+                        // to create a realistic effect, set the GL_SPECULAR parameter to the same value as the GL_DIFFUSE
+                        OpenGl_Vec4 aPosition = new NCollection_Vec4<float>((float)(theLight.Position().X()),
+                            (float)(theLight.Position().Y()),
+                            (float)(theLight.Position().Z()), 1.0f);
+
+                        theCtx.core11ffp.glLightfv(theLightGlId, LightParameter.Ambient, THE_DEFAULT_AMBIENT);
+                        theCtx.core11ffp.glLightfv(theLightGlId, LightParameter.Diffuse, aLightColor.GetData());
+                        theCtx.core11ffp.glLightfv(theLightGlId, LightParameter.Specular, aLightColor.GetData());
+                        theCtx.core11ffp.glLightfv(theLightGlId, LightParameter.Position, aPosition.GetData());
+                        theCtx.core11ffp.glLightfv(theLightGlId, LightParameter.SpotDirection, THE_DEFAULT_SPOT_DIR);
+                        theCtx.core11ffp.glLightf(theLightGlId, LightParameter.SpotExponent, THE_DEFAULT_SPOT_EXPONENT);
+                        theCtx.core11ffp.glLightf(theLightGlId, LightParameter.SpotCutoff, THE_DEFAULT_SPOT_CUTOFF);
+                        theCtx.core11ffp.glLightf(theLightGlId, LightParameter.ConstantAttenuation, theLight.ConstAttenuation());
+                        theCtx.core11ffp.glLightf(theLightGlId, LightParameter.LinearAttenuation, theLight.LinearAttenuation());
+                        theCtx.core11ffp.glLightf(theLightGlId, LightParameter.QuadraticAttenuation, 0.0f);
+                        break;
+                    }
+                case Graphic3d_TypeOfLightSource.Graphic3d_TypeOfLightSource_Spot:
+                    {
+                        OpenGl_Vec4 aPosition = new NCollection_Vec4<float>((float)(theLight.Position().X()),
+                            (float)(theLight.Position().Y()), (float)(theLight.Position().Z()), 1.0f);
+
+                        theCtx.core11ffp.glLightfv(theLightGlId, LightParameter.Ambient, THE_DEFAULT_AMBIENT);
+                        theCtx.core11ffp.glLightfv(theLightGlId, LightParameter.Diffuse, aLightColor.GetData());
+                        theCtx.core11ffp.glLightfv(theLightGlId, LightParameter.Specular, aLightColor.GetData());
+                        theCtx.core11ffp.glLightfv(theLightGlId, LightParameter.Position, aPosition.GetData());
+                        theCtx.core11ffp.glLightfv(theLightGlId, LightParameter.SpotDirection, theLight.PackedDirectionRange().GetData());
+                        theCtx.core11ffp.glLightf(theLightGlId, LightParameter.SpotExponent, theLight.Concentration() * 128.0f);
+                        theCtx.core11ffp.glLightf(theLightGlId, LightParameter.SpotCutoff, (theLight.Angle() * 180.0f) / (float)(Math.PI));
+                        theCtx.core11ffp.glLightf(theLightGlId, LightParameter.ConstantAttenuation, theLight.ConstAttenuation());
+                        theCtx.core11ffp.glLightf(theLightGlId, LightParameter.LinearAttenuation, theLight.LinearAttenuation());
+                        theCtx.core11ffp.glLightf(theLightGlId, LightParameter.QuadraticAttenuation, 0.0f);
+                        break;
+                    }
+            }
+
+            // restore matrix in case of headlight
+            if (theLight.IsHeadlight())
+            {
+                theCtx.core11ffp.glLoadMatrixf(theModelView.GetData());
+            }
+
+            theCtx.core11fwd.glEnable((int)theLightGlId);
+        }
+
+        protected NCollection_Array1<OpenGl_ShaderLightParameters> myLightParamsArray = new NCollection_Array1<OpenGl_ShaderLightParameters>();
+
+        void pushLightSourceState(OpenGl_ShaderProgram theProgram)
+        {
+            theProgram.UpdateState(OpenGl_UniformStateType.OpenGl_LIGHT_SOURCES_STATE, myLightSourceState.Index());
+            if (theProgram == myFfpProgram)
+            {
+                if (myContext.core11ffp == null)
+                {
+                    return;
+                }
+
+                int aLightGlId = (int)All.Light0;
+                OpenGl_Mat4 aModelView = myWorldViewState.WorldViewMatrix() * myModelWorldState.ModelWorldMatrix();
+                for (Graphic3d_LightSet.Iterator aLightIt = new Graphic3d_LightSet.Iterator(myLightSourceState.LightSources(), IterationFilter.IterationFilter_ExcludeDisabledAndAmbient);
+                     aLightIt.More(); aLightIt.Next())
+                {
+                    if (aLightGlId > (int)All.Light7) // only 8 lights in FFP...
+                    {
+                        //myContext.PushMessage(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_PORTABILITY, 0, GL_DEBUG_SEVERITY_MEDIUM,
+                        //           "Warning: light sources limit (8) has been exceeded within Fixed-function pipeline.");
+                        continue;
+                    }
+
+                    bindLight(aLightIt.Value(), (uint)aLightGlId, aModelView, myContext);
+                    ++aLightGlId;
+                }
+
+                // apply accumulated ambient color
+                Graphic3d_Vec4 anAmbient1 = myLightSourceState.LightSources() != null
+                                                ? myLightSourceState.LightSources().AmbientColor()
+                                                : new Graphic3d_Vec4(0.0f, 0.0f, 0.0f, 1.0f);
+                myContext.core11ffp.glLightModelfv(All.LightModelAmbient, anAmbient1.GetData());
+
+                // GL_LIGHTING is managed by drawers to switch between shaded / no lighting output,
+                // therefore managing the state here does not have any effect - do it just for consistency.
+                if (aLightGlId != (int)All.Light0)
+                {
+                    myContext.core11fwd.glEnable(EnableCap.Lighting);
+                }
+                else
+                {
+                    myContext.core11fwd.glDisable(EnableCap.Lighting);
+                }
+                // switch off unused lights
+                for (; aLightGlId <= (int)All.Light7; ++aLightGlId)
+                {
+                    myContext.core11fwd.glDisable(aLightGlId);
+                }
+                return;
+            }
+
+            int aNbLightsMax = theProgram.NbLightsMax();
+            GLint anAmbientLoc = theProgram.GetStateLocation(OpenGl_StateVariable.OpenGl_OCC_LIGHT_AMBIENT);
+            if (aNbLightsMax == 0
+             && anAmbientLoc == OpenGl_ShaderProgram.INVALID_LOCATION)
+            {
+                return;
+            }
+
+            if (myLightTypeArray.Size() < aNbLightsMax)
+            {
+                myLightTypeArray.Resize(0, aNbLightsMax - 1, false);
+                myLightParamsArray.Resize(0, aNbLightsMax - 1, false);
+            }
+            for (int aLightIt = 0; aLightIt < aNbLightsMax; ++aLightIt)
+            {
+                myLightTypeArray.SetValue(aLightIt, -1);
+            }
+
+            if (myLightSourceState.LightSources() == null
+             || myLightSourceState.LightSources().IsEmpty())
+            {
+                theProgram.SetUniform(myContext,
+                                        theProgram.GetStateLocation(OpenGl_StateVariable.OpenGl_OCC_LIGHT_SOURCE_COUNT),
+                                        0);
+                theProgram.SetUniform(myContext,
+                                        anAmbientLoc,
+                                        new OpenGl_Vec4(0.0f, 0.0f, 0.0f, 0.0f));
+                /*theProgram.SetUniform(myContext,
+                                        theProgram.GetStateLocation(OpenGl_StateVariable.OpenGl_OCC_LIGHT_SOURCE_TYPES),
+                                        aNbLightsMax,
+                                        myLightTypeArray.list);*/
+                return;
+            }
+
+            int aLightsNb = 0;
+            for (Graphic3d_LightSet.Iterator anIter = new Graphic3d_LightSet.Iterator(myLightSourceState.LightSources(), IterationFilter.IterationFilter_ExcludeDisabledAndAmbient);
+                 anIter.More(); anIter.Next())
+            {
+                Graphic3d_CLight aLight = anIter.Value();
+                if (aLightsNb >= aNbLightsMax)
+                {
+                    if (aNbLightsMax != 0)
+                    {
+                        //myContext.PushMessage(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_PORTABILITY, 0, GL_DEBUG_SEVERITY_MEDIUM,
+                        //   TCollection_AsciiString("Warning: light sources limit (") + aNbLightsMax + ") has been exceeded.");
+                    }
+                    continue;
+                }
+
+                int aLightType = myLightTypeArray.ChangeValue(aLightsNb);
+                OpenGl_ShaderLightParameters aLightParams = myLightParamsArray.ChangeValue(aLightsNb);
+                if (!aLight.IsEnabled()) // has no affect with Graphic3d_LightSet::IterationFilter_ExcludeDisabled - here just for consistency
+                {
+                    // if it is desired to keep disabled light in the same order - we can replace it with a black light so that it will have no influence on result
+                    aLightType = -1; // Graphic3d_TypeOfLightSource_Ambient can be used instead
+                    aLightParams.Color = new OpenGl_Vec4(0.0f, 0.0f, 0.0f, 0.0f);
+                    ++aLightsNb;
+                    continue;
+                }
+
+                // ignoring OpenGl_Context::ToRenderSRGB() for light colors,
+                // as non-absolute colors for lights are rare and require tuning anyway
+                aLightType = (int)aLight.Type();
+                aLightParams.Color = aLight.PackedColor();
+                aLightParams.Color.a(aLight.Intensity()); // used by PBR and ignored by old shading model
+                aLightParams.Parameters = aLight.PackedParams();
+                switch (aLight.Type())
+                {
+                    case Graphic3d_TypeOfLightSource.Graphic3d_TypeOfLightSource_Ambient:
+                        {
+                            break;
+                        }
+                    case Graphic3d_TypeOfLightSource.Graphic3d_TypeOfLightSource_Directional:
+                        {
+                            if (aLight.IsHeadlight())
+                            {
+                                Graphic3d_Mat4 anOrientInv = myWorldViewState.WorldViewMatrixInverse();
+                                aLightParams.Position = anOrientInv * new Graphic3d_Vec4(-aLight.PackedDirection(), 0.0f);
+                                aLightParams.Position.SetValues(aLightParams.Position.xyz().Normalized(), 0.0f);
+                            }
+                            else
+                            {
+                                aLightParams.Position = new Graphic3d_Vec4(-aLight.PackedDirection(), 0.0f);
+                            }
+                            break;
+                        }
+                    case Graphic3d_TypeOfLightSource.Graphic3d_TypeOfLightSource_Spot:
+                        {
+                            if (aLight.IsHeadlight())
+                            {
+                                Graphic3d_Mat4 anOrientInv = myWorldViewState.WorldViewMatrixInverse();
+                                aLightParams.Direction = anOrientInv * new Graphic3d_Vec4(aLight.PackedDirection(), 0.0f);
+                                aLightParams.Direction.SetValues(aLightParams.Direction.xyz().Normalized(), 0.0f);
+                            }
+                            else
+                            {
+                                aLightParams.Direction = new Graphic3d_Vec4(aLight.PackedDirection(), 0.0f);
+                            }
+                        }
+                        break;
+                    case Graphic3d_TypeOfLightSource.Graphic3d_TypeOfLightSource_Positional:
+                        {
+                            if (aLight.IsHeadlight())
+                            {
+                                aLightParams.Position.x((float)(aLight.Position().X()));
+                                aLightParams.Position.y((float)(aLight.Position().Y()));
+                                aLightParams.Position.z((float)(aLight.Position().Z()));
+                                Graphic3d_Mat4 anOrientInv = myWorldViewState.WorldViewMatrixInverse();
+                                aLightParams.Position = anOrientInv * new Graphic3d_Vec4(aLightParams.Position.xyz(), 1.0f);
+                            }
+                            else
+                            {
+                                aLightParams.Position.x((float)(aLight.Position().X() - myLocalOrigin.X()));
+                                aLightParams.Position.y((float)(aLight.Position().Y() - myLocalOrigin.Y()));
+                                aLightParams.Position.z((float)(aLight.Position().Z() - myLocalOrigin.Z()));
+                                aLightParams.Position.w(0.0f);
+                            }
+                            aLightParams.Direction.w(aLight.Range());
+                            break;
+                        }
+                }
+                ++aLightsNb;
+            }
+
+            Graphic3d_Vec4 anAmbient = myLightSourceState.LightSources().AmbientColor();
+            theProgram.SetUniform(myContext,
+                                    theProgram.GetStateLocation(OpenGl_StateVariable.OpenGl_OCC_LIGHT_SOURCE_COUNT),
+                                    aLightsNb);
+            theProgram.SetUniform(myContext,
+                                    anAmbientLoc,
+                                    anAmbient);
+            /*theProgram.SetUniform(myContext,
+                                    theProgram.GetStateLocation(OpenGl_StateVariable.OpenGl_OCC_LIGHT_SOURCE_TYPES),
+                                    aNbLightsMax,
+                                    myLightTypeArray.list);*/
+            if (aLightsNb > 0)
+            {
+                /*theProgram.SetUniform(myContext,
+                                        theProgram.GetStateLocation(OpenGl_StateVariable.OpenGl_OCC_LIGHT_SOURCE_PARAMS),
+                                        aLightsNb * OpenGl_ShaderLightParameters.NbOfVec4(),
+                                        myLightParamsArray.First().Packed());*/
+            }
+            OpenGl_ShaderUniformLocation aLocation = theProgram.GetStateLocation(OpenGl_StateVariable.OpenGl_OCCT_NB_SPEC_IBL_LEVELS);
+            if (aLocation)
+            {
+                theProgram.SetUniform(myContext, aLocation, myLightSourceState.SpecIBLMapLevels());
+            }
+
+            OpenGl_ShaderUniformLocation aShadowMatLoc = theProgram.GetStateLocation(OpenGl_StateVariable.OpenGl_OCC_LIGHT_SHADOWMAP_MATRICES);
+            // update shadow map variables
+            if (aShadowMatLoc)
+            {
+                if (myShadowMatArray.Size() < theProgram.NbShadowMaps())
+                {
+                    myShadowMatArray.Resize(0, theProgram.NbShadowMaps() - 1, false);
+                }
+
+                Graphic3d_Vec2 aSizeBias = new NCollection_Vec2<float>();
+                if (myLightSourceState.HasShadowMaps())
+                {
+                    aSizeBias.SetValues(1.0f / (float)myLightSourceState.ShadowMaps().First().Texture().SizeX(),
+                                         myLightSourceState.ShadowMaps().First().ShadowMapBias());
+                    int aNbShadows = Math.Min(theProgram.NbShadowMaps(), myLightSourceState.ShadowMaps().Size());
+                    for (int aShadowIter = 0; aShadowIter < aNbShadows; ++aShadowIter)
+                    {
+                        OpenGl_ShadowMap aShadow = myLightSourceState.ShadowMaps().Value(aShadowIter);
+                        myShadowMatArray[aShadowIter] = aShadow.LightSourceMatrix();
+                    }
+                }
+
+                theProgram.SetUniform(myContext, aShadowMatLoc, theProgram.NbShadowMaps(), myShadowMatArray.First());
+                theProgram.SetUniform(myContext, theProgram.GetStateLocation(OpenGl_StateVariable.OpenGl_OCC_LIGHT_SHADOWMAP_SIZE_BIAS), aSizeBias);
+            }
+        }
+
+        NCollection_Array1<Graphic3d_Mat4> myShadowMatArray = new NCollection_Array1<NCollection_Mat4<float>>();
+
+        //! Pushes current state of OCCT clipping planes to specified program (only on state change).
+        void PushClippingState(OpenGl_ShaderProgram theProgram)
+        {
+            if (myClippingState.Index() != theProgram.ActiveState(OpenGl_UniformStateType.OpenGl_CLIP_PLANES_STATE))
+            {
+                pushClippingState(theProgram);
+            }
+        }
+        NCollection_Array1<OpenGl_Vec4d> myClipPlaneArrayFfp = new NCollection_Array1<OpenGl_Vec4d>();
+
+        void pushClippingState(OpenGl_ShaderProgram theProgram)
+        {
+            theProgram.UpdateState(OpenGl_UniformStateType.OpenGl_CLIP_PLANES_STATE, myClippingState.Index());
+            if (theProgram == myFfpProgram)
+            {
+                if (myContext.core11ffp == null)
+                {
+                    return;
+                }
+
+                int aNbMaxPlanes = myContext.MaxClipPlanes();
+                if (myClipPlaneArrayFfp.Size() < aNbMaxPlanes)
+                {
+                    myClipPlaneArrayFfp.Resize(0, aNbMaxPlanes - 1, false);
+                }
+
+                int aPlaneId1 = 0;
+                bool toRestoreModelView = false;
+                Graphic3d_ClipPlane aCappedChain1 = myContext.Clipping().CappedChain();
+                for (OpenGl_ClippingIterator aPlaneIter = new OpenGl_ClippingIterator(myContext.Clipping()); aPlaneIter.More(); aPlaneIter.Next())
+                {
+                    Graphic3d_ClipPlane aPlane = aPlaneIter.Value();
+                    if (aPlaneIter.IsDisabled()
+                     || aPlane.IsChain()
+                     || (aPlane == aCappedChain1
+                      && myContext.Clipping().IsCappingEnableAllExcept()))
+                    {
+                        continue;
+                    }
+                    else if (aPlaneId1 >= aNbMaxPlanes)
+                    {
+                        Message.SendWarning("OpenGl_ShaderManager, warning: clipping planes limit (" + aNbMaxPlanes + ") has been exceeded");
+                        break;
+                    }
+
+                    var anEquation = aPlane.GetEquation();
+                    OpenGl_Vec4d aPlaneEq = myClipPlaneArrayFfp.ChangeValue(aPlaneId1);
+                    aPlaneEq.x(anEquation.x());
+                    aPlaneEq.y(anEquation.y());
+                    aPlaneEq.z(anEquation.z());
+                    aPlaneEq.w(anEquation.w());
+                    if (myHasLocalOrigin)
+                    {
+                        gp_XYZ aPos = aPlane.ToPlane().Position().Location().XYZ() - myLocalOrigin;
+                        double aD = -(anEquation.x() * aPos.X() + anEquation.y() * aPos.Y() + anEquation.z() * aPos.Z());
+                        aPlaneEq.w(aD);
+                    }
+
+                    var anFfpPlaneID = (int)All.ClipPlane0 + aPlaneId1;
+                    if (anFfpPlaneID == (int)All.ClipPlane0)
+                    {
+                        // set either identity or pure view matrix
+                        toRestoreModelView = true;
+                        myContext.core11ffp.glMatrixMode(All.Modelview);
+                        myContext.core11ffp.glLoadMatrixf(myWorldViewState.WorldViewMatrix().GetData());
+                    }
+
+                    myContext.core11fwd.glEnable((int)anFfpPlaneID);
+                    myContext.core11ffp.glClipPlane(anFfpPlaneID, aPlaneEq);
+
+                    ++aPlaneId1;
+                }
+
+                // switch off unused lights
+                for (; aPlaneId1 < aNbMaxPlanes; ++aPlaneId1)
+                {
+                    myContext.core11fwd.glDisable((int)All.ClipPlane0 + aPlaneId1);
+                }
+
+                // restore combined model-view matrix
+                if (toRestoreModelView)
+                {
+                    OpenGl_Mat4 aModelView = myWorldViewState.WorldViewMatrix() * myModelWorldState.ModelWorldMatrix();
+                    myContext.core11ffp.glLoadMatrixf(aModelView.GetData());
+                }
+                return;
+            }
+
+            GLint aLocEquations = theProgram.GetStateLocation(OpenGl_StateVariable.OpenGl_OCC_CLIP_PLANE_EQUATIONS);
+            if (aLocEquations == OpenGl_ShaderProgram.INVALID_LOCATION)
+            {
+                return;
+            }
+
+            int aNbClipPlanesMax = theProgram.NbClipPlanesMax();
+            int aNbPlanes = Math.Min(myContext.Clipping().NbClippingOrCappingOn(), aNbClipPlanesMax);
+            if (aNbPlanes < 1)
+            {
+                theProgram.SetUniform(myContext, theProgram.GetStateLocation(OpenGl_StateVariable.OpenGl_OCC_CLIP_PLANE_COUNT), 0);
+                return;
+            }
+
+            if (myClipPlaneArray.Size() < aNbClipPlanesMax)
+            {
+                myClipPlaneArray.Resize(0, aNbClipPlanesMax - 1, false);
+                myClipChainArray.Resize(0, aNbClipPlanesMax - 1, false);
+            }
+
+            int aPlaneId = 0;
+            Graphic3d_ClipPlane aCappedChain = myContext.Clipping().CappedChain();
+            for (OpenGl_ClippingIterator aPlaneIter = new OpenGl_ClippingIterator(myContext.Clipping()); aPlaneIter.More(); aPlaneIter.Next())
+            {
+                Graphic3d_ClipPlane aPlane = aPlaneIter.Value();
+                if (aPlaneIter.IsDisabled())
+                {
+                    continue;
+                }
+
+                if (myContext.Clipping().IsCappingDisableAllExcept())
+                {
+                    // enable only specific (sub) plane
+                    if (aPlane != aCappedChain)
+                    {
+                        continue;
+                    }
+
+                    int aSubPlaneIndex = 1;
+                    for (Graphic3d_ClipPlane aSubPlaneIter = aCappedChain; aSubPlaneIter != null; aSubPlaneIter = aSubPlaneIter.ChainNextPlane(), ++aSubPlaneIndex)
+                    {
+                        if (aSubPlaneIndex == myContext.Clipping().CappedSubPlane())
+                        {
+                            addClippingPlane(ref aPlaneId, aSubPlaneIter, aSubPlaneIter.GetEquation(), 1);
+                            break;
+                        }
+                    }
+                    break;
+                }
+                else if (aPlane == aCappedChain) // && myContext->Clipping().IsCappingEnableAllExcept()
+                {
+                    // enable sub-planes within processed Chain as reversed and ORed, excluding filtered plane
+                    if (aPlaneId + aPlane.NbChainNextPlanes() - 1 > aNbClipPlanesMax)
+                    {
+                        //myContext->PushMessage(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_PORTABILITY, 0, GL_DEBUG_SEVERITY_HIGH,
+                        //      TCollection_AsciiString("Error: clipping planes limit (") + aNbClipPlanesMax + ") has been exceeded.");
+                        break;
+                    }
+
+                    int aSubPlaneIndex = 1;
+                    for (Graphic3d_ClipPlane aSubPlaneIter = aPlane; aSubPlaneIter != null; aSubPlaneIter = aSubPlaneIter.ChainNextPlane(), ++aSubPlaneIndex)
+                    {
+                        if (aSubPlaneIndex != -myContext.Clipping().CappedSubPlane())
+                        {
+                            addClippingPlane(ref aPlaneId, aSubPlaneIter, aSubPlaneIter.ReversedEquation(), 1);
+                        }
+                    }
+                }
+                else
+                {
+                    // normal case
+                    if (aPlaneId + aPlane.NbChainNextPlanes() > aNbClipPlanesMax)
+                    {
+                        //myContext.PushMessage(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_PORTABILITY, 0, GL_DEBUG_SEVERITY_HIGH,
+                        //        ("Error: clipping planes limit (") + aNbClipPlanesMax + ") has been exceeded.");
+                        break;
+                    }
+                    for (Graphic3d_ClipPlane aSubPlaneIter = aPlane; aSubPlaneIter != null; aSubPlaneIter = aSubPlaneIter.ChainNextPlane())
+                    {
+                        addClippingPlane(ref aPlaneId, aSubPlaneIter, aSubPlaneIter.GetEquation(), aSubPlaneIter.NbChainNextPlanes());
+                    }
+                }
+            }
+
+            theProgram.SetUniform(myContext, theProgram.GetStateLocation(OpenGl_StateVariable.OpenGl_OCC_CLIP_PLANE_COUNT), aPlaneId);
+            theProgram.SetUniform(myContext, aLocEquations, aNbClipPlanesMax, myClipPlaneArray.list);
+            //theProgram.SetUniform(myContext, theProgram.GetStateLocation(OpenGl_StateVariable.OpenGl_OCC_CLIP_PLANE_CHAINS), aNbClipPlanesMax, myClipChainArray.list);
+        }
+
+        NCollection_Array1<int> myClipChainArray = new NCollection_Array1<int>();
+
+        //! Append clipping plane definition to temporary buffers.
+        void addClippingPlane(ref int thePlaneId,
+                          Graphic3d_ClipPlane thePlane,
+                          Graphic3d_Vec4d theEq,
+                          int theChainFwd)
+        {
+            myClipChainArray.SetValue(thePlaneId, theChainFwd);
+            OpenGl_Vec4 aPlaneEq = myClipPlaneArray.ChangeValue(thePlaneId);
+            aPlaneEq.x((float)(theEq.x()));
+            aPlaneEq.y((float)(theEq.y()));
+            aPlaneEq.z((float)(theEq.z()));
+            aPlaneEq.w((float)(theEq.w()));
+            if (myHasLocalOrigin)
+            {
+                aPlaneEq.w((float)(LocalClippingPlaneW(thePlane)));
+            }
+            ++thePlaneId;
+        }
+
+        //! Return clipping plane W equation value moved considering local camera transformation.
+        double LocalClippingPlaneW(Graphic3d_ClipPlane thePlane)
+        {
+            Graphic3d_Vec4d anEq = thePlane.GetEquation();
+            if (myHasLocalOrigin)
+            {
+                gp_XYZ aPos = thePlane.ToPlane().Position().Location().XYZ() - myLocalOrigin;
+                return -(anEq.x() * aPos.X() + anEq.y() * aPos.Y() + anEq.z() * aPos.Z());
+            }
+            return anEq.w();
+        }
+
+        NCollection_Array1<OpenGl_Vec4> myClipPlaneArray = new NCollection_Array1<NCollection_Vec4<float>>();
+
         // =======================================================================
         // function : PushState
         // purpose  : Pushes state of OCCT graphics parameters to the program
         // =======================================================================
         public void PushState(OpenGl_ShaderProgram theProgram,
 
-                            Graphic3d_TypeOfShadingModel theShadingModel = Graphic3d_TypeOfShadingModel.Graphic3d_TypeOfShadingModel_Unlit)
+                                    Graphic3d_TypeOfShadingModel theShadingModel = Graphic3d_TypeOfShadingModel.Graphic3d_TypeOfShadingModel_Unlit)
         {
             OpenGl_ShaderProgram aProgram = theProgram != null ? theProgram : myFfpProgram;
-            /*PushClippingState(aProgram);
-            PushLightSourceState(aProgram); // should be before PushWorldViewState()*/
+            PushClippingState(aProgram);
+            PushLightSourceState(aProgram); // should be before PushWorldViewState()
             PushWorldViewState(aProgram);
             PushModelWorldState(aProgram);
             PushProjectionState(aProgram);/*
@@ -702,7 +1244,7 @@ namespace OCCPort.OpenGL
                 OpenGl_ShaderUniformLocation aLocViewPort = theProgram.GetStateLocation(OpenGl_StateVariable.OpenGl_OCCT_VIEWPORT);
                 if (aLocViewPort)
                 {
-                    theProgram.SetUniform(myContext, aLocViewPort, new Vector4((float)myContext.Viewport()[0], (float)myContext.Viewport()[1],
+                    theProgram.SetUniform(myContext, aLocViewPort, new NCollection_Vec4<float>((float)myContext.Viewport()[0], (float)myContext.Viewport()[1],
                                                                                 (float)myContext.Viewport()[2], (float)myContext.Viewport()[3]));
                 }
             }
@@ -864,5 +1406,78 @@ namespace OCCPort.OpenGL
             myIndex = myNextIndex; // use myNextIndex here to handle properly Update() after Revert()
             ++myNextIndex;
         }
+
+
+        //! Returns current state index.
+        public int Index() { return myIndex; }
+
+    }
+
+
+    //! Packed properties of light source
+    public struct OpenGl_ShaderLightParameters
+    {
+        public OpenGl_ShaderLightParameters() { }
+        public OpenGl_Vec4 Color = new NCollection_Vec4<float>();      //!< RGB color + Intensity (in .w)
+        public OpenGl_Vec4 Position = new NCollection_Vec4<float>();   //!< XYZ Direction or Position + IsHeadlight (in .w)
+        public OpenGl_Vec4 Direction = new NCollection_Vec4<float>();  //!< spot light XYZ direction + Range (in .w)
+        public OpenGl_Vec4 Parameters = new NCollection_Vec4<float>(); //!< same as Graphic3d_CLight::PackedParams()
+
+        //! Returns packed (serialized) representation of light source properties
+        public float[] Packed()
+        {
+            return Color.GetData().Concat(Position.GetData()).Concat(Direction.GetData()).Concat(Parameters.GetData()).ToArray();
+            // return reinterpret_cast<const OpenGl_Vec4*> (this); 
+        }
+        public static int NbOfVec4() { return 4; }
+
+
+    }
+
+
+    //! The iterator through clipping planes.
+    public class OpenGl_ClippingIterator
+    {
+
+        //! Return true if plane has been temporarily disabled either by Graphic3d_ClipPlane->IsOn() property or by temporary filter.
+        //! Beware that this method does NOT handle a Chain filter for Capping algorithm OpenGl_Clipping::CappedChain()!
+        public bool IsDisabled() { return myDisabled.Value(myCurrIndex) || !Value().IsOn(); }
+
+        //! Main constructor.
+        public OpenGl_ClippingIterator(OpenGl_Clipping theClipping)
+        {
+            myDisabled = (theClipping.myDisabledPlanes);
+            myCurrIndex = (1);
+
+            myIter1.Init(theClipping.myPlanesGlobal);
+            myIter2.Init(theClipping.myPlanesLocal);
+        }
+
+        //! Return true if iterator points to the valid clipping plane.
+        public bool More() { return myIter1.More() || myIter2.More(); }
+
+        //! Go to the next clipping plane.
+        public void Next()
+        {
+            ++myCurrIndex;
+            if (myIter1.More())
+            {
+                myIter1.Next();
+            }
+            else
+            {
+                myIter2.Next();
+            }
+        }
+
+        internal Graphic3d_ClipPlane Value()
+        {
+            throw new NotImplementedException();
+        }
+
+        Graphic3d_SequenceOfHClipPlane.Iterator myIter1;
+        Graphic3d_SequenceOfHClipPlane.Iterator myIter2;
+        NCollection_Vector<bool> myDisabled;
+        int myCurrIndex;
     }
 }

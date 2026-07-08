@@ -6,6 +6,11 @@ namespace OCCPort.OpenGL
 {
     public class OpenGl_GlCore11
     {
+        internal void glClipPlane(int anFfpPlaneID, OpenGl_Vec4d aPlaneEq)
+        {
+            GL.ClipPlane((ClipPlaneName)anFfpPlaneID, aPlaneEq.GetData());
+        }
+
         internal void glColor4fv(float[] v)
         {
             GL.Color4(v);
@@ -43,6 +48,30 @@ namespace OCCPort.OpenGL
         internal void glEnableClientState(All vertexArray)
         {
             GL.EnableClientState((ArrayCap)vertexArray);
+        }
+
+        internal void glLightf(uint theLightGlId, LightParameter spotCutoff, float tHE_DEFAULT_SPOT_CUTOFF)
+        {
+            GL.Light((LightName)theLightGlId, spotCutoff, tHE_DEFAULT_SPOT_CUTOFF);
+        }
+
+        internal void glLightfv(LightName name, LightParameter type, float[] vals)
+        {
+            GL.Light(name, type, vals);
+        }
+        internal void glLightfv(uint name, LightParameter type, float[] vals)
+        {
+            GL.Light((LightName)name, type, vals);
+        }
+
+        internal void glLightModelfv(All lightModelAmbient, float[] floats)
+        {
+            GL.LightModel((LightModelParameter)lightModelAmbient, floats);
+        }
+
+        internal void glLoadIdentity()
+        {
+            GL.LoadIdentity();
         }
 
         internal void glLoadMatrixf(Matrix4 matrix4)

@@ -1,4 +1,5 @@
-﻿using TKMath;
+﻿using System.Reflection.Metadata;
+using TKMath;
 
 namespace TKService
 {
@@ -7,6 +8,39 @@ namespace TKService
     //! The plane equation is specified in "world" coordinate system.
     public class Graphic3d_ClipPlane
     {
+
+
+        //! Return TRUE if this item defines a conjunction (logical AND) between a set of Planes.
+        //! Graphic3d_ClipPlane item defines either a Clipping halfspace (single Clipping Plane)
+        //! or a Clipping volume defined by a logical AND (conjunction) operation between a set of Planes defined as a Chain
+        //! (so that the volume cuts a space only in case if check fails for ALL Planes in the Chain).
+        //!
+        //! Note that Graphic3d_ClipPlane item cannot:
+        //! - Define a Chain with logical OR (disjunction) operation;
+        //!   this should be done through Graphic3d_SequenceOfHClipPlane.
+        //! - Define nested Chains.
+        //! - Disable Chain items; only entire Chain can be disabled (by disabled a head of Chain).
+        //!
+        //! The head of a Chain defines all visual properties of the Chain,
+        //! so that Graphic3d_ClipPlane of next items in a Chain merely defines only geometrical definition of the plane.
+        public bool IsChain()  { return myNextInChain!=null; }
+
+
+        //! Return the next plane in a Chain of Planes defining logical AND operation,
+        //! or NULL if there is no chain or it is a last element in chain.
+
+        public Graphic3d_ClipPlane ChainNextPlane() { return myNextInChain; }
+
+        //! Get 4-component equation vector for clipping plane.
+        //! @return clipping plane equation vector.
+        public Graphic3d_Vec4d ReversedEquation()  { return myEquationRev; }
+
+        //! Get geometrical definition.
+        //! @return geometrical definition of clipping plane
+        public gp_Pln ToPlane()  { return myPlane; }
+        //! Get 4-component equation vector for clipping plane.
+        //! @return clipping plane equation vector.
+        public Graphic3d_Vec4d GetEquation()  { return myEquation; }
 
         //! Check state of capping surface rendering.
         //! @return true (turned on) or false depending on the state.

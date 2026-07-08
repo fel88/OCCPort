@@ -17,6 +17,7 @@ namespace TKernel
         {
             myLowerBound = 1;
             myUpperBound = 0;
+            
             //myDeletable(Standard_False),
             //  myData(NULL)
 
@@ -123,6 +124,8 @@ namespace TKernel
 
         public int Length()
         {
+            if (list == null)
+                return 0;
             return list.Length;
         }
         public void Resize(int theLower, int theUpper, bool theToCopyData)
@@ -145,12 +148,20 @@ namespace TKernel
 
         public int Size()
         {
+            if (list == null)
+                return 0;
             return list.Length;
         }
 
         public T ChangeFirst()
         {
             return list.First();
+        }
+
+        public T ChangeValue(int theIndex)
+        {
+            Exceptions.Standard_OutOfRange_Raise_if(theIndex < myLowerBound || theIndex > myUpperBound, "NCollection_Array1::Value");
+            return list[theIndex - myLowerBound];
         }
 
         public class TRef : ITref<T>

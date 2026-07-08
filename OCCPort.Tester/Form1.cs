@@ -33,7 +33,7 @@ namespace OCCPort.Tester
             glControl = new GLControl(new GLControlSettings()
             {
                 Profile = OpenTK.Windowing.Common.ContextProfile.Compatability,
-                //NumberOfSamples = 8
+                NumberOfSamples = 8
             });
             Shown += Form1_Shown;
             v3d_viewer = new V3d_Viewer(new OpenGl_GraphicDriver(new Aspect_DisplayConnection()));

@@ -146,6 +146,12 @@ namespace OCCPort.OpenGL
         {
             GL.Uniform1(theLocation, theTextureUnit);
         }
+
+        internal void glUniform2fv(int theLocation, int theCount, float[] floats)
+        {
+            GL.Uniform2(theLocation, theCount, floats);
+        }
+
         internal void glUniform4fv(int location, int v2, Vector4 theValue)
         {
             GL.Uniform4(location, v2, theValue.ToFloatArray());

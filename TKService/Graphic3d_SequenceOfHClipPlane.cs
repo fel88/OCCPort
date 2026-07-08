@@ -1,4 +1,5 @@
-﻿using TKernel;
+﻿using System.Reflection.Metadata;
+using TKernel;
 
 namespace TKService
 {
@@ -16,20 +17,33 @@ namespace TKService
     public class Graphic3d_SequenceOfHClipPlane
     {
         //! Return TRUE if sequence is empty.
-     public    bool IsEmpty()  { return myItems.IsEmpty(); }
+        public bool IsEmpty() { return myItems.IsEmpty(); }
 
         //! Return the number of items in sequence.
-        public int Size()  { return myItems.Size(); }
+        public int Size() { return myItems.Size(); }
 
         NCollection_Sequence<Graphic3d_ClipPlane> myItems = new NCollection_Sequence<Graphic3d_ClipPlane>();
-  bool myToOverrideGlobal;
+        bool myToOverrideGlobal;
 
         public class Iterator
         {
             public Iterator(Graphic3d_SequenceOfHClipPlane thePlanes)
             {
             }
+            public void Init(Graphic3d_SequenceOfHClipPlane thePlanes)
+            {
+                throw new NotImplementedException();
 
+                if (thePlanes != null)
+                {
+                    //NCollection_Sequence<Graphic3d_ClipPlane>.Iterator.Init(thePlanes.myItems);
+                }
+                else
+                {
+                    throw new NotImplementedException();
+                    //*this = Iterator();
+                }
+            }
             public bool More()
             {
                 throw new NotImplementedException();

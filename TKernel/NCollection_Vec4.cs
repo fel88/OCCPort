@@ -58,7 +58,20 @@ namespace TKernel
         public NCollection_Vec4()
         {
             v = new Element_t[4];
-        }  //! Initialize ALL components of vector within specified value.
+        }
+
+
+        public NCollection_Vec4(NCollection_Vec3<Element_t> theVec3, Element_t theW)
+        {
+            v = new Element_t[4];
+
+            v[0] = theVec3.x();
+            v[1] = theVec3.y();
+            v[2] = theVec3.z();
+            v[3] = theW;
+        }
+
+        //! Initialize ALL components of vector within specified value.
         public NCollection_Vec4(Element_t theValue)
         {
             v = new Element_t[4];
@@ -76,7 +89,7 @@ namespace TKernel
             v[2] = theZ;
             v[3] = theW;
         }
-
+      
         //! Assign new values as 3-component vector and a 4-th value.
         public void SetValues(NCollection_Vec3<Element_t> theVec3, Element_t theW)
         {
@@ -100,6 +113,10 @@ namespace TKernel
                 v[i] = array[i];
             }
         }
+        public Element_t[] GetData()
+        {
+            return v;
+        }
         public Element_t X { get => v[0]; set => v[0] = value; }
         public Element_t Y { get => v[1]; set => v[1] = value; }
         public Element_t Z { get => v[2]; set => v[2] = value; }
@@ -110,6 +127,7 @@ namespace TKernel
         public void x(Element_t val) { v[0] = val; }
         public void y(Element_t val) { v[1] = val; }
         public void z(Element_t val) { v[2] = val; }
+        public void w(Element_t val) { v[3] = val; }
 
         //! Alias to 1st component as RED channel in RGBA.
         public Element_t r() { return v[0]; }
@@ -146,6 +164,11 @@ namespace TKernel
         {
             return new NCollection_Vec4<Element_t>(temp.x() + temp2.x(), temp.y() + temp2.y(), temp.z() + temp2.z(), temp.w() + temp2.w());
         }
+        public static NCollection_Vec4<Element_t> operator -(NCollection_Vec4<Element_t> temp)
+        {
+            return new NCollection_Vec4<Element_t>(-temp.x() , -temp.y() , -temp.z(), -temp.w());
+        }
+
         public static NCollection_Vec4<Element_t> operator *(NCollection_Vec4<Element_t> temp, Element_t temp2)
         {
             return new NCollection_Vec4<Element_t>(temp.x() * temp2, temp.y() * temp2, temp.z() * temp2, temp.w() * temp2);
