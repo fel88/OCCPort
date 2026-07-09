@@ -446,6 +446,7 @@ namespace TKService
         }
     }
 
+    //! Nature of the reflection of a material.
     public enum Graphic3d_TypeOfReflection
     {
         Graphic3d_TOR_AMBIENT = 0,

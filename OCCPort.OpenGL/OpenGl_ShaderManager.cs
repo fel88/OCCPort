@@ -845,6 +845,12 @@ namespace OCCPort.OpenGL
             {
                 myLightTypeArray.Resize(0, aNbLightsMax - 1, false);
                 myLightParamsArray.Resize(0, aNbLightsMax - 1, false);
+                /// not origin code here
+                for (int i = 0; i < myLightParamsArray.list.Length; i++)
+                {
+                    myLightParamsArray.list[i] = new OpenGl_ShaderLightParameters();
+                }
+                /// ////end
             }
             for (int aLightIt = 0; aLightIt < aNbLightsMax; ++aLightIt)
             {
@@ -860,10 +866,10 @@ namespace OCCPort.OpenGL
                 theProgram.SetUniform(myContext,
                                         anAmbientLoc,
                                         new OpenGl_Vec4(0.0f, 0.0f, 0.0f, 0.0f));
-                /*theProgram.SetUniform(myContext,
+                theProgram.SetUniform(myContext,
                                         theProgram.GetStateLocation(OpenGl_StateVariable.OpenGl_OCC_LIGHT_SOURCE_TYPES),
                                         aNbLightsMax,
-                                        myLightTypeArray.list);*/
+                                        myLightTypeArray.list);
                 return;
             }
 
@@ -964,16 +970,16 @@ namespace OCCPort.OpenGL
             theProgram.SetUniform(myContext,
                                     anAmbientLoc,
                                     anAmbient);
-            /*theProgram.SetUniform(myContext,
+            theProgram.SetUniform(myContext,
                                     theProgram.GetStateLocation(OpenGl_StateVariable.OpenGl_OCC_LIGHT_SOURCE_TYPES),
                                     aNbLightsMax,
-                                    myLightTypeArray.list);*/
+                                    myLightTypeArray.list);
             if (aLightsNb > 0)
             {
-                /*theProgram.SetUniform(myContext,
+                theProgram.SetUniform(myContext,
                                         theProgram.GetStateLocation(OpenGl_StateVariable.OpenGl_OCC_LIGHT_SOURCE_PARAMS),
                                         aLightsNb * OpenGl_ShaderLightParameters.NbOfVec4(),
-                                        myLightParamsArray.First().Packed());*/
+                                        myLightParamsArray.list.SelectMany(z => z.Packed()).ToArray());
             }
             OpenGl_ShaderUniformLocation aLocation = theProgram.GetStateLocation(OpenGl_StateVariable.OpenGl_OCCT_NB_SPEC_IBL_LEVELS);
             if (aLocation)
@@ -1184,7 +1190,7 @@ namespace OCCPort.OpenGL
 
             theProgram.SetUniform(myContext, theProgram.GetStateLocation(OpenGl_StateVariable.OpenGl_OCC_CLIP_PLANE_COUNT), aPlaneId);
             theProgram.SetUniform(myContext, aLocEquations, aNbClipPlanesMax, myClipPlaneArray.list);
-            //theProgram.SetUniform(myContext, theProgram.GetStateLocation(OpenGl_StateVariable.OpenGl_OCC_CLIP_PLANE_CHAINS), aNbClipPlanesMax, myClipChainArray.list);
+            theProgram.SetUniform(myContext, theProgram.GetStateLocation(OpenGl_StateVariable.OpenGl_OCC_CLIP_PLANE_CHAINS), aNbClipPlanesMax, myClipChainArray.list);
         }
 
         NCollection_Array1<int> myClipChainArray = new NCollection_Array1<int>();
@@ -1222,6 +1228,86 @@ namespace OCCPort.OpenGL
 
         NCollection_Array1<OpenGl_Vec4> myClipPlaneArray = new NCollection_Array1<NCollection_Vec4<float>>();
 
+        //! Pushes current state of material to specified program (only on state change).
+        void PushMaterialState(OpenGl_ShaderProgram theProgram)
+        {
+            if (myMaterialState.Index() != theProgram.ActiveState(OpenGl_UniformStateType.OpenGl_MATERIAL_STATE))
+            {
+                pushMaterialState(theProgram);
+            }
+        }
+
+        private float ShortRealLast()
+        {
+            const float FLT_MAX = 3.402823466e+38F;// max value
+
+            return FLT_MAX;
+        }
+
+        void pushMaterialState(OpenGl_ShaderProgram theProgram)
+        {
+            OpenGl_Material aMat = myMaterialState.Material();
+            theProgram.UpdateState(OpenGl_UniformStateType.OpenGl_MATERIAL_STATE, myMaterialState.Index());
+            if (theProgram == myFfpProgram)
+            {
+                if (myContext.core11ffp == null)
+                {
+                    return;
+                }
+
+                if (myMaterialState.AlphaCutoff() < ShortRealLast())
+                {
+                    myContext.core11fwd.glAlphaFunc(AlphaFunction.Gequal, myMaterialState.AlphaCutoff());
+                    myContext.core11fwd.glEnable(EnableCap.AlphaTest);
+                }
+                else
+                {
+                    myContext.core11fwd.glDisable(EnableCap.AlphaTest);
+                }
+
+                var aFrontFace = myMaterialState.ToDistinguish() ? TriangleFace.Front : TriangleFace.FrontAndBack;
+                OpenGl_MaterialCommon aFrontMat = aMat.Common[0];
+                OpenGl_MaterialCommon aBackMat = aMat.Common[1];
+                Graphic3d_Vec4 aSpec4 = new NCollection_Vec4<float>(aFrontMat.SpecularShininess.rgb(), 1.0f);
+                myContext.core11ffp.glMaterialfv(aFrontFace, MaterialParameter.Ambient, aFrontMat.Ambient.GetData());
+                myContext.core11ffp.glMaterialfv(aFrontFace, MaterialParameter.Diffuse, aFrontMat.Diffuse.GetData());
+                myContext.core11ffp.glMaterialfv(aFrontFace, MaterialParameter.Specular, aSpec4.GetData());
+                myContext.core11ffp.glMaterialfv(aFrontFace, MaterialParameter.Emission, aFrontMat.Emission.GetData());
+                myContext.core11ffp.glMaterialf(aFrontFace, MaterialParameter.Shininess, aFrontMat.Shine());
+                if (myMaterialState.ToDistinguish())
+                {
+                    Graphic3d_Vec4 aSpec4Back = new NCollection_Vec4<float>(aBackMat.SpecularShininess.rgb(), 1.0f);
+                    myContext.core11ffp.glMaterialfv(TriangleFace.Back, MaterialParameter.Ambient, aBackMat.Ambient.GetData());
+                    myContext.core11ffp.glMaterialfv(TriangleFace.Back, MaterialParameter.Diffuse, aBackMat.Diffuse.GetData());
+                    myContext.core11ffp.glMaterialfv(TriangleFace.Back, MaterialParameter.Specular, aSpec4Back.GetData());
+                    myContext.core11ffp.glMaterialfv(TriangleFace.Back, MaterialParameter.Emission, aBackMat.Emission.GetData());
+                    myContext.core11ffp.glMaterialf(TriangleFace.Back, MaterialParameter.Shininess, aBackMat.Shine());
+                }
+                return;
+            }
+
+            theProgram.SetUniform(myContext,
+                                    theProgram.GetStateLocation(OpenGl_StateVariable.OpenGl_OCCT_ALPHA_CUTOFF),
+                                    myMaterialState.AlphaCutoff());
+            theProgram.SetUniform(myContext,
+                                    theProgram.GetStateLocation(OpenGl_StateVariable.OpenGl_OCCT_TEXTURE_ENABLE),
+                                    myMaterialState.ToMapTexture() ? 1 : 0);
+            theProgram.SetUniform(myContext,
+                                    theProgram.GetStateLocation(OpenGl_StateVariable.OpenGl_OCCT_DISTINGUISH_MODE),
+                                    myMaterialState.ToDistinguish() ? 1 : 0);
+
+            OpenGl_ShaderUniformLocation aLocPbrFront = theProgram.GetStateLocation(OpenGl_StateVariable.OpenGl_OCCT_PBR_MATERIAL);
+            if (aLocPbrFront)
+            {
+                theProgram.SetUniform(myContext, aLocPbrFront, OpenGl_Material.NbOfVec4Pbr(), aMat.PackedPbr());
+            }
+            OpenGl_ShaderUniformLocation aLocFront = theProgram.GetStateLocation(OpenGl_StateVariable.OpenGl_OCCT_COMMON_MATERIAL);
+            if (aLocFront)
+            {
+                theProgram.SetUniform(myContext, aLocFront, OpenGl_Material.NbOfVec4Common(), aMat.PackedCommon());
+            }
+        }
+
         // =======================================================================
         // function : PushState
         // purpose  : Pushes state of OCCT graphics parameters to the program
@@ -1235,9 +1321,9 @@ namespace OCCPort.OpenGL
             PushLightSourceState(aProgram); // should be before PushWorldViewState()
             PushWorldViewState(aProgram);
             PushModelWorldState(aProgram);
-            PushProjectionState(aProgram);/*
+            PushProjectionState(aProgram);
             PushMaterialState(aProgram);
-            PushOitState(aProgram);*/
+            /*PushOitState(aProgram);*/
 
             if (theProgram != null)
             {
@@ -1415,7 +1501,7 @@ namespace OCCPort.OpenGL
 
 
     //! Packed properties of light source
-    public struct OpenGl_ShaderLightParameters
+    public class OpenGl_ShaderLightParameters
     {
         public OpenGl_ShaderLightParameters() { }
         public OpenGl_Vec4 Color = new NCollection_Vec4<float>();      //!< RGB color + Intensity (in .w)
@@ -1424,9 +1510,9 @@ namespace OCCPort.OpenGL
         public OpenGl_Vec4 Parameters = new NCollection_Vec4<float>(); //!< same as Graphic3d_CLight::PackedParams()
 
         //! Returns packed (serialized) representation of light source properties
-        public float[] Packed()
+        public OpenGl_Vec4[] Packed()
         {
-            return Color.GetData().Concat(Position.GetData()).Concat(Direction.GetData()).Concat(Parameters.GetData()).ToArray();
+            return [Color, Position, Direction, Parameters];
             // return reinterpret_cast<const OpenGl_Vec4*> (this); 
         }
         public static int NbOfVec4() { return 4; }

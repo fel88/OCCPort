@@ -25,6 +25,17 @@ namespace OCCPort.OpenGL
         //! Alpha cutoff value.
         public float AlphaCutoff() { return myAlphaCutoff; }
 
+        //! Distinguish front/back flag.
+        public bool ToDistinguish() { return myToDistinguish; }
+
+
+        //! Return front material.
+        public OpenGl_Material Material() { return myMaterial; }
+
+        //! Flag for mapping a texture.
+        public bool ToMapTexture() { return myToMapTexture; }
+
+
         OpenGl_Material myMaterial;      //!< material
         float myAlphaCutoff;   //!< alpha cutoff value
         bool myToDistinguish; //!< distinguish front/back flag

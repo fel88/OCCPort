@@ -45,6 +45,29 @@ namespace TKService
   new  RawMaterial (Graphic3d_NameOfMaterial.Graphic3d_NameOfMaterial_DEFAULT,     "Default"),
   new  RawMaterial (Graphic3d_NameOfMaterial.Graphic3d_NameOfMaterial_UserDefined, "UserDefined")
   };
+
+
+        //! Returns material type.
+        public Graphic3d_TypeOfMaterial MaterialType() { return myMaterialType; }
+
+        //! Returns the ambient color of the surface.
+        public Quantity_Color AmbientColor() { return myColors[(int)Graphic3d_TypeOfReflection.Graphic3d_TOR_AMBIENT]; }
+
+        //! Returns the specular color of the surface.
+        public Quantity_Color SpecularColor() { return myColors[(int)Graphic3d_TypeOfReflection.Graphic3d_TOR_SPECULAR]; }
+
+        //! Returns the emissive color of the surface.
+        public Quantity_Color EmissiveColor() { return myColors[(int)Graphic3d_TypeOfReflection.Graphic3d_TOR_EMISSION]; }
+
+        Graphic3d_PBRMaterial myPBRMaterial = new Graphic3d_PBRMaterial();
+
+        //! Returns physically based representation of material
+        public Graphic3d_PBRMaterial PBRMaterial() { return myPBRMaterial; }
+
+
+        //! Returns the diffuse color of the surface.
+        public Quantity_Color DiffuseColor() { return myColors[(int)Graphic3d_TypeOfReflection.Graphic3d_TOR_DIFFUSE]; }
+
         void init(Graphic3d_NameOfMaterial theName)
         {
             RawMaterial aMat = THE_MATERIALS[(int)theName];
@@ -83,14 +106,20 @@ namespace TKService
         {
             return !myColors[(int)theType].IsEqual(Quantity_NameOfColor.Quantity_NOC_BLACK);
         }
+
+        //! Returns the luminosity of the surface.
+        public float Shininess() { return myShininess; }
+
         const int Graphic3d_TypeOfReflection_NB = 4;
         Quantity_Color[] myColors = new Quantity_Color[Graphic3d_TypeOfReflection_NB];
 
-    }//! Nature of the reflection of a material.
+    }
+
+
 
 
     //! Types of materials specifies if a material can change color.
-    enum Graphic3d_TypeOfMaterial
+    public enum Graphic3d_TypeOfMaterial
     {
         Graphic3d_MATERIAL_ASPECT, //!< aspect   material definition with configurable color (like plastic)
         Graphic3d_MATERIAL_PHYSIC  //!< physical material definition with fixed color (like gold)
@@ -115,17 +144,26 @@ namespace TKService
         public RawMaterial(Graphic3d_NameOfMaterial theName, string theStringName)
         {
             StringName = (theStringName);
-            /*BSDF(Graphic3d_BSDF::CreateDiffuse(Graphic3d_Vec3(0.0f))),
-            TransparencyCoef(0.0f),
-            RefractionIndex(1.0f),
-            Shininess(0.039f),
-            AmbientCoef(0.25f),
-            DiffuseCoef(1.0f),*/
+            /*BSDF(Graphic3d_BSDF::CreateDiffuse(Graphic3d_Vec3(0.0f))),*/
+            TransparencyCoef = 0.0f;
+            RefractionIndex = 1.0f;
+            Shininess = 0.039f;
+            AmbientCoef = 0.25f;
+            DiffuseCoef = (1.0f);
             MaterialType = Graphic3d_TypeOfMaterial.Graphic3d_MATERIAL_ASPECT;
             MaterialName = (theName);
             switch (theName)
             {
                 default:
+                case Graphic3d_NameOfMaterial.Graphic3d_NameOfMaterial_DEFAULT:
+                    MaterialType = Graphic3d_TypeOfMaterial.Graphic3d_MATERIAL_ASPECT;
+
+                    Colors[(int)Graphic3d_TypeOfReflection. Graphic3d_TOR_AMBIENT] = new Quantity_Color(new Graphic3d_Vec3(0.15f));
+                    Colors[(int)Graphic3d_TypeOfReflection.Graphic3d_TOR_DIFFUSE] = new Quantity_Color(new Graphic3d_Vec3(0.65f));
+                    Colors[(int)Graphic3d_TypeOfReflection.Graphic3d_TOR_SPECULAR] = new Quantity_Color(new Graphic3d_Vec3(0.0f));
+                    Colors[(int)Graphic3d_TypeOfReflection.Graphic3d_TOR_EMISSION] = new Quantity_Color(new Graphic3d_Vec3(0.0f));
+                    break;
+
                 case Graphic3d_NameOfMaterial.Graphic3d_NameOfMaterial_Plastified:
                     MaterialType = Graphic3d_TypeOfMaterial.Graphic3d_MATERIAL_ASPECT;
 
@@ -145,5 +183,4 @@ namespace TKService
 
 
     };
-
 }

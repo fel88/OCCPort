@@ -83,6 +83,16 @@ namespace OCCPort.OpenGL
             GL.LoadMatrix( matrix4);
         }
 
+        internal void glMaterialf(TriangleFace back, MaterialParameter shininess, float v)
+        {
+            GL.Material(back, shininess, v);
+        }
+
+        internal void glMaterialfv(TriangleFace materialFace,MaterialParameter param, float[] floats)
+        {
+            GL.Material(materialFace, param, floats);
+        }
+
         internal void glMatrixMode(All projection)
         {
             GL.MatrixMode((MatrixMode)projection);

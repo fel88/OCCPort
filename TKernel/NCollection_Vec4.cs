@@ -89,7 +89,7 @@ namespace TKernel
             v[2] = theZ;
             v[3] = theW;
         }
-      
+
         //! Assign new values as 3-component vector and a 4-th value.
         public void SetValues(NCollection_Vec3<Element_t> theVec3, Element_t theW)
         {
@@ -137,12 +137,14 @@ namespace TKernel
 
         //! Alias to 2nd component as GREEN channel in RGBA.
         public Element_t g() { return v[1]; }
+        public void g(Element_t val) { v[1] = val; }
 
         //! Alias to 3rd component as Z coordinate in XYZW.
         public Element_t z() { return v[2]; }
 
         //! Alias to 3rd component as BLUE channel in RGBA.
         public Element_t b() { return v[2]; }
+        public void b(Element_t val) { v[2] = val; }
 
         //! Alias to 4th component as W coordinate in XYZW.
         public Element_t w() { return v[3]; }
@@ -166,7 +168,7 @@ namespace TKernel
         }
         public static NCollection_Vec4<Element_t> operator -(NCollection_Vec4<Element_t> temp)
         {
-            return new NCollection_Vec4<Element_t>(-temp.x() , -temp.y() , -temp.z(), -temp.w());
+            return new NCollection_Vec4<Element_t>(-temp.x(), -temp.y(), -temp.z(), -temp.w());
         }
 
         public static NCollection_Vec4<Element_t> operator *(NCollection_Vec4<Element_t> temp, Element_t temp2)

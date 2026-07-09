@@ -1,4 +1,5 @@
-﻿using OCCPort.Common;
+﻿using Microsoft.VisualBasic;
+using OCCPort.Common;
 using System.Globalization;
 using System.Security.Cryptography.X509Certificates;
 using System.Xml.Linq;
@@ -31,7 +32,7 @@ namespace TKernel
         }
         public Quantity_Color(NCollection_Vec3<float> theRgb)
         {
-            myRgb = new NCollection_Vec3<float> (theRgb);        
+            myRgb = new NCollection_Vec3<float>(theRgb);
             Quantity_ColorValidateRgbRange(theRgb.r(), theRgb.g(), theRgb.b());
         }
 
@@ -93,6 +94,12 @@ namespace TKernel
                     }
             }
         }
+
+        public static implicit operator NCollection_Vec3<float>(Quantity_Color f)
+        {
+            return new NCollection_Vec3<float>(f.myRgb);
+        }
+
 
         // =======================================================================
         // function : Convert_LinearRGB_To_Lab

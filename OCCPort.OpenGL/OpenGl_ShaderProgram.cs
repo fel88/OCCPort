@@ -84,14 +84,34 @@ namespace OCCPort.OpenGL
         public int TextureSetBits() { return myTextureSetBits; }
 
 
+
+
+        // =======================================================================
+        // function : SetUniform
+        // purpose  : Specifies the value of the floating-point uniform variable
+        // =======================================================================
+        public bool SetUniform(OpenGl_Context theCtx,
+                                                   GLint theLocation,
+                                                   float theValue)
+        {
+            if (myProgramID == NO_PROGRAM || theLocation == INVALID_LOCATION)
+            {
+                return false;
+            }
+
+            theCtx.core20fwd.glUniform1f(theLocation, theValue);
+            return true;
+        }
+
+
         // =======================================================================
         // function : SetUniform
         // purpose  : Specifies the value of the float4 uniform array
         // =======================================================================
         public bool SetUniform(OpenGl_Context theCtx,
-                                                   int theLocation,
-                                                   int theCount,
-                                                   IEnumerable< OpenGl_Vec4> theData)
+                                                           int theLocation,
+                                                           int theCount,
+                                                           IEnumerable<OpenGl_Vec4> theData)
         {
             if (myProgramID == NO_PROGRAM || theLocation == INVALID_LOCATION)
             {
@@ -100,6 +120,20 @@ namespace OCCPort.OpenGL
             var data = theData.Take(theCount).SelectMany(z => z.GetData()).ToArray();
 
             theCtx.core20fwd.glUniform4fv(theLocation, theCount, data);
+            return true;
+        }
+        public bool SetUniform(OpenGl_Context theCtx,
+                                                   int theLocation,
+                                                   int theCount,
+                                                   IEnumerable<int> theData)
+        {
+            if (myProgramID == NO_PROGRAM || theLocation == INVALID_LOCATION)
+            {
+                return false;
+            }
+            var data = theData.Take(theCount).ToArray();
+
+            theCtx.core20fwd.glUniform1iv(theLocation, theCount, data);
             return true;
         }
 

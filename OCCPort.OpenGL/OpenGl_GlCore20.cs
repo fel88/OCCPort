@@ -138,6 +138,11 @@ namespace OCCPort.OpenGL
             GL.TextureParameter((int)texture2D,(TextureParameterName)textureMinFilter, (int)aFilterGl);
         }
 
+        internal void glUniform1f(int theLocation, float theValue)
+        {
+            GL.Uniform1(theLocation, theValue);
+        }
+
         internal void glUniform1i(int theLocation, Graphic3d_TextureUnit theTextureUnit)
         {
             GL.Uniform1(theLocation, (int)theTextureUnit);
@@ -145,6 +150,11 @@ namespace OCCPort.OpenGL
         internal void glUniform1i(int theLocation, int theTextureUnit)
         {
             GL.Uniform1(theLocation, theTextureUnit);
+        }
+
+        internal void glUniform1iv(int theLocation, int theCount, int[] data)
+        {
+            GL.Uniform1(theLocation, theCount, data);
         }
 
         internal void glUniform2fv(int theLocation, int theCount, float[] floats)

@@ -58,9 +58,16 @@ namespace TKernel
             return new NCollection_Vec3<T>(temp.x() + temp2.x(), temp.y() + temp2.y(), temp.z() + temp2.z());
         }
 
+
         public static NCollection_Vec3<T> operator *(NCollection_Vec3<T> temp, T temp2)
         {
             return new NCollection_Vec3<T>(temp.x() * temp2, temp.y() * temp2, temp.z() * temp2);
+        }
+
+        //! Compute per-component multiplication.
+        public static NCollection_Vec3<T> operator *(NCollection_Vec3<T> temp, NCollection_Vec3<T> temp2)
+        {
+            return new NCollection_Vec3<T>(temp.x() * temp2.x(), temp.y() * temp2.y(), temp.z() * temp2.z());
         }
 
         public static NCollection_Vec3<T> operator /(NCollection_Vec3<T> temp, T temp2)

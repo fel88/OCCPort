@@ -162,7 +162,7 @@ myLineFeather (1.0f),*/
             myViewportVirt[3] = 0;
 
 
-            myPolygonOffset.Mode =Aspect_PolygonOffsetMode. Aspect_POM_Off;
+            myPolygonOffset.Mode = Aspect_PolygonOffsetMode.Aspect_POM_Off;
             myPolygonOffset.Factor = 0.0f;
             myPolygonOffset.Units = 0.0f;
             myShaderManager = new OpenGl_ShaderManager(this);
@@ -334,7 +334,7 @@ myLineFeather (1.0f),*/
                                                 ? anAspect.BackInteriorColor()
                                                 : aFrontIntColor;
 
-            //  myMaterial.Init(this, aMatFrontSrc, aFrontIntColor, aMatBackSrc, aBackIntColor);
+            myMaterial.Init(this, aMatFrontSrc, aFrontIntColor, aMatBackSrc, aBackIntColor);
             // if (!theHighlight.IsNull()
             //    && theHighlight.BasicFillAreaAspect().IsNull())
             {
@@ -394,7 +394,7 @@ myLineFeather (1.0f),*/
             return FLT_MAX;
         }
 
-        public OpenGl_Material myMaterial;        //!< current front/back material state (cached to reduce GL context updates)
+        public OpenGl_Material myMaterial = new OpenGl_Material();        //!< current front/back material state (cached to reduce GL context updates)
 
         //! Sets and applies current polygon offset.
         public void SetPolygonOffset(Graphic3d_PolygonOffset theOffset)
@@ -461,7 +461,7 @@ myLineFeather (1.0f),*/
 
         bool myAlphaToCoverage; //!< flag indicating GL_SAMPLE_ALPHA_TO_COVERAGE state
         public bool extAnis;            //!< GL_EXT_texture_filter_anisotropic
-        public bool  extTexR16;          //!< GL_EXT_texture_norm16 on OpenGL ES; always available on desktop
+        public bool extTexR16;          //!< GL_EXT_texture_norm16 on OpenGL ES; always available on desktop
 
         //! Either GL_CLAMP_TO_EDGE (1.2+) or GL_CLAMP (1.1).
         public int TextureWrapClamp() { return myTexClamp; }
@@ -1783,7 +1783,7 @@ myLineFeather (1.0f),*/
         public bool SetColorMask(bool theToWriteColor)
         {
             bool anOldValue = myColorMask[0];
-            myColorMask=[theToWriteColor, theToWriteColor, theToWriteColor, caps.buffersOpaqueAlpha ? false : theToWriteColor];
+            myColorMask = [theToWriteColor, theToWriteColor, theToWriteColor, caps.buffersOpaqueAlpha ? false : theToWriteColor];
             bool toWrite = theToWriteColor ? true : false;
             core11fwd.glColorMask(toWrite, toWrite, toWrite, myColorMask[3] ? true : false);
             return anOldValue;

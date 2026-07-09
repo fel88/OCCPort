@@ -191,5 +191,10 @@ namespace OCCPort.OpenGL
         {
             GL.TexParameter((TextureTarget)theTarget,(TextureParameterName) theParam, theValue);
         }
+
+        internal void glAlphaFunc(AlphaFunction gequal, float v)
+        {
+            GL.AlphaFunc(gequal, v);
+        }
     }
 }
