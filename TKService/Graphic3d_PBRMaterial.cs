@@ -28,10 +28,10 @@ namespace TKService
         public Quantity_ColorRGBA Color() { return myColor; }
 
 
-        Quantity_ColorRGBA myColor=new Quantity_ColorRGBA ();     //!< albedo color with alpha component [0, 1]
+        Quantity_ColorRGBA myColor = new Quantity_ColorRGBA();     //!< albedo color with alpha component [0, 1]
         float myMetallic;  //!< metallic coefficient of material [0, 1]
         float myRoughness; //!< roughness coefficient of material [0, 1]
-        Graphic3d_Vec3 myEmission=new TKernel.NCollection_Vec3<float> ();  //!< light intensity emitted by material [>= 0]
+        Graphic3d_Vec3 myEmission = new TKernel.NCollection_Vec3<float>();  //!< light intensity emitted by material [>= 0]
         float myIOR;       //!< index of refraction [1, 3]
 
 

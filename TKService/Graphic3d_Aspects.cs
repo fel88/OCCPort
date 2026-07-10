@@ -22,6 +22,15 @@ namespace TKService
 
         }
 
+
+        //! Modifies the surface material of external faces
+        public void SetFrontMaterial(Graphic3d_MaterialAspect theMaterial) { myFrontMaterial = theMaterial; }
+
+        //! Modifies the surface material of internal faces
+        public void SetBackMaterial(Graphic3d_MaterialAspect theMaterial) { myBackMaterial = theMaterial; }
+
+        //! Allows material distinction between front and back faces.
+        public void SetDistinguishOn() { myToDistinguishMaterials = true; }
         //! Return line type; Aspect_TOL_SOLID by default.
         public Aspect_TypeOfLine LineType() { return myLineType; }
 
@@ -32,7 +41,7 @@ namespace TKService
         public Quantity_ColorRGBA InteriorColorRGBA() { return myInteriorColor; }
 
         //! Return a multiplier for each bit in the line stipple pattern within [1, 256] range; 1 by default.
-        public ushort LineStippleFactor()  { return myLineFactor; }
+        public ushort LineStippleFactor() { return myLineFactor; }
 
         Aspect_TypeOfMarker myMarkerType;
 
@@ -114,9 +123,9 @@ namespace TKService
                 && myIsTextZoomable == theOther.myIsTextZoomable;
         }
 
-        Graphic3d_MaterialAspect myFrontMaterial = new Graphic3d_MaterialAspect();
-        Graphic3d_MaterialAspect myBackMaterial = new Graphic3d_MaterialAspect();
-        Aspect_InteriorStyle myInteriorStyle;
+        protected Graphic3d_MaterialAspect myFrontMaterial = new Graphic3d_MaterialAspect();
+        protected Graphic3d_MaterialAspect myBackMaterial = new Graphic3d_MaterialAspect();
+        protected Aspect_InteriorStyle myInteriorStyle;
 
         //! Return true if texture mapping is enabled (false by default).
         public bool ToMapTexture() { return myToMapTexture; }
@@ -158,8 +167,19 @@ namespace TKService
             return 0xFFFF;
         }
 
+        //! Modifies the edge thickness (same as SetLineWidth())
+        public void SetEdgeWidth(double theWidth) { SetLineWidth((float)theWidth); }
 
-        Aspect_TypeOfLine myLineType;
+        //! Returns TRUE if drawing element edges should discard first edge in triangle; FALSE by default.
+        //! Graphics hardware works mostly with triangles, so that wireframe presentation will draw triangle edges by default.
+        //! This flag allows rendering wireframe presentation of quad-only array split into triangles.
+        //! For this, quads should be split in specific order, so that the quad diagonal (to be NOT rendered) goes first:
+        //!     1------2
+        //!    /      /   Triangle #1: 2-0-1; Triangle #2: 0-2-3
+        //!   0------3
+        public bool ToSkipFirstEdge() { return myToSkipFirstEdge; }
+
+        protected Aspect_TypeOfLine myLineType;
 
         //! Modifies the line thickness
         //! Warning: Raises Standard_OutOfRange if the width is a negative value.
@@ -214,12 +234,11 @@ namespace TKService
         Graphic3d_MarkerImage myMarkerImage;
         //Graphic3d_HatchStyle     myHatchStyle;
         string myTextFont;
-        // Graphic3d_MaterialAspect myFrontMaterial;
-        //  Graphic3d_MaterialAspect myBackMaterial;
+        
 
-        protected Quantity_ColorRGBA myInteriorColor;
-        protected Quantity_ColorRGBA myBackInteriorColor;
-        protected Quantity_ColorRGBA myEdgeColor;
+        protected Quantity_ColorRGBA myInteriorColor = new Quantity_ColorRGBA();
+        protected Quantity_ColorRGBA myBackInteriorColor = new Quantity_ColorRGBA();
+        protected Quantity_ColorRGBA myEdgeColor = new Quantity_ColorRGBA();
 
         //  Graphic3d_PolygonOffset myPolygonOffset;
         //  Aspect_InteriorStyle myInteriorStyle;

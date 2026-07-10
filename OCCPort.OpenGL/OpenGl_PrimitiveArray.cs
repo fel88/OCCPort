@@ -328,7 +328,7 @@ namespace OCCPort.OpenGL
             }
 
             Graphic3d_TypeOfShadingModel aShadingModel = Graphic3d_TypeOfShadingModel.Graphic3d_TypeOfShadingModel_Unlit;
-
+            anAspectFace = theWorkspace.ApplyAspects(false); // do not bind textures before binding the program
             OpenGl_TextureSet aTextureSet = theWorkspace.TextureSet();
             bool toEnableEnvMap = aTextureSet != null
                                       && aTextureSet == theWorkspace.EnvironmentTexture();

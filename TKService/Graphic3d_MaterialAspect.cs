@@ -154,6 +154,18 @@ namespace TKService
             MaterialName = (theName);
             switch (theName)
             {
+                case Graphic3d_NameOfMaterial.Graphic3d_NameOfMaterial_Brass:
+                    MaterialType = Graphic3d_TypeOfMaterial.Graphic3d_MATERIAL_PHYSIC;
+
+                    //BSDF = Graphic3d_BSDF::CreateMetallic(new Graphic3d_Vec3(0.985f, 0.985f, 0.985f),
+//                      Graphic3d_Fresnel.CreateSchlick(new Graphic3d_Vec3(0.58f, 0.42f, 0.20f)), 0.045f);
+
+                    Shininess = 0.65f;
+                    Colors[(int)Graphic3d_TypeOfReflection.Graphic3d_TOR_AMBIENT] = new Quantity_Color(new Graphic3d_Vec3(0.088428f, 0.041081f, 0.002090f));
+                    Colors[(int)Graphic3d_TypeOfReflection.Graphic3d_TOR_DIFFUSE] = new Quantity_Color(new Graphic3d_Vec3(0.570482f, 0.283555f, 0.012335f));
+                    Colors[(int)Graphic3d_TypeOfReflection.Graphic3d_TOR_SPECULAR] = new Quantity_Color(new Graphic3d_Vec3(0.992f, 0.941f, 0.808f));
+                    Colors[(int)Graphic3d_TypeOfReflection.Graphic3d_TOR_EMISSION] = new Quantity_Color(new Graphic3d_Vec3(0.0f));
+                    break;
                 default:
                 case Graphic3d_NameOfMaterial.Graphic3d_NameOfMaterial_DEFAULT:
                     MaterialType = Graphic3d_TypeOfMaterial.Graphic3d_MATERIAL_ASPECT;

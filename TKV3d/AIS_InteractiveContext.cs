@@ -449,31 +449,31 @@ namespace TKV3d
 
         void InitAttributes()
         {
-            /*  Graphic3d_MaterialAspect aMat=new Graphic3d_MaterialAspect ( Graphic3d_NameOfMaterial_Brass);
-              myDefaultDrawer.ShadingAspect().SetMaterial(aMat);
-
+            Graphic3d_MaterialAspect aMat = new Graphic3d_MaterialAspect(Graphic3d_NameOfMaterial.Graphic3d_NameOfMaterial_Brass);
+            myDefaultDrawer.ShadingAspect().SetMaterial(aMat);
+            /*
               //  myDefaultDrawer->ShadingAspect()->SetColor(Quantity_NOC_GRAY70);
               Handle(Prs3d_LineAspect) aLineAspect = myDefaultDrawer->HiddenLineAspect();
-              aLineAspect->SetColor(Quantity_NOC_GRAY20);
-              aLineAspect->SetWidth(1.0);
-              aLineAspect->SetTypeOfLine(Aspect_TOL_DASH);
+            aLineAspect->SetColor(Quantity_NOC_GRAY20);
+            aLineAspect->SetWidth(1.0);
+            aLineAspect->SetTypeOfLine(Aspect_TOL_DASH);
 
-              // tolerance to 2 pixels...
-              SetPixelTolerance(2);
+            // tolerance to 2 pixels...
+            SetPixelTolerance(2);
 
-              // Customizing the drawer for trihedrons and planes...
-              Handle(Prs3d_DatumAspect) aTrihAspect = myDefaultDrawer->DatumAspect();
-              const Standard_Real aLength = 100.0;
-              aTrihAspect->SetAxisLength(aLength, aLength, aLength);
-              const Quantity_Color aColor = Quantity_NOC_LIGHTSTEELBLUE4;
-              aTrihAspect->LineAspect(Prs3d_DatumParts_XAxis)->SetColor(aColor);
-              aTrihAspect->LineAspect(Prs3d_DatumParts_YAxis)->SetColor(aColor);
-              aTrihAspect->LineAspect(Prs3d_DatumParts_ZAxis)->SetColor(aColor);
+            // Customizing the drawer for trihedrons and planes...
+            Handle(Prs3d_DatumAspect) aTrihAspect = myDefaultDrawer->DatumAspect();
+            const Standard_Real aLength = 100.0;
+            aTrihAspect->SetAxisLength(aLength, aLength, aLength);
+            const Quantity_Color aColor = Quantity_NOC_LIGHTSTEELBLUE4;
+            aTrihAspect->LineAspect(Prs3d_DatumParts_XAxis)->SetColor(aColor);
+            aTrihAspect->LineAspect(Prs3d_DatumParts_YAxis)->SetColor(aColor);
+            aTrihAspect->LineAspect(Prs3d_DatumParts_ZAxis)->SetColor(aColor);
 
-              Handle(Prs3d_PlaneAspect) aPlaneAspect = myDefaultDrawer->PlaneAspect();
-              const Standard_Real aPlaneLength = 200.0;
-              aPlaneAspect->SetPlaneLength(aPlaneLength, aPlaneLength);
-              aPlaneAspect->EdgesAspect()->SetColor(Quantity_NOC_SKYBLUE);*/
+            Handle(Prs3d_PlaneAspect) aPlaneAspect = myDefaultDrawer->PlaneAspect();
+            const Standard_Real aPlaneLength = 200.0;
+            aPlaneAspect->SetPlaneLength(aPlaneLength, aPlaneLength);
+            aPlaneAspect->EdgesAspect()->SetColor(Quantity_NOC_SKYBLUE); */
         }
 
         //! Initialize default highlighting attributes.
@@ -1222,7 +1222,7 @@ namespace TKV3d
 
         private void highlightWithSubintensity(AIS_InteractiveObject anObj, int theMode)
         {
-            
+
         }
 
         public void SetDisplayMode(AIS_InteractiveObject theIObj, int theMode, bool theToUpdateViewer)
@@ -1239,13 +1239,13 @@ namespace TKV3d
             }*/
 
             AIS_GlobalStatus aStatus = myObjects[theIObj];
-            if (theIObj.DisplayStatus() !=PrsMgr_DisplayStatus. PrsMgr_DisplayStatus_Displayed)
+            if (theIObj.DisplayStatus() != PrsMgr_DisplayStatus.PrsMgr_DisplayStatus_Displayed)
             {
                 aStatus.SetDisplayMode(theMode);
                 theIObj.SetDisplayMode(theMode);
                 return;
             }
-            
+
             // erase presentations for all display modes different from <aMode>
             int anOldMode = aStatus.DisplayMode();
             if (anOldMode != theMode)
@@ -1258,7 +1258,7 @@ namespace TKV3d
             }
 
             aStatus.SetDisplayMode(theMode);
-            
+
             myMainPM.Display(theIObj, theMode);
             if (aStatus.IsHilighted())
             {
@@ -1268,7 +1268,7 @@ namespace TKV3d
             {
                 highlightWithSubintensity(theIObj, theMode);
             }
-            
+
             if (theToUpdateViewer)
             {
                 myMainVwr.Update();
@@ -1287,8 +1287,8 @@ namespace TKV3d
         //! Provides the type of material setting for the view of the Object.
         public void SetMaterial(AIS_InteractiveObject theIObj, Graphic3d_MaterialAspect theMaterial, bool theToUpdateViewer)
         {
-            if (theIObj==null)            
-                return;            
+            if (theIObj == null)
+                return;
 
             setContextToObject(theIObj);
             theIObj.SetMaterial(theMaterial);

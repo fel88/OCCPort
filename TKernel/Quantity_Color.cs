@@ -15,6 +15,13 @@ namespace TKernel
     //! for instance, application usually providing color picking within 0..255 range in sRGB color space.
     public struct Quantity_Color
     {
+        //! Creates Quantity_NOC_YELLOW color (for historical reasons).
+        public Quantity_Color()
+        {
+            myRgb = (valuesOf(Quantity_NameOfColor.Quantity_NOC_YELLOW, Quantity_TypeOfColor.Quantity_TOC_RGB));
+        }
+
+
         //! Creates the color from enumeration value.
         public Quantity_Color(Quantity_NameOfColor theName)
         {

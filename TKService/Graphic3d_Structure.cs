@@ -749,12 +749,4 @@ namespace TKService
             throw new NotImplementedException();
         }
     }
-
-    //! This class defines graphic attributes for opaque 3d primitives (polygons, triangles, quadrilaterals).
-    public class Graphic3d_AspectFillArea3d : Graphic3d_Aspects
-    {
-
-
-
-    }
 }
