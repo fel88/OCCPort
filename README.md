@@ -1,4 +1,4 @@
-# OCCPort
+# OpenCascade.Sharp
 
 Partial C# port of https://www.opencascade.com/ for educational purposes
 
