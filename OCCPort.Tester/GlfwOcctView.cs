@@ -4,6 +4,7 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 using System;
 using System.Windows.Forms;
 using TKernel;
+using TKOpenGl;
 using TKService;
 using TKV3d;
 

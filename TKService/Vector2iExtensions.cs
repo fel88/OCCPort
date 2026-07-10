@@ -8,5 +8,5 @@ namespace TKService
         {
             return new TKernel.NCollection_Vec2<int>(v.X, v.Y);
         }
-    }
+    } 
 }

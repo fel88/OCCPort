@@ -16,6 +16,7 @@ using System.Windows.Forms;
 using TKBRep;
 using TKG3d;
 using TKMath;
+using TKOpenGl;
 using TKService;
 using TKV3d;
 using static OpenTK.Graphics.OpenGL.GL;

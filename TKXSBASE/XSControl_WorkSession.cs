@@ -28,37 +28,37 @@ namespace TKXSBASE
         //! 5 recreates TransferReader then begins a new transfer
         public void InitTransferReader(int mode)
         {
-            if (mode == 0 || mode == 5) myTransferReader.Clear(-1);  // full clear
-            if (myTransferReader.IsNull()) SetTransferReader(new XSControl_TransferReader);
-            else SetTransferReader(myTransferReader);
+            //if (mode == 0 || mode == 5) myTransferReader.Clear(-1);  // full clear
+            //if (myTransferReader.IsNull()) SetTransferReader(new XSControl_TransferReader);
+            //else SetTransferReader(myTransferReader);
 
-            // mode = 0 fait par SetTransferReader suite a Nullify
-            if (mode == 1)
-            {
-                if (!myTransferReader.IsNull()) myTransferReader->Clear(-1);
-                else SetTransferReader(new XSControl_TransferReader);
-            }
-            if (mode == 2)
-            {
-                Handle(Transfer_TransientProcess) TP = myTransferReader->TransientProcess();
-                if (TP.IsNull())
-                {
-                    TP = new Transfer_TransientProcess;
-                    myTransferReader->SetTransientProcess(TP);
-                    TP->SetGraph(HGraph());
-                }
-                Handle(TColStd_HSequenceOfTransient) lis = myTransferReader->RecordedList();
-                Standard_Integer i, nb = lis->Length();
-                for (i = 1; i <= nb; i++) TP->SetRoot(lis->Value(i));
-            }
-            if (mode == 3)
-            {
-                Handle(Transfer_TransientProcess) TP = myTransferReader->TransientProcess();
-                if (TP.IsNull()) return;
-                Standard_Integer i, nb = TP->NbRoots();
-                for (i = 1; i <= nb; i++) myTransferReader->RecordResult(TP->Root(i));
-            }
-            if (mode == 4 || mode == 5) myTransferReader->BeginTransfer();
+            //// mode = 0 fait par SetTransferReader suite a Nullify
+            //if (mode == 1)
+            //{
+            //    if (!myTransferReader.IsNull()) myTransferReader->Clear(-1);
+            //    else SetTransferReader(new XSControl_TransferReader);
+            //}
+            //if (mode == 2)
+            //{
+            //    Handle(Transfer_TransientProcess) TP = myTransferReader->TransientProcess();
+            //    if (TP.IsNull())
+            //    {
+            //        TP = new Transfer_TransientProcess;
+            //        myTransferReader->SetTransientProcess(TP);
+            //        TP->SetGraph(HGraph());
+            //    }
+            //    Handle(TColStd_HSequenceOfTransient) lis = myTransferReader->RecordedList();
+            //    Standard_Integer i, nb = lis->Length();
+            //    for (i = 1; i <= nb; i++) TP->SetRoot(lis->Value(i));
+            //}
+            //if (mode == 3)
+            //{
+            //    Handle(Transfer_TransientProcess) TP = myTransferReader->TransientProcess();
+            //    if (TP.IsNull()) return;
+            //    Standard_Integer i, nb = TP->NbRoots();
+            //    for (i = 1; i <= nb; i++) myTransferReader->RecordResult(TP->Root(i));
+            //}
+            //if (mode == 4 || mode == 5) myTransferReader->BeginTransfer();
         }
 
     }

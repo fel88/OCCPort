@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package >
+  <metadata>
+    <id>OpenCascade.Sharp</id>
+    <version>0.1.0</version>
+    <title>OpenCascade (OCCT) pure C# port</title>
+    <authors>fel88</authors>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <tags>opencascade cad brep occt</tags>
+    <license type="expression">LGPL-2.1-or-later</license>
+    <!-- <icon>icon.png</icon> -->
+    <projectUrl>https://github.com/fel88/OpenCascade.Sharp</projectUrl>
+    <description>OpenCascade .NET port</description>
+    
+    <copyright>Copyleft 2026</copyright>
+      <dependencies>
+            <dependency id="OpenTK" version="4.9.4" />
+        </dependencies>
+    
+  </metadata>
+  <files>
+    
+     <file src="bin\Release\net8.0\OCCPort.Common.dll" target="lib\net8.0" /> 
+     <file src="bin\Release\net8.0\OCCPort.dll" target="lib\net8.0" /> 
+     <file src="bin\Release\net8.0\TKBRep.dll" target="lib\net8.0" /> 
+     <file src="bin\Release\net8.0\TKernel.dll" target="lib\net8.0" /> 
+     <file src="bin\Release\net8.0\TKG2d.dll" target="lib\net8.0" /> 
+     <file src="bin\Release\net8.0\TKG3d.dll" target="lib\net8.0" /> 
+     <file src="bin\Release\net8.0\TKGeomAlgo.dll" target="lib\net8.0" /> 
+     <file src="bin\Release\net8.0\TKGeomBase.dll" target="lib\net8.0" /> 
+     <file src="bin\Release\net8.0\TKMath.dll" target="lib\net8.0" /> 
+     <file src="bin\Release\net8.0\TKMesh.dll" target="lib\net8.0" /> 
+     <file src="bin\Release\net8.0\TKService.dll" target="lib\net8.0" /> 
+     <file src="bin\Release\net8.0\TKShHealing.dll" target="lib\net8.0" /> 
+     <file src="bin\Release\net8.0\TKTopAlgo.dll" target="lib\net8.0" /> 
+     <file src="bin\Release\net8.0\TKV3d.dll" target="lib\net8.0" /> 
+     <file src="bin\Release\net8.0\TKOpenGl.dll" target="lib\net8.0" /> 
+     <file src="bin\Release\net8.0\Triangle.dll" target="lib\net8.0" /> 
+     
+     
+
+    
+  </files>
+</package>

@@ -3,6 +3,7 @@ using System;
 using System.Windows.Forms;
 using TKernel;
 using TKMath;
+using TKOpenGl;
 using TKService;
 using TKV3d;
 

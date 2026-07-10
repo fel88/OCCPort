@@ -1,0 +1,27 @@
+﻿using OCCPort.OpenGL;
+using System.Threading;
+
+namespace OCCPort
+{
+    public class OpenGl_NamedResource : OpenGl_Resource
+    {
+        public OpenGl_NamedResource()
+        {
+
+        }
+        public OpenGl_NamedResource(string theId)
+        {
+            myResourceId = (theId);
+
+        }  //! Return resource name.
+        public string ResourceId() { return myResourceId; }
+
+        public override void Release(OpenGl_Context theGlCtx)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public   string myResourceId; //!< resource name
+
+    }
+}

@@ -56,12 +56,12 @@ namespace TKernel
                 return myMap.FindFromIndex(myIndex);
             }
 
-            
+
 
             public void ChangeValue(T2 v)
             {
                 Exceptions.Standard_NoSuchObject_Raise_if(!More(), "NCollection_IndexedDataMap::Iterator::Value");
-                 myMap.dic[myIndex - 1]=new KeyValuePair<TheKeyType, T2>(myMap.dic[myIndex - 1].Key,v);
+                myMap.dic[myIndex - 1] = new KeyValuePair<TheKeyType, T2>(myMap.dic[myIndex - 1].Key, v);
             }
         }
 
@@ -147,7 +147,7 @@ namespace TKernel
             {
                 if (hasher.Equals(dic[i].Key, theKey1))
                     //if (dic[i].Key.Equals(theKey1))
-                    return i;
+                    return i + 1;
             }
             dic.Add(new KeyValuePair<TheKeyType, T2>(theKey1, theItem));
             return dic.Count;

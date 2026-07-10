@@ -1,7 +1,6 @@
 ﻿global using AIS_ListOfInteractive = TKernel.NCollection_List<TKV3d.AIS_InteractiveObject>;
 global using AIS_ListIteratorOfListOfInteractive = TKernel.NCollection_List<TKV3d.AIS_InteractiveObject>.Iterator;
 using OCCPort.Common;
-using OCCPort.Enums;
 using OpenTK.Mathematics;
 using System;
 using System.Collections;

@@ -12,7 +12,7 @@
     <PackageReference Include="OpenTK.GLControl" Version="4.0.2" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\OCCPort.OpenGL\OCCPort.OpenGL.csproj" />
     <ProjectReference Include="..\OCCPort\OCCPort.csproj" />
+    <ProjectReference Include="..\TKOpenGl\TKOpenGl.csproj" />
   </ItemGroup>
 </Project>
