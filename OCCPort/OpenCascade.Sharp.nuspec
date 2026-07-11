@@ -11,7 +11,7 @@
     <!-- <icon>icon.png</icon> -->
     <projectUrl>https://github.com/fel88/OpenCascade.Sharp</projectUrl>
     <description>OpenCascade .NET port</description>
-    
+    <readme>docs\README.md</readme>
     <copyright>Copyleft 2026</copyright>
       <dependencies>
             <dependency id="OpenTK" version="4.9.4" />
@@ -39,6 +39,7 @@
      <file src="bin\Release\net8.0\TKV3d.dll" target="lib\net8.0" /> 
      <file src="bin\Release\net8.0\TKOpenGl.dll" target="lib\net8.0" /> 
      <file src="bin\Release\net8.0\Triangle.dll" target="lib\net8.0" /> 
+     <file src="docs\README.md" target="docs\" /> 
      
      
 
