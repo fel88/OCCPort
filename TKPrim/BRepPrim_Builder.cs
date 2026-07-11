@@ -1,12 +1,13 @@
-﻿using System;
+﻿using OCCPort;
 using TKBRep;
 using TKG2d;
 using TKG3d;
 using TKMath;
 
-namespace OCCPort
+namespace TKPrim
 {
-    internal class BRepPrim_Builder
+    //! implements the abstract Builder with the BRep Builder
+    public class BRepPrim_Builder
     {
         public BRepPrim_Builder()
         {
@@ -49,7 +50,7 @@ namespace OCCPort
             myBuilder.Add(S, F);
         }
 
-        public void SetPCurve(TopoDS_Edge E, 
+        public void SetPCurve(TopoDS_Edge E,
             TopoDS_Face F, gp_Lin2d L)
         {
             myBuilder.UpdateEdge(E, new Geom2d_Line(L), F, Precision.Confusion());
@@ -68,7 +69,7 @@ namespace OCCPort
 
         public void AddWireEdge(TopoDS_Wire W, TopoDS_Edge E, bool direct)
         {
-            TopoDS_Edge EE = new TopoDS_Edge( E);
+            TopoDS_Edge EE = new TopoDS_Edge(E);
             if (!direct)
                 EE.Reverse();
             myBuilder.Add(W, EE);
@@ -83,7 +84,7 @@ namespace OCCPort
                         double P,
                         bool direct)
         {
-            TopoDS_Vertex VV = new  TopoDS_Vertex (V);
+            TopoDS_Vertex VV = new TopoDS_Vertex(V);
             if (!direct)
                 VV.Reverse();
 

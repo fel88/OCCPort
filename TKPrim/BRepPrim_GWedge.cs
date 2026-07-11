@@ -1,14 +1,30 @@
-﻿using OCCPort.Common;
-using System;
-using System.Data;
-using System.Linq;
-using System.Security.Cryptography;
+﻿using OCCPort;
+using OCCPort.Common;
 using TKBRep;
 using TKMath;
 
-namespace OCCPort
+namespace TKPrim
 {
-    internal class BRepPrim_GWedge
+    //! A wedge is defined by  :
+    //!
+    //! Axes : an Axis2 (coordinate system)
+    //!
+    //! YMin, YMax the  coordinates of the  ymin and ymax
+    //! rectangular faces parallel to the ZX plane (of the
+    //! coordinate systems)
+    //!
+    //! ZMin,ZMax,XMin,XMax the rectangular
+    //! left (YMin) face parallel to the Z and X axes.
+    //!
+    //! Z2Min,Z2Max,X2Min,X2Max the rectangular
+    //! right (YMax) face parallel to the Z and X axes.
+    //!
+    //! For a box Z2Min = ZMin, Z2Max = ZMax,
+    //! X2Min = XMin, X2Max = XMax
+    //!
+    //! The wedge can be open in the corresponding direction
+    //! of its Boolean myInfinite
+    public class BRepPrim_GWedge
     {
         public BRepPrim_GWedge()
         {
@@ -187,7 +203,8 @@ new[]                      { 8,10, 4, 6,-1,-1},
                         dd4 = BRepPrim_Direction.BRepPrim_XMin;
                         break;
 
-                };
+                }
+                ;
 
                 gp_Lin L;
                 gp_Dir DX = P.XAxis().Direction();
@@ -287,7 +304,8 @@ new[]                      { 8,10, 4, 6,-1,-1},
                         break;
                     default:
                         break;
-                };
+                }
+                ;
 
                 myBuilder.MakeWire(myWires[i]);
 
@@ -341,7 +359,8 @@ new[]                      { 8,10, 4, 6,-1,-1},
 
                     default:
                         break;
-                };
+                }
+                ;
 
                 gp_Lin L = Line(d1, d2);
                 myBuilder.MakeEdge(myEdges[i], L);
@@ -389,8 +408,8 @@ new[]                      { 8,10, 4, 6,-1,-1},
                 myBuilder.CompleteEdge(myEdges[i]);
                 EdgesBuilt[i] = true;
             }
-                        
-            
+
+
             return myEdges[i];
 
         }
@@ -455,7 +474,8 @@ new[]                      { 8,10, 4, 6,-1,-1},
                     Z = Z2Max;
                     break;
 
-            };
+            }
+            ;
 
             gp_Pnt P = myAxes.Location();
             P.Translate(X * new gp_Vec(myAxes.XDirection()));
@@ -584,7 +604,8 @@ new[]                      { 8,10, 4, 6,-1,-1},
                     dd4 = BRepPrim_Direction.BRepPrim_XMin;
                     break;
 
-            };
+            }
+            ;
 
             return HasEdge(d1, dd1) || HasEdge(d1, dd2) || HasEdge(d1, dd3) || HasEdge(d1, dd4);
 
@@ -616,7 +637,8 @@ new[]                      { 8,10, 4, 6,-1,-1},
                     D = myAxes.Direction();
                     break;
 
-            };
+            }
+            ;
             double X = 0.0, Y = 0.0, Z = 0.0;
 
             switch (i)
@@ -668,7 +690,8 @@ new[]                      { 8,10, 4, 6,-1,-1},
                     if (Z2Max != ZMax) D = new gp_Dir((YMax - YMin) * VZ + (ZMax - Z2Max) * VY);
                     break;
 
-            };
+            }
+            ;
 
             gp_Pnt P = myAxes.Location();
             P.Translate(X * new gp_Vec(myAxes.XDirection()));
@@ -708,7 +731,8 @@ new[]                      { 8,10, 4, 6,-1,-1},
                     D = myAxes.YDirection();
                     break;
 
-            };
+            }
+            ;
 
             switch (i)
             {
@@ -892,6 +916,4 @@ new[]                      { 8,10, 4, 6,-1,-1},
 
 
     }
-
-
 }

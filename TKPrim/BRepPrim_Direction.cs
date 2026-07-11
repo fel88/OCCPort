@@ -1,4 +1,4 @@
-﻿namespace OCCPort
+﻿namespace TKPrim
 {
     public enum BRepPrim_Direction
     {
@@ -9,6 +9,5 @@
         BRepPrim_ZMin,
         BRepPrim_ZMax
     }
-
 
 }

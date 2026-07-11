@@ -25,7 +25,9 @@
     <ProjectReference Include="..\TKMath\TKMath.csproj" />
     <ProjectReference Include="..\TKMesh\TKMesh.csproj" />
     <ProjectReference Include="..\TKOpenGl\TKOpenGl.csproj" />
+    <ProjectReference Include="..\TKPrim\TKPrim.csproj" />
     <ProjectReference Include="..\TKService\TKService.csproj" />
+    <ProjectReference Include="..\TKSTEP\TKSTEP.csproj" />
     <ProjectReference Include="..\TKV3d\TKV3d.csproj" />
     <ProjectReference Include="..\Triangle\Triangle.csproj" />
   </ItemGroup>

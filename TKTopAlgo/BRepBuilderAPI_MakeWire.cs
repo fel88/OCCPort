@@ -1,8 +1,6 @@
-﻿using OCCPort.Enums;
-using System;
-using TKTopAlgo;
+﻿using OCCPort;
 
-namespace OCCPort
+namespace TKTopAlgo
 {
     //! Describes functions to build wires from edges. A wire can
     //! be built from any number of edges.
@@ -37,7 +35,7 @@ namespace OCCPort
     //! -   consulting the result.
     public class BRepBuilderAPI_MakeWire : BRepBuilderAPI_MakeShape
     {
-        
+
 
         //! Adds the edge E to the wire under construction.
         //! E must be connectable to the wire under construction, and, unless it
@@ -59,9 +57,9 @@ namespace OCCPort
             {
                 Done();
                 myShape = myMakeWire.Wire();
-            }            
+            }
         }
-     
+
 
         public TopoDS_Wire Wire()
         {

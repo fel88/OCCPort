@@ -1,3 +1,5 @@
+*.nupkg
+nuget.exe
 .vs/
 bin/
 obj/

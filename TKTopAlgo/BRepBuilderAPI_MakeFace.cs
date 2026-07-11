@@ -1,7 +1,7 @@
-﻿using TKBRep;
-using TKTopAlgo;
+﻿using OCCPort;
+using TKBRep;
 
-namespace OCCPort.Tester
+namespace TKTopAlgo
 {
     //! Provides methods to build faces.
     //!
@@ -31,9 +31,9 @@ namespace OCCPort.Tester
     public class BRepBuilderAPI_MakeFace : BRepBuilderAPI_MakeShape
     {
         //! Find a surface from the wire and make a face.
-     //! if <OnlyPlane> is true, the computed surface will be
-     //! a plane. If it is not possible to find a plane, the
-     //! flag NotDone will be set.
+        //! if <OnlyPlane> is true, the computed surface will be
+        //! a plane. If it is not possible to find a plane, the
+        //! flag NotDone will be set.
         public BRepBuilderAPI_MakeFace(TopoDS_Wire W, bool OnlyPlane = false)
         {
             myMakeFace = new BRepLib_MakeFace(W, OnlyPlane);
@@ -43,10 +43,10 @@ namespace OCCPort.Tester
                 myShape = myMakeFace.Shape();
             }
         }
-        
+
         public static implicit operator TopoDS_Face(BRepBuilderAPI_MakeFace f)
         {
-           return f.Face();
+            return f.Face();
         }
 
         public TopoDS_Face Face()

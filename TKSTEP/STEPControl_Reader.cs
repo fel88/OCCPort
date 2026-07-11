@@ -36,7 +36,7 @@
     //! WS = reader.WS();
     //! if ( WS->TransferReader()->HasResult(ent) )
     //! TopoDS_Shape shape = WS->TransferReader()->ShapeResult(ent);
-    class STEPControl_Reader : XSControl_Reader
+    public class STEPControl_Reader : XSControl_Reader
 
     {
 

@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>OpenCascade.Sharp</id>
-    <version>0.1.0</version>
+    <version>0.1.1</version>
     <title>OpenCascade (OCCT) pure C# port</title>
     <authors>fel88</authors>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -26,8 +26,11 @@
      <file src="bin\Release\net8.0\TKernel.dll" target="lib\net8.0" /> 
      <file src="bin\Release\net8.0\TKG2d.dll" target="lib\net8.0" /> 
      <file src="bin\Release\net8.0\TKG3d.dll" target="lib\net8.0" /> 
-     <file src="bin\Release\net8.0\TKGeomAlgo.dll" target="lib\net8.0" /> 
-     <file src="bin\Release\net8.0\TKGeomBase.dll" target="lib\net8.0" /> 
+     <file src="bin\Release\net8.0\TKGeomAlgo.dll" target="lib\net8.0" />
+     <file src="bin\Release\net8.0\TKGeomBase.dll" target="lib\net8.0" />
+     <file src="bin\Release\net8.0\TKXSBASE.dll" target="lib\net8.0" /> 
+     <file src="bin\Release\net8.0\TKSTEP.dll" target="lib\net8.0" /> 
+     <file src="bin\Release\net8.0\TKPrim.dll" target="lib\net8.0" /> 
      <file src="bin\Release\net8.0\TKMath.dll" target="lib\net8.0" /> 
      <file src="bin\Release\net8.0\TKMesh.dll" target="lib\net8.0" /> 
      <file src="bin\Release\net8.0\TKService.dll" target="lib\net8.0" /> 

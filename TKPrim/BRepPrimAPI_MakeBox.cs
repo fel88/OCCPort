@@ -1,10 +1,28 @@
-﻿using System;
+﻿using OCCPort;
 using TKBRep;
 using TKMath;
 using TKTopAlgo;
 
-namespace OCCPort.Tester
+namespace TKPrim
 {
+    //! Describes functions to build parallelepiped boxes.
+    //! A MakeBox object provides a framework for:
+    //! -   defining the construction of a box,
+    //! -   implementing the construction algorithm, and
+    //! -   consulting the result.
+    //! Constructs a box such that its sides are parallel to the axes of
+    //! -   the global coordinate system, or
+    //! -   the local coordinate system Axis. and
+    //! -   with a corner at (0, 0, 0) and of size (dx, dy, dz), or
+    //! -   with a corner at point P and of size (dx, dy, dz), or
+    //! -   with corners at points P1 and P2.
+    //! Exceptions
+    //! Standard_DomainError if: dx, dy, dz are less than or equal to
+    //! Precision::Confusion(), or
+    //! -   the vector joining the points P1 and P2 has a
+    //! component projected onto the global coordinate
+    //! system less than or equal to Precision::Confusion().
+    //! In these cases, the box would be flat.
     public class BRepPrimAPI_MakeBox : BRepBuilderAPI_MakeShape
     {
         BRepPrim_Wedge myWedge;
@@ -79,5 +97,4 @@ namespace OCCPort.Tester
     }
 
 
-  
 }

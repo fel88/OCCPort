@@ -17,7 +17,9 @@ using TKBRep;
 using TKG3d;
 using TKMath;
 using TKOpenGl;
+using TKPrim;
 using TKService;
+using TKTopAlgo;
 using TKV3d;
 using static OpenTK.Graphics.OpenGL.GL;
 

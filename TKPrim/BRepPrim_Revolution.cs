@@ -23,4 +23,5 @@ namespace TKPrim
         Geom_Curve myMeridian;     
         Geom2d_Curve myPMeridian;
     }
+
 }
