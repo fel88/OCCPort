@@ -19,6 +19,11 @@ namespace OCCPort
             mySurface = (S);
         }
 
+        public override void Continuity(GeomAbs_Shape shape)
+        {
+            throw new NotImplementedException();
+        }
+
         public override BRep_CurveRepresentation Copy()
         {
             BRep_PolygonOnSurface P = new BRep_PolygonOnSurface(myPolygon2D,

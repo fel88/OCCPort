@@ -50,6 +50,7 @@
             toolStripButton12 = new System.Windows.Forms.ToolStripButton();
             toolStripButton13 = new System.Windows.Forms.ToolStripButton();
             toolStripButton15 = new System.Windows.Forms.ToolStripButton();
+            toolStripButton16 = new System.Windows.Forms.ToolStripButton();
             toolStrip1.SuspendLayout();
             SuspendLayout();
             // 
@@ -61,7 +62,7 @@
             // 
             // toolStrip1
             // 
-            toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { toolStripButton1, toolStripDropDownButton1, toolStripButton2, toolStripButton14, toolStripButton3, toolStripButton4, toolStripButton5, toolStripButton6, toolStripButton7, toolStripButton8, toolStripButton9, toolStripButton10, toolStripButton11, toolStripButton12, toolStripButton13, toolStripButton15 });
+            toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { toolStripButton1, toolStripDropDownButton1, toolStripButton2, toolStripButton14, toolStripButton3, toolStripButton4, toolStripButton5, toolStripButton6, toolStripButton7, toolStripButton8, toolStripButton9, toolStripButton10, toolStripButton11, toolStripButton12, toolStripButton13, toolStripButton15, toolStripButton16 });
             toolStrip1.Location = new System.Drawing.Point(0, 0);
             toolStrip1.Name = "toolStrip1";
             toolStrip1.Size = new System.Drawing.Size(1058, 25);
@@ -91,14 +92,14 @@
             // frontToolStripMenuItem
             // 
             frontToolStripMenuItem.Name = "frontToolStripMenuItem";
-            frontToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            frontToolStripMenuItem.Size = new System.Drawing.Size(100, 22);
             frontToolStripMenuItem.Text = "front";
             frontToolStripMenuItem.Click += frontToolStripMenuItem_Click;
             // 
             // topToolStripMenuItem
             // 
             topToolStripMenuItem.Name = "topToolStripMenuItem";
-            topToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            topToolStripMenuItem.Size = new System.Drawing.Size(100, 22);
             topToolStripMenuItem.Text = "top";
             topToolStripMenuItem.Click += topToolStripMenuItem_Click;
             // 
@@ -235,6 +236,15 @@
             toolStripButton15.Text = "clear";
             toolStripButton15.Click += toolStripButton15_Click;
             // 
+            // toolStripButton16
+            // 
+            toolStripButton16.Image = (System.Drawing.Image)resources.GetObject("toolStripButton16.Image");
+            toolStripButton16.ImageTransparentColor = System.Drawing.Color.Magenta;
+            toolStripButton16.Name = "toolStripButton16";
+            toolStripButton16.Size = new System.Drawing.Size(65, 20);
+            toolStripButton16.Text = "add cyl";
+            toolStripButton16.Click += toolStripButton16_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -275,6 +285,7 @@
         private System.Windows.Forms.ToolStripButton toolStripButton13;
         private System.Windows.Forms.ToolStripButton toolStripButton14;
         private System.Windows.Forms.ToolStripButton toolStripButton15;
+        private System.Windows.Forms.ToolStripButton toolStripButton16;
     }
 }
 

@@ -46,5 +46,10 @@ namespace OCCPort
 
             return P;
         }
+
+        public override void Continuity(GeomAbs_Shape shape)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

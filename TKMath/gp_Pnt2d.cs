@@ -41,13 +41,29 @@ namespace TKMath
         }
         //! Assigns the two coordinates of Coord to this point.
         public void SetXY(gp_XY theCoord) { coord = theCoord; }
-//! Returns the coordinates of this point.
-            //! Note: This syntax allows direct modification of the returned value.
+        //! Returns the coordinates of this point.
+        //! Note: This syntax allows direct modification of the returned value.
         internal gp_XY ChangeCoord()
         {
-            
+
             return coord;
 
+        }
+
+        //! Comparison
+        //! Returns True if the distance between the two
+        //! points is lower or equal to theLinearTolerance.
+        public bool IsEqual(gp_Pnt2d theOther, double theLinearTolerance)
+        {
+            return Distance(theOther) <= theLinearTolerance;
+        }
+
+        public double Distance(gp_Pnt2d theOther)
+        {
+            gp_XY aXY = theOther.coord;
+            double aX = coord.X() - aXY.X();
+            double aY = coord.Y() - aXY.Y();
+            return Math.Sqrt(aX * aX + aY * aY);
         }
 
         public gp_Pnt2d(gp_XY gp_XY) : this()

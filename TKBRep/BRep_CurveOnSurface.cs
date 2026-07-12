@@ -5,7 +5,7 @@ using TKMath;
 
 namespace OCCPort
 {
-    internal class BRep_CurveOnSurface : BRep_GCurve
+    public class BRep_CurveOnSurface : BRep_GCurve
     {
         public BRep_CurveOnSurface(Geom2d_Curve PC,
             Geom_Surface S, TopLoc_Location L)
@@ -47,6 +47,11 @@ namespace OCCPort
         }
 
         public override BRep_CurveRepresentation Copy()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void Continuity(GeomAbs_Shape shape)
         {
             throw new NotImplementedException();
         }

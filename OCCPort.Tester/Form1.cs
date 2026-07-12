@@ -625,5 +625,24 @@ namespace OCCPort.Tester
             // Clears all objects from the context and releases presentation memory
             myAISContext.RemoveAll(true);
         }
+
+        private void toolStripButton16_Click(object sender, EventArgs e)
+        {
+
+            // Define dimensions
+            double radius = 10.0;
+            double height = 50.0;
+
+            // Create the cylinder
+            BRepPrimAPI_MakeCylinder mkCylinder=new BRepPrimAPI_MakeCylinder (radius, height);
+
+            // Get the resulting TopoDS_Shape
+            TopoDS_Shape myCylinder = mkCylinder.Shape();
+            var shape = new AIS_Shape(myCylinder);
+
+            myAISContext.Display(shape, true);
+            myAISContext.SetDisplayMode(shape, (int)AIS_DisplayMode.AIS_Shaded, false);
+            myAISContext.UpdateCurrentViewer();
+        }
     }
 }

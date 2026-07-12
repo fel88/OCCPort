@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OCCPort.Common;
+using System;
 
 namespace TKMath
 {
@@ -12,6 +13,26 @@ namespace TKMath
             vydir = new gp_Dir(0.0, 1.0, 0.0);
             // vxdir(1.,0.,0.) use default ctor of gp_Dir, as it creates the same dir(1,0,0)
         }
+        //! Translates an axis plaxement in the direction of the vector <theV>.
+        //! The magnitude of the translation is the vector's magnitude.
+        public gp_Ax2 Translated(gp_Vec theV)
+        {
+            gp_Ax2 aTemp = this;
+            aTemp.Translate(theV);
+            return aTemp;
+        }
+
+        public void Rotate(gp_Ax1 theA1, double theAng)
+        {
+            gp_Pnt aTemp = axis.Location();
+            aTemp.Rotate(theA1, theAng);
+            axis.SetLocation(aTemp);
+            vxdir.Rotate(theA1, theAng);
+            vydir.Rotate(theA1, theAng);
+            axis.SetDirection(vxdir.Crossed(vydir));
+        }
+
+        public void Translate(gp_Vec theV) { axis.Translate(theV); }
 
         //! Creates an axis placement with an origin P such that:
         //! -   N is the Direction, and

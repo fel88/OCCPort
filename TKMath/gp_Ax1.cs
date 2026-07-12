@@ -1,4 +1,6 @@
-﻿namespace TKMath
+﻿using OCCPort.Common;
+
+namespace TKMath
 {
     //! Describes an axis in 3D space.
     //! An axis is defined by:
@@ -14,6 +16,18 @@
     //! or to define a symmetry axis.
     public struct gp_Ax1
     {
+        //! Assigns V as the "Direction"  of this axis.
+        public void SetDirection(gp_Dir theV) { vdir = theV; }
+
+        //! Assigns  P as the origin of this axis.
+        public void SetLocation(gp_Pnt theP) { loc = theP; }
+        //! Rotates this axis at an angle theAngRad (in radians) about the axis theA1
+        //! and assigns the result to this axis.
+        public void Rotate(gp_Ax1 theA1, double theAngRad)
+        {
+            loc.Rotate(theA1, theAngRad);
+            vdir.Rotate(theA1, theAngRad);
+        }
 
         gp_Pnt loc;
         gp_Dir vdir;

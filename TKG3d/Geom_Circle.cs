@@ -1,0 +1,45 @@
+﻿using OCCPort;
+using OCCPort.Common;
+
+namespace TKG3d
+{
+    //! Describes a circle in 3D space.
+    //! A circle is defined by its radius and, as with any conic
+    //! curve, is positioned in space with a right-handed
+    //! coordinate system (gp_Ax2 object) where:
+    //! - the origin is the center of the circle, and
+    //! - the origin, "X Direction" and "Y Direction" define the
+    //! plane of the circle.
+    //! This coordinate system is the local coordinate
+    //! system of the circle.
+    //! The "main Direction" of this coordinate system is the
+    //! vector normal to the plane of the circle. The axis, of
+    //! which the origin and unit vector are respectively the
+    //! origin and "main Direction" of the local coordinate
+    //! system, is termed the "Axis" or "main Axis" of the circle.
+    //! The "main Direction" of the local coordinate system
+    //! gives an explicit orientation to the circle (definition of
+    //! the trigonometric sense), determining the direction in
+    //! which the parameter increases along the circle.
+    //! The Geom_Circle circle is parameterized by an angle:
+    //! P(U) = O + R*Cos(U)*XDir + R*Sin(U)*YDir, where:
+    //! - P is the point of parameter U,
+    //! - O, XDir and YDir are respectively the origin, "X
+    //! Direction" and "Y Direction" of its local coordinate system,
+    //! - R is the radius of the circle.
+    //! The "X Axis" of the local coordinate system therefore
+    //! defines the origin of the parameter of the circle. The
+    //! parameter is the angle with this "X Direction".
+    //! A circle is a closed and periodic curve. The period is
+    //! 2.*Pi and the parameter range is [ 0, 2.*Pi [.
+    public class Geom_Circle : Geom_Conic
+    {
+        public Geom_Circle(gp_Circ C)
+        {
+            radius = (C.Radius());
+            pos = C.Position();
+        }
+        double radius;
+
+    }
+}

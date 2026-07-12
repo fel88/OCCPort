@@ -19,6 +19,12 @@ namespace TKGeomBase
                 throw new Standard_NoSuchObject("ProjLib_Projector::Line");
             return myLin;
         }
+        public gp_Circ2d Circle()
+        {
+            if (myType != GeomAbs_CurveType.GeomAbs_Circle)
+                throw new Standard_NoSuchObject("ProjLib_Projector::Circle");
+            return myCirc;
+        }
 
         public void SetType(GeomAbs_CurveType Type)
         {
@@ -30,6 +36,8 @@ namespace TKGeomBase
         }
         protected GeomAbs_CurveType myType;
         protected gp_Lin2d myLin;
+        protected gp_Circ2d myCirc;
+
         protected bool myIsPeriodic;
         protected bool isDone;
         public GeomAbs_CurveType _GetType()

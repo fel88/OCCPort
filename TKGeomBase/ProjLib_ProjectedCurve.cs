@@ -76,9 +76,9 @@ namespace TKGeomBase
                 case GeomAbs_CurveType.GeomAbs_Line:
                     P.Project(C.Line());
                     break;
-                //case GeomAbs_Circle:
-                //    P.Project(C->Circle());
-                //    break;
+                case GeomAbs_CurveType.GeomAbs_Circle:
+                //P.Project(C.Circle());
+                //break;
                 //case GeomAbs_Ellipse:
                 //    P.Project(C->Ellipse());
                 //    break;
@@ -666,6 +666,13 @@ namespace TKGeomBase
         public override bool IsPeriodic()
         {
             throw new NotImplementedException();
+        }
+
+        public override gp_Circ2d Circle()
+        {
+
+            return myResult.Circle();
+
         }
     }
 }

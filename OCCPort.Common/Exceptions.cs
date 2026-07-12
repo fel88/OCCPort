@@ -62,5 +62,11 @@
                 throw new Exception(v2);
             
         }
+
+        public static void Standard_DomainError_Raise_if(bool value, string v)
+        {
+            if (value)
+                throw new Exception(v);
+        }
     }
 }

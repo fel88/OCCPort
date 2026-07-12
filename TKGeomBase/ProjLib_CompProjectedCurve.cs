@@ -140,5 +140,10 @@ namespace TKGeomBase
         {
             throw new NotImplementedException();
         }
+
+        public override gp_Circ2d Circle()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

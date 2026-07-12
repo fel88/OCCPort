@@ -45,5 +45,7 @@ namespace TKG2d
         {
             throw new NotImplementedException();
         }
+
+        public abstract gp_Circ2d Circle();
     }
 }

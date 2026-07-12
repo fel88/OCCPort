@@ -20,6 +20,14 @@ namespace TKMath
         //! For this unit vector, returns its Y coordinate.
         public double Y() { return coord.Y(); }
 
+        public void SetCoord(double theXv,
+                                 double theYv)
+        {
+            double aD = Math.Sqrt(theXv * theXv + theYv * theYv);
+            Exceptions.Standard_ConstructionError_Raise_if(aD <= gp.Resolution(), "gp_Dir2d::SetCoord() - result vector has zero norm");
+            coord.SetX(theXv / aD);
+            coord.SetY(theYv / aD);
+        }
 
         //! Computes the scalar product
         public double Dot(gp_Dir2d theOther) { return coord.Dot(theOther.coord); }

@@ -1,5 +1,6 @@
 ﻿using OCCPort;
 using OCCPort.Common;
+using System.Reflection.Metadata;
 using TKG2d;
 using TKG3d;
 using TKMath;
@@ -25,9 +26,160 @@ namespace TKBRep
     public class BRep_Builder : TopoDS_Builder
 
     {
+        public void Continuity(TopoDS_Edge E,
+                                 TopoDS_Face F1,
+                                 TopoDS_Face F2,
+                                 GeomAbs_Shape C)
+        {
+            TopLoc_Location l1, l2;
+            Geom_Surface S1 = BRep_Tool.Surface(F1, out l1);
+            Geom_Surface S2 = BRep_Tool.Surface(F2, out l2);
+            Continuity(E, S1, S2, l1, l2, C);
+        }
+
+        public void Continuity(TopoDS_Edge E,
+                                  Geom_Surface S1,
+                                  Geom_Surface S2,
+                                  TopLoc_Location L1,
+                                  TopLoc_Location L2,
+                                  GeomAbs_Shape C)
+        {
+            BRep_TEdge TE = (BRep_TEdge)E.TShape();
+            if (TE.Locked())
+            {
+                throw new TopoDS_LockedShape("BRep_Builder::Continuity");
+            }
+            TopLoc_Location l1 = L1.Predivided(E.Location());
+            TopLoc_Location l2 = L2.Predivided(E.Location());
+
+            UpdateCurves(TE.ChangeCurves(), S1, S2, l1, l2, C);
+
+
+            TE.Modified(true);
+        }
+        static void UpdateCurves(BRep_ListOfCurveRepresentation lcr,
+                         Geom_Surface S1,
+                         Geom_Surface S2,
+                         TopLoc_Location L1,
+                         TopLoc_Location L2,
+                         GeomAbs_Shape C)
+        {
+            BRep_ListIteratorOfListOfCurveRepresentation itcr = new BRep_ListIteratorOfListOfCurveRepresentation(lcr);
+            while (itcr.More())
+            {
+                BRep_CurveRepresentation cr = itcr.Value();
+                bool isregu = cr.IsRegularity(S1, S2, L1, L2);
+                if (isregu) break;
+                itcr.Next();
+            }
+
+            if (itcr.More())
+            {
+                BRep_CurveRepresentation cr = itcr.Value();
+                cr.Continuity(C);
+            }
+            else
+            {
+                BRep_CurveOn2Surfaces COS = new BRep_CurveOn2Surfaces
+                  (S1, S2, L1, L2, C);
+                lcr.Append(COS);
+            }
+        }
         public void UpdateEdge(TopoDS_Edge E,
-                                     Poly_Polygon3D P,
-                                     ref TopLoc_Location L)
+                                      Geom2d_Curve C1,
+                                      Geom2d_Curve C2,
+                                      TopoDS_Face F,
+                                      double Tol)
+        {
+            TopLoc_Location l;
+            UpdateEdge(E, C1, C2, BRep_Tool.Surface(F, out l), l, Tol);
+        }
+
+        public void UpdateEdge(TopoDS_Edge E,
+                                  Geom2d_Curve C1,
+                                  Geom2d_Curve C2,
+                                  Geom_Surface S,
+                                  TopLoc_Location L,
+                                  double Tol)
+        {
+            BRep_TEdge TE = (BRep_TEdge)E.TShape();
+            if (TE.Locked())
+            {
+                throw new TopoDS_LockedShape("BRep_Builder::UpdateEdge");
+            }
+
+            TopLoc_Location l = L.Predivided(E.Location());
+
+            UpdateCurves(TE.ChangeCurves(), C1, C2, S, l);
+
+            TE.UpdateTolerance(Tol);
+            TE.Modified(true);
+        }
+
+        //=======================================================================
+        //function : UpdateCurves
+        //purpose  : Insert two pcurves <C1,C2> on surface <S> with location <L> 
+        //           in a list of curve representations <lcr>
+        //           Remove the pcurves on <S> from <lcr> if <C1> or <C2> is null
+        //=======================================================================
+
+        public static void UpdateCurves(BRep_ListOfCurveRepresentation lcr,
+                               Geom2d_Curve C1,
+                               Geom2d_Curve C2,
+                               Geom_Surface S,
+                               TopLoc_Location L)
+        {
+            BRep_ListIteratorOfListOfCurveRepresentation itcr = new BRep_ListIteratorOfListOfCurveRepresentation(lcr);
+            BRep_CurveRepresentation cr;
+            BRep_GCurve GC;
+            double f = -Precision.Infinite(), l = Precision.Infinite();
+
+            while (itcr.More())
+            {
+                GC = (BRep_GCurve)(itcr.Value());
+                if (GC != null)
+                {
+                    if (GC.IsCurve3D())
+                    {
+                        GC.Range(ref f, ref l);
+                    }
+                    bool iscos = GC.IsCurveOnSurface(S, L);
+                    if (iscos) break;
+                }
+                itcr.Next();
+            }
+
+            if (itcr.More())
+            {
+                // cr is used to keep a reference on the curve representation
+                // this avoid deleting it as its content may be referenced by C or S
+                cr = itcr.Value();
+                lcr.Remove(itcr);
+            }
+
+            if (C1 != null && C2 != null)
+            {
+                BRep_CurveOnClosedSurface COS = new
+                                BRep_CurveOnClosedSurface(C1, C2, S, L, GeomAbs_Shape.GeomAbs_C0);
+                double aFCur = 0.0, aLCur = 0.0;
+                COS.Range(ref aFCur, ref aLCur);
+                if (!Precision.IsInfinite(f))
+                {
+                    aFCur = f;
+                }
+
+                if (!Precision.IsInfinite(l))
+                {
+                    aLCur = l;
+                }
+
+                COS.SetRange(aFCur, aLCur);
+                lcr.Append(COS);
+            }
+        }
+        public void UpdateEdge(TopoDS_Edge E,
+                                                     Poly_Polygon3D P,
+                                                     ref TopLoc_Location L)
         {
             BRep_TEdge TE = (BRep_TEdge)E.TShape();
             if (TE.Locked())
@@ -646,5 +798,27 @@ namespace TKBRep
         {
             throw new NotImplementedException();
         }
+    }
+
+
+    //! Representation  of a    curve by two  pcurves   on
+    //! a closed surface.
+    public class BRep_CurveOnClosedSurface : BRep_CurveOnSurface
+    {
+        public BRep_CurveOnClosedSurface
+   (Geom2d_Curve PC1,
+    Geom2d_Curve PC2,
+    Geom_Surface S,
+    TopLoc_Location L,
+    GeomAbs_Shape C) : base(PC1, S, L)
+        {
+            myPCurve2 = (PC2);
+            myContinuity = (C);
+        }
+
+        Geom2d_Curve myPCurve2;
+        GeomAbs_Shape myContinuity;
+        gp_Pnt2d myUV21;
+        gp_Pnt2d myUV22;
     }
 }

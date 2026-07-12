@@ -29,6 +29,11 @@ namespace OCCPort
 
         }
 
+        public override void Continuity(GeomAbs_Shape shape)
+        {
+            throw new NotImplementedException();
+        }
+
         Poly_Polygon3D myPolygon3D;
 
     }

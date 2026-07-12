@@ -1,4 +1,6 @@
-﻿namespace TKMath
+﻿using OCCPort.Common;
+
+namespace TKMath
 {
     //! Defines a 3D cartesian point.
     public struct gp_Pnt
@@ -8,6 +10,12 @@
         public override string ToString()
         {
             return $"gp_Pnt  X: {coord.X()} Y: {coord.Y()} Z: {coord.Z()}";
+        }
+        public void Rotate(gp_Ax1 theA1, double theAng)
+        {
+            gp_Trsf aT = new gp_Trsf();
+            aT.SetRotation(theA1, theAng);
+            aT.Transforms(coord);
         }
 
         //! Creates a point with zero coordinates.

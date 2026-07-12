@@ -1,4 +1,7 @@
-﻿namespace OCCPort
+﻿using OCCPort.Common;
+using TKMath;
+
+namespace OCCPort
 {
     //! Describes a circle in 3D space.
     //! A circle is defined by its radius and positioned in space
@@ -28,5 +31,32 @@
     //! parametric equations of circles
     public class gp_Circ
     {
+
+        //! Creates an indefinite circle.
+        public gp_Circ()
+        {
+            radius = Standard_Real.RealLast();
+        }
+
+        //! Returns the position of the circle.
+        //! It is the local coordinate system of the circle.
+        public gp_Ax2 Position() { return pos; }
+
+        //! Returns the radius of this circle.
+        public double Radius() { return radius; }
+
+        //! A2 locates the circle and gives its orientation in 3D space.
+        //! Warnings :
+        //! It is not forbidden to create a circle with theRadius = 0.0  Raises ConstructionError if theRadius < 0.0
+        public gp_Circ(gp_Ax2 theA2, double theRadius)
+        {
+            pos = (theA2);
+            radius = theRadius;
+
+            Exceptions.Standard_ConstructionError_Raise_if(theRadius < 0.0, "gp_Circ() - radius should be positive number");
+        }
+        gp_Ax2 pos;
+        double radius;
+
     }
 }

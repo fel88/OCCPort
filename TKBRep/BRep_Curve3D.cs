@@ -41,5 +41,10 @@ C == null ? Standard_Real.RealLast() : C.LastParameter())
             C.SetRange(First(), Last());
             return C;
         }
+
+        public override void Continuity(GeomAbs_Shape shape)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

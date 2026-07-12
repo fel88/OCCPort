@@ -13,7 +13,12 @@ namespace TKMath
     public struct gp_Dir
     {
         private gp_XYZ coord;
-
+        public void Rotate(gp_Ax1 theA1, double theAng)
+        {
+            gp_Trsf aT = new gp_Trsf();
+            aT.SetRotation(theA1, theAng);
+            coord.Multiply(aT.HVectorialPart());
+        }
         public override string ToString()
         {
             return $"gp_Dir: X:{coord.X()} Y:{coord.Y()} Z:{coord.Z()}";

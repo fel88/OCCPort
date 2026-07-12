@@ -1,5 +1,6 @@
 ﻿using OCCPort;
 using OCCPort.Common;
+using System.Security.Cryptography;
 using TKMath;
 
 namespace TKG2d
@@ -17,6 +18,13 @@ namespace TKG2d
         GeomAbs_CurveType myTypeCurve;
         double myFirst;
         double myLast;
+
+        public override gp_Circ2d Circle()
+        {
+            Exceptions.Standard_NoSuchObject_Raise_if(myTypeCurve != GeomAbs_CurveType.GeomAbs_Circle,
+                                               "Geom2dAdaptor_Curve::Circle() - curve is not a Circle");
+            return ((Geom2d_Circle)(myCurve)).Circ2d();
+        }
 
         public override Geom2d_BezierCurve Bezier()
         {

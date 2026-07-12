@@ -36,6 +36,12 @@
     //! -   gp_Ax2 is used to define a coordinate system that must be always right-handed.
     public struct gp_Ax3
     {
+        public gp_Ax3(gp_Ax2 theA)
+        {
+            axis = (theA.Axis());
+            vydir = (theA.YDirection());
+            vxdir = theA.XDirection();
+        }
 
         //! Returns  True if  the  coordinate  system is right-handed. i.e.
         //! XDirection().Crossed(YDirection()).Dot(Direction()) > 0

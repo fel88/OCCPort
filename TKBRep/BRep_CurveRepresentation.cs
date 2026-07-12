@@ -1,4 +1,5 @@
 ﻿using OCCPort.Common;
+using System.ComponentModel.Design;
 using System.Reflection.Metadata;
 using TKG2d;
 using TKG3d;
@@ -26,6 +27,15 @@ namespace OCCPort
         }
         //! Return a copy of this representation.
         public abstract BRep_CurveRepresentation Copy();
+
+        public virtual bool IsRegularity
+          (Geom_Surface S1,
+   Geom_Surface S2,
+   TopLoc_Location L1,
+   TopLoc_Location L2)
+        {
+            return false;
+        }
 
         public virtual bool IsRegularity()
         {
@@ -90,6 +100,8 @@ namespace OCCPort
         {
             return false;
         }
+
+        public abstract void Continuity(GeomAbs_Shape shape);
 
         //=======================================================================
         //function : Continuity

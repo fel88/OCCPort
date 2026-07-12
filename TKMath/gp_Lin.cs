@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OCCPort.Common;
+using System;
 
 namespace TKMath
 {
@@ -20,6 +21,8 @@ namespace TKMath
     public class gp_Lin
     {
         public void Translate(gp_Vec theV) { pos.Translate(theV); }
+
+        public void Rotate(gp_Ax1 theA1, double theAng) { pos.Rotate(theA1, theAng); }
 
         gp_Ax1 pos;
         //! Returns the direction of the line.

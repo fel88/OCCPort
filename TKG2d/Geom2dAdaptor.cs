@@ -26,12 +26,12 @@ namespace TKG2d
                     }
                     break;
 
-                //case GeomAbs_Circle:
-                //    {
-                //        Handle(Geom2d_Circle) GL = new Geom2d_Circle(HC.Circle());
-                //        C2D = GL;
-                //    }
-                //    break;
+                case GeomAbs_CurveType.GeomAbs_Circle:
+                    {
+                        Geom2d_Circle GL = new Geom2d_Circle(HC.Circle());
+                        C2D = GL;
+                    }
+                    break;
 
 
                 //case GeomAbs_Ellipse:
