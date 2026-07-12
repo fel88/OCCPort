@@ -49,37 +49,18 @@ namespace TKMesh
         int ParametersNb();
     }
 
-    public class VectorOfIFaceHandles
+    public class VectorOfIFaceHandles: NCollection_Vector<IMeshData_Face>
     {
-        //  IMeshData_Face
-        List<IMeshData_Face> items = new List<IMeshData_Face>();
-        public int Size()
+        
+    }
+    
+    internal class VectorOfOrientation : NCollection_Vector<TopAbs_Orientation> 
+    {
+        public VectorOfOrientation(int capacity, NCollection_IncAllocator theAllocator) : base(capacity,theAllocator)
         {
-            return items.Count;
         }
+    }
 
-        internal void Append(IMeshData_Face aEdge)
-        {
-            items.Add(aEdge);
-        }
-
-        internal IMeshData_Face Get(int v)
-        {
-            return items[v];
-        }
-    }
-    internal class VectorOfIEdgePtrs : List<IMeshData_Edge>
-    {
-        public VectorOfIEdgePtrs(int capacity, NCollection_IncAllocator theAllocator) : base(capacity)
-        {
-        }
-    }
-    internal class VectorOfOrientation : List<TopAbs_Orientation>
-    {
-        public VectorOfOrientation(int capacity, NCollection_IncAllocator theAllocator) : base(capacity)
-        {
-        }
-    }
     //! Enumerates built-in meshing algorithms factories implementing IMeshTools_MeshAlgoFactory interface.
     public enum IMeshTools_MeshAlgoType
     {

@@ -1,4 +1,6 @@
-﻿using OCCPort;
+﻿//typedef NCollection_Shared<NCollection_Vector<IEdgeHandle> >          VectorOfIEdgeHandles;
+global using VectorOfIEdgeHandles = TKernel.NCollection_Vector<TKMesh.IMeshData_Edge>;
+using OCCPort;
 using TKBRep;
 
 namespace TKMesh
@@ -26,7 +28,7 @@ namespace TKMesh
 
         public override IMeshData_Face GetFace(int theIndex)
         {
-            return myDFaces.Get(theIndex);
+            return myDFaces[(theIndex)];
         }
 
 
@@ -36,14 +38,14 @@ namespace TKMesh
         {
             var aFace = new BRepMeshData_Face(theFace);
             myDFaces.Append(aFace);
-            return myDFaces.Get(FacesNb() - 1);
+            return myDFaces[(FacesNb() - 1)];
         }
 
         public override IMeshData_Edge AddEdge(TopoDS_Edge theEdge)
         {
             IMeshData_Edge aEdge = new BRepMeshData_Edge(theEdge);//(new(myAllocator) BRepMeshData_Edge(theEdge, myAllocator));
             myDEdges.Append(aEdge);
-            return myDEdges.Get(EdgesNb() - 1);
+            return myDEdges[(EdgesNb() - 1)];
         }
 
 
@@ -56,7 +58,7 @@ namespace TKMesh
 
         public override IMeshData_Edge GetEdge(int v)
         {
-            return myDEdges.Get(v);
+            return myDEdges[v];
         }
 
         //! Returns maximum size of shape's bounding box.
@@ -71,24 +73,7 @@ namespace TKMesh
         //IMeshData::VectorOfIEdgeHandles myDEdges;
     }
 
-    internal class VectorOfIEdgeHandles
-    {
-        List<IMeshData_Edge> items = new List<IMeshData_Edge>();
-        public int Size()
-        {
-            return items.Count;
-        }
-
-        internal void Append(IMeshData_Edge aEdge)
-        {
-            items.Add(aEdge);
-        }
-
-        internal IMeshData_Edge Get(int v)
-        {
-            return items[v];
-        }
-    }
+    
 }
 
 

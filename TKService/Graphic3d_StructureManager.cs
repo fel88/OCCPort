@@ -1,4 +1,5 @@
-﻿using TKernel;
+﻿using System.Reflection.Metadata;
+using TKernel;
 using TKMath;
 
 namespace TKService
@@ -35,6 +36,10 @@ namespace TKService
             {
                 item.SetTransform(theStructure, theTrsf);
             }
+        }
+        public void UnregisterObject(object theObject)
+        {
+            myRegisteredObjects.UnBind(theObject);
         }
 
         public void ReCompute(Graphic3d_Structure theStructure)
@@ -77,7 +82,7 @@ namespace TKService
 
             myRegisteredObjects.Bind(theObject, theAffinity);
         }
-        Graphic3d_MapOfStructure myHighlightedStructure;
+        Graphic3d_MapOfStructure myHighlightedStructure = new Graphic3d_MapOfStructure();
 
 
         public void Erase(Graphic3d_Structure theStructure)

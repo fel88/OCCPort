@@ -26,7 +26,10 @@ namespace TKernel
             }
             return this;
         }
-
+        public int Extent()
+        {
+            return Count;
+        }
         public void Prepend(T a)
         {
             Insert(0, a);

@@ -48,7 +48,33 @@ namespace TKV3d
                 mySelector.Deactivate(aSel);
             }
         }
+        public void Remove(SelectMgr_SelectableObject theObject)
+        {
+            for (PrsMgr_ListOfPresentableObjectsIter anChildrenIter = new PrsMgr_ListOfPresentableObjectsIter(theObject.Children()); anChildrenIter.More(); anChildrenIter.Next())
+            {
+                Remove((SelectMgr_SelectableObject)(anChildrenIter.Value()));
+            }
 
+            if (!theObject.HasOwnPresentations())
+                return;
+
+            if (myGlobal.Contains(theObject))
+            {
+                if (mySelector.Contains(theObject))
+                {
+                    for (SelectMgr_SequenceOfSelection.Iterator aSelIter=new SelectMgr_SequenceOfSelection.Iterator  (theObject.Selections()); aSelIter.More(); aSelIter.Next())
+                    {
+                       // mySelector.RemoveSelectionOfObject(theObject, aSelIter.Value());
+                        aSelIter.Value().UpdateBVHStatus(SelectMgr_TypeOfBVHUpdate.SelectMgr_TBU_Remove);
+                        mySelector.Deactivate(aSelIter.Value());
+                    }
+                   // mySelector.RemoveSelectableObject(theObject);
+                }
+                myGlobal.Remove(theObject);
+            }
+
+            //theObject.ClearSelections();
+        }
         //=======================================================================
         //function : Update
         //purpose  : Selections are recalculated if they are flagged
@@ -144,10 +170,11 @@ namespace TKV3d
         {
             throw new NotImplementedException();
         }
-
+        
+        //! Return the Selector.
         internal StdSelect_ViewerSelector3d Selector()
         {
-            throw new NotImplementedException();
+            return mySelector;
         }
 
         SelectMgr_ViewerSelector mySelector;

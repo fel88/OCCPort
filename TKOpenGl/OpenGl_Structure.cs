@@ -227,6 +227,14 @@ namespace OCCPort.OpenGL
 
         }
 
+        public override void OnVisibilityChanged()
+        {
+            if (IsRaytracable())
+            {
+                ++myModificationState;
+            }
+        }
+
         bool myIsRaytracable;
 
         private class GroupIterator

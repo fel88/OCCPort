@@ -1,4 +1,6 @@
-﻿using OCCPort;
+﻿global using TColStd_Array1OfInteger = TKernel.NCollection_Array1<int>;
+
+using OCCPort;
 using OCCPort.Common;
 using TKBRep;
 using TKernel;

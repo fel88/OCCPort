@@ -202,7 +202,9 @@ namespace TKService
             return myLayerSettings;
         }
 
-        public bool Remove(Graphic3d_CStructure theStruct, ref Graphic3d_DisplayPriority thePriority,
+        //! Remove structure and returns its priority, if the structure is not found, method returns negative value
+        public bool Remove(Graphic3d_CStructure theStruct,
+            ref Graphic3d_DisplayPriority thePriority,
                               bool isForChangePriority = false)
         {
             if (theStruct == null)
@@ -210,6 +212,47 @@ namespace TKService
                 thePriority = Graphic3d_DisplayPriority.Graphic3d_DisplayPriority_INVALID;
                 return false;
             }
+
+            for (int aPriorityIter = (int)Graphic3d_DisplayPriority.Graphic3d_DisplayPriority_Bottom; aPriorityIter <= (int)Graphic3d_DisplayPriority.Graphic3d_DisplayPriority_Topmost; ++aPriorityIter)
+            {
+                Graphic3d_IndexedMapOfStructure  aStructures = myArray[aPriorityIter];
+                int anIndex = aStructures.FindIndex(theStruct);
+                if (anIndex == 0)
+                {
+                    continue;
+                }
+
+                aStructures.Swap(anIndex, aStructures.Size());
+                aStructures.RemoveLast();
+
+                if (!isForChangePriority)
+                {
+                    bool isAlwaysRend = theStruct.IsAlwaysRendered();
+                    if (!isAlwaysRend)
+                    {
+                        if (!myBVHPrimitives.Remove(theStruct))
+                        {
+                            if (!myBVHPrimitivesTrsfPers.Remove(theStruct))
+                            {
+                                isAlwaysRend = true;
+                            }
+                        }
+                    }
+                    if (isAlwaysRend)
+                    {
+                         int anIndex2 = myAlwaysRenderedMap.FindIndex(theStruct);
+                        if (anIndex2 != 0)
+                        {
+                            myAlwaysRenderedMap.Swap(myAlwaysRenderedMap.Size(), anIndex2);
+                            myAlwaysRenderedMap.RemoveLast();
+                        }
+                    }
+                }
+                --myNbStructures;
+                thePriority = (Graphic3d_DisplayPriority)aPriorityIter;
+                return true;
+            }
+
             thePriority = Graphic3d_DisplayPriority.Graphic3d_DisplayPriority_INVALID;
             return false;
 
@@ -521,30 +564,7 @@ namespace TKService
     }
     public class Graphic3d_IndexedMapOfStructure : NCollection_IndexedMap<Graphic3d_CStructure, NCollection_DefaultHasher<Graphic3d_CStructure>>
     {
-        internal class Iterator
-        {
-            Graphic3d_IndexedMapOfStructure col;
-            public Iterator(Graphic3d_IndexedMapOfStructure aStructures)
-            {
-                col = aStructures;
-            }
-
-            int index = 0;
-            internal bool More()
-            {
-                return index < col.Count;
-            }
-
-            internal void Next()
-            {
-                index++;
-            }
-
-            internal Graphic3d_CStructure Value()
-            {
-                return col[index];
-            }
-        }
+     
     }
 
     public static class Constants
@@ -552,47 +572,6 @@ namespace TKService
         public const int Graphic3d_DisplayPriority_NB = Graphic3d_DisplayPriority.Graphic3d_DisplayPriority_Topmost - Graphic3d_DisplayPriority.Graphic3d_DisplayPriority_Bottom + 1;
         public const int AIS_RotationMode_LOWER = 0;
         //public const int AIS_RotationMode_UPPER = (int)AIS_RotationMode.AIS_RotationMode_BndBoxScene;
-    }
-
-    //! Set of transformation persistent OpenGl_Structure for building BVH tree.
-    //! Provides built-in mechanism to invalidate tree when world view projection state changes.
-    //! Due to frequent invalidation of BVH tree the choice of BVH tree builder is made
-    //! in favor of BVH linear builder (quick rebuild).
-    internal class Graphic3d_BvhCStructureSetTrsfPers : BVH_Set<double>//3
-    {
-        private Select3D_BVHBuilder3d theBuilder;
-
-        //! Cleans the whole primitive set.
-        public  void Clear()
-        {
-            myStructs.Clear();
-            MarkDirty();
-        }
-        //! Marks object state as outdated (needs BVH rebuilding).
-        void MarkDirty()
-        {
-            myIsDirty = true;
-        }
-        //! Marks internal object state as outdated.
-        bool myIsDirty;
-
-        public Graphic3d_BvhCStructureSetTrsfPers(Select3D_BVHBuilder3d theBuilder)
-        {
-            this.theBuilder = theBuilder;
-        }
-
-        internal void Add(Graphic3d_CStructure theStruct)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal int Size()
-        {
-            return myStructs.Size();
-        }
-        //! Indexed map of structures.
-        Graphic3d_IndexedMapOfStructure myStructs = new Graphic3d_IndexedMapOfStructure();
-
     }
 
 

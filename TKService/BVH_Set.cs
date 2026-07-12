@@ -4,7 +4,7 @@
     //! the minimal geometry interface needed to construct BVH.
     //! \tparam T Numeric data type
     //! \tparam N Vector dimension
-    internal class BVH_Set<T1>
+    public class BVH_Set<T1>
     {
     }
 }

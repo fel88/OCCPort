@@ -128,11 +128,7 @@ namespace TKService
             return myGroups;
         }
 
-        internal void OnVisibilityChanged()
-        {
-            throw new NotImplementedException();
-        }
-
+        public abstract void OnVisibilityChanged();
         internal void SetGroupTransformPersistence(bool v)
         {
             //throw new NotImplementedException();

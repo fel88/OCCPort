@@ -152,6 +152,11 @@ namespace TKV3d
             myCompBB = true;
         }
 
+        //! Returns index 0. This value refers to SHAPE from TopAbs_ShapeEnum
+        public override int Signature() { return 0; }
+
+        //! Returns Object as the type of Interactive Object.
+        public override AIS_KindOfInteractive Type() { return AIS_KindOfInteractive.AIS_KindOfInteractive_Shape; }
         //! Returns this shape object.
         public TopoDS_Shape Shape() { return myshape; }
 

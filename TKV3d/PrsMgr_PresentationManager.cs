@@ -2,6 +2,7 @@
 using System.Reflection.Metadata;
 using TKMath;
 using TKService;
+using TKV3d;
 
 namespace TKV3d
 {
@@ -18,6 +19,53 @@ namespace TKV3d
             myImmediateModeOn = (0);
             //
         }
+
+        //! erases the presentation of the object in the given
+        //! Presentation manager with the given mode.
+        //! If @theMode is -1, then erases all presentations of the object.
+        public void Erase(PrsMgr_PresentableObject thePrsObj,
+                                            int theMode = 0)
+        {
+            if (thePrsObj.ToPropagateVisualState())
+            {
+                for (PrsMgr_ListOfPresentableObjectsIter anIter = new PrsMgr_ListOfPresentableObjectsIter(thePrsObj.Children()); anIter.More(); anIter.Next())
+                {
+                    Erase(anIter.Value(), theMode);
+                }
+            }
+
+            PrsMgr_Presentations aPrsList = thePrsObj.Presentations();
+            for (PrsMgr_Presentations.Iterator aPrsIter = new PrsMgr_Presentations.Iterator(aPrsList); aPrsIter.More();)
+            {
+                PrsMgr_Presentation aPrs = aPrsIter.Value();
+                if (aPrs == null)
+                {
+                    aPrsIter.Next();
+                    continue;
+                }
+
+                PrsMgr_PresentationManager aPrsMgr = aPrs.PresentationManager();
+                if ((theMode == aPrs.Mode() || theMode == -1)
+                 && (this == aPrsMgr))
+                {
+                    aPrs.Erase();
+
+                    aPrsList.Remove(aPrsIter);
+
+                    if (theMode != -1)
+                    {
+                        return;
+                    }
+                }
+                else
+                {
+                    aPrsIter.Next();
+                }
+            }
+        }
+
+
+
         //! Internal function that scans thePrsList for shadow presentations
         //! and applies transformation theTrsf to them in case if parent ID
         //! of shadow presentation is equal to theRefId
@@ -115,28 +163,28 @@ namespace TKV3d
             }
 
             if (thePrsObj.ToPropagateVisualState())
-			{
-				for (PrsMgr_ListOfPresentableObjectsIter anIter=new PrsMgr_ListOfPresentableObjectsIter (thePrsObj.Children()); anIter.More(); anIter.Next())
-				{
-					PrsMgr_PresentableObject aChild = anIter.Value();
-					if (aChild.DisplayStatus() != PrsMgr_DisplayStatus.PrsMgr_DisplayStatus_Erased)
-					{
-						Display(anIter.Value(), theMode);
-					}
-				}
-			}
+            {
+                for (PrsMgr_ListOfPresentableObjectsIter anIter = new PrsMgr_ListOfPresentableObjectsIter(thePrsObj.Children()); anIter.More(); anIter.Next())
+                {
+                    PrsMgr_PresentableObject aChild = anIter.Value();
+                    if (aChild.DisplayStatus() != PrsMgr_DisplayStatus.PrsMgr_DisplayStatus_Erased)
+                    {
+                        Display(anIter.Value(), theMode);
+                    }
+                }
+            }
 
         }
 
         public void Update(PrsMgr_PresentableObject thePrsObj, int theMode)
         {
-            for (PrsMgr_ListOfPresentableObjectsIter anIter=new PrsMgr_ListOfPresentableObjectsIter  (thePrsObj.Children()); anIter.More(); anIter.Next())
+            for (PrsMgr_ListOfPresentableObjectsIter anIter = new PrsMgr_ListOfPresentableObjectsIter(thePrsObj.Children()); anIter.More(); anIter.Next())
             {
                 Update(anIter.Value(), theMode);
             }
 
             PrsMgr_Presentation aPrs = Presentation(thePrsObj, theMode);
-            if (aPrs!=null)
+            if (aPrs != null)
             {
                 aPrs.Clear();
                 thePrsObj.Fill(this, aPrs, theMode);
@@ -187,7 +235,7 @@ namespace TKV3d
                 return;
             }
 
-            for (PrsMgr_ListOfPresentations.Iterator anIter=new TKernel.NCollection_List<Graphic3d_Structure>.Iterator  (myImmediateList); anIter.More(); anIter.Next())
+            for (PrsMgr_ListOfPresentations.Iterator anIter = new TKernel.NCollection_List<Graphic3d_Structure>.Iterator(myImmediateList); anIter.More(); anIter.Next())
             {
                 if (anIter.Value() == thePrs)
                 {
@@ -203,7 +251,7 @@ namespace TKV3d
         {
             if (thePrsObj.ToPropagateVisualState())
             {
-                for (PrsMgr_ListOfPresentableObjectsIter anIter=new PrsMgr_ListOfPresentableObjectsIter (thePrsObj.Children()); anIter.More(); anIter.Next())
+                for (PrsMgr_ListOfPresentableObjectsIter anIter = new PrsMgr_ListOfPresentableObjectsIter(thePrsObj.Children()); anIter.More(); anIter.Next())
                 {
                     if (IsDisplayed(anIter.Value(), theMode))
                     {
@@ -212,8 +260,8 @@ namespace TKV3d
                 }
             }
 
-             PrsMgr_Presentation aPrs = Presentation(thePrsObj, theMode);
-            return aPrs!=null
+            PrsMgr_Presentation aPrs = Presentation(thePrsObj, theMode);
+            return aPrs != null
                  && aPrs.IsDisplayed();
         }
 
@@ -221,7 +269,7 @@ namespace TKV3d
         {
             if (thePrsObj.ToPropagateVisualState())
             {
-                for (PrsMgr_ListOfPresentableObjectsIter anIter=new PrsMgr_ListOfPresentableObjectsIter (thePrsObj.Children()); anIter.More(); anIter.Next())
+                for (PrsMgr_ListOfPresentableObjectsIter anIter = new PrsMgr_ListOfPresentableObjectsIter(thePrsObj.Children()); anIter.More(); anIter.Next())
                 {
                     if (IsHighlighted(anIter.Value(), theMode))
                     {
@@ -230,8 +278,8 @@ namespace TKV3d
                 }
             }
 
-             PrsMgr_Presentation aPrs = Presentation(thePrsObj, theMode);
-            return aPrs!=null
+            PrsMgr_Presentation aPrs = Presentation(thePrsObj, theMode);
+            return aPrs != null
                  && aPrs.IsHighlighted();
         }
 

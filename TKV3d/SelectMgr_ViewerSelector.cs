@@ -1,4 +1,6 @@
-﻿using OCCPort.Common;
+﻿global using TColStd_Array1OfInteger=TKernel.NCollection_Array1<int> ;
+
+using OCCPort.Common;
 using System.Reflection.Metadata;
 using TKernel;
 using TKMath;
@@ -38,6 +40,11 @@ namespace TKV3d
     //!    intersection detection will be resized according to its sensitivity.
     public class SelectMgr_ViewerSelector//typedef SelectMgr_ViewerSelector StdSelect_ViewerSelector3d;
     {
+        public void ClearPicked()
+        {
+            mystored.Clear();
+            myIsSorted = true;
+        }
 
         public void Deactivate(SelectMgr_Selection theSelection)
         {
@@ -170,10 +177,10 @@ namespace TKV3d
             return aStoredOwner;
         }
 
-        SelectMgr_IndexedDataMapOfOwnerCriterion mystored;
+        SelectMgr_IndexedDataMapOfOwnerCriterion mystored = new SelectMgr_IndexedDataMapOfOwnerCriterion();
 
         bool myIsSorted;
-        TColStd_Array1OfInteger myIndexes;
+        TColStd_Array1OfInteger myIndexes = new TColStd_Array1OfInteger();
         private void SortResult()
         {
             throw new NotImplementedException();

@@ -25,6 +25,11 @@ namespace TKernel
         {
             return this[i];
         }
+        public void Remove(Iterator aPrsIter)
+        {
+            Remove(aPrsIter.Value());
+        }
+
 
         //! Constant item access by theIndex
         public T Value(int theIndex)
@@ -93,6 +98,7 @@ namespace TKernel
             return this[Lower()];
         }
 
+        
         public void Remove(int v)
         {
             RemoveAt(v - 1);

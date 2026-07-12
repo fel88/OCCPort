@@ -1,4 +1,7 @@
-﻿using TKBRep;
+﻿
+global using VectorOfIEdgePtrs = TKernel.NCollection_Vector<TKMesh.IMeshData_Edge>;
+
+using TKBRep;
 using TKernel;
 using TKG3d;
 

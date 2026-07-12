@@ -16,6 +16,10 @@ namespace TKernel
             return true;
         }
 
+        public int Extent()
+        {
+            return Count;
+        }
         //! Added: add a new key if not yet in the map, and return 
         //! reference to either newly added or previously existing object
         public T Added(T K)

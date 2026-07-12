@@ -1,4 +1,6 @@
-﻿using OCCPort.Common;
+﻿global using TColStd_Array1OfInteger = TKernel.NCollection_Array1<int>;
+
+using OCCPort.Common;
 using TKernel;
 using TKG3d;
 using TKMath;

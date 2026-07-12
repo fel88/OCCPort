@@ -126,6 +126,8 @@ namespace TKV3d
         //! Returns the viewer in which the view has been created.
         public V3d_Viewer Viewer() { return MyViewer; }
 
+        //! If automatic z-range fitting is turned on, adjusts Z-min and Z-max
+        //! projection volume planes with call to ZFitAll.
         public void AutoZFit()
         {
             if (!AutoZFitMode())
@@ -139,7 +141,9 @@ namespace TKV3d
         //! returns TRUE if automatic z-fit mode is turned on.
         bool AutoZFitMode() { return myAutoZFitIsOn; }
 
-        void ZFitAll(double theScaleFactor)
+        //! Change Z-min and Z-max planes of projection volume to match the
+        //! displayed objects.
+        public void ZFitAll(double theScaleFactor = 1.0)
         {
             Bnd_Box aMinMaxBox = myView.MinMaxValues(false); // applicative min max boundaries
             Bnd_Box aGraphicBox = myView.MinMaxValues(true);  // real graphical boundaries (not accounting infinite flag).
@@ -344,7 +348,7 @@ namespace TKV3d
         }
         public void SetDepth(double Depth)
         {
-            Exceptions.V3d_BadValue_Raise_if(Depth == 0.0 , "V3d_View::SetDepth, bad depth");
+            Exceptions.V3d_BadValue_Raise_if(Depth == 0.0, "V3d_View::SetDepth, bad depth");
 
             Graphic3d_Camera aCamera = Camera();
 
@@ -356,7 +360,7 @@ namespace TKV3d
             else
             {
                 // Move the view ref point instead of the eye.
-                gp_Vec aDir=new gp_Vec (aCamera.Direction());
+                gp_Vec aDir = new gp_Vec(aCamera.Direction());
                 gp_Pnt aCameraEye = aCamera.Eye();
                 gp_Pnt aCameraCenter = aCameraEye.Translated(aDir.Multiplied(Math.Abs(Depth)));
 
@@ -917,14 +921,17 @@ namespace TKV3d
         //=======================================================================
         public gp_Pnt GravityPoint()
         {
-            Graphic3d_MapOfStructure[] aSetOfStructures;
-            myView.DisplayedStructures(out aSetOfStructures);
+            Graphic3d_MapOfStructure aSetOfStructures = new Graphic3d_MapOfStructure();
+            myView.DisplayedStructures(aSetOfStructures);
 
             bool hasSelection = false;
+            //for (Graphic3d_MapOfStructure.Iterator aStructIter=new Graphic3d_MapOfStructure.Iterator  (aSetOfStructures);
+            // aStructIter.More(); aStructIter.Next())
+            //  {
             foreach (var aStructIter in aSetOfStructures)
             {
-                if (aStructIter.Key().IsHighlighted()
-                 && aStructIter.Key().IsVisible())
+                if (aStructIter.IsHighlighted()
+                 && aStructIter.IsVisible())
                 {
                     hasSelection = true;
                     break;
@@ -936,7 +943,7 @@ namespace TKV3d
             gp_XYZ aResult = new gp_XYZ(0.0, 0.0, 0.0);
             foreach (var aStructIter in aSetOfStructures)
             {
-                var aStruct = aStructIter.Key();
+                var aStruct = aStructIter;
                 if (!aStruct.IsVisible()
                   || aStruct.IsInfinite()
                   || (hasSelection && !aStruct.IsHighlighted()))
@@ -1330,7 +1337,14 @@ namespace TKV3d
             myView.Redraw();
         }
 
-        public void FitAll(double theMargin, bool theToUpdate)
+
+        //! Adjust view parameters to fit the displayed scene, respecting height / width ratio.
+        //! The Z clipping range (depth range) is fitted if AutoZFit flag is TRUE.
+        //! Throws program error exception if margin coefficient is < 0 or >= 1.
+        //! Updates the view.
+        //! @param theMargin [in] the margin coefficient for view borders.
+        //! @param theToUpdate [in] flag to perform view update.
+        public void FitAll(double theMargin = 0.01, bool theToUpdate = true)
         {
             FitAll(myView.MinMaxValues(), theMargin, theToUpdate);
         }

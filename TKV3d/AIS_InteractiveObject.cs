@@ -1,4 +1,6 @@
-﻿namespace TKV3d
+﻿using OCCPort.Common;
+
+namespace TKV3d
 {
     //! Defines a class of objects with display and selection services.
     //! Entities which are visualized and selected are Interactive Objects.
@@ -18,11 +20,28 @@
     {
         public AIS_InteractiveObject(PrsMgr_TypeOfPresentation3d aTypeOfPresentation3d = PrsMgr_TypeOfPresentation3d.PrsMgr_TOP_AllView)
             : base(aTypeOfPresentation3d)
-        {            
+        {
             myCTXPtr = null;
         }
 
-        AIS_InteractiveContext myCTXPtr; //!< pointer to Interactive Context, where object is currently displayed; @sa SetContext()
+        //! Returns the kind of Interactive Object; AIS_KindOfInteractive_None by default.
+        public virtual AIS_KindOfInteractive Type() { return AIS_KindOfInteractive.AIS_KindOfInteractive_None; }
+
+        //! Specifies additional characteristics of Interactive Object of Type(); -1 by default.
+        //! Among the datums, this signature is attributed to the shape.
+        //! The remaining datums have the following default signatures:
+        //! - Point          signature 1
+        //! - Axis           signature 2
+        //! - Trihedron      signature 3
+        //! - PlaneTrihedron signature 4
+        //! - Line           signature 5
+        //! - Circle         signature 6
+        //! - Plane          signature 7.
+        public virtual int Signature() { return -1; }
+
+
+
+        public AIS_InteractiveContext myCTXPtr; //!< pointer to Interactive Context, where object is currently displayed; @sa SetContext()
         object myOwner;  //!< application-specific owner object
 
         internal void SetDisplayStatus(PrsMgr_DisplayStatus theStatus)

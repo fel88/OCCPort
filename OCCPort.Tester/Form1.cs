@@ -274,12 +274,14 @@ namespace OCCPort.Tester
 
         private void frontToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            GravityViewManager.FrontView();
+            GravityViewManager?.View?.SetProj(V3d_TypeOfOrientation.V3d_Yneg);
+
+            //GravityViewManager.FrontView();
         }
 
         private void topToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            GravityViewManager.TopView();
+            GravityViewManager?.View?.SetProj(V3d_TypeOfOrientation.V3d_Zpos);
         }
 
         private void toolStripButton2_Click(object sender, EventArgs e)
@@ -339,7 +341,7 @@ namespace OCCPort.Tester
         TopoDS_Shape lastGenerated = null;
         private void toolStripButton6_Click(object sender, EventArgs e)
         {
-            GravityViewManager.View.myView.Items.Clear();
+            //GravityViewManager.View.myView.Items.Clear();
         }
         AIS_ViewController aIS_ViewController;
         V3d_Viewer v3d_viewer;
@@ -609,7 +611,19 @@ namespace OCCPort.Tester
                 pp.Add(new Vector3d(xx, yy, 0));
             }
 
-            MakeFace(pp.ToArray());            
+            MakeFace(pp.ToArray());
+        }
+
+        private void toolStripButton14_Click(object sender, EventArgs e)
+        {
+            GravityViewManager?.View?.FitAll();
+            GravityViewManager?.View?.ZFitAll();
+        }
+
+        private void toolStripButton15_Click(object sender, EventArgs e)
+        {
+            // Clears all objects from the context and releases presentation memory
+            myAISContext.RemoveAll(true);
         }
     }
 }

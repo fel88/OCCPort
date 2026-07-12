@@ -347,11 +347,15 @@ namespace TKService
         //! Invalidates content of the view but does not redraw it.
         public abstract void Invalidate();
 
-        public List<Graphic3d_MapOfStructure> Items = new List<Graphic3d_MapOfStructure>();
 
-        public void DisplayedStructures(out Graphic3d_MapOfStructure[] aSetOfStructures)
+
+        public void DisplayedStructures(Graphic3d_MapOfStructure aSetOfStructures)
         {
-            aSetOfStructures = Items.ToArray();
+            foreach (var item in myStructsDisplayed)
+            {
+                aSetOfStructures.Add(item);
+            }
+
         }
         public abstract Graphic3d_Layer[] Layers();
 
@@ -369,7 +373,7 @@ namespace TKService
         //! Returns True if the window associated to the view is defined.
         public abstract bool IsDefined();
 
-     
+
 
         //! Returns camera object of the view.
         public override Graphic3d_Camera Camera() { return myCamera; }
@@ -737,10 +741,11 @@ namespace TKService
 
         }
 
-        private bool IsDisplayed(Graphic3d_Structure aStruct)
+        private bool IsDisplayed(Graphic3d_Structure theStructure)
         {
-            throw new NotImplementedException();
+            return myStructsDisplayed.Contains(theStructure);
         }
+
         protected NCollection_Sequence<Graphic3d_CView> mySubviews = new NCollection_Sequence<Graphic3d_CView>(); //!< list of child views
 
         public abstract bool IsInvalidated();

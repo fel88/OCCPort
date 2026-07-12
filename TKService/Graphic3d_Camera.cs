@@ -285,9 +285,10 @@ namespace TKService
 
             // Prepare camera frustum planes.
             gp_Pln[] aFrustumPlaneArray = new gp_Pln[6];
+            Frustum(ref aFrustumPlaneArray[0], ref aFrustumPlaneArray[1], ref aFrustumPlaneArray[2],
+                     ref aFrustumPlaneArray[3], ref aFrustumPlaneArray[4], ref aFrustumPlaneArray[5]);
+
             NCollection_Array1<gp_Pln> aFrustumPlane = new NCollection_Array1<gp_Pln>(aFrustumPlaneArray, 1, 6);
-            Frustum(aFrustumPlane[1], aFrustumPlane[2], aFrustumPlane[3],
-                     aFrustumPlane[4], aFrustumPlane[5], aFrustumPlane[6]);
 
             // Prepare camera up, side, direction vectors.
             gp_Dir aCamUp = OrthogonalizedUp();
@@ -417,12 +418,24 @@ namespace TKService
         }
 
 
-        public void Frustum(gp_Pln theLeft,
-                                   gp_Pln theRight,
-                                   gp_Pln theBottom,
-                                   gp_Pln theTop,
-                                   gp_Pln theNear,
-                                   gp_Pln theFar)
+        //! Calculate WCS frustum planes for the camera projection volume.
+        //! Frustum is a convex volume determined by six planes directing
+        //! inwards.
+        //! The frustum planes are usually used as inputs for camera algorithms.
+        //! Thus, if any changes to projection matrix calculation are necessary,
+        //! the frustum planes calculation should be also touched.
+        //! @param theLeft [out] the frustum plane for left side of view.
+        //! @param theRight [out] the frustum plane for right side of view.
+        //! @param theBottom [out] the frustum plane for bottom side of view.
+        //! @param theTop [out] the frustum plane for top side of view.
+        //! @param theNear [out] the frustum plane for near side of view.
+        //! @param theFar [out] the frustum plane for far side of view.
+        public void Frustum(ref gp_Pln theLeft,
+                                ref gp_Pln theRight,
+                                ref gp_Pln theBottom,
+                               ref gp_Pln theTop,
+                               ref gp_Pln theNear,
+                               ref gp_Pln theFar)
         {
             gp_Vec aProjection = new gp_Vec(Direction());
             var anUp = new gp_Vec(OrthogonalizedUp());
@@ -1644,16 +1657,16 @@ namespace TKService
 
                 // The first eight points are from theGraphicBB, the last eight points are from theMinMax (can be absent).
                 if (aCounter >= 8)
-                {                    
+                {
                     aModelMinDist = Math.Min(aDistance, aModelMinDist);
                     aModelMaxDist = Math.Max(aDistance, aModelMaxDist);
                 }
                 else
-                {                    
+                {
                     aGraphMinDist = Math.Min(aDistance, aGraphMinDist);
                     aGraphMaxDist = Math.Max(aDistance, aGraphMaxDist);
                 }
-                    
+
                 aCounter++;
             }
 

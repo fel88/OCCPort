@@ -1,4 +1,5 @@
 ﻿using OCCPort.Common;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -8,30 +9,33 @@ namespace TKernel
 {
     public class NCollection_IndexedMap<T> : NCollection_IndexedMap<T, NCollection_DefaultHasher<T>>
     {
-      
+
     }
 
     public class NCollection_IndexedMap<T, Hasher> : List<T> where Hasher : IEqualityComparer<T>, new()
     {
         public class Iterator
         {
-            public Iterator(NCollection_IndexedMap<T> myAlwaysRenderedMap)
+            NCollection_IndexedMap<T, Hasher> col;
+            public Iterator(NCollection_IndexedMap<T, Hasher> aStructures)
             {
+                col = aStructures;
             }
 
+            int index = 0;
             public bool More()
             {
-                throw new NotImplementedException();
+                return index < col.Count;
             }
 
-            public object Next()
+            public void Next()
             {
-                throw new NotImplementedException();
+                index++;
             }
 
             public T Value()
             {
-                throw new NotImplementedException();
+                return col[index];
             }
         }
         public NCollection_IndexedMap()
@@ -39,6 +43,23 @@ namespace TKernel
 
         }
 
+        public void Swap(int theIndex1, int theIndex2)
+        {
+            Exceptions.Standard_OutOfRange_Raise_if(theIndex1 < 1 || theIndex1 > Extent()
+                                  || theIndex2 < 1 || theIndex2 > Extent(), "NCollection_IndexedMap::Swap");
+
+            if (theIndex1 == theIndex2)
+                return;
+
+            T tmp = this[theIndex1 - 1];
+            this[theIndex1 - 1] = this[theIndex2 - 1];
+            this[theIndex2 - 1] = tmp;
+        }
+
+        public void RemoveLast()
+        {
+            RemoveAt(Count - 1);
+        }
         public bool IsEmpty()
         {
             return Count == 0;
@@ -47,29 +68,18 @@ namespace TKernel
         //! FindIndex
         public int FindIndex(T theKey1)
         {
-            if (IsEmpty()) 
+            if (IsEmpty())
                 return 0;
 
             for (int i = 0; i < Count; i++)
             {
                 if (hasher.Equals(this[i], theKey1))
                 {
-                    RemoveAt(i);
-                    return i;
+                    //RemoveAt(i);
+                    return i + 1;
                 }
             }
             return 0;
-            /*
-            IndexedMapNode* pNode1 = (IndexedMapNode*)myData1[Hasher::HashCode(theKey1, NbBuckets())];
-            while (pNode1)
-            {
-                if (Hasher::IsEqual(pNode1->Key1(), theKey1))
-                {
-                    return pNode1->Index();
-                }
-                pNode1 = (IndexedMapNode*)pNode1->Next();
-            }
-            return 0;*/
         }
 
         Hasher hasher = new Hasher();
@@ -93,7 +103,7 @@ namespace TKernel
                 for (int i = 0; i < Count; i++)
                 {
                     if (hasher.Equals(this[i], theStruct))
-                        return i;
+                        return i + 1;
                 }
             }
 
@@ -102,6 +112,10 @@ namespace TKernel
         }
 
         public int Size()
+        {
+            return Count;
+        }
+        public int Extent()
         {
             return Count;
         }

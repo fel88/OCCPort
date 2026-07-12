@@ -1,4 +1,5 @@
-﻿using TKernel;
+﻿using OCCPort.Common;
+using TKernel;
 
 namespace TKMesh
 {
@@ -309,29 +310,16 @@ namespace TKMesh
             return Count;
         }
     }
-    internal class DMapOfIntegerListOfInteger
-    //typedef NCollection_Shared<NCollection_DataMap<Standard_Integer, ListOfInteger> >                             DMapOfIntegerListOfInteger;
+
+    internal class DMapOfIntegerListOfInteger : NCollection_DataMap<int, ListOfInteger>    
     {
-        public Dictionary<int, ListOfInteger> map = new Dictionary<int, ListOfInteger>();
+        
 
         public DMapOfIntegerListOfInteger(int v, NCollection_IncAllocator myAllocator)
         {
         }
 
-        internal void Bind(int aNodeId, ListOfInteger value)
-        {
-            map.Add(aNodeId, value);
-        }
-
-        internal ListOfInteger Find(int theIndex)
-        {
-            return map[theIndex];
-        }
-
-        internal bool IsBound(int aNodeId)
-        {
-            return map.ContainsKey(aNodeId);
-        }
+        
     }
     internal class IDMapOfLink : NCollection_IndexedDataMap<BRepMesh_Edge, BRepMesh_PairOfIndex, NCollection_DefaultHasher<object>>
     {

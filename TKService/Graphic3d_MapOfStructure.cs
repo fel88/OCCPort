@@ -1,6 +1,4 @@
 ﻿global using Prs3d_Presentation = TKService.Graphic3d_Structure;
-
-
 using TKernel;
 
 namespace TKService
@@ -12,15 +10,17 @@ namespace TKService
 
         }
 
-        Prs3d_Presentation key;
-        public Prs3d_Presentation Key()
+        public class Iterator
         {
-            return key;
-        }
+            public bool More()
+            {
+                throw new NotImplementedException();
+            }
 
-        internal int Extent()
-        {
-            return Count;
+            public object Next()
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 

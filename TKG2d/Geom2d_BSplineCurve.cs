@@ -1,4 +1,6 @@
-﻿using TKernel;
+﻿global using TColStd_Array1OfInteger = TKernel.NCollection_Array1<int>;
+
+using TKernel;
 using TKMath;
 
 namespace TKG2d

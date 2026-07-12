@@ -86,7 +86,7 @@ namespace TKernel
             }
             return default;
         }
-
+     
         public bool Find(T1 theObject, out T2 aResult)
         {
             if (ContainsKey(theObject))

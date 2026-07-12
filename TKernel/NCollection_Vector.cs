@@ -25,6 +25,10 @@ namespace TKernel
     //! to enlarge the vector during the iteration.
     public class NCollection_Vector<T> : NCollection_BaseVector<T>
     {
+        public NCollection_Vector(int v, NCollection_IncAllocator theAllocator)
+        {
+        }
+
         public NCollection_Vector() { }
         public NCollection_Vector(NCollection_Vector<T> copy)
         {

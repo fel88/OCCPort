@@ -801,6 +801,186 @@ namespace TKV3d
             //}
         }
 
+        //! Clears the list of entities detected by MoveTo() and resets dynamic highlighting.
+        //! @param theToRedrawImmediate if TRUE, the main Viewer will be redrawn on update
+        //! @return TRUE if viewer needs to be updated (e.g. there were actually dynamically highlighted entities)
+        public bool ClearDetected(bool theToRedrawImmediate = false)
+        {
+            myCurDetected = 0;
+            myCurHighlighted = 0;
+            myDetectedSeq.Clear();
+            bool toUpdate = false;
+            if (myLastPicked != null && myLastPicked.HasSelectable())
+            {
+                toUpdate = true;
+                clearDynamicHighlight();
+            }
+            myLastPicked = null;
+            MainSelector().ClearPicked();
+            if (toUpdate && theToRedrawImmediate)
+            {
+                myMainVwr.RedrawImmediate();
+            }
+            return toUpdate;
+        }
+
+        //! fills <aListOfIO> with objects of a particular Type and Signature with no consideration of display status.
+        //! by Default, <WhichSignature> = -1 means control only on <WhichKind>.
+        //! if <WhichKind> = AIS_KindOfInteractive_None and <WhichSignature> = -1, all the objects are put into the list.
+        public void ObjectsInside(AIS_ListOfInteractive theListOfIO,
+                                       AIS_KindOfInteractive theKind = AIS_KindOfInteractive.AIS_KindOfInteractive_None,
+                                       int theSign = -1)
+        {
+            if (theKind == AIS_KindOfInteractive.AIS_KindOfInteractive_None
+   && theSign == -1)
+            {
+                for (AIS_DataMapIteratorOfDataMapOfIOStatus anObjIter = new NCollection_DataMap<AIS_InteractiveObject, AIS_GlobalStatus, NCollection_DefaultHasher<object>>.Iterator(myObjects); anObjIter.More(); anObjIter.Next())
+                {
+                    theListOfIO.Append(anObjIter.Key());
+                }
+                return;
+            }
+
+            for (AIS_DataMapIteratorOfDataMapOfIOStatus anObjIter = new NCollection_DataMap<AIS_InteractiveObject, AIS_GlobalStatus, NCollection_DefaultHasher<object>>.Iterator(myObjects); anObjIter.More(); anObjIter.Next())
+            {
+                if (anObjIter.Key().Type() != theKind)
+                {
+                    continue;
+                }
+
+                if (theSign == -1
+                 || anObjIter.Key().Signature() == theSign)
+                {
+                    theListOfIO.Append(anObjIter.Key());
+                }
+            }
+
+        }
+        //! Removes all the objects from Context.
+        public void RemoveAll(bool theToUpdateViewer)
+        {
+            ClearDetected();
+
+            AIS_ListOfInteractive aList = new NCollection_List<AIS_InteractiveObject>();
+            ObjectsInside(aList);
+            for (AIS_ListOfInteractive.Iterator aListIterator = new NCollection_List<AIS_InteractiveObject>.Iterator(aList); aListIterator.More(); aListIterator.Next())
+            {
+                Remove(aListIterator.Value(), false);
+            }
+
+            if (theToUpdateViewer)
+            {
+                myMainVwr.Update();
+            }
+        }
+
+        //! Removes Object from every viewer.
+        public void Remove(AIS_InteractiveObject theIObj,
+                                      bool theToUpdateViewer)
+        {
+            if (theIObj == null)
+            {
+                return;
+            }
+
+            if (theIObj.HasInteractiveContext())
+            {
+                if (theIObj.myCTXPtr != this)
+                {
+                    throw new Standard_ProgramError("AIS_InteractiveContext - object has been displayed in another context!");
+                }
+                theIObj.SetContext(null);
+            }
+            ClearGlobal(theIObj, theToUpdateViewer);
+        }
+        void unselectOwners(AIS_InteractiveObject theObject)
+        {
+           /* SelectMgr_SequenceOfOwner aSeq;
+            for (AIS_NListOfEntityOwner.Iterator aSelIter =new AIS_NListOfEntityOwner.Iterator (mySelection.Objects()); aSelIter.More(); aSelIter.Next())
+            {
+                if (aSelIter.Value().IsSameSelectable(theObject))
+                {
+                    aSeq.Append(aSelIter.Value());
+                }
+            }
+           
+            for (SelectMgr_SequenceOfOwner.Iterator aDelIter (aSeq); aDelIter.More(); aDelIter.Next())
+            {
+                AddOrRemoveSelected(aDelIter.Value(), false);
+            }*/
+        }
+
+        void ClearGlobal(AIS_InteractiveObject theIObj,
+                                           bool theToUpdateviewer)
+        {
+            AIS_GlobalStatus aStatus = null;
+            if (theIObj == null
+            || !myObjects.Find(theIObj, out aStatus))
+            {
+                // for cases when reference shape of connected interactives was not displayed
+                // but its selection primitives were calculated
+                SelectMgr_SelectableObject anObj = theIObj; // to avoid ambiguity
+                mgrSelector.Remove(anObj);
+                return;
+            }
+
+            unselectOwners(theIObj);
+
+            myMainPM.Erase(theIObj, -1);
+            theIObj.ErasePresentations(true); // make sure highlighting presentations are properly erased
+
+            // Object removes from Detected sequence
+            for (int aDetIter = myDetectedSeq.Lower(); aDetIter <= myDetectedSeq.Upper();)
+            {
+                SelectMgr_EntityOwner aPicked = MainSelector().Picked(myDetectedSeq[aDetIter]);
+                AIS_InteractiveObject anObj = null;
+                if (aPicked != null)
+                {
+                    anObj = (AIS_InteractiveObject)(aPicked.Selectable());
+                }
+
+                if (anObj != null
+                  && anObj == theIObj)
+                {
+                    myDetectedSeq.Remove(aDetIter);
+                    if (myCurDetected == aDetIter)
+                    {
+                        myCurDetected = Math.Min(myDetectedSeq.Upper(), aDetIter);
+                    }
+                    if (myCurHighlighted == aDetIter)
+                    {
+                        myCurHighlighted = 0;
+                    }
+                }
+                else
+                {
+                    aDetIter++;
+                }
+            }
+
+            // remove IO from the selection manager to avoid memory leaks
+            SelectMgr_SelectableObject anObj1 = theIObj; // to avoid ambiguity
+            mgrSelector.Remove(anObj1);
+
+            setObjectStatus(theIObj, PrsMgr_DisplayStatus.PrsMgr_DisplayStatus_None, -1, -1);
+            theIObj.ViewAffinity().SetVisible(true); // reset view affinity mask
+            myMainVwr.StructureManager().UnregisterObject(theIObj);
+
+            if (myLastPicked != null)
+            {
+                if (myLastPicked.IsSameSelectable(theIObj))
+                {
+                    clearDynamicHighlight();
+                    myLastPicked = null;
+                }
+            }
+
+            if (theToUpdateviewer
+             && theIObj.DisplayStatus() == PrsMgr_DisplayStatus.PrsMgr_DisplayStatus_Displayed)
+            {
+                myMainVwr.Update();
+            }
+        }
 
         //! Removes dynamic highlight draw
         void clearDynamicHighlight()
@@ -1233,10 +1413,10 @@ namespace TKV3d
                 theIObj.SetDisplayMode((int)theMode);
                 return;
             }
-            /*else if (!theIObj.AcceptDisplayMode(theMode))
+            else if (!theIObj.AcceptDisplayMode(theMode))
             {
                 return;
-            }*/
+            }
 
             AIS_GlobalStatus aStatus = myObjects[theIObj];
             if (theIObj.DisplayStatus() != PrsMgr_DisplayStatus.PrsMgr_DisplayStatus_Displayed)
@@ -1348,5 +1528,6 @@ namespace TKV3d
         AIS_SOD_OnlyOneGood,
         AIS_SOD_SeveralGood
     };
+
 }
 

@@ -26,6 +26,12 @@ namespace TKService
             MarkDirty();
         }
 
+        internal bool Remove(Graphic3d_CStructure theStruct)
+        {
+            //todo
+            return true;
+        }
+
         Graphic3d_IndexedMapOfStructure myStructs = new Graphic3d_IndexedMapOfStructure();    //!< Indexed map of structures.
 
 
