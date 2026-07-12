@@ -1,4 +1,6 @@
-﻿namespace TKService
+﻿using OCCPort.Common;
+
+namespace TKService
 {
     //! Defines a platform-neutral window.
     //! This class is intended to be used in context when window management (including OpenGL context creation)
@@ -15,7 +17,13 @@
         int myWidth;
         int myHeight;
         bool myIsMapped;
-
+        //! Return the window size.
+        public override void Size(out int theWidth,
+                           out int theHeight)
+        {
+            theWidth = myWidth;
+            theHeight = myHeight;
+        }
         //! Return native handle of this drawable.
         public override Aspect_Drawable NativeHandle() { return myHandle; }
 
@@ -24,7 +32,7 @@
             throw new NotImplementedException();
         }
 
-        internal bool SetSize(int theWidth, int theHeight)
+        public bool SetSize(int theWidth, int theHeight)
         {
             if (myWidth == theWidth
              && myHeight == theHeight)
@@ -39,7 +47,7 @@
 
         public override Aspect_TypeOfResize DoResize()
         {
-            return Aspect_TypeOfResize. Aspect_TOR_UNKNOWN;
+            return Aspect_TypeOfResize.Aspect_TOR_UNKNOWN;
         }
     }
 

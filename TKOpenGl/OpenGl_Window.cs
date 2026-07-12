@@ -1,4 +1,5 @@
 ﻿using OCCPort.OpenGL;
+using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using System;
@@ -20,7 +21,7 @@ namespace OCCPort
         OpenGl_Context myGlContext;
         bool myOwnGContext;    //!< set to TRUE if GL context was not created by this class
         Aspect_Window myPlatformWindow; //!< software platform window wrapper
-        Aspect_Window mySizeWindow;     //!< window object defining dimensions
+        public Aspect_Window mySizeWindow;     //!< window object defining dimensions
 
         Vector2i mySize;        //!< window width x height in pixels
 
@@ -188,7 +189,7 @@ namespace OCCPort
 
             mySize = new Vector2i();
             mySizeWindow.Size(out mySize.X, out mySize.Y);
-            
+
             bool isCoreProfile = false;
             //#elif defined(_WIN32)
             var aWindow = myPlatformWindow.NativeHandle();
@@ -223,22 +224,18 @@ namespace OCCPort
         // =======================================================================
         void init()
         {
-            if (!Activate())
-            {
-                return;
-            }
+            if (!Activate())            
+                return;            
 
-
-
-            //myGlContext->core11fwd->glDisable(GL_DITHER);
-            //  myGlContext->core11fwd->glDisable(GL_SCISSOR_TEST);
+            myGlContext.core11fwd.glDisable(EnableCap.Dither);
+            myGlContext.core11fwd.glDisable(EnableCap.ScissorTest);
             int[] aViewport = new[] { 0, 0, mySize.X, mySize.Y };
-            /*   myGlContext->ResizeViewport(aViewport);
-               myGlContext->SetDrawBuffer(GL_BACK);
-               if (myGlContext->core11ffp != NULL)
-               {
-                   myGlContext->core11ffp->glMatrixMode(GL_MODELVIEW);
-               }*/
+            myGlContext.ResizeViewport(aViewport);
+            myGlContext.SetDrawBuffer((int)All.Back);
+            if (myGlContext.core11ffp != null)
+            {
+                myGlContext.core11ffp.glMatrixMode(All.Modelview);
+            }
         }
 
         internal OpenGl_Context GetGlContext()

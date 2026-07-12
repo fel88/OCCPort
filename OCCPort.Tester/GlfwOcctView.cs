@@ -30,7 +30,7 @@ namespace OCCPort.Tester
             if (theWidth != 0
                 && theHeight != 0
                 && myView!=null)
-            {
+            {                
                 myView.Window().DoResize();
                 myView.MustBeResized();
                 myView.Invalidate();

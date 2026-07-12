@@ -1,17 +1,15 @@
-﻿using OpenTK.Mathematics;
+﻿using OCCPort.Common;
+using OpenTK.Mathematics;
 
 namespace TKService
 {
     public abstract class Aspect_Window
     {
-        public int Width = 800;
-        public int Height = 600;
-        public void Size(out int x, out int y)
-        {
-            x = Width;
-            y = Height;
-        }
+        
+        //! Returns The Window SIZE in PIXEL
+        public abstract  void Size(out int Width, out int  Height)  ;
 
+        
         //! Apply the resizing to the window <me>.
         public abstract  Aspect_TypeOfResize DoResize();
 

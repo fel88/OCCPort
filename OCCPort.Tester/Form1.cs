@@ -50,7 +50,7 @@ namespace OCCPort.Tester
                 glControl = new GLControl(new OpenTK.Graphics.GraphicsMode(32, 24, 0, 8));
             }*/
             evwrapper = new EventWrapperGlControl(glControl);
-
+            
             glControl.Paint += Gl_Paint;
             ViewManager = GravityViewManager = new GravityCameraViewManager(glControl);
             ViewManager.Attach(evwrapper, camera1);
@@ -87,7 +87,6 @@ namespace OCCPort.Tester
             hglrc = wglGetCurrentContext();
 
             Proxy.runOpenTk(glControl.Context.WindowPtr, hglrc.Value);
-
 
             inited = true;
 
@@ -164,8 +163,7 @@ namespace OCCPort.Tester
             proxy.iterate();
             glControl.SwapBuffers();
             return;
-            GravityViewManager.View.MyWindow.Width = glControl.Width;
-            GravityViewManager.View.MyWindow.Height = glControl.Height;
+            
 
             ViewManager.Update();
 

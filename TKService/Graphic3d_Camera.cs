@@ -299,15 +299,17 @@ namespace TKService
             gp_Pnt aBndCenter = ((aBndMin.XYZ() + aBndMax.XYZ()) / 2.0);
 
             gp_Pnt[] aBndCornerArray = new gp_Pnt[8];
+
+            aBndCornerArray[0].SetCoord(aBndMin.X(), aBndMin.Y(), aBndMin.Z());
+            aBndCornerArray[1].SetCoord(aBndMin.X(), aBndMin.Y(), aBndMax.Z());
+            aBndCornerArray[2].SetCoord(aBndMin.X(), aBndMax.Y(), aBndMin.Z());
+            aBndCornerArray[3].SetCoord(aBndMin.X(), aBndMax.Y(), aBndMax.Z());
+            aBndCornerArray[4].SetCoord(aBndMax.X(), aBndMin.Y(), aBndMin.Z());
+            aBndCornerArray[5].SetCoord(aBndMax.X(), aBndMin.Y(), aBndMax.Z());
+            aBndCornerArray[6].SetCoord(aBndMax.X(), aBndMax.Y(), aBndMin.Z());
+            aBndCornerArray[7].SetCoord(aBndMax.X(), aBndMax.Y(), aBndMax.Z());
+
             NCollection_Array1<gp_Pnt> aBndCorner = new NCollection_Array1<gp_Pnt>(aBndCornerArray, 1, 8);
-            aBndCorner[1].SetCoord(aBndMin.X(), aBndMin.Y(), aBndMin.Z());
-            aBndCorner[2].SetCoord(aBndMin.X(), aBndMin.Y(), aBndMax.Z());
-            aBndCorner[3].SetCoord(aBndMin.X(), aBndMax.Y(), aBndMin.Z());
-            aBndCorner[4].SetCoord(aBndMin.X(), aBndMax.Y(), aBndMax.Z());
-            aBndCorner[5].SetCoord(aBndMax.X(), aBndMin.Y(), aBndMin.Z());
-            aBndCorner[6].SetCoord(aBndMax.X(), aBndMin.Y(), aBndMax.Z());
-            aBndCorner[7].SetCoord(aBndMax.X(), aBndMax.Y(), aBndMin.Z());
-            aBndCorner[8].SetCoord(aBndMax.X(), aBndMax.Y(), aBndMax.Z());
 
             // Perspective-correct camera projection vector, matching the bounding box is determined geometrically.
             // Knowing the initial shape of a frustum it is possible to match it to a bounding box.
@@ -346,6 +348,7 @@ namespace TKService
                 {
                     aFitDist = Math.Max(aFitDist, new gp_Vec(aBndCenter, aBndCorner[aJ]).Dot(aPlaneN));
                     //write back aFitDist to aFitDistance[anI];??
+                    aFitDistance[anI] = aFitDist;
                 }
             }
             // The center of camera is placed on the same line with center of bounding box.

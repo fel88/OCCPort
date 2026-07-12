@@ -65,6 +65,12 @@ namespace OCCPort.Tester
 
         }
 
+        public override void Size(out int Width, out int Height)
+        {
+            Width = myXRight - myXLeft;
+            Height = myYBottom - myYTop;
+        }
+
         //! Return GLFW window.
         internal Window* getGlfwWindow()
         {
