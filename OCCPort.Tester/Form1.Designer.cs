@@ -47,6 +47,7 @@
             toolStripButton10 = new System.Windows.Forms.ToolStripButton();
             toolStripButton11 = new System.Windows.Forms.ToolStripButton();
             toolStripButton12 = new System.Windows.Forms.ToolStripButton();
+            toolStripButton13 = new System.Windows.Forms.ToolStripButton();
             toolStrip1.SuspendLayout();
             SuspendLayout();
             // 
@@ -58,7 +59,7 @@
             // 
             // toolStrip1
             // 
-            toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { toolStripButton1, toolStripDropDownButton1, toolStripButton2, toolStripButton3, toolStripButton4, toolStripButton5, toolStripButton6, toolStripButton7, toolStripButton8, toolStripButton9, toolStripButton10, toolStripButton11, toolStripButton12 });
+            toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { toolStripButton1, toolStripDropDownButton1, toolStripButton2, toolStripButton3, toolStripButton4, toolStripButton5, toolStripButton6, toolStripButton7, toolStripButton8, toolStripButton9, toolStripButton10, toolStripButton11, toolStripButton12, toolStripButton13 });
             toolStrip1.Location = new System.Drawing.Point(0, 0);
             toolStrip1.Name = "toolStrip1";
             toolStrip1.Size = new System.Drawing.Size(1058, 25);
@@ -205,6 +206,15 @@
             toolStripButton12.Text = "add plane";
             toolStripButton12.Click += toolStripButton12_Click;
             // 
+            // toolStripButton13
+            // 
+            toolStripButton13.Image = (System.Drawing.Image)resources.GetObject("toolStripButton13.Image");
+            toolStripButton13.ImageTransparentColor = System.Drawing.Color.Magenta;
+            toolStripButton13.Name = "toolStripButton13";
+            toolStripButton13.Size = new System.Drawing.Size(69, 22);
+            toolStripButton13.Text = "add star";
+            toolStripButton13.Click += toolStripButton13_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -242,6 +252,7 @@
         private System.Windows.Forms.ToolStripButton toolStripButton10;
         private System.Windows.Forms.ToolStripButton toolStripButton11;
         private System.Windows.Forms.ToolStripButton toolStripButton12;
+        private System.Windows.Forms.ToolStripButton toolStripButton13;
     }
 }
 

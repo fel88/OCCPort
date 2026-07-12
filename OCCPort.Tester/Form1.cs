@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -99,7 +100,7 @@ namespace OCCPort.Tester
             }
             proxy.ActivateGrid(true);
             //proxy.ShowCube();
-            proxy.SetDisplayMode(1);
+            //proxy.SetDisplayMode(1);
             proxy.SetMaterial(1);
             //proxy.SetDegenerateModeOff();
             proxy.RedrawView();
@@ -151,8 +152,8 @@ namespace OCCPort.Tester
             {
 
 			}*/
-            
-             Redraw();
+
+            Redraw();
         }
 
         void Redraw()
@@ -513,6 +514,37 @@ namespace OCCPort.Tester
 
         }
 
+        void MakeFace(Vector3d[] points)
+        {
+            // Define 4 points for the rectangle
+            gp_Pnt[] pnts = points.Select(z => new gp_Pnt(z.X, z.Y, z.Z)).ToArray();
+            // Create Wire (Closed Contour)
+            BRepBuilderAPI_MakeWire mw = new BRepBuilderAPI_MakeWire();
+
+            // Create Edges
+
+            for (int i = 0; i < pnts.Length; i++)
+            {
+                var p1 = pnts[i % pnts.Length];
+                var p2 = pnts[(i + 1) % pnts.Length];
+
+                mw.Add(new BRepBuilderAPI_MakeEdge(p1, p2));
+
+            }
+
+
+            TopoDS_Wire wire = mw.Wire();
+
+            // Create Face
+            TopoDS_Face face = new BRepBuilderAPI_MakeFace(wire);
+
+            var solid = face;
+            var shape = new AIS_Shape(solid);
+
+            myAISContext.Display(shape, true);
+            myAISContext.SetDisplayMode(shape, (int)AIS_DisplayMode.AIS_Shaded, false);
+            myAISContext.UpdateCurrentViewer();
+        }
         void MakeRectFace(Vector3d v1, Vector3d v2, Vector3d v3, Vector3d v4)
         {
             // Define 4 points for the rectangle
@@ -544,6 +576,40 @@ namespace OCCPort.Tester
             myAISContext.Display(shape, true);
             myAISContext.SetDisplayMode(shape, (int)AIS_DisplayMode.AIS_Shaded, false);
             myAISContext.UpdateCurrentViewer();
+        }
+
+        private void toolStripButton13_Click(object sender, EventArgs e)
+        {
+            var d = AutoDialog.DialogHelpers.StartDialog();
+
+            d.AddInt("qty", "Qty", 8, 3, 60);
+
+            d.AddDouble("rad1", "Radius 1", 100, 1, 1000);
+            d.AddDouble("rad2", "Radius 2", 50, 1, 1000);
+
+            if (!d.ShowDialog())
+                return;
+
+            var rad1 = d.GetDouble("rad1");
+            var rad2 = d.GetDouble("rad2");
+            var qty = d.GetInt("qty");
+
+
+            List<Vector3d> pp = new List<Vector3d>();
+            int q = qty * 2;
+            for (int i = 0; i < q; i++)
+            {
+                var ang = -i * 360.0 / q;
+                var radians = ang * Math.PI / 180.0;
+                var rad = rad1;
+                if (i % 2 == 0)
+                    rad = rad2;
+                var xx = rad * Math.Cos(radians);
+                var yy = rad * Math.Sin(radians);
+                pp.Add(new Vector3d(xx, yy, 0));
+            }
+
+            MakeFace(pp.ToArray());            
         }
     }
 }

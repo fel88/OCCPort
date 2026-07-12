@@ -232,27 +232,10 @@ namespace TKernel
 
             for (int i = 0; i < dic.Count; i++)
             {
-                /*  if (hasher != null)
-                  {
-                      if (hasher.Equals(dic[i].Key, theKey1))
-                          return i + 1;
-                  }
-                  else*/
-                {
-
-                    if (dic[i].Key.Equals(theKey1))
-                        return i + 1;
-                }
+                if (hasher.Equals(dic[i].Key, theKey1))
+                    return i + 1;                
             }
-            //IndexedDataMapNode* pNode1 = (IndexedDataMapNode*)myData1[Hasher::HashCode(theKey1, NbBuckets())];
-            //while (pNode1)
-            //{
-            //    if (Hasher::IsEqual(pNode1->Key1(), theKey1))
-            //    {
-            //        return pNode1->Index();
-            //    }
-            //    pNode1 = (IndexedDataMapNode*)pNode1->Next();
-            //}
+            
             return 0;
         }
 

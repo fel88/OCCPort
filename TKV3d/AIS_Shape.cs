@@ -41,6 +41,12 @@ namespace TKV3d
     public class AIS_Shape : AIS_InteractiveObject
     {
 
+        //! Return true if specified display mode is supported.
+        public override bool AcceptDisplayMode(int theMode)
+        {
+            return theMode >= 0 && theMode <= 2;
+        }
+
         public override void Compute(PrsMgr_PresentationManager thePrsMgr,
                                    Prs3d_Presentation thePrs,
                                    int theMode)

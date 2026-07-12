@@ -129,9 +129,15 @@ namespace TKMath
                 }
             }
         }
+
         public void ROTATE(math_Matrix a, int i, int j, int k, int l, double tau, ref double h, ref double g, double s)
         {
-
+            /*
+#define ROTATE(a,i,j,k,l) g=a(i,j);\
+                          h=a(k,l);\
+                          a(i,j)=g-s*(h+g*tau);\
+                          a(k,l)=h+s*(g-h*tau);
+*/
             g = a[i, j];
             h = a[k, l];
             a[i, j] = g - s * (h + g * tau);
@@ -223,7 +229,7 @@ namespace TKMath
                             }
                             for (j = 1; j <= n; j++)
                             {
-                                ROTATE(a, j, ip, j, iq, tau, ref h, ref g, s);
+                                ROTATE(v, j, ip, j, iq, tau, ref h, ref g, s);
                             }
                             nrot++;
                         }
