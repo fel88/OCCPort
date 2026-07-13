@@ -127,11 +127,13 @@ namespace OCCPort
         private void Clear()
         {
             hasMore = false;
-            myStack.list.Clear();
-            /*for (int i = 0; i <= myTop; ++i)
+            
+            for (int i = 0; i <= myTop; ++i)
 			{
-				myStack[i].~TopoDS_Iterator();
-			}*/
+                //myStack[i].~TopoDS_Iterator();
+                myStack[i] = null;
+            }
+
             myTop = -1;
 
         }
@@ -225,8 +227,8 @@ namespace OCCPort
                         mySizeOfStack = NewSize;
                         myStack = newStack;
                     }
-                    myStack.Add(new TopoDS_Iterator(myShape));
-                    //myStack[myTop] = new TopoDS_Iterator(myShape);
+                    //myStack.Add(new TopoDS_Iterator(myShape));
+                    myStack[myTop] = new TopoDS_Iterator(myShape);
                     //new(&myStack[myTop]) TopoDS_Iterator(myShape);
                 }
             }
@@ -255,7 +257,7 @@ namespace OCCPort
                             for (i = 0; i < myTop; i++)
                             {
                                 //new(&newStack[i]) TopoDS_Iterator(myStack[i]);
-                                newStack.Add(new TopoDS_Iterator(myStack[i]));
+                                newStack[i] = (new TopoDS_Iterator(myStack[i]));
 
                                 //myStack[i].~TopoDS_Iterator();
                             }
@@ -264,7 +266,7 @@ namespace OCCPort
                             myStack = newStack;
                         }
                         //new(&myStack[myTop]) TopoDS_Iterator(ShapTop);
-                        myStack.Add(new TopoDS_Iterator(ShapTop));
+                        myStack[myTop] = (new TopoDS_Iterator(ShapTop));
 
                     }
                     else
@@ -295,18 +297,19 @@ namespace OCCPort
 
     internal class TopExp_Stack : TopoDS_Iterator
     {
+        public TopExp_Stack()
+        {
+
+        }
         //  typedef TopoDS_Iterator* TopExp_Stack;
-        public List<TopoDS_Iterator> list = new List<TopoDS_Iterator>();
+        public TopoDS_Iterator[] list = new TopoDS_Iterator[20];
         public TopoDS_Iterator this[int i]
         {
             get { return list[i]; }
             set { list[i] = value; }
         }
 
-        internal void Add(TopoDS_Iterator topoDS_Iterator)
-        {
-            list.Add(topoDS_Iterator);
-        }
+        
     }
 }
 

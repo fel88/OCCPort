@@ -4,16 +4,45 @@ using System.Xml.Linq;
 
 namespace TKernel
 {
-    public class NCollection_Map<T>:List<T>
+    public class NCollection_Map<T> : NCollection_Map<T, NCollection_DefaultHasher<T>>
     {
-        public new  bool Add(T e)
+        public NCollection_Map() : base() { }
+        public NCollection_Map(int v) : base(v)
         {
-            if (Contains(e))
+
+        }
+
+    }
+    public class NCollection_Map<T, Hasher> : List<T> where Hasher : IEqualityComparer<T>, new()
+    {
+        Hasher hasher;
+        public new bool Add(T e)
+        {
+
+            foreach (var item in this)
             {
-                return false;
+                if (hasher.Equals(item, e))
+                    return false;
             }
+            //if (Contains(e))
+            //{
+            //    return false;
+            //}
             base.Add(e);
             return true;
+        }
+
+        public new void Remove(T e)
+        {
+            for (int i = 0; i < this.Count; i++)
+            {
+                T? item = this[i];
+                if (hasher.Equals(item, e))
+                {
+                    RemoveAt(i);
+                    return;
+                }
+            }
         }
 
         public int Extent()
@@ -24,9 +53,10 @@ namespace TKernel
         //! reference to either newly added or previously existing object
         public T Added(T K)
         {
+
             foreach (var item in this)
             {
-                if (item.Equals(K))
+                if (hasher.Equals(item, K))
                 {
                     return item;
                 }
@@ -34,9 +64,9 @@ namespace TKernel
             //probably should clone here
             //if (!Contains(K))
             //{
-              base.Add(K);
+            base.Add(K);
             //}
-            
+
             return K;
         }
 
@@ -45,15 +75,20 @@ namespace TKernel
             return Count == 0;
 
         }
-        
 
-        public NCollection_Map() { }
+
+        public NCollection_Map()
+        {
+
+            hasher = new Hasher();
+        }
         public NCollection_Map(int v)
         {
+            hasher = new Hasher();
         }
 
-        
 
-        
+
+
     }
 }

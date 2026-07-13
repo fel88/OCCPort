@@ -1,8 +1,35 @@
-﻿using System;
+﻿using OCCPort.Common;
+using System;
+using TKBRep;
 using TKG3d;
 
 namespace OCCPort
 {
+    //! A TShape  is a topological  structure describing a
+    //! set of points in a 2D or 3D space.
+    //!
+    //! A topological shape is a structure made from other
+    //! shapes.  This is a deferred class  used to support
+    //! topological objects.
+    //!
+    //! TShapes are   defined   by  their  optional domain
+    //! (geometry)  and  their  components  (other TShapes
+    //! with  Locations and Orientations).  The components
+    //! are stored in a List of Shapes.
+    //!
+    //! A   TShape contains  the   following boolean flags :
+    //!
+    //! - Free       : Free or Frozen.
+    //! - Modified   : Has been modified.
+    //! - Checked    : Has been checked.
+    //! - Orientable : Can be oriented.
+    //! - Closed     : Is closed (note that only Wires and Shells may be closed).
+    //! - Infinite   : Is infinite.
+    //! - Convex     : Is convex.
+    //!
+    //! Users have no direct access to the classes derived
+    //! from TShape.  They  handle them with   the classes
+    //! derived from Shape.
     public abstract class TopoDS_TShape
     {
         public TopoDS_TShape()
@@ -13,6 +40,8 @@ namespace OCCPort
           | TopoDS_TShape_Flags.TopoDS_TShape_Flags_Orientable);
         }
 
+        [Aux]
+        public TopoDS_Shape[] InernalShapes => myShapes.ToArray();
         internal TopoDS_ListOfShape myShapes;
         //! Returns the type as a term of the ShapeEnum enum :
         //! VERTEX, EDGE, WIRE, FACE, ....
@@ -65,6 +94,8 @@ namespace OCCPort
         };
 
         int myFlags;
+        //! Returns the orientability flag.
+        public bool Orientable() { return ((myFlags & (int)TopoDS_TShape_Flags.TopoDS_TShape_Flags_Orientable) != 0); }
 
         //! Returns the free flag.
         public bool Free() { return ((myFlags & (int)TopoDS_TShape_Flags.TopoDS_TShape_Flags_Free) != 0); }

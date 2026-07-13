@@ -175,14 +175,6 @@ namespace OCCPort
         //! - TopoDS__UnCompatibleShapes if S and C are not compatible.
         public void Add(TopoDS_Shape aShape, TopoDS_Shape aComponent)
         {
-
-            //=======================================================================
-            //function : Add
-            //purpose  : insert aComponent in aShape
-            //=======================================================================
-
-
-
             // From now the Component cannot be edited
             aComponent.TShape().Free(false);
 
@@ -240,7 +232,7 @@ namespace OCCPort
                         S.Move(aLoc.Inverted(), false);
                     //
                     // Set the TShape as modified.
-                    aShape.TShape().Modified(true);
+                    aShape.TShape().Modified(true);                   
                 }
                 else
                 {

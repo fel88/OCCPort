@@ -38,8 +38,14 @@ namespace TKernel
 
         public class Iterator
         {
+            public void Initialize(NCollection_List<T> myShapes)
+            {
+                list = myShapes;
+                index = 0;
+            }
 
             public NCollection_List<T> list;
+            public Iterator() { }
             public Iterator(NCollection_List<T> aDisplayedObjects)
             {
                 list = aDisplayedObjects;

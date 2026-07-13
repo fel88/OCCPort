@@ -83,7 +83,7 @@ namespace TKG3d
 
         public override bool IsUPeriodic()
         {
-            return true;
+            return false;
         }
 
         public override bool IsVPeriodic()

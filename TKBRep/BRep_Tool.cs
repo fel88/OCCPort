@@ -892,12 +892,18 @@ namespace TKBRep
             return bRet;
         }
 
+
+        //! If S is Shell, returns True if it has no free boundaries (edges).
+        //! If S is Wire, returns True if it has no free ends (vertices).
+        //! (Internal and External sub-shepes are ignored in these checks)
+        //! If S is Edge, returns True if its vertices are the same.
+        //! For other shape types returns S.Closed().
         public static bool IsClosed(TopoDS_Shape theShape)
         {
             if (theShape.ShapeType() == TopAbs_ShapeEnum.TopAbs_SHELL)
             {
-                //Dictionary<TopoDS_Shape, TopTools_ShapeMapHasher> aMap(101, new NCollection_IncAllocator);
-                NCollection_Map<TopoDS_Edge> aMap = new();
+                NCollection_Map<TopoDS_Shape, TopTools_ShapeMapHasher> aMap = new();
+
                 TopExp_Explorer exp = new TopExp_Explorer(theShape.Oriented(TopAbs_Orientation.TopAbs_FORWARD), TopAbs_ShapeEnum.TopAbs_EDGE);
                 bool hasBound = false;
                 for (; exp.More(); exp.Next())
@@ -912,9 +918,9 @@ namespace TKBRep
                 return hasBound && aMap.IsEmpty();
             }
             else if (theShape.ShapeType() == TopAbs_ShapeEnum.TopAbs_WIRE)
-            {
-                //NCollection_Map<TopoDS_Shape, TopTools_ShapeMapHasher> aMap(101, new NCollection_IncAllocator);
-                NCollection_Map<TopoDS_Shape> aMap = new();
+            {                
+                NCollection_Map<TopoDS_Shape, TopTools_ShapeMapHasher> aMap=new ();
+                
                 TopExp_Explorer exp = new TopExp_Explorer(theShape.Oriented(TopAbs_Orientation.TopAbs_FORWARD), TopAbs_ShapeEnum.TopAbs_VERTEX);
                 bool hasBound = false;
                 for (; exp.More(); exp.Next())
@@ -1019,7 +1025,7 @@ namespace TKBRep
                     T = PT.Triangulation();
                     L = E.Location() * PT.Location();
                     return;
-                }                
+                }
             }
 
             L.Identity();

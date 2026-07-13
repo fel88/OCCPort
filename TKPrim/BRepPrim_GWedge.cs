@@ -2,6 +2,7 @@
 using OCCPort.Common;
 using TKBRep;
 using TKMath;
+using TKTopAlgo;
 
 namespace TKPrim
 {
@@ -67,7 +68,7 @@ namespace TKPrim
                 myBuilder.MakeShell(myShell);
 
                 if (HasFace(BRepPrim_Direction.BRepPrim_XMin))
-                    myBuilder.AddShellFace(myShell, Face(BRepPrim_Direction.BRepPrim_XMin));
+                    myBuilder.AddShellFace(myShell, Face(BRepPrim_Direction.BRepPrim_XMin));                
                 if (HasFace(BRepPrim_Direction.BRepPrim_XMax))
                     myBuilder.AddShellFace(myShell, Face(BRepPrim_Direction.BRepPrim_XMax));
                 if (HasFace(BRepPrim_Direction.BRepPrim_YMin))
@@ -168,9 +169,8 @@ new[]                      { 8,10, 4, 6,-1,-1},
             {
                 gp_Pln P = Plane(d1);
                 myBuilder.MakeFace(myFaces[i], P);
-                if (HasWire(d1)) myBuilder.AddFaceWire(myFaces[i], Wire(d1));
-                if (i % 2 == 0) myBuilder.ReverseFace(myFaces[i]);
-
+                if (HasWire(d1)) myBuilder.AddFaceWire(myFaces[i], Wire(d1));                
+                if (i % 2 == 0) myBuilder.ReverseFace(myFaces[i]);                
                 // pcurves
 
                 BRepPrim_Direction dd1 = BRepPrim_Direction.BRepPrim_ZMin, dd2 = BRepPrim_Direction.BRepPrim_YMax,
@@ -317,15 +317,13 @@ new[]                      { 8,10, 4, 6,-1,-1},
                     myBuilder.AddWireEdge(myWires[i], Edge(d1, dd2), true);
                 if (HasEdge(d1, dd1))
                     myBuilder.AddWireEdge(myWires[i], Edge(d1, dd1), true);
-
+                
                 myBuilder.CompleteWire(myWires[i]);
                 WiresBuilt[i] = true;
             }
 
             return myWires[i];
-
         }
-
 
         TopoDS_Edge Edge(BRepPrim_Direction d1, BRepPrim_Direction d2)
         {

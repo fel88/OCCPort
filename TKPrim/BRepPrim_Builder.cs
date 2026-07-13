@@ -4,6 +4,7 @@ using TKBRep;
 using TKG2d;
 using TKG3d;
 using TKMath;
+using TKTopAlgo;
 
 namespace TKPrim
 {
@@ -57,12 +58,12 @@ namespace TKPrim
             BRepTools.Update(S);
         }
 
-        public void AddShellFace(TopoDS_Shell S,
-
-                         TopoDS_Face F)
+        //! Adds the Face <F>  in the Shell <Sh>.
+        public void AddShellFace(TopoDS_Shell S, TopoDS_Face F)
         {
             myBuilder.Add(S, F);
         }
+
         public void SetPCurve(TopoDS_Edge E,
 
                    TopoDS_Face F,
@@ -102,7 +103,7 @@ namespace TKPrim
 
         public void CompleteWire(TopoDS_Wire W)
         {
-            W.Closed(BRep_Tool.IsClosed(W));
+            W.Closed(BRep_Tool.IsClosed(W));            
             BRepTools.Update(W);
         }
 
@@ -138,6 +139,7 @@ namespace TKPrim
                         double P,
                         bool direct)
         {
+            //TopoDS_Vertex VV = V;
             TopoDS_Vertex VV = new TopoDS_Vertex(V);
             if (!direct)
                 VV.Reverse();

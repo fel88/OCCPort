@@ -18,6 +18,7 @@ namespace OCCPort
         public TopoDS_Vertex() : base() { }
         public TopoDS_Vertex(TopoDS_Shape theOther) : base(theOther)
         {
+            
         }
 
         public override void Orientation(TopAbs_Orientation theOrient) { base.Orientation(theOrient); }

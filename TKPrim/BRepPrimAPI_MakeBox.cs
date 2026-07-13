@@ -1,5 +1,7 @@
 ﻿using OCCPort;
+using OCCPort.Common;
 using TKBRep;
+using TKernel;
 using TKMath;
 using TKTopAlgo;
 
@@ -67,6 +69,7 @@ namespace TKPrim
             myShape = new TopoDS_Solid();
         }
 
+        //! Returns the constructed box as a shell.
         public TopoDS_Shell Shell()
         {
             myShape = myWedge.Shell();
@@ -74,11 +77,13 @@ namespace TKPrim
             return TopoDS.Shell(myShape);
         }
 
-
-        public void Build()
+        //! Stores the solid in myShape.
+        public override void Build(Message_ProgressRange theRange = null)
         {
             Solid();
-        }
+            AuxFunctions.Check1(myShape);
+        }   
+
         //=======================================================================
         //function : Solid
         //purpose  : 

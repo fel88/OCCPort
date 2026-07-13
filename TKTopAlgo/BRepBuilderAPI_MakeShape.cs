@@ -10,6 +10,7 @@ namespace TKTopAlgo
     //! of sub-shapes.
     public class BRepBuilderAPI_MakeShape : BRepBuilderAPI_Command
     {
+        
 
         public TopoDS_Shape myShape;
         public TopoDS_Shape Shape()
