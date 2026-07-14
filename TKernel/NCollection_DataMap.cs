@@ -86,7 +86,18 @@ namespace TKernel
             }
             return default;
         }
-     
+
+        public T2 ChangeFind(T1 theObject)
+        {
+            if (ContainsKey(theObject))
+            {
+                return this[theObject];
+                
+            }
+            
+            return default;
+        }
+
         public bool Find(T1 theObject, out T2 aResult)
         {
             if (ContainsKey(theObject))

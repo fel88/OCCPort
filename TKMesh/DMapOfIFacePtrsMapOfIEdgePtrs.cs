@@ -1,6 +1,9 @@
-﻿namespace TKMesh
+﻿using System.Reflection.Metadata;
+using TKernel;
+
+namespace TKMesh
 {
-    internal class DMapOfIFacePtrsMapOfIEdgePtrs
+    internal class DMapOfIFacePtrsMapOfIEdgePtrs: NCollection_DataMap<IFacePtr, MapOfIEdgePtr, WeakEqual<IMeshData_Face> > 
     {
     }
 }

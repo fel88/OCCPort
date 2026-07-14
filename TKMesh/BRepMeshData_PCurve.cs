@@ -12,6 +12,14 @@ namespace TKMesh
         {
             return (myOrientation != TopAbs_Orientation.TopAbs_REVERSED);
         }
+
+        //! Returns internal flag of this pcurve.
+        public bool IsInternal()
+        {
+            return (myOrientation == TopAbs_Orientation.TopAbs_INTERNAL);
+        }
+
+
         public TopAbs_Orientation GetOrientation()
         {
             return myOrientation;

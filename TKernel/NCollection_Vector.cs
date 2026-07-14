@@ -55,6 +55,10 @@ namespace TKernel
         {
             return findV(theIndex);
         }
+        public void ChangeValue(int v, T theVertex)
+        {
+            this[v] = theVertex;
+        }
 
         public void Append(T t)
         {
@@ -108,6 +112,7 @@ namespace TKernel
                 index++;
             }
 
+          
             public T Value()
             {
                 return list[index];

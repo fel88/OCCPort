@@ -1,4 +1,5 @@
 ﻿using OCCPort;
+using OCCPort.Common;
 using TKBRep;
 using TKG3d;
 using TKMath;
@@ -26,9 +27,58 @@ namespace TKMesh
             theMaxDimension = Math.Max(aMaxX - aMinX, Math.Max(aMaxY - aMinY, aMaxZ - aMinZ));
         }
 
+        public static double MaxFaceTolerance(TopoDS_Face theFace)
+        {
+            double aMaxTolerance = BRep_Tool.Tolerance(theFace);
+
+            double aTolerance = Math.Max(
+              MaxTolerance(TopAbs_ShapeEnum.TopAbs_EDGE, theFace, new EdgeTolerance()),
+              MaxTolerance(TopAbs_ShapeEnum.TopAbs_VERTEX, theFace, new VertexTolerance()));
+
+            return Math.Max(aMaxTolerance, aTolerance);
+        }
+
+        //! Auxiliary struct to take a tolerance of vertex.
+        public class VertexTolerance : IToleranceExtractor
+        {
+            public double Get(TopoDS_Shape theVertex)
+            {
+                return BRep_Tool.Tolerance(TopoDS.Vertex(theVertex));
+            }
+        }
+
+        //! Auxiliary struct to take a tolerance of edge.
+        public class EdgeTolerance : IToleranceExtractor
+        {
+            public double Get(TopoDS_Shape theEdge)
+            {
+                return BRep_Tool.Tolerance(TopoDS.Edge(theEdge));
+            }
+        }
+
+        public interface IToleranceExtractor
+        {
+            double Get(TopoDS_Shape topoDS_Shape);
+        }
+
+        //! Returns maximum tolerance of face element of the specified type.
+
+      public   static double MaxTolerance(TopAbs_ShapeEnum ShapeType, TopoDS_Face theFace, IToleranceExtractor toleranceExtractor)
+        {
+            double aMaxTolerance = Standard_Real.RealFirst();
+            TopExp_Explorer aExplorer = new TopExp_Explorer(theFace, ShapeType);
+            for (; aExplorer.More(); aExplorer.Next())
+            {
+                double aTolerance = toleranceExtractor.Get(aExplorer.Current());
+                if (aTolerance > aMaxTolerance)
+                    aMaxTolerance = aTolerance;
+            }
+
+            return aMaxTolerance;
+        }
         public static gp_Pnt UseLocation(
-   gp_Pnt thePnt,
-   TopLoc_Location theLoc)
+           gp_Pnt thePnt,
+           TopLoc_Location theLoc)
         {
             if (theLoc.IsIdentity())
             {

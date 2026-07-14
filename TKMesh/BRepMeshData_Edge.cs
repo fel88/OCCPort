@@ -1,6 +1,7 @@
 ﻿using OCCPort;
 using OCCPort.Common;
 using TKBRep;
+using TKernel;
 using TKG3d;
 
 namespace TKMesh
@@ -93,9 +94,9 @@ namespace TKMesh
         public IMeshData_PCurve GetPCurve(IMeshData_Face theDFace, TopAbs_Orientation theOrientation)
         {
             ListOfInteger aListOfPCurves = myPCurvesMap.Find(theDFace);
-            var aPCurve1 = myPCurves.get(aListOfPCurves.First());
+            var aPCurve1 = myPCurves[(aListOfPCurves.First())];
             return (aPCurve1.GetOrientation() == theOrientation) ?
-    aPCurve1 : myPCurves.get(aListOfPCurves.Last());
+    aPCurve1 : myPCurves[(aListOfPCurves.Last())];
         }
 
         public int PCurvesNb()
@@ -140,35 +141,15 @@ namespace TKMesh
         }
     }
 
-    internal class VectorOfIPCurveHandles
+    internal class VectorOfIPCurveHandles: NCollection_Vector<IMeshData_PCurve> 
     {
-        List<IMeshData_PCurve> list = new List<IMeshData_PCurve>();
+        
         public VectorOfIPCurveHandles(int capacity)
         {
 
         }
 
-        public IMeshData_PCurve this[int key]
-        {
-            get => list[key];
-            set => list[key] = value;
-        }
-
-        public void Append(IMeshData_PCurve d)
-        {
-            list.Add(d);
-        }
-        internal IMeshData_PCurve get(int v)
-        {
-            return this[v];
-        }
-
-        internal int Size()
-        {
-            return list.Count;
-        }
-
-
+        
     }
 }
 

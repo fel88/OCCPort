@@ -78,7 +78,7 @@
 
         //! Enables/disables usage of shape tolerances for computing face deflection.
         //! Disabled by default.
-        public double ForceFaceDeflection;
+        public bool ForceFaceDeflection;
 
         //! Allows/forbids the decrease of the quality of the generated mesh
         //! over the existing one.

@@ -15,6 +15,8 @@ namespace TKMesh
         int GetIndex(int theIndex);
         void SetIndex(int theIndex, int val);
 
+        //! Returns internal flag of this pcurve.
+        bool IsInternal();
 
         //! Returns discrete face pcurve is associated to.
         IMeshData_Face GetFace();

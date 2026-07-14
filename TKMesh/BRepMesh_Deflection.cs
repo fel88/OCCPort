@@ -1,4 +1,6 @@
 ﻿using OCCPort;
+using OCCPort.Common;
+using System.Security.Cryptography;
 using TKBRep;
 using TKG3d;
 using TKMath;
@@ -67,7 +69,59 @@ namespace TKMesh
             return (anAdjustmentCoefficient * aShapeSize * theRelativeDeflection);
         }
 
+        public static void ComputeDeflection(
+      IFaceHandle theDFace,
+      IMeshTools_Parameters theParameters)
+        {
+            double aDeflection = theParameters.DeflectionInterior;
+            if (theParameters.Relative)
+            {
+                aDeflection = ComputeAbsoluteDeflection(theDFace.GetFace(),
+                                                        aDeflection, -1.0);
+            }
 
+            double aFaceDeflection = 0.0;
+            if (!theParameters.ForceFaceDeflection)
+            {
+                if (theDFace.WiresNb() > 0)
+                {
+                    for (int aWireIt = 0; aWireIt < theDFace.WiresNb(); ++aWireIt)
+                    {
+                        aFaceDeflection += theDFace.GetWire(aWireIt).GetDeflection();
+                    }
+
+                    aFaceDeflection /= theDFace.WiresNb();
+                }
+
+                aFaceDeflection = Math.Max(2.0 * BRepMesh_ShapeTool.MaxFaceTolerance(
+                  theDFace.GetFace()), aFaceDeflection);
+            }
+            aFaceDeflection = Math.Max(aDeflection, aFaceDeflection);
+
+            theDFace.SetDeflection(aFaceDeflection);
+        }
+
+        public static void ComputeDeflection(
+   IWireHandle theDWire,
+   IMeshTools_Parameters theParameters)
+        {
+            double aWireDeflection = 0.0;
+            if (theDWire.EdgesNb() > 0)
+            {
+                for (int aEdgeIt = 0; aEdgeIt < theDWire.EdgesNb(); ++aEdgeIt)
+                {
+                    aWireDeflection += theDWire.GetEdge(aEdgeIt).GetDeflection();
+                }
+
+                aWireDeflection /= theDWire.EdgesNb();
+            }
+            else
+            {
+                aWireDeflection = theParameters.Deflection;
+            }
+
+            theDWire.SetDeflection(aWireDeflection);
+        }
         //================================================
         // Function: ComputeDeflection (edge)
         // Purpose : 

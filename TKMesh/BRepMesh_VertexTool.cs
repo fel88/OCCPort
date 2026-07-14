@@ -116,27 +116,9 @@ namespace TKMesh
 
         double[] myTolerance = new double[2];
     }
-    internal class VectorOfVertex : List<BRepMesh_Vertex>
-    {
-        public int Length()
-        {
-            return Count;
-        }
-        public BRepMesh_Vertex Value(int index)
-        {
-            return this[index];
-        }
 
-        internal void Append(BRepMesh_Vertex theVertex)
-        {
-            Add(theVertex);
-        }
+    internal class VectorOfVertex : NCollection_Vector<BRepMesh_Vertex>;
 
-        internal void ChangeValue(int v, BRepMesh_Vertex theVertex)
-        {
-            this[v] = theVertex;
-        }
-    }
     public class VertexCellFilter : NCollection_CellFilter<BRepMesh_VertexInspector>
     {
         public VertexCellFilter(double v) : base(v, BRepMesh_VertexInspector.Dimension)
