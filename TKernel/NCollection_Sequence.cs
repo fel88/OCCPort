@@ -30,6 +30,24 @@ namespace TKernel
             Remove(aPrsIter.Value());
         }
 
+        //! Set item value by theIndex
+        public void SetValue(int theIndex,
+                      T theItem)
+        { ChangeValue(theIndex, theItem); }
+
+
+        //! Split in two sequences
+        public void Split(int theIndex, NCollection_Sequence<T> theSeq)
+        {
+            //todo check this!!
+            for (int i = theIndex + 1; i < Count; i++)
+            {
+                theSeq.Add(this[i]);
+            }
+            this.RemoveRange(theIndex, this.Count - theIndex);
+
+        }
+
 
         //! Constant item access by theIndex
         public T Value(int theIndex)
@@ -98,7 +116,7 @@ namespace TKernel
             return this[Lower()];
         }
 
-        
+
         public void Remove(int v)
         {
             RemoveAt(v - 1);
@@ -112,7 +130,7 @@ namespace TKernel
             {
                 throw new NotImplementedException();
                 //myCurrent = (isStart ? theSeq.myFirstItem : NULL);
-              //  myPrevious = (isStart ? NULL : theSeq.myLastItem);
+                //  myPrevious = (isStart ? NULL : theSeq.myLastItem);
             }
 
             NCollection_Sequence<T> target;

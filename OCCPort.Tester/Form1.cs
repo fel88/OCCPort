@@ -487,6 +487,7 @@ namespace OCCPort.Tester
             d.AddDouble("cx", "X");
             d.AddDouble("cy", "Y");
             d.AddDouble("cz", "Z");
+            d.AddBoolField("hole", "hole");
 
             d.AddDouble("w", "Width", 100);
             d.AddDouble("h", "Height", 50);
@@ -499,6 +500,7 @@ namespace OCCPort.Tester
             var cz = d.GetDouble("cz");
             var w = d.GetDouble("w");
             var h = d.GetDouble("h");
+            var withHole = d.GetBoolField("hole");
             double area = w * h;
             if (Math.Abs(area) < (0.0))
             {
@@ -506,10 +508,29 @@ namespace OCCPort.Tester
                 return;
             }
             var center = new Vector3d(cx, cy, cz);
-            MakeRectFace(center + new Vector3d(-w / 2, -h / 2, 0),
-                     center + new Vector3d(w / 2, -h / 2, 0),
-                     center + new Vector3d(w / 2, h / 2, 0),
-                     center + new Vector3d(-w / 2, h / 2, 0));
+            if (withHole)
+            {
+                /*
+                 * gp_Pnt ip1(-30, -10, 0);
+		gp_Pnt ip2(30, -10, 0);
+		gp_Pnt ip3(30, 10, 0);
+		gp_Pnt ip4(-30, 10, 0);
+
+                 */
+                MakeRectFaceWithHole([center + new Vector3d(-w / 2, -h / 2, 0),
+                         center + new Vector3d(w / 2, -h / 2, 0),
+                         center + new Vector3d(w / 2, h / 2, 0),
+                         center + new Vector3d(-w / 2, h / 2, 0)], [new Vector3d(-30,-10,0),
+                         new Vector3d(30,-10,0),
+                         new Vector3d(30,10,0),
+                         new Vector3d(-30,10,0)
+                         ]);
+            }
+            else
+                MakeRectFace(center + new Vector3d(-w / 2, -h / 2, 0),
+                         center + new Vector3d(w / 2, -h / 2, 0),
+                         center + new Vector3d(w / 2, h / 2, 0),
+                         center + new Vector3d(-w / 2, h / 2, 0));
 
 
         }
@@ -571,6 +592,68 @@ namespace OCCPort.Tester
             TopoDS_Face face = new BRepBuilderAPI_MakeFace(wire);
 
             var solid = face;
+            var shape = new AIS_Shape(solid);
+
+            myAISContext.Display(shape, true);
+            myAISContext.SetDisplayMode(shape, (int)AIS_DisplayMode.AIS_Shaded, false);
+            myAISContext.UpdateCurrentViewer();
+        }
+
+        void MakeRectFaceWithHole(Vector3d[] outer, Vector3d[] hole)
+        {
+            var v1 = outer[0];
+            var v2 = outer[1];
+            var v3 = outer[2];
+            var v4 = outer[3];
+
+            // Define 4 points for the rectangle
+            gp_Pnt p1 = new gp_Pnt(v1.X, v1.Y, v1.Z);
+            gp_Pnt p2 = new gp_Pnt(v2.X, v2.Y, v2.Z);
+            gp_Pnt p3 = new gp_Pnt(v3.X, v3.Y, v3.Z);
+            gp_Pnt p4 = new gp_Pnt(v4.X, v4.Y, v4.Z);
+
+            // Create Edges
+            TopoDS_Edge e1 = new BRepBuilderAPI_MakeEdge(p1, p2);
+            TopoDS_Edge e2 = new BRepBuilderAPI_MakeEdge(p2, p3);
+            TopoDS_Edge e3 = new BRepBuilderAPI_MakeEdge(p3, p4);
+            TopoDS_Edge e4 = new BRepBuilderAPI_MakeEdge(p4, p1);
+
+            // Create Wire (Closed Contour)
+            BRepBuilderAPI_MakeWire mw = new BRepBuilderAPI_MakeWire();
+            mw.Add(e1);
+            mw.Add(e2);
+            mw.Add(e3);
+            mw.Add(e4);
+            TopoDS_Wire wire = mw.Wire();
+
+
+
+            // Define 4 points for the rectangle
+            gp_Pnt ip1 = new gp_Pnt(hole[0].X, hole[0].Y, hole[0].Z);
+            gp_Pnt ip2 = new gp_Pnt(hole[1].X, hole[1].Y, hole[1].Z);
+            gp_Pnt ip3 = new gp_Pnt(hole[2].X, hole[2].Y, hole[2].Z);
+            gp_Pnt ip4 = new gp_Pnt(hole[3].X, hole[3].Y, hole[3].Z);
+
+            // Create Edges
+            TopoDS_Edge ie1 = new BRepBuilderAPI_MakeEdge(ip1, ip4);
+            TopoDS_Edge ie2 = new BRepBuilderAPI_MakeEdge(ip4, ip3);
+            TopoDS_Edge ie3 = new BRepBuilderAPI_MakeEdge(ip3, ip2);
+            TopoDS_Edge ie4 = new BRepBuilderAPI_MakeEdge(ip2, ip1);
+
+            // Create Wire (Closed Contour)
+            BRepBuilderAPI_MakeWire imw = new BRepBuilderAPI_MakeWire();
+            imw.Add(ie1);
+            imw.Add(ie2);
+            imw.Add(ie3);
+            imw.Add(ie4);
+
+            TopoDS_Wire iwire = imw.Wire();
+
+            // Create Face
+            BRepBuilderAPI_MakeFace faceMaker = new BRepBuilderAPI_MakeFace(wire);
+            faceMaker.Add(iwire);
+
+            var solid = faceMaker.Face();
             var shape = new AIS_Shape(solid);
 
             myAISContext.Display(shape, true);

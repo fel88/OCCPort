@@ -133,7 +133,9 @@ namespace TKMath
         public static gp_Vec operator ^(gp_Vec v, gp_Vec theRight)
         {
             return v.Crossed(theRight);
-        }  //! computes the cross product between two vectors
+        }  
+        
+        //! computes the cross product between two vectors
         public gp_Vec Crossed(gp_Vec theRight)
         {
             this.coord.Cross(theRight.coord);

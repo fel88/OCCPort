@@ -1,10 +1,11 @@
 ﻿using OCCPort;
 using OCCPort.Common;
+using System.Security.Cryptography;
 
 namespace TKMath
 {
     //! Defines a non-persistent vector in 2D space.
-    public class gp_Vec2d
+    public struct gp_Vec2d
     {
         //! For this vector, returns its X  coordinate.
         public double X() { return coord.X(); }
@@ -32,6 +33,28 @@ namespace TKMath
             coord = (theCoord);
         }
 
+        public static gp_Vec2d operator /(gp_Vec2d v, double theScalar)
+        {
+            return v.Divided(theScalar);
+        }
+
+        //! divides a vector by a scalar
+        gp_Vec2d Divided(double theScalar)
+        {
+            gp_Vec2d aV = this;
+            aV.coord.Divide(theScalar);
+            return aV;
+        }
+
+        public static double operator ^(gp_Vec2d v, gp_Vec2d theRight)
+        {
+            return v.Crossed(theRight);
+        }
+        //! Computes the crossing product between two vectors
+        public double Crossed(gp_Vec2d theRight)
+        {
+            return coord.Crossed(theRight.coord);
+        }
         public gp_Vec2d() { }
         //! Computes the magnitude of this vector.
         public double Magnitude() { return coord.Modulus(); }

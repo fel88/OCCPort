@@ -44,6 +44,30 @@ namespace TKTopAlgo
             }
         }
 
+        //! Adds the wire W to the constructed face as a hole.
+        //! Warning
+        //! W must not cross the other bounds of the face, and all
+        //! the bounds must define only one area on the surface.
+        //! (Be careful, however, as this is not checked.)
+        //! Example
+        //! // a cylinder
+        //! gp_Cylinder C = ..;
+        //! // a wire
+        //! TopoDS_Wire W = ...;
+        //! BRepBuilderAPI_MakeFace MF(C);
+        //! MF.Add(W);
+        //! TopoDS_Face F = MF;
+        public void Add(TopoDS_Wire W)
+        {
+            myMakeFace.Add(W);
+            if (myMakeFace.IsDone())
+            {
+                Done();
+                myShape = myMakeFace.Shape();
+            }
+        }
+
+
         public static implicit operator TopoDS_Face(BRepBuilderAPI_MakeFace f)
         {
             return f.Face();

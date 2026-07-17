@@ -22,6 +22,9 @@ namespace TKMath
         //! For this point returns its two coordinates as a number pair.
         public void Coord(ref double theXp, ref double theYp) { coord.Coord(ref theXp, ref theYp); }
 
+        //! For this point, returns its two coordinates as a number pair.
+        public gp_XY Coord()  { return coord; }
+
         //! For this point, assigns the values theXp and theYp to its two coordinates
         public void SetCoord(double theXp, double theYp) { coord.SetCoord(theXp, theYp); }
 

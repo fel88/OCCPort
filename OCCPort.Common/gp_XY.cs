@@ -18,6 +18,13 @@
             return new gp_XY(x / theScalar, y / theScalar);
         }
 
+        //! divides <me> by a real.
+        public void Divide(double theScalar)
+        {
+            x /= theScalar;
+            y /= theScalar;
+        }
+
         public override string ToString()
         {
             return $"gp_XY X:{x} Y:{y}";
