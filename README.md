@@ -13,3 +13,5 @@ Also available as [nuget](https://www.nuget.org/packages/OpenCascade.Sharp)
 
 
 <img width="600"  alt="image" src="https://github.com/user-attachments/assets/f3ff0577-98b2-4ea3-8578-abcbef0bfac1" />
+
+<img width="600"  alt="image" src="https://github.com/user-attachments/assets/62f68705-d60a-4521-b730-1054cdc91f82" />
