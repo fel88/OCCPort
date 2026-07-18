@@ -104,6 +104,7 @@ namespace TKMesh
             return myPCurves.Size();
         }
 
+        //! Adds discrete pcurve for the specified discrete face.
         public IMeshData_PCurve AddPCurve(IMeshData_Face theDFace, TopAbs_Orientation theOrientation)
         {
 

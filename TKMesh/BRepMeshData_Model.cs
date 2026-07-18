@@ -41,6 +41,7 @@ namespace TKMesh
             return myDFaces[(FacesNb() - 1)];
         }
 
+        //! Adds new edge to shape model.
         public override IMeshData_Edge AddEdge(TopoDS_Edge theEdge)
         {
             IMeshData_Edge aEdge = new BRepMeshData_Edge(theEdge);//(new(myAllocator) BRepMeshData_Edge(theEdge, myAllocator));

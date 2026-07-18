@@ -214,7 +214,18 @@ namespace TKBRep
             aShape.Orientation(theOrient);
             return aShape;
         }
+        [Aux]
+        public virtual TopoDS_Shape Clone()
+        {
+            var aShape = Activator.CreateInstance(GetType()) as TopoDS_Shape;
+            //TopoDS_Shape aShape = (TopoDS_Shape)MemberwiseClone();
+            aShape.myOrient = myOrient;
+            aShape.myTShape = myTShape;
+            aShape.myLocation = myLocation;//clone ?
 
+            
+            return aShape;
+        }
 
 
         //! Returns the number of direct sub-shapes (children).

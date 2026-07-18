@@ -38,6 +38,7 @@ namespace TKMesh
         IMeshData_PCurve GetPCurve(IMeshData_Face myDFace, TopAbs_Orientation topAbs_Orientation);
         //! Returns true in case if the edge is free one, i.e. it does not have pcurves.
         bool IsFree();
+
         //! Adds discrete pcurve for the specified discrete face.
         IMeshData_PCurve AddPCurve(
             IMeshData_Face theDFace,

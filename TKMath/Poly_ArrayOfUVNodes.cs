@@ -41,6 +41,7 @@ namespace TKMath
         }
 
         gp_Pnt2d[] points = null;
+        //gp_Vec2f[] pointsf = null;
         internal int Size()
         {
             return points.Length;
@@ -48,12 +49,14 @@ namespace TKMath
 
         internal void SetValue(int v, gp_Pnt2d thePnt)
         {
-            // if (myStride == (Standard_Integer)sizeof(gp_Pnt2d))
+             if (myStride == sizeof(double)*2)
             {
-                //  NCollection_AliasedArray::ChangeValue<gp_Pnt2d>(theIndex) = theValue;
+                points[v] = thePnt;
+                  //NCollection_AliasedArray.ChangeValue<gp_Pnt2d>(theIndex) = theValue;
             }
-            //else
+            else
             {
+                throw new NotImplementedException();
                 //gp_Vec2f & aVec2 = NCollection_AliasedArray::ChangeValue<gp_Vec2f>(theIndex);
                 //aVec2.SetValues((float)theValue.X(), (float)theValue.Y());
             }

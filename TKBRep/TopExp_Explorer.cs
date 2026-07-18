@@ -301,13 +301,7 @@ namespace OCCPort
         {
 
         }
-        //  typedef TopoDS_Iterator* TopExp_Stack;
-        public TopoDS_Iterator[] list = new TopoDS_Iterator[20];
-        public TopoDS_Iterator this[int i]
-        {
-            get { return list[i]; }
-            set { list[i] = value; }
-        }
+        
 
         
     }

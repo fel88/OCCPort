@@ -42,7 +42,13 @@ namespace OCCPort
             //Standard_NoSuchObject_Raise_if(!More(),"TopoDS_Iterator::Value");  
             return myShape;
         }
-
+        //  typedef TopoDS_Iterator* TopExp_Stack;
+        public TopoDS_Iterator[] list = new TopoDS_Iterator[20];
+        public TopoDS_Iterator this[int i]
+        {
+            get { return list[i]; }
+            set { list[i] = value; }
+        }
         //! Initializes this iterator with shape S.
         //! Note:
         //! - If cumOri is true, the function composes all
@@ -70,7 +76,9 @@ namespace OCCPort
 
             if (More())
             {
-                myShape = myShapes.Value();
+                //myShape =  myShapes.Value();
+                
+                myShape =   myShapes.Value().Clone();
                 myShape.Orientation(TopAbs.Compose(myOrientation, myShape.Orientation()));
                 if (!myLocation.IsIdentity())
                     myShape.Move(myLocation, false);
@@ -82,7 +90,9 @@ namespace OCCPort
             myShapes.Next();
             if (More())
             {
-                myShape = myShapes.Value();
+                //myShape =  myShapes.Value();
+                myShape = myShapes.Value().Clone();
+
                 myShape.Orientation(TopAbs.Compose(myOrientation, myShape.Orientation()));
                 if (!myLocation.IsIdentity())
                     myShape.Move(myLocation, false);

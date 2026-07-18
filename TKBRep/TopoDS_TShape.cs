@@ -51,6 +51,11 @@ namespace OCCPort
         //! @sa TopoDS_Iterator for accessing sub-shapes
         public int NbChildren() { return myShapes.Size(); }
 
+        //! Returns the convexness flag.
+        public bool Convex() { return ((myFlags & (int)TopoDS_TShape_Flags.TopoDS_TShape_Flags_Convex) != 0); }
+
+        //! Sets the convexness flag.
+        public void Convex(bool theIsConvex) { setFlag(TopoDS_TShape_Flags.TopoDS_TShape_Flags_Convex, theIsConvex); }
 
 
         //! Returns a copy  of the  TShape  with no sub-shapes.

@@ -488,6 +488,7 @@ namespace OCCPort.Tester
             d.AddDouble("cy", "Y");
             d.AddDouble("cz", "Z");
             d.AddBoolField("hole", "hole");
+            
 
             d.AddDouble("w", "Width", 100);
             d.AddDouble("h", "Height", 50);
@@ -501,6 +502,7 @@ namespace OCCPort.Tester
             var w = d.GetDouble("w");
             var h = d.GetDouble("h");
             var withHole = d.GetBoolField("hole");
+            
             double area = w * h;
             if (Math.Abs(area) < (0.0))
             {
@@ -527,10 +529,14 @@ namespace OCCPort.Tester
                          ]);
             }
             else
-                MakeRectFace(center + new Vector3d(-w / 2, -h / 2, 0),
-                         center + new Vector3d(w / 2, -h / 2, 0),
-                         center + new Vector3d(w / 2, h / 2, 0),
-                         center + new Vector3d(-w / 2, h / 2, 0));
+            {
+                
+                    MakeRectFace(center + new Vector3d(-w / 2, -h / 2, 0),
+                             center + new Vector3d(w / 2, -h / 2, 0),
+                             center + new Vector3d(w / 2, h / 2, 0),
+                             center + new Vector3d(-w / 2, h / 2, 0));
+                
+            }
 
 
         }

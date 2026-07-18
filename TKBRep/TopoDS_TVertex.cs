@@ -8,6 +8,11 @@ namespace OCCPort
     public abstract class TopoDS_TVertex : TopoDS_TShape
     {
         
+        public TopoDS_TVertex()
+        {
+            Closed(true);
+            Convex(true);
+        }
 
         public override TopAbs_ShapeEnum ShapeType()
         {

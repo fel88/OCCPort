@@ -6,9 +6,12 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace TKMath
 {
     //! Defines  a non-persistent 2D cartesian point.
-
     public struct gp_Pnt2d
     {
+        public override string ToString()
+        {
+            return $"gp_Pnt2d  X: {coord.X()} Y: {coord.Y()} ";
+        }
 
         public gp_XY coord;
         //=======================================================================

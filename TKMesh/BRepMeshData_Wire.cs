@@ -14,6 +14,9 @@ namespace TKMesh
         {
             return myDEdges.Count;
         }
+
+        //! Adds new discrete edge with specified orientation to wire chain.
+        //! @return index of added edge in wire chain.
         public override int AddEdge(IMeshData_Edge theDEdge, TopAbs_Orientation theOrientation)
         {
             int aIndex = EdgesNb();

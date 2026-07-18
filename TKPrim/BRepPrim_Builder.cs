@@ -101,6 +101,8 @@ namespace TKPrim
             BRepTools.Update(F);
         }
 
+        //! This is called once a wire is  completed. It gives
+        //! the opportunity to perform any post treatment.
         public void CompleteWire(TopoDS_Wire W)
         {
             W.Closed(BRep_Tool.IsClosed(W));            

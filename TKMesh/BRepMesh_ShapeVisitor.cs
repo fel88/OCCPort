@@ -21,19 +21,14 @@ namespace TKMesh
         // Purpose : 
         //=======================================================================
         public BRepMesh_ShapeVisitor(IMeshData_Model theModel)
-
         {
             myModel = (theModel);
             myDEdgeMap = new DMapOfShapeInteger(/*1, new NCollection_IncAllocator(IMeshData::MEMORY_BLOCK_SIZE_HUGE)*/);
         }
 
-        //=======================================================================
-        // Function: addWire
-        // Purpose : 
-        //=======================================================================
 
-        public override bool addWire(TopoDS_Wire theWire,
-IMeshData_Face theDFace)
+        //! Adds wire to face discrete model.
+        public override bool addWire(TopoDS_Wire theWire, IMeshData_Face theDFace)
         {
             if (theWire.IsNull())
             {
