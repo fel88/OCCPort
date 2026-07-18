@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>OpenCascade.Sharp</id>
-    <version>0.1.1</version>
+    <version>0.1.2</version>
     <title>OpenCascade (OCCT) pure C# port</title>
     <authors>fel88</authors>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
