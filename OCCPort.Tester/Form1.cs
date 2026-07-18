@@ -14,6 +14,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using TKBO;
 using TKBRep;
 using TKG3d;
 using TKMath;
@@ -50,7 +51,7 @@ namespace OCCPort.Tester
                 glControl = new GLControl(new OpenTK.Graphics.GraphicsMode(32, 24, 0, 8));
             }*/
             evwrapper = new EventWrapperGlControl(glControl);
-            
+
             glControl.Paint += Gl_Paint;
             ViewManager = GravityViewManager = new GravityCameraViewManager(glControl);
             ViewManager.Attach(evwrapper, camera1);
@@ -163,7 +164,7 @@ namespace OCCPort.Tester
             proxy.iterate();
             glControl.SwapBuffers();
             return;
-            
+
 
             ViewManager.Update();
 
@@ -348,6 +349,9 @@ namespace OCCPort.Tester
         {
             var d = DialogHelpers.StartDialog();
             d.Text = "New box";
+            d.AddDouble("x", "x", 0);
+            d.AddDouble("y", "y", 0);
+            d.AddDouble("z", "z", 0);
             d.AddDouble("w", "Width", 50);
             d.AddDouble("l", "Length", 50);
             d.AddDouble("h", "Height", 50);
@@ -358,24 +362,30 @@ namespace OCCPort.Tester
             var w = d.GetDouble("w");
             var h = d.GetDouble("h");
             var l = d.GetDouble("l");
-            gp_Pnt p1 = new gp_Pnt(0, 0, 0);
-            gp_Pnt p2 = new gp_Pnt(w, h, l);
+
+            var x = d.GetDouble("x");
+            var y = d.GetDouble("y");
+            var z = d.GetDouble("z");
+            gp_Pnt p1 = new gp_Pnt(x, y, z);
+            gp_Pnt p2 = new gp_Pnt(x + w, y + h, z + l);
             BRepPrimAPI_MakeBox box = new BRepPrimAPI_MakeBox(p1, p2);
 
             box.Build();
             var solid = box.Solid();
             lastGenerated = solid;
             var shape = new AIS_Shape(solid);
+
             myAISContext.Display(shape, true);
             myAISContext.SetDisplayMode(shape, (int)AIS_DisplayMode.AIS_Shaded, false);
             myAISContext.UpdateCurrentViewer();
+            shapes.Add(shape);
 
 
 
             //auto hn = GetHandle(*shape);
             //hh->FromObjHandle(hn);
         }
-
+        List<AIS_Shape> shapes = new List<AIS_Shape>();
         private void toolStripButton7_Click(object sender, EventArgs e)
         {
             AddBox();
@@ -488,7 +498,7 @@ namespace OCCPort.Tester
             d.AddDouble("cy", "Y");
             d.AddDouble("cz", "Z");
             d.AddBoolField("hole", "hole");
-            
+
 
             d.AddDouble("w", "Width", 100);
             d.AddDouble("h", "Height", 50);
@@ -502,7 +512,7 @@ namespace OCCPort.Tester
             var w = d.GetDouble("w");
             var h = d.GetDouble("h");
             var withHole = d.GetBoolField("hole");
-            
+
             double area = w * h;
             if (Math.Abs(area) < (0.0))
             {
@@ -530,12 +540,12 @@ namespace OCCPort.Tester
             }
             else
             {
-                
-                    MakeRectFace(center + new Vector3d(-w / 2, -h / 2, 0),
-                             center + new Vector3d(w / 2, -h / 2, 0),
-                             center + new Vector3d(w / 2, h / 2, 0),
-                             center + new Vector3d(-w / 2, h / 2, 0));
-                
+
+                MakeRectFace(center + new Vector3d(-w / 2, -h / 2, 0),
+                         center + new Vector3d(w / 2, -h / 2, 0),
+                         center + new Vector3d(w / 2, h / 2, 0),
+                         center + new Vector3d(-w / 2, h / 2, 0));
+
             }
 
 
@@ -711,6 +721,7 @@ namespace OCCPort.Tester
         {
             // Clears all objects from the context and releases presentation memory
             myAISContext.RemoveAll(true);
+            shapes.Clear();
         }
 
         private void toolStripButton16_Click(object sender, EventArgs e)
@@ -721,7 +732,7 @@ namespace OCCPort.Tester
             double height = 50.0;
 
             // Create the cylinder
-            BRepPrimAPI_MakeCylinder mkCylinder=new BRepPrimAPI_MakeCylinder (radius, height);
+            BRepPrimAPI_MakeCylinder mkCylinder = new BRepPrimAPI_MakeCylinder(radius, height);
 
             // Get the resulting TopoDS_Shape
             TopoDS_Shape myCylinder = mkCylinder.Shape();
@@ -730,6 +741,22 @@ namespace OCCPort.Tester
             myAISContext.Display(shape, true);
             myAISContext.SetDisplayMode(shape, (int)AIS_DisplayMode.AIS_Shaded, false);
             myAISContext.UpdateCurrentViewer();
+        }
+
+        private void toolStripButton17_Click(object sender, EventArgs e)
+        {
+            // Perform the Boolean Fuse (Union)
+            BRepAlgoAPI_Fuse fuseAlg = new(shapes[0].Shape(), shapes[1].Shape());
+            fuseAlg.Build();
+
+            // Retrieve the resulting shape
+            TopoDS_Shape fusedResult = fuseAlg.Shape();
+            var shape = new AIS_Shape(fusedResult);
+
+            myAISContext.Display(shape, true);
+            myAISContext.SetDisplayMode(shape, (int)AIS_DisplayMode.AIS_Shaded, false);
+            myAISContext.UpdateCurrentViewer();
+
         }
     }
 }

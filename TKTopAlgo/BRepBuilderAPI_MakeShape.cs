@@ -26,16 +26,10 @@ namespace TKTopAlgo
         }
 
 
-
-
-
         //! This is  called by  Shape().  It does  nothing but
         //! may be redefined.
         public virtual void Build(Message_ProgressRange theRange = null)
         {
         }
-
-
-
     }
 }

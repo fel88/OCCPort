@@ -1,30 +1,11 @@
 ﻿using System;
 using TKBRep;
+using TKernel;
 
 namespace OCCPort
 {
-    public class TopTools_ListIteratorOfListOfShape
+    public class TopTools_ListIteratorOfListOfShape: NCollection_List<TopoDS_Shape>.Iterator
     {
-        TopTools_ListOfShape list;
-        public void Initialize(TopTools_ListOfShape l)
-        {
-            list = l;
-        }
-
-        int index = 0;
-        public bool More()
-        {
-            return index < list.Count;
-        }
-
-        public  void Next()
-        {
-            index++;
-        }
-
-        public TopoDS_Shape Value()
-        {
-            return list[index];
-        }
+        
     }
 }

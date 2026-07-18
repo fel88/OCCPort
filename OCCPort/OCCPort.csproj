@@ -18,6 +18,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\OCCPort.Common\OCCPort.Common.csproj" />
+    <ProjectReference Include="..\TKBO\TKBO.csproj" />
     <ProjectReference Include="..\TKernel\TKernel.csproj" />
     <ProjectReference Include="..\TKG2d\TKG2d.csproj" />
     <ProjectReference Include="..\TKG3d\TKG3d.csproj" />

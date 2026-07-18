@@ -13,6 +13,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\OCCPort\OCCPort.csproj" />
+    <ProjectReference Include="..\TKBO\TKBO.csproj" />
     <ProjectReference Include="..\TKOpenGl\TKOpenGl.csproj" />
     <ProjectReference Include="..\TKPrim\TKPrim.csproj" />
   </ItemGroup>

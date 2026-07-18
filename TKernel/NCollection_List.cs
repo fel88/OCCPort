@@ -76,6 +76,11 @@ namespace TKernel
         {
             Add(aPoints);
         }
+        public void Append(NCollection_List<T> aPoints)
+        {
+            AddRange(aPoints);
+            aPoints.Clear();
+        }
 
         public T First()
         {

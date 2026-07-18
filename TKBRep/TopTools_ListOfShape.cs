@@ -5,53 +5,20 @@ using TKernel;
 
 namespace TKBRep
 {
-    public class TopTools_ListOfShape : List<TopoDS_Shape>
+    public class TopTools_ListOfShape : NCollection_List<TopoDS_Shape>
     {
-        public NCollection_BaseAllocator Allocator()
+        public TopTools_ListOfShape()
         {
-            return myAllocator;
+            allocator = new NCollection_BaseAllocator();
         }
-        NCollection_BaseAllocator myAllocator = new NCollection_BaseAllocator();
-
-        public TopTools_ListOfShape() { }
         public TopTools_ListOfShape(NCollection_BaseAllocator nCollection_BaseAllocator)
         {
+            allocator = nCollection_BaseAllocator;
         }
-
-        public bool IsEmpty()
+        NCollection_BaseAllocator allocator;
+        public NCollection_BaseAllocator Allocator()
         {
-            return Count == 0;
-        }
-
-
-        //typedef NCollection_List<TopoDS_Shape> TopTools_ListOfShape;
-
-        //! Append another list at the end.
-        //! After this operation, theOther list will be cleared.
-        public void Append(TopTools_ListOfShape anc)
-        {
-            AddRange(anc);
-            anc.Clear();
-        }
-
-        public void Append(TopoDS_Shape anc)
-        {
-            Add(anc);
-        }
-
-        public int Extent()
-        {
-            return Count; 
-        }
-
-        public void RemoveFirst()
-        {
-            RemoveAt(0);
-        }
-
-        public TopoDS_Shape First()
-        {
-            return this[0];
+            return allocator;
         }
     }
 }
