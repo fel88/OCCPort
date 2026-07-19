@@ -62,6 +62,11 @@ namespace TKG3d
             return -U;
         }
 
+        public override GeomAbs_Shape Continuity()
+        {
+            return GeomAbs_Shape.GeomAbs_CN;
+        }
+
         public Geom_Line(gp_Ax1 A) { pos = (A); }
 
         public Geom_Line(gp_Lin L)

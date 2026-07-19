@@ -52,7 +52,7 @@ namespace TKG2d
             return (-U);
         }
 
-        public override void D0(double U, ref gp_Pnt2d P)
+        public override void D0(double U, out gp_Pnt2d P)
         {
             P = ElCLib.LineValue(U, pos);
         }

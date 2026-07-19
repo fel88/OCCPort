@@ -76,9 +76,10 @@ namespace TKG2d
             //    break;
 
             //default:
-            myCurve.D0(U, ref P);
+            myCurve.D0(U, out P);
             //}
         }
+
         public Geom2dAdaptor_Curve(Geom2d_Curve theCrv, double theUFirst, double theULast)
         {
             myTypeCurve = GeomAbs_CurveType.GeomAbs_OtherCurve;

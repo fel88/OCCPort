@@ -30,6 +30,19 @@ namespace TKG3d
         //! curve becomes the StartPoint of the reversed curve.
         public abstract void Reverse();
 
+
+        //! It is the global continuity of the curve
+        //! C0 : only geometric continuity,
+        //! C1 : continuity of the first derivative all along the Curve,
+        //! C2 : continuity of the second derivative all along the Curve,
+        //! C3 : continuity of the third derivative all along the Curve,
+        //! G1 : tangency continuity all along the Curve,
+        //! G2 : curvature continuity all along the Curve,
+        //! CN : the order of continuity is infinite.
+        public  abstract GeomAbs_Shape Continuity();
+
+
+
         //! Returns the  parameter on the  reversed  curve for
         //! the point of parameter U on <me>.
         //!

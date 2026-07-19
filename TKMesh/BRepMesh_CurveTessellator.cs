@@ -162,8 +162,8 @@ namespace TKMesh
                 return;
             }
 
-            theCurve2d.D0(theFirst, ref uvf);
-            theCurve2d.D0(theLast, ref uvl);
+            theCurve2d.D0(theFirst, out uvf);
+            theCurve2d.D0(theLast, out uvl);
 
             P3dF = theSurf.Value(uvf.X(), uvf.Y());
             P3dL = theSurf.Value(uvl.X(), uvl.Y());

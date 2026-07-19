@@ -361,7 +361,7 @@ namespace OCCPort
                 {
                     gp_Pnt2d pnt = new gp_Pnt2d();
                     startPar += dP;
-                    aPC.D0(startPar, ref pnt);
+                    aPC.D0(startPar, out pnt);
                     if (Math.Abs(aPRef.X() - pnt.X()) < tolU && Math.Abs(aPRef.Y() - pnt.Y()) < tolV)
                         continue;
                     else
@@ -386,7 +386,7 @@ namespace OCCPort
                 {
                     gp_Pnt2d pnt = new gp_Pnt2d();
                     startPar -= dP;
-                    aPC.D0(startPar, ref pnt);
+                    aPC.D0(startPar, out pnt);
                     if (Math.Abs(aPRef.X() - pnt.X()) < tolU && Math.Abs(aPRef.Y() - pnt.Y()) < tolV)
                         continue;
                     else
@@ -571,9 +571,9 @@ namespace OCCPort
                     // Get 2D point equals to < myVertex > in 2D for current edge.
                     gp_Pnt2d PRef = new gp_Pnt2d();
                     if (myEdge.Orientation() == TopAbs_Orientation.TopAbs_REVERSED)
-                        aPCurve.D0(dfFPar, ref PRef);
+                        aPCurve.D0(dfFPar, out PRef);
                     else
-                        aPCurve.D0(dfLPar, ref PRef);
+                        aPCurve.D0(dfLPar, out PRef);
 
                     // Get next 2D point from current edge's PCurve with parameter
                     // F + dP (REV) or L - dP (FOR)
@@ -581,7 +581,7 @@ namespace OCCPort
                     double dfMPar = GetNextParamOnPC(aPCurve, PRef, dfFPar, dfLPar, myTolU, myTolV, isrevese);
 
                     gp_Pnt2d PRefm = new gp_Pnt2d();
-                    aPCurve.D0(dfMPar, ref PRefm);
+                    aPCurve.D0(dfMPar, out PRefm);
                     // Get vector from PRef to PRefm
                     gp_Vec2d anERefDir = new gp_Vec2d(PRef, PRefm);
                     if (anERefDir.SquareMagnitude() < gp.Resolution())
@@ -634,9 +634,9 @@ namespace OCCPort
                             if (aVert1.IsSame(aVert2) == isDegenerated)
                             {
                                 if (E.Orientation() == TopAbs_Orientation.TopAbs_REVERSED)
-                                    aPCurve.D0(dfLPar, ref aPEb);
+                                    aPCurve.D0(dfLPar, out aPEb);
                                 else
-                                    aPCurve.D0(dfFPar, ref aPEb);
+                                    aPCurve.D0(dfFPar, out aPEb);
 
                                 if (Math.Abs(dfLPar - dfFPar) > Precision.PConfusion())
                                 {
@@ -644,7 +644,7 @@ namespace OCCPort
                                     isrevese = !isrevese;
                                     double aEPm = GetNextParamOnPC(aPCurve, aPEb, dfFPar, dfLPar, myTolU, myTolV, isrevese);
 
-                                    aPCurve.D0(aEPm, ref aPEe);
+                                    aPCurve.D0(aEPm, out aPEe);
                                     if (aPEb.SquareDistance(aPEe) <= gp.Resolution())
                                     {
                                         //seems to be very short curve

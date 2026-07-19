@@ -76,6 +76,10 @@ namespace TKMath
         }
 
 
+        //! Creates a direction corresponding to X axis.
+        public gp_Dir2d() {
+            coord =new (1.0, 0.0);
+         }
         public gp_Dir2d(gp_Vec2d theV)
         {
             gp_XY aXY = theV.XY();

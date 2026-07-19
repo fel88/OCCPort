@@ -144,6 +144,11 @@ namespace TKG3d
 
         }
 
+        public override GeomAbs_Shape Continuity()
+        {
+            throw new NotImplementedException();
+        }
+
         TColStd_HArray1OfReal flatknots;
         int deg;
 

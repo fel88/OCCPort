@@ -25,11 +25,11 @@ namespace OCCPort
             bool ispos = Precision.IsPositiveInfinite(l);
             if (!isneg)
             {
-                myPCurve.D0(f, ref myUV1);
+                myPCurve.D0(f, out myUV1);
             }
             if (!ispos)
             {
-                myPCurve.D0(l,ref myUV2);
+                myPCurve.D0(l,out myUV2);
             }
         }
 

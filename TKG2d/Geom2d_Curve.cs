@@ -1,4 +1,5 @@
-﻿using TKMath;
+﻿using OCCPort.Common;
+using TKMath;
 
 namespace TKG2d
 {
@@ -24,7 +25,7 @@ namespace TKG2d
         public gp_Pnt2d Value(double U)
         {
             gp_Pnt2d P = new gp_Pnt2d();
-            D0(U, ref P);
+            D0(U, out P);
             return P;
         }
         //! Returns the point P of parameter U and the first derivative V1.
@@ -32,7 +33,7 @@ namespace TKG2d
         public abstract void D1(double U, out gp_Pnt2d P, out gp_Vec2d V1);
 
 
-
+       
         //! curve becomes the StartPoint of the reversed curve.
         public abstract void Reverse();
         //! Computes the parameter on the reversed curve for
@@ -64,7 +65,7 @@ namespace TKG2d
         //! compute the current point. For example when the first
         //! derivative on the basis curve and the offset direction
         //! are parallel.
-        public abstract void D0(double U, ref gp_Pnt2d P);
+        public abstract void D0(double U, out gp_Pnt2d P);
 
     }
 }

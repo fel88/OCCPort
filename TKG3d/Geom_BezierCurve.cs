@@ -53,6 +53,11 @@ namespace TKG3d
     //! - The length of a Bezier curve can be null.
     public class Geom_BezierCurve : Geom_BoundedCurve
     {
+        public override GeomAbs_Shape Continuity()
+        {
+            throw new NotImplementedException();
+        }
+
         public override Geom_Geometry Copy()
         {
             throw new System.NotImplementedException();

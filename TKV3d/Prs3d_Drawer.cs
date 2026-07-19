@@ -535,7 +535,9 @@ namespace TKV3d
 		*/
         internal bool IsoOnTriangulation()
         {
-            throw new NotImplementedException();
+            return myHasOwnIsoOnTriangulation || myLink==null
+          ? myIsoOnTriangulation
+          : myLink.IsoOnTriangulation();
         }
 
 

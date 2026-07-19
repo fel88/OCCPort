@@ -20,7 +20,7 @@ namespace TKG2d
     //! the parameter of the basis curve.
     public abstract class Geom2d_BoundedCurve : Geom2d_Curve
     {
-        public override void D0(double U, ref gp_Pnt2d P)
+        public override void D0(double U, out gp_Pnt2d P)
         {
             throw new NotImplementedException();
         }

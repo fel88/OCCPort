@@ -55,7 +55,7 @@ namespace TKMath
             return vdir;
         }
 
-        internal gp_Pnt Location()
+        public gp_Pnt Location()
         {
             return loc;
         }

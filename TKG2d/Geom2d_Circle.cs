@@ -37,6 +37,26 @@ namespace TKG2d
             radius = (C.Radius());
             pos = C.Axis();
         }
+
+        //! Returns in P the point of parameter U.
+        //! P = C + R * Cos (U) * XDir + R * Sin (U) * YDir
+        //! where C is the center of the circle , XDir the XDirection and
+        //! YDir the YDirection of the circle's local coordinate system.
+        public override void D0( double U, out gp_Pnt2d P)
+        {
+            P = ElCLib.CircleValue(U, pos, radius);
+        }
+
+        public override double LastParameter()
+        {
+            return 2.0 * Math.PI;
+        }
+
+        public override double FirstParameter()
+        {
+            return 0.0;
+        }
+
         public gp_Circ2d Circ2d()
         {
             return new gp_Circ2d(pos, radius);

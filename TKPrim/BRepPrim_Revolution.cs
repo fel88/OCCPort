@@ -25,12 +25,17 @@ namespace TKPrim
 
         public override gp_Pnt2d MeridianValue(double V)
         {
-            throw new NotImplementedException();
+            return myPMeridian.Value(V);
         }
 
         public override TopoDS_Face MakeEmptyLateralFace()
         {
-            throw new NotImplementedException();
+            Geom_SurfaceOfRevolution S =
+    new Geom_SurfaceOfRevolution(myMeridian, Axes().Axis());
+
+            TopoDS_Face F = new TopoDS_Face();
+            myBuilder.Builder().MakeFace(F, S, Precision.Confusion());
+            return F;
         }
 
         public override void SetMeridianPCurve(TopoDS_Edge E, TopoDS_Face F)
@@ -40,7 +45,13 @@ namespace TKPrim
 
         public override TopoDS_Edge MakeEmptyMeridianEdge(double Ang)
         {
-            throw new NotImplementedException();
+            TopoDS_Edge E = new TopoDS_Edge();
+            Geom_Curve C = (Geom_Curve)(myMeridian.Copy());
+            gp_Trsf T = new gp_Trsf();
+            T.SetRotation(Axes().Axis(), Ang);
+            C.Transform(T);
+            myBuilder.Builder().MakeEdge(E, C, Precision.Confusion());
+            return E;
         }
 
         Geom_Curve myMeridian;

@@ -35,6 +35,33 @@ namespace TKMath
             return ElCLib.LineParameter(L.Position(), P);
         }
 
+        public static gp_Pnt CircleValue(double U,
+                    gp_Ax2 Pos,
+                    double Radius)
+        {
+            gp_XYZ XDir = Pos.XDirection().XYZ();
+            gp_XYZ YDir = Pos.YDirection().XYZ();
+            gp_XYZ PLoc = Pos.Location().XYZ();
+            double A1 = Radius * Math.Cos(U);
+            double A2 = Radius * Math.Sin(U);
+            return new gp_Pnt(A1 * XDir.X() + A2 * YDir.X() + PLoc.X(),
+                  A1 * XDir.Y() + A2 * YDir.Y() + PLoc.Y(),
+                  A1 * XDir.Z() + A2 * YDir.Z() + PLoc.Z());
+        }
+
+        public static gp_Pnt2d CircleValue(double U,
+                    gp_Ax22d Pos,
+                    double Radius)
+        {
+            gp_XY XDir = Pos.XDirection().XY();
+            gp_XY YDir = Pos.YDirection().XY();
+            gp_XY PLoc = Pos.Location().XY();
+            double A1 = Radius * Math.Cos(U);
+            double A2 = Radius * Math.Sin(U);
+            return new gp_Pnt2d(A1 * XDir.X() + A2 * YDir.X() + PLoc.X(),
+                    A1 * XDir.Y() + A2 * YDir.Y() + PLoc.Y());
+        }
+
         public static double LineParameter(gp_Ax2d L, gp_Pnt2d P)
         {
             gp_XY Coord = P.XY();

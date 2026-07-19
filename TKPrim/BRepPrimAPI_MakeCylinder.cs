@@ -1,4 +1,5 @@
-﻿using OCCPort.Common;
+﻿using OCCPort;
+using OCCPort.Common;
 using TKMath;
 
 namespace TKPrim
@@ -19,8 +20,16 @@ namespace TKPrim
         //! @param H [in] cylinder height
         public BRepPrimAPI_MakeCylinder(double R, double H)
         {
+            myShape = new TopoDS_Solid();
+
             myCylinder = new BRepPrim_Cylinder(gp.XOY(), R, H);
         }
+
+        public override object OneAxis()
+        {
+            return myCylinder;
+        }
+
 
         //! Make a cylinder (part cylinder).
         //! @param R     [in] cylinder radius

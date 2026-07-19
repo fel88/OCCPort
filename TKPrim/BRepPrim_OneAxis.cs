@@ -8,6 +8,25 @@ namespace TKPrim
 {
     public abstract class BRepPrim_OneAxis
     {
+        public BRepPrim_OneAxis()
+        {
+            for (int i = 0; i < myWires.Length; i++)
+            {
+                myWires[i] = new TopoDS_Wire();
+            }
+            for (int i = 0; i < myEdges.Length; i++)
+            {
+                myEdges[i] = new TopoDS_Edge();
+            }
+            for (int i = 0; i < myVertices.Length; i++)
+            {
+                myVertices[i] = new ();
+            }
+            for (int i = 0; i < myFaces.Length; i++)
+            {
+                myFaces[i] = new();
+            }
+        }
 
         //! Returns the meridian point at parameter <V> in the
         //! plane XZ.
@@ -1169,7 +1188,7 @@ namespace TKPrim
 
         //! Creates a OneAxis algorithm.  <B> is used to build
         //! the Topology. The angle defaults to 2*PI.
-        protected BRepPrim_OneAxis(BRepPrim_Builder B, gp_Ax2 A, double VMin, double VMax)
+        protected BRepPrim_OneAxis(BRepPrim_Builder B, gp_Ax2 A, double VMin, double VMax) : this()
         {
             myBuilder = (B);
             myAxes = (A);
@@ -1226,7 +1245,7 @@ namespace TKPrim
         double myVMin;
         double myVMax;
         double myMeridianOffset;
-        TopoDS_Shell myShell;
+        TopoDS_Shell myShell = new TopoDS_Shell();
         bool ShellBuilt;
         TopoDS_Vertex[] myVertices = new TopoDS_Vertex[6];
         bool[] VerticesBuilt = new bool[6];

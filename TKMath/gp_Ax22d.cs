@@ -20,9 +20,18 @@
     public class gp_Ax22d
     {
 
-        gp_Pnt2d point;
-        gp_Dir2d vydir;
-        gp_Dir2d vxdir;
+        //! Returns the "Location" point (origin) of <me>.
+        public gp_Pnt2d Location() { return point; }
+
+        //! Returns the "XDirection" of <me>.
+        public gp_Dir2d XDirection() { return vxdir; }
+
+        //! Returns the "YDirection" of <me>.
+        public gp_Dir2d YDirection() { return vydir; }
+
+        gp_Pnt2d point = new gp_Pnt2d();
+        gp_Dir2d vydir = new gp_Dir2d();
+        gp_Dir2d vxdir = new gp_Dir2d();
         //! Creates -   a coordinate system where its origin is the origin of
         //! theA and its "X Direction" is the unit vector of theA, which   is:
         //! -   right-handed if theIsSense is true (default value), or

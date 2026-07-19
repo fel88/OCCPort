@@ -25,7 +25,7 @@ namespace TKG2d
         }
        protected gp_Ax22d pos;
 
-        public override void D0(double U, ref gp_Pnt2d P)
+        public override void D0(double U, out gp_Pnt2d P)
         {
             throw new NotImplementedException();
         }

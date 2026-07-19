@@ -28,6 +28,11 @@ namespace TKPrim
             myBuilder.Range(E, P1, P2);
         }
 
+        public BRep_Builder Builder()
+        {
+            return myBuilder;
+        }
+
         public void MakeDegeneratedEdge(TopoDS_Edge E)
         {
             myBuilder.MakeEdge(E);
@@ -105,7 +110,7 @@ namespace TKPrim
         //! the opportunity to perform any post treatment.
         public void CompleteWire(TopoDS_Wire W)
         {
-            W.Closed(BRep_Tool.IsClosed(W));            
+            W.Closed(BRep_Tool.IsClosed(W));
             BRepTools.Update(W);
         }
 

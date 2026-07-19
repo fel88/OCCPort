@@ -1,5 +1,6 @@
 ﻿using OCCPort;
 using OCCPort.Common;
+using TKMath;
 
 namespace TKG3d
 {
@@ -39,7 +40,30 @@ namespace TKG3d
             radius = (C.Radius());
             pos = C.Position();
         }
+        
+        
+        //! Returns in P the point of parameter U.
+         //! P = C + R * Cos (U) * XDir + R * Sin (U) * YDir
+         //! where C is the center of the circle , XDir the XDirection and
+         //! YDir the YDirection of the circle's local coordinate system.
+        public override  void D0( double  U, ref  gp_Pnt P)
+        {
+            P = ElCLib.CircleValue(U, pos, radius);
+        }
+
+
         double radius;
 
-    }
+        //! Returns the value of the first parameter of this
+        //! circle. This is  0.0, which gives the start point of this circle, or
+        //! The start point and end point of a circle are coincident.
+        public override double FirstParameter()
+        {
+            return 0.0;
+        }
+
+        public  override double LastParameter()       { return 2.0 * Math.PI; }
+
+
+}
 }

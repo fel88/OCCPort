@@ -68,5 +68,10 @@ namespace TKG3d
         {
             throw new NotImplementedException();
         }
+
+        public override GeomAbs_Shape Continuity()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -217,14 +217,30 @@ namespace OCCPort
             }
         }
 
+        //! Returns  the number  of  intervals for  continuity
+        //! <S>. May be one if Continuity(me) >= <S>
         public override int NbIntervals(GeomAbs_Shape S)
         {
-            throw new System.NotImplementedException();
+            if (myConSurf == null)
+            {
+                return myCurve.NbIntervals(S);
+            }
+            else
+            {
+                return myConSurf.NbIntervals(S);
+            }
         }
 
         public override void Intervals(TColStd_Array1OfReal T, GeomAbs_Shape S)
         {
-            throw new System.NotImplementedException();
+            if (myConSurf==null)
+            {
+                myCurve.Intervals(T, S);
+            }
+            else
+            {
+                myConSurf.Intervals(T, S);
+            }
         }
     }
 }
