@@ -1,5 +1,4 @@
-﻿using OCCPort;
-using OCCPort.Common;
+﻿using OCCPort.Common;
 using TKernel;
 using TKG2d;
 using TKMath;
@@ -366,18 +365,19 @@ namespace TKG3d
         {
             throw new NotImplementedException();
         }
-    }
 
-    //! Identifies the position of a vertex or a set of
-    //! vertices relative to a region of a shape.
-    //! The figure shown above illustrates the states of
-    //! vertices found in various parts of the edge relative
-    //! to the face which it intersects.
-    public enum TopAbs_State
-    {
-        TopAbs_IN,
-        TopAbs_OUT,
-        TopAbs_ON,
-        TopAbs_UNKNOWN
-    };
+        public override gp_Circ Circle()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override double Period()
+        {
+            if (myType == GeomAbs_CurveType.GeomAbs_Circle ||
+      myType == GeomAbs_CurveType.GeomAbs_Ellipse)
+                return (2.0 * Math.PI);
+
+            return myCurve.Period();
+        }
+    }
 }

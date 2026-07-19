@@ -1,7 +1,6 @@
 ﻿using OCCPort.Common;
-using TKMath;
 
-namespace OCCPort
+namespace TKMath
 {
     //! Describes a circle in 3D space.
     //! A circle is defined by its radius and positioned in space
@@ -50,13 +49,41 @@ namespace OCCPort
         //! It is not forbidden to create a circle with theRadius = 0.0  Raises ConstructionError if theRadius < 0.0
         public gp_Circ(gp_Ax2 theA2, double theRadius)
         {
-            pos = (theA2);
+            pos = theA2;
             radius = theRadius;
 
             Exceptions.Standard_ConstructionError_Raise_if(theRadius < 0.0, "gp_Circ() - radius should be positive number");
         }
         gp_Ax2 pos;
         double radius;
+        public void Transform(gp_Trsf theT)
+        {
+            radius *= theT.ScaleFactor();
+            if (radius < 0)
+            {
+                radius = -radius;
+            }
+            pos.Transform(theT);
+        }
+
+        //! Returns the "XAxis" of the circle.
+        //! This axis is perpendicular to the axis of the conic.
+        //! This axis and the "Yaxis" define the plane of the conic.
+        public gp_Ax1 XAxis() { return new gp_Ax1(pos.Location(), pos.XDirection()); }
+
+        //! Returns the "YAxis" of the circle.
+        //! This axis and the "Xaxis" define the plane of the conic.
+        //! The "YAxis" is perpendicular to the "Xaxis".
+        public gp_Ax1 YAxis()
+        {
+            return new gp_Ax1(pos.Location(), pos.YDirection());
+        }
+
+        //! Returns the center of the circle. It is the
+        //! "Location" point of the local coordinate system
+        //! of the circle
+        public gp_Pnt Location() { return pos.Location(); }
+
 
     }
 }

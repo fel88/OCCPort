@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection.Metadata;
 using TKG2d;
 using TKG3d;
 using TKMath;
@@ -17,6 +18,20 @@ namespace OCCPort
             mySurface = S;
 
         }
+
+        public override bool IsCurveOnSurface(Geom_Surface S,
+            TopLoc_Location L)
+        {
+            return (S == mySurface) && (L == myLocation);
+        }
+
+
+        public override Geom2d_Curve PCurve()
+        {
+            return myPCurve;
+        }
+
+
         public override void Update()
         {
             double f = First();
@@ -29,7 +44,7 @@ namespace OCCPort
             }
             if (!ispos)
             {
-                myPCurve.D0(l,out myUV2);
+                myPCurve.D0(l, out myUV2);
             }
         }
 

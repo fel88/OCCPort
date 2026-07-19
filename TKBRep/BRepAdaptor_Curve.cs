@@ -233,13 +233,36 @@ namespace OCCPort
 
         public override void Intervals(TColStd_Array1OfReal T, GeomAbs_Shape S)
         {
-            if (myConSurf==null)
+            if (myConSurf == null)
             {
                 myCurve.Intervals(T, S);
             }
             else
             {
                 myConSurf.Intervals(T, S);
+            }
+        }
+
+        public override gp_Circ Circle()
+        {
+            gp_Circ C = new gp_Circ();
+            if (myConSurf == null)
+                C = myCurve.Circle();
+            else
+                C = myConSurf.Circle();
+            C.Transform(myTrsf);
+            return C;
+        }
+
+        public override double Period()
+        {
+            if (myConSurf == null)
+            {
+                return myCurve.Period();
+            }
+            else
+            {
+                return myConSurf.Period();
             }
         }
     }

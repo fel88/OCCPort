@@ -55,11 +55,95 @@ namespace TKMath
             }
             return Result;
         }
+        // returns the column range of a matrix.
 
+
+        // returns the value of the Upper index of the row range of a matrix.
+
+        public int LowerCol() { return LowerColIndex; }
+
+        // returns the value of the Lower index of the column range of a matrix.
+
+        public int UpperCol() { return UpperColIndex; }
+
+        public int LowerRow() { return LowerRowIndex; }
+
+        // returns the value of the Lower index of the row range of a matrix.
+
+        public int UpperRow() { return UpperRowIndex; }
         public double this[int key, int key2]
         {
             get => Array[key, key2];
             set => Array[key, key2] = value;
+        }
+
+        public static math_Matrix operator *(math_Matrix v, math_Matrix theOther)
+        {
+            return v.Multiplied(theOther);
+        }
+
+        public math_Matrix Multiplied(math_Matrix Right)
+        {
+            Exceptions.Standard_DimensionError_Raise_if(ColNumber() != Right.RowNumber(),
+                                                "math_Matrix::Multiplied() - matrices have incompatible dimensions");
+
+            math_Matrix Result = new(LowerRowIndex, UpperRowIndex,
+                       Right.LowerColIndex, Right.UpperColIndex);
+
+            double Som;
+            for (int I = LowerRowIndex; I <= UpperRowIndex; I++)
+            {
+                for (int J2 = Right.LowerColIndex; J2 <= Right.UpperColIndex; J2++)
+                {
+                    Som = 0.0;
+                    int I2 = Right.LowerRowIndex;
+                    for (int J = LowerColIndex; J <= UpperColIndex; J++)
+                    {
+                        Som = Som + Array[I, J] * Right.Array[I2, J2];
+                        I2++;
+                    }
+                    Result.Array[I, J2] = Som;
+                }
+            }
+            return Result;
+        }
+
+        public void Invert()
+        {
+            Exceptions.math_NotSquare_Raise_if(RowNumber() != ColNumber(),
+                                         "math_Matrix::Transpose() - matrix is not square");
+
+            math_Gauss Sol = new(this);
+            if (Sol.IsDone())
+            {
+                Sol.Invert(this);
+            }
+            else
+            {
+                throw new math_SingularMatrix(); // SingularMatrix Exception;
+            }
+        }
+
+        public math_Matrix Inverse()
+        {
+            math_Matrix Result = new(this);
+            Result.Invert();
+            return Result;
+        }
+
+        public math_Matrix Transposed()
+        {
+            math_Matrix Result = new(LowerColIndex, UpperColIndex,
+                       LowerRowIndex, UpperRowIndex);
+
+            for (int I = LowerRowIndex; I <= UpperRowIndex; I++)
+            {
+                for (int J = LowerColIndex; J <= UpperColIndex; J++)
+                {
+                    Result.Array[J, I] = Array[I, J];
+                }
+            }
+            return Result;
         }
 
         public int RowNumber()
@@ -88,6 +172,17 @@ namespace TKMath
                              || (LowerCol > UpperCol), "math_Matrix() - invalid dimensions");
         }
 
+
+        //! constructs a matrix for copy in initialization.
+        //! An exception is raised if the matrixes have not the same dimensions.
+        public math_Matrix(math_Matrix Other)
+        {
+            LowerRowIndex = (Other.LowerRow());
+            UpperRowIndex = (Other.UpperRow());
+            LowerColIndex = (Other.LowerCol());
+            UpperColIndex = (Other.UpperCol());
+            Array = new math_DoubleTab(Other.Array);
+        }
 
         public math_Matrix(int LowerRow,
 
@@ -216,6 +311,17 @@ namespace TKMath
             UppC = upperCol;
 
             Allocate();
+        }
+
+        public math_DoubleTab(math_DoubleTab array)
+        {
+            Addr = (array.Addr.ToArray());
+            isAllocated = false;
+            LowR = (array.LowR);
+            UppR = (array.UppR);
+            LowC = (array.LowC);
+            UppC = array.UppC;
+
         }
     }
 }

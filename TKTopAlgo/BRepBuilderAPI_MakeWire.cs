@@ -35,7 +35,30 @@ namespace TKTopAlgo
     //! -   consulting the result.
     public class BRepBuilderAPI_MakeWire : BRepBuilderAPI_MakeShape
     {
+        //! Constructs an empty wire framework, to which edges
+        //! are added using the Add function.
+        //! As soon as the wire contains one edge, it can return
+        //! with the use of the function Wire.
+        //! Warning
+        //! The function Error will return
+        //! BRepBuilderAPI_EmptyWire if it is called before at
+        //! least one edge is added to the wire under construction.
+        public BRepBuilderAPI_MakeWire()
+        {
 
+        }
+
+        //! Make a Wire from an edge.
+        public BRepBuilderAPI_MakeWire(TopoDS_Edge E)
+        {
+            myMakeWire = new BRepLib_MakeWire (E);
+
+            if (myMakeWire.IsDone())
+            {
+                Done();
+                myShape = myMakeWire.Wire();
+            }
+        }
 
         //! Adds the edge E to the wire under construction.
         //! E must be connectable to the wire under construction, and, unless it
@@ -58,6 +81,11 @@ namespace TKTopAlgo
                 Done();
                 myShape = myMakeWire.Wire();
             }
+        }
+
+        public static implicit operator TopoDS_Wire(BRepBuilderAPI_MakeWire f)
+        {
+            return f.Wire();
         }
 
 

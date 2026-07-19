@@ -16,6 +16,14 @@ namespace TKMath
             return new gp_Pnt(f);
         }
 
+        public double CrossSquareMagnitude(gp_XYZ theRight)
+        {
+            double aXresult = y * theRight.z - z * theRight.y;
+            double aYresult = z * theRight.x - x * theRight.z;
+            double aZresult = x * theRight.y - y * theRight.x;
+            return aXresult * aXresult + aYresult * aYresult + aZresult * aZresult;
+        }
+
         public override string ToString()
         {
             return $"gp_XYZ: X:{x} Y:{y} Z:{z}";

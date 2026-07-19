@@ -13,6 +13,63 @@ namespace TKMath
             vydir = new gp_Dir(0.0, 1.0, 0.0);
             // vxdir(1.,0.,0.) use default ctor of gp_Dir, as it creates the same dir(1,0,0)
         }
+
+        //! Creates -   a coordinate system with an origin P, where V
+        //! gives the "main Direction" (here, "X Direction" and "Y
+        //! Direction" are defined automatically).
+        public gp_Ax2(gp_Pnt P, gp_Dir V)
+        {
+            axis = new(P, V);
+
+            double A = V.X();
+            double B = V.Y();
+            double C = V.Z();
+            double Aabs = A;
+            if (Aabs < 0) Aabs = -Aabs;
+            double Babs = B;
+            if (Babs < 0) Babs = -Babs;
+            double Cabs = C;
+            if (Cabs < 0) Cabs = -Cabs;
+
+            gp_Dir D = new gp_Dir();
+
+            //  pour determiner l axe X :
+            //  on dit que le produit scalaire Vx.V = 0. 
+            //  et on recherche le max(A,B,C) pour faire la division.
+            //  l'une des coordonnees du vecteur est nulle. 
+
+            if (Babs <= Aabs && Babs <= Cabs)
+            {
+                if (Aabs > Cabs) D.SetCoord(-C, 0.0, A);
+                else D.SetCoord(C, 0.0, -A);
+            }
+            else if (Aabs <= Babs && Aabs <= Cabs)
+            {
+                if (Babs > Cabs) D.SetCoord(0.0, -C, B);
+                else D.SetCoord(0.0, C, -B);
+            }
+            else
+            {
+                if (Aabs > Babs) D.SetCoord(-B, A, 0.0);
+                else D.SetCoord(B, -A, 0.0);
+            }
+            SetXDirection(D);
+        }
+
+
+        //! Changes the "Xdirection" of <me>. The main direction
+        //! "Direction" is not modified, the "Ydirection" is modified.
+        //! If <Vx> is not normal to the main direction then <XDirection>
+        //! is computed as follows XDirection = Direction ^ (Vx ^ Direction).
+        //! Exceptions
+        //! Standard_ConstructionError if Vx or Vy is parallel to
+        //! the "main Direction" of this coordinate system.
+        public void SetXDirection(gp_Dir theVx)
+        {
+            vxdir = axis.Direction().CrossCrossed(theVx, axis.Direction());
+            vydir = axis.Direction().Crossed(vxdir);
+        }
+
         //! Translates an axis plaxement in the direction of the vector <theV>.
         //! The magnitude of the translation is the vector's magnitude.
         public gp_Ax2 Translated(gp_Vec theV)
@@ -20,6 +77,16 @@ namespace TKMath
             gp_Ax2 aTemp = this;
             aTemp.Translate(theV);
             return aTemp;
+        }
+
+        public void Transform(gp_Trsf theT)
+        {
+            gp_Pnt aTemp = axis.Location();
+            aTemp.Transform(theT);
+            axis.SetLocation(aTemp);
+            vxdir.Transform(theT);
+            vydir.Transform(theT);
+            axis.SetDirection(vxdir.Crossed(vydir));
         }
 
         public void Rotate(gp_Ax1 theA1, double theAng)

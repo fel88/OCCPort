@@ -26,9 +26,9 @@ namespace TKGeomBase
                     GC = new Geom_Line(Proj.Line());
                     break;
 
-                //case GeomAbs_CurveType.GeomAbs_Circle:
-                //    GC = new Geom_Circle(Proj.Circle());
-                //    break;
+                case GeomAbs_CurveType.GeomAbs_Circle:
+                    GC = new Geom_Circle(Proj.Circle());
+                    break;
 
                 //case GeomAbs_CurveType.GeomAbs_Ellipse:
                 //    GC = new Geom_Ellipse(Proj.Ellipse());

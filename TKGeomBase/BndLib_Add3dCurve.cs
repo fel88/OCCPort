@@ -26,11 +26,11 @@ namespace TKGeomBase
                         BndLib.Add(C.Line(), U1, U2, Tol, B);
                         break;
                     }
-                //case GeomAbs_CurveType.GeomAbs_Circle:
-                //	{
-                //		BndLib.Add(C.Circle(), U1, U2, Tol, B);
-                //		break;
-                //	}
+                case GeomAbs_CurveType.GeomAbs_Circle:
+                	{
+                		BndLib.Add(C.Circle(), U1, U2, Tol, B);
+                		break;
+                	}
                 //case GeomAbs_CurveType.GeomAbs_Ellipse:
                 //	{
                 //		BndLib::Add(C.Ellipse(), U1, U2, Tol, B);

@@ -1,4 +1,6 @@
 ﻿using OCCPort;
+using OCCPort.Common;
+using System.Reflection.Metadata;
 using TKBRep;
 using TKG3d;
 using TKMath;
@@ -57,7 +59,27 @@ namespace TKTopAlgo
             return TopoDS.Edge(Shape());
         }
 
+        public BRepLib_MakeEdge(gp_Circ C)
+        {
+            myShape = new TopoDS_Edge();//not origin code!!
 
+            Geom_Circle GC = new Geom_Circle(C);
+            Init(GC);
+        }
+
+        public void Init(Geom_Curve C)
+        {
+            Init(C, C.FirstParameter(), C.LastParameter());
+        }
+        public void Init(Geom_Curve C,
+                  double p1,
+                  double p2)
+        {
+            //  BRep_Builder B;
+
+            TopoDS_Vertex V1 = new TopoDS_Vertex(), V2 = new TopoDS_Vertex();
+            Init(C, V1, V2, p1, p2);
+        }
         public void Init(Geom_Curve C,
 
                  gp_Pnt P1,
@@ -336,6 +358,14 @@ namespace TKTopAlgo
         {
             myShape = new TopoDS_Wire();//not origin code!
             myError = BRepLib_WireError.BRepLib_EmptyWire;
+        }
+
+
+        public BRepLib_MakeWire(TopoDS_Edge E)
+        {
+            myShape = new TopoDS_Wire();//not origin code!
+
+            Add(E);
         }
 
         public TopoDS_Wire Wire()

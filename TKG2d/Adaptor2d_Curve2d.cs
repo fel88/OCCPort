@@ -1,4 +1,5 @@
 ﻿using OCCPort;
+using OCCPort.Common;
 using TKMath;
 
 namespace TKG2d
@@ -21,6 +22,9 @@ namespace TKG2d
         //! Computes the point of parameter U on the curve.
         public abstract void D0(double U, ref gp_Pnt2d P);
         public abstract double Resolution(double u);
+
+        public abstract double Period();
+
 
         public abstract int Degree();
         //! Computes the point of parameter U on the curve with its

@@ -1,5 +1,4 @@
 ﻿global using TColStd_Array1OfInteger = TKernel.NCollection_Array1<int>;
-
 using OCCPort.Common;
 using TKernel;
 using TKG3d;
@@ -47,6 +46,14 @@ namespace TKGeomBase
             return myResult.Line();
         }
 
+        public override gp_Circ Circle()
+        {
+            if (myType != GeomAbs_CurveType.GeomAbs_Circle)
+                throw new Standard_NoSuchObject("ProjLib_ProjectOnPlane:Circle");
+
+            return myResult.Circle();
+        }
+
         public static gp_Pnt ProjectPnt(gp_Ax3 ThePlane,
   gp_Dir TheDir,
   gp_Pnt Point)
@@ -76,8 +83,8 @@ namespace TKGeomBase
             GeomAdaptor_Curve aGAHCurve;
 
             Geom_Line GeomLinePtr;
-            /*Handle(Geom_Circle)    GeomCirclePtr;
-            Handle(Geom_Ellipse)   GeomEllipsePtr;
+            Geom_Circle GeomCirclePtr = null;
+            Geom_Ellipse GeomEllipsePtr = null;/*
             Handle(Geom_Hyperbola) GeomHyperbolaPtr;
             Handle(Geom_Parabola) GeomParabolaPtr;*/
 
@@ -88,7 +95,7 @@ namespace TKGeomBase
             int num_knots;
             GeomAbs_CurveType Type = C._GetType();
 
-            gp_Ax2 Axis;
+            gp_Ax2 Axis = new gp_Ax2();
             double R1 = 0.0, R2 = 0.0;
 
             myKeepParam = KeepParametrization;
@@ -198,6 +205,171 @@ namespace TKGeomBase
                         }
                         break;
                     }
+                    break;
+                case GeomAbs_CurveType.GeomAbs_Circle:
+                    // Pour le cercle et l ellipse on a les relations suivantes:
+                    // ( Rem : pour le cercle R1 = R2 = R)
+                    //     P(u) = O + R1 * Cos(u) * Xc + R2 * Sin(u) * Yc
+                    // ==> Q(u) = f(P(u)) 
+                    //          = f(O) + R1 * Cos(u) * f(Xc) + R2 * Sin(u) * f(Yc)
+
+                    gp_Circ Circ = myCurve.Circle();
+                    Axis = Circ.Position();
+                    R1 = R2 = Circ.Radius();
+                    goto case GeomAbs_CurveType.GeomAbs_Ellipse;
+
+                case GeomAbs_CurveType.GeomAbs_Ellipse:
+                    {
+
+                        {
+                            if (Type == GeomAbs_CurveType.GeomAbs_Ellipse)
+                            {
+                                //gp_Elips E = myCurve->Ellipse();
+                                //Axis = E.Position();
+                                //R1 = E.MajorRadius();
+                                //R2 = E.MinorRadius();
+                            }
+
+                            // Common Code  for CIRCLE & ELLIPSE begin here
+                            gp_Dir X = Axis.XDirection();
+                            gp_Dir Y = Axis.YDirection();
+                            gp_Vec VDx = ProjectVec(myPlane, myDirection, X);
+                            gp_Vec VDy = ProjectVec(myPlane, myDirection, Y);
+                            gp_Dir Dx, Dy;
+
+                            double Tol2 = myTolerance * myTolerance;
+                            if (VDx.SquareMagnitude() < Tol2 ||
+                              VDy.SquareMagnitude() < Tol2 ||
+                              VDx.CrossSquareMagnitude(VDy) < Tol2)
+                            {
+                                myIsApprox = true;
+                            }
+
+                            if (!myIsApprox)
+                            {
+                                Dx = new gp_Dir(VDx);
+                                Dy = new gp_Dir(VDy);
+                                gp_Pnt O = Axis.Location();
+                                gp_Pnt P = ProjectPnt(myPlane, myDirection, O);
+                                gp_Pnt Px = ProjectPnt(myPlane, myDirection, O.Translated(R1 * new gp_Vec(X)));
+                                gp_Pnt Py = ProjectPnt(myPlane, myDirection, O.Translated(R2 * new gp_Vec(Y)));
+                                double Major = P.Distance(Px);
+                                double Minor = P.Distance(Py);
+
+                                if (myKeepParam)
+                                {
+                                    myIsApprox = !new gp_Dir(VDx).IsNormal(new gp_Dir(VDy), Precision.Angular());
+                                }
+                                else
+                                {
+                                    // Since it is not necessary to keep the same parameter for the point on the original and on the projected curves,
+                                    // we will use the following approach to find axes of the projected ellipse and provide the canonical curve:
+                                    // https://www.geometrictools.com/Documentation/ParallelProjectionEllipse.pdf
+                                    math_Matrix aMatrA = new(1, 2, 1, 2);
+                                    // A = Jp^T * Pr(Je), where
+                                    //   Pr(Je) - projection of axes of original ellipse to the target plane
+                                    //   Jp - X and Y axes of the target plane
+                                    aMatrA[1, 1] = myPlane.XDirection().XYZ().Dot(VDx.XYZ());
+                                    aMatrA[1, 2] = myPlane.XDirection().XYZ().Dot(VDy.XYZ());
+                                    aMatrA[2, 1] = myPlane.YDirection().XYZ().Dot(VDx.XYZ());
+                                    aMatrA[2, 2] = myPlane.YDirection().XYZ().Dot(VDy.XYZ());
+
+                                    math_Matrix aMatrDelta2 = new(1, 2, 1, 2, 0.0);
+                                    //           | 1/MajorRad^2       0       |
+                                    // Delta^2 = |                            |
+                                    //           |      0        1/MajorRad^2 |
+                                    aMatrDelta2[1, 1] = 1.0 / (R1 * R1);
+                                    aMatrDelta2[2, 2] = 1.0 / (R2 * R2);
+
+                                    math_Matrix aMatrAInv = aMatrA.Inverse();
+                                    math_Matrix aMatrM = aMatrAInv.Transposed() * aMatrDelta2 * aMatrAInv;
+
+                                    // perform eigenvalues calculation
+                                    math_Jacobi anEigenCalc = new(aMatrM);
+                                    if (anEigenCalc.IsDone())
+                                    {
+                                        // radii of the projected ellipse
+                                        Minor = 1.0 / Math.Sqrt(anEigenCalc.Value(1));
+                                        Major = 1.0 / Math.Sqrt(anEigenCalc.Value(2));
+
+                                        // calculate the rotation angle for the plane axes to meet the correct axes of the projected ellipse
+                                        // (swap eigenvectors in respect to major and minor axes)
+                                        math_Matrix anEigenVec = anEigenCalc.Vectors();
+                                        gp_Trsf2d aTrsfInPlane = new gp_Trsf2d();
+                                        //aTrsfInPlane.SetValues(anEigenVec[1, 2], anEigenVec[1, 1], 0.0,
+                                        //  anEigenVec[2, 2], anEigenVec[2, 1], 0.0);
+                                        gp_Trsf aRot = new gp_Trsf();
+                                      //  aRot.SetRotation(new gp_Ax1(P, myPlane.Direction()), aTrsfInPlane.RotationPart());
+
+                                        Dx = myPlane.XDirection().Transformed(aRot);
+                                        Dy = myPlane.YDirection().Transformed(aRot);
+                                    }
+                                    else
+                                    {
+                                        myIsApprox = true;
+                                    }
+                                }
+
+                                if (!myIsApprox)
+                                {
+                                    gp_Ax2 Axe = new(P, Dx ^ Dy, Dx);
+
+                                    if (Math.Abs(Major - Minor) < Precision.Confusion())
+                                    {
+                                        myType = GeomAbs_CurveType.GeomAbs_Circle;
+                                        gp_Circ Circ1 = new(Axe, Major);
+                                        GeomCirclePtr = new Geom_Circle(Circ1);
+                                        //  Modified by Sergey KHROMOV - Tue Jan 29 16:57:29 2002 Begin
+                                        GeomAdaptor_Curve aGACurve = new(GeomCirclePtr);
+                                        //myResult = new GeomAdaptor_Curve(aGACurve);
+                                        //  Modified by Sergey KHROMOV - Tue Jan 29 16:57:30 2002 End
+                                    }
+                                    else if (Major > Minor)
+                                    {
+                                        myType = GeomAbs_CurveType.GeomAbs_Ellipse;
+                                        //Elips = gp_Elips(Axe, Major, Minor);
+
+                                        //GeomEllipsePtr = new Geom_Ellipse(Elips);
+                                        ////  Modified by Sergey KHROMOV - Tue Jan 29 16:57:29 2002 Begin
+                                        //GeomAdaptor_Curve aGACurve(GeomEllipsePtr);
+                                        //myResult = new GeomAdaptor_Curve(aGACurve);
+                                        ////  Modified by Sergey KHROMOV - Tue Jan 29 16:57:30 2002 End
+                                    }
+                                    else
+                                    {
+                                        myIsApprox = true;
+                                    }
+                                }
+                            }
+
+                            // No way to build the canonical curve, approximate as B-spline
+                            if (myIsApprox)
+                            {
+                                //myType = GeomAbs_BSplineCurve;
+                                //PerformApprox(myCurve, myPlane, myDirection, ApproxCurve);
+                                ////  Modified by Sergey KHROMOV - Tue Jan 29 16:57:29 2002 Begin
+                                //GeomAdaptor_Curve aGACurve(ApproxCurve);
+                                //myResult = new GeomAdaptor_Curve(aGACurve);
+                                ////  Modified by Sergey KHROMOV - Tue Jan 29 16:57:30 2002 End
+                            }
+                            else if (GeomCirclePtr != null || GeomEllipsePtr != null)
+                            {
+                                Geom_Curve aResultCurve = GeomCirclePtr;
+                                if (aResultCurve == null)
+                                    aResultCurve = GeomEllipsePtr;
+                                // start and end parameters of the projected curve
+                                double aParFirst = myCurve.FirstParameter();
+                                double aParLast = myCurve.LastParameter();
+                                gp_Pnt aPntFirst = ProjectPnt(myPlane, myDirection, myCurve.Value(aParFirst));
+                                gp_Pnt aPntLast = ProjectPnt(myPlane, myDirection, myCurve.Value(aParLast));
+                                GeomLib_Tool.Parameter(aResultCurve, aPntFirst, Precision.Confusion(), ref myFirstPar);
+                                GeomLib_Tool.Parameter(aResultCurve, aPntLast, Precision.Confusion(), ref myLastPar);
+                                while (myLastPar <= myFirstPar)
+                                    myLastPar += myResult.Period();
+                            }
+                        }
+                    }
+                    break;
                 default:
                     {
                         myKeepParam = true;
@@ -297,6 +469,20 @@ namespace TKGeomBase
         public override void Intervals(TColStd_Array1OfReal T, GeomAbs_Shape S)
         {
             throw new NotImplementedException();
+        }
+
+        public override double Period()
+        {
+            if (!IsPeriodic())
+            {
+                throw new Standard_NoSuchObject("ProjLib_ProjectOnPlane::Period");
+            }
+
+            if (myIsApprox)
+                //return false;
+                return 0;
+            else
+                        return myCurve.Period();
         }
 
         Adaptor3d_Curve myCurve;

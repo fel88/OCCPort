@@ -1,5 +1,5 @@
-﻿using OCCPort;
-using OCCPort.Common;
+﻿using OCCPort.Common;
+using System.Runtime.Intrinsics.X86;
 using TKMath;
 
 namespace TKG3d
@@ -40,15 +40,39 @@ namespace TKG3d
             radius = (C.Radius());
             pos = C.Position();
         }
-        
-        
+
+        public gp_Circ Circ() { return new gp_Circ(pos, radius); }
+
+        public Geom_Circle(gp_Ax2 A2, double R)
+        {
+            radius = (R);
+            if (R < 0.0)
+                throw new Standard_ConstructionError();
+
+            pos = A2;
+        }
+
+        public override Geom_Geometry Copy()
+        {
+            Geom_Circle C = new(pos, radius);
+            return C;
+        }
+
         //! Returns in P the point of parameter U.
-         //! P = C + R * Cos (U) * XDir + R * Sin (U) * YDir
-         //! where C is the center of the circle , XDir the XDirection and
-         //! YDir the YDirection of the circle's local coordinate system.
-        public override  void D0( double  U, ref  gp_Pnt P)
+        //! P = C + R * Cos (U) * XDir + R * Sin (U) * YDir
+        //! where C is the center of the circle , XDir the XDirection and
+        //! YDir the YDirection of the circle's local coordinate system.
+        public override void D0(double U, ref gp_Pnt P)
         {
             P = ElCLib.CircleValue(U, pos, radius);
+        }
+
+        public override bool IsPeriodic() { return true; }
+
+        //! Returns the radius of this circle.
+        public double Radius()
+        {
+            return radius;
         }
 
 
@@ -62,8 +86,11 @@ namespace TKG3d
             return 0.0;
         }
 
-        public  override double LastParameter()       { return 2.0 * Math.PI; }
+        public override double LastParameter() { return 2.0 * Math.PI; }
 
-
-}
+        public override double Eccentricity()
+        {
+            return 0;
+        }
+    }
 }

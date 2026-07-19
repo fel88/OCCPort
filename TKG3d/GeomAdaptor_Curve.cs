@@ -26,6 +26,11 @@ namespace TKG3d
             Load(theCurve);
         }
 
+        public override double Period()
+        {
+            return myCurve.LastParameter() - myCurve.FirstParameter();
+        }
+
         public override double FirstParameter()
         {
             return myFirst;
@@ -114,11 +119,11 @@ namespace TKG3d
                     Load((C as Geom_TrimmedCurve).BasisCurve(), UFirst, ULast);
                 }
                 else
-                /*if (TheType == typeof(Geom_Circle))
+                if (TheType == typeof(Geom_Circle))
                 {
                     myTypeCurve = GeomAbs_CurveType.GeomAbs_Circle;
                 }
-                else*/
+                else
                 if (TheType == typeof(Geom_Line))
                 {
                     myTypeCurve = GeomAbs_CurveType.GeomAbs_Line;
@@ -690,12 +695,12 @@ namespace TKG3d
             }
 
         }
-    }
 
-    //! Interface for calculation of values and derivatives for different kinds of curves in 3D.
-    //! Works both with adaptors and curves.
-    public class GeomEvaluator_Curve
-    {
-
+        public override gp_Circ Circle()
+        {
+            Standard_NoSuchObject_Raise_if(myTypeCurve != GeomAbs_CurveType.GeomAbs_Circle,
+                                  "GeomAdaptor_Curve::Circle() - curve is not a Circle");
+            return ((Geom_Circle)(myCurve)).Circ();
+        }
     }
 }

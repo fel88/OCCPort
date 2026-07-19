@@ -1,5 +1,8 @@
 ﻿
 using OCCPort.Common;
+using System;
+using System.Reflection.Metadata;
+using TKernel;
 
 namespace TKMath
 {
@@ -103,6 +106,14 @@ namespace TKMath
             V = EigenVectors.Col(Num);
         }
 
+        //! returns the eigenvalue number Num.
+        //! Eigenvalues are in the range (1..n).
+        //! Exception NotDone is raised if calculation is not done successfully.
+        public double Value(int Num)
+        {
+            Exceptions.StdFail_NotDone_Raise_if(!Done, " ");
+            return EigenValues[Num];
+        }
 
         public static void EigenSort(math_Vector d, math_Matrix v)
         { // descending order
@@ -271,6 +282,137 @@ namespace TKMath
     public static class math_Recipes
     {
 
+
+        public static int LU_Decompose(math_Matrix a,
+                            math_IntegerVector indx,
+                            double d,
+                            double TINY,
+                     Message_ProgressRange theProgress)
+        {
+
+            math_Vector vv = new(1, a.RowNumber());
+            return LU_Decompose(a, indx, d, vv, TINY, theProgress);
+        }
+
+        public static int LU_Decompose(math_Matrix a,
+                     math_IntegerVector indx,
+                     double d,
+                     math_Vector vv,
+                     double TINY,
+                      Message_ProgressRange theProgress)
+        {
+
+            int i, imax = 0, j, k;
+            double big, dum, sum, temp;
+
+            int n = a.RowNumber();
+            d = 1.0;
+
+            Message_ProgressScope aPS = new(theProgress, "math_Gauss LU_Decompose", n);
+
+            for (i = 1; i <= n; i++)
+            {
+                big = 0.0;
+                for (j = 1; j <= n; j++)
+                    if ((temp = Math.Abs(a[i, j])) > big) big = temp;
+                if (big <= TINY)
+                {
+                    return math_Status_SingularMatrix;
+                }
+                vv[(i)] = 1.0 / big;
+            }
+
+            for (j = 1; j <= n && aPS.More(); j++, aPS.Next())
+            {
+                for (i = 1; i < j; i++)
+                {
+                    sum = a[i, j];
+                    for (k = 1; k < i; k++)
+                        sum -= a[i, k] * a[k, j];
+                    a[i, j] = sum;
+                }
+                big = 0.0;
+                for (i = j; i <= n; i++)
+                {
+                    sum = a[i, j];
+                    for (k = 1; k < j; k++)
+                        sum -= a[i, k] * a[k, j];
+                    a[i, j] = sum;
+
+                    // Note that comparison is made so as to have imax updated even if argument is NAN, Inf or IND, see #25559
+                    if ((dum = vv[i] * Math.Abs(sum)) < big)
+                    {
+                        continue;
+                    }
+                    big = dum;
+                    imax = i;
+                }
+                if (j != imax)
+                {
+                    for (k = 1; k <= n; k++)
+                    {
+                        dum = a[imax, k];
+                        a[imax, k] = a[j, k];
+                        a[j, k] = dum;
+                    }
+                    d = -d;
+                    vv[imax] = vv[j];
+                }
+
+                indx[j] = imax;
+                if (Math.Abs(a[j, j]) <= TINY)
+                {
+                    return math_Status_SingularMatrix;
+                }
+                if (j != n)
+                {
+                    dum = 1.0 / (a[j, j]);
+                    for (i = j + 1; i <= n; i++)
+                        a[i, j] *= dum;
+                }
+            }
+
+            if (j <= n)
+            {
+                return math_Status_UserAborted;
+            }
+
+            return math_Status_OK;
+        }
+
+        public static void LU_Solve(math_Matrix a,
+                   math_IntegerVector indx,
+                  math_Vector b)
+        {
+
+            int i, ii = 0, ip, j;
+            double sum;
+
+            int n = a.RowNumber();
+            int nblow = b.Lower() - 1;
+            for (i = 1; i <= n; i++)
+            {
+                ip = indx[i];
+                sum = b[ip + nblow];
+                b[ip + nblow] = b[i + nblow];
+                //if (ii)
+                if (ii != 0)
+                    for (j = ii; j < i; j++)
+                        sum -= a[i, j] * b[j + nblow];
+                else
+                    //if (sum) 
+                    if (sum != 0)
+                    ii = i;
+                b[i + nblow] = sum;
+            }
+            for (i = n; i >= 1; i--)
+            {
+                sum = b[i + nblow];
+                for (j = i + 1; j <= n; j++)
+                    sum -= a[i, j] * b[j + nblow];
+                b[i + nblow] = sum / a[i, i];
+            }
+        }
         public const int math_Status_UserAborted = -1;
         public const int math_Status_OK = 0;
         public const int math_Status_SingularMatrix = 1;

@@ -133,8 +133,8 @@ namespace TKMath
         public static gp_Vec operator ^(gp_Vec v, gp_Vec theRight)
         {
             return v.Crossed(theRight);
-        }  
-        
+        }
+
         //! computes the cross product between two vectors
         public gp_Vec Crossed(gp_Vec theRight)
         {
@@ -204,6 +204,13 @@ namespace TKMath
         }
         //! Computes the square magnitude of this vector.
         public double SquareMagnitude() => coord.SquareModulus();
+        //! Computes the square magnitude of
+        //! the cross product between <me> and theRight.
+        //! Returns || <me> ^ theRight ||**2
+        public double CrossSquareMagnitude(gp_Vec theRight)
+        {
+            return coord.CrossSquareMagnitude(theRight.coord);
+        }
 
         public gp_Vec(gp_Dir theV)
         {

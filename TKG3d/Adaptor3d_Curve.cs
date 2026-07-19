@@ -32,6 +32,9 @@ namespace TKG3d
         public abstract void Intervals(TColStd_Array1OfReal T, GeomAbs_Shape S);
 
 
+        public abstract double Period();
+
+
         //=======================================================================
         //function : GetType
         //purpose  : 
@@ -53,6 +56,7 @@ namespace TKG3d
         //=======================================================================
 
         public abstract gp_Lin Line();
+        public abstract gp_Circ Circle();
 
         public abstract gp_Pnt Value(double d);
 

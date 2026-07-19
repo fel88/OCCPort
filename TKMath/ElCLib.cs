@@ -134,9 +134,9 @@ namespace TKMath
             return aEpsilon;
         }
 
-        private static double NextAfter(double value1, object value2)
+        private static double NextAfter(double value, double value2)
         {
-            throw new NotImplementedException();
+            return Math.BitIncrement(value);
         }
 
         public static gp_Pnt LineValue(double U,
@@ -182,9 +182,42 @@ namespace TKMath
             //return ElCLib.CircleValue(U, C.Position(), C.Radius());
         }
 
-        public static double InPeriod(double u, double myuinf, double v)
+
+        //=======================================================================
+        //function : InPeriod
+        //purpose  : Value theULast is never returned.
+        //          Example of some case (checked on WIN64 platform)
+        //          with some surface having period 2*PI = 6.2831853071795862.
+        //            Let theUFirst be equal to 6.1645624650899675. Then,
+        //          theULast must be equal to
+        //              6.1645624650899675+6.2831853071795862=12.4477477722695537.
+        //
+        //          However, real result is 12.447747772269555.
+        //          Therefore, new period value to adjust will be equal to
+        //              12.447747772269555-6.1645624650899675=6.2831853071795871.
+        //
+        //          As we can see, (6.2831853071795871 != 6.2831853071795862).
+        //
+        //          According to above said, this method should be used carefully.
+        //          In order to increase reliability of this method, input arguments
+        //          needs to be replaced with following: 
+        //            (theU, theUFirst, thePeriod). theULast parameter is excess.
+        //=======================================================================
+        public static double InPeriod(double theU, double theUFirst, double theULast)
         {
-            throw new NotImplementedException();
+            if (Precision.IsInfinite(theU) ||
+      Precision.IsInfinite(theUFirst) ||
+      Precision.IsInfinite(theULast))
+            {//In order to avoid FLT_Overflow exception
+                return theU;
+            }
+
+            double  aPeriod = theULast - theUFirst;
+
+            if (aPeriod < Epsilon(theULast))
+                return theU;
+
+            return Math.Max(theUFirst, theU + aPeriod * Math.Ceiling((theUFirst - theU) / aPeriod));
         }
     }
 }

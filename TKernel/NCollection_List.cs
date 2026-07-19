@@ -13,7 +13,11 @@ namespace TKernel
         {
             Assign(copy);
         }
-
+        
+        public  void Remove(Iterator itcr)
+        {
+            
+        }
         //! Replace this list by the items of another list (theOther parameter).
         //! This method does not change the internal allocator.
         public NCollection_List<T> Assign(NCollection_List<T> theOther)
@@ -38,6 +42,7 @@ namespace TKernel
 
         public class Iterator
         {
+            
             public void Initialize(NCollection_List<T> myShapes)
             {
                 list = myShapes;

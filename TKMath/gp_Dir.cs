@@ -19,6 +19,17 @@ namespace TKMath
             aT.SetRotation(theA1, theAng);
             coord.Multiply(aT.HVectorialPart());
         }
+
+        public gp_Dir CrossCrossed(gp_Dir theV1, gp_Dir theV2)
+        {
+            gp_Dir aV = new gp_Dir(this);
+            (aV.coord).CrossCross(theV1.coord, theV2.coord);
+            double aD = aV.coord.Modulus();
+            Exceptions.Standard_ConstructionError_Raise_if(aD <= gp.Resolution(), "gp_Dir::CrossCrossed() - result vector has zero norm");
+            aV.coord.Divide(aD);
+            return aV;
+        }
+
         public override string ToString()
         {
             return $"gp_Dir: X:{coord.X()} Y:{coord.Y()} Z:{coord.Z()}";
@@ -139,6 +150,19 @@ namespace TKMath
             coord.SetZ(aZ / aD);
 
         }
+
+
+        //! Returns True if  the angle between this unit vector and the unit vector theOther is equal to Pi/2 (normal).
+        public bool IsNormal(gp_Dir theOther, double theAngularTolerance)
+        {
+            double anAng = Math.PI / 2.0 - Angle(theOther);
+            if (anAng < 0)
+            {
+                anAng = -anAng;
+            }
+            return anAng <= theAngularTolerance;
+        }
+
         //! Normalizes the vector theV and creates a direction. Raises ConstructionError if theV.Magnitude() <= Resolution.
         public gp_Dir(gp_Dir theV)
         {
@@ -287,5 +311,5 @@ namespace TKMath
         {
         }
     }
-}
+    }
 

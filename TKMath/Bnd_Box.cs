@@ -45,6 +45,12 @@ namespace TKMath
             SetVoid();
         }
 
+        public double GetGap()
+        {
+            return Gap;
+        }
+
+
         //! Creates a bounding box, it contains:
         //! -   minimum/maximum point of bounding box,
         //! The constructed box is qualified Void. Its gap is null.

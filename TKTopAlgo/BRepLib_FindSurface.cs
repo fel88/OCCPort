@@ -9,7 +9,7 @@ using TKG3d;
 using TKGeomBase;
 using TKMath;
 
-    
+
 namespace TKTopAlgo
 {
     //! Provides an  algorithm to find  a Surface  through a
@@ -214,27 +214,26 @@ namespace TKTopAlgo
                             aParams.Append(dfUl);
                             break;
                         }
-                    //case GeomAbs_Circle:
-                    //case GeomAbs_Ellipse:
-                    //case GeomAbs_Hyperbola:
-                    //case GeomAbs_Parabola:
-                    //    // Four points on other analytical curves
-                    //    iNbPoints = 4;
-                    //    Standard_FALLTHROUGH
+                    case GeomAbs_CurveType.GeomAbs_Circle:
+                    case GeomAbs_CurveType.GeomAbs_Ellipse:
+                    case GeomAbs_CurveType.GeomAbs_Hyperbola:
+                    case GeomAbs_CurveType.GeomAbs_Parabola:
+                        // Four points on other analytical curves
+                        iNbPoints = 4;
+                        goto default;
                     default:
                         {
                             // Put some points on other curves
                             if (iNbPoints == 0)
                                 iNbPoints = 15 + c.NbIntervals(GeomAbs_Shape.GeomAbs_C3);
 
-                            //  TColStd_Array1OfReal aBounds = new TColStd_Array1OfReal(1, 2);
-                            // aBounds.SetValue(1, dfUf);
-                            //  aBounds.SetValue(2, dfUl);
+                            TColStd_Array1OfReal aBounds = new TColStd_Array1OfReal(1, 2);
+                            aBounds.SetValue(1, dfUf);
+                            aBounds.SetValue(2, dfUl);
 
-                            // fillParams(aBounds, iNbPoints - 1, dfUf, dfUl, aParams);
+                            fillParams(aBounds, iNbPoints - 1, dfUf, dfUl, aParams);
                             break;
-                        }
-
+                        }                        
                 }
 
                 // Add the points with weights to the sequences
@@ -412,6 +411,41 @@ namespace TKTopAlgo
 
             return dfMaxDist;
         }
+
+        static void fillParams(TColStd_Array1OfReal theKnots,
+        int theDegree,
+        double theParMin,
+        double theParMax,
+        NCollection_Vector<double> theParams)
+        {
+            double aPrevPar = theParMin;
+            theParams.Append(aPrevPar);
+
+            int aNbP = Math.Max(theDegree, 1);
+
+            for (int i = 1;
+                (i < theKnots.Length()) && (theKnots[(i)] < (theParMax - Precision.PConfusion())); ++i)
+            {
+                if (theKnots[(i + 1)] < theParMin + Precision.PConfusion())
+                    continue;
+
+                double aStep = (theKnots[(i + 1)] - theKnots[(i)]) / aNbP;
+                for (int k = 1; k <= aNbP; ++k)
+                {
+                    double aPar = theKnots[(i)] + k * aStep;
+                    if (aPar > theParMax - Precision.PConfusion())
+                        break;
+
+                    if (aPar > aPrevPar + Precision.PConfusion())
+                    {
+                        theParams.Append(aPar);
+                        aPrevPar = aPar;
+                    }
+                }
+            }
+            theParams.Append(theParMax);
+        }
+
         private void fillPoints(BRepAdaptor_Curve theCurve, NCollection_Vector<double> theParams,
                     TColgp_SequenceOfPnt thePoints, TColStd_SequenceOfReal theWeights)
         {

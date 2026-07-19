@@ -1,4 +1,5 @@
-﻿using TKMath;
+﻿using OCCPort.Common;
+using TKMath;
 
 namespace TKG3d
 {
@@ -25,7 +26,7 @@ namespace TKG3d
     //! the direction in which the parameter increases along
     //! the conic. The "X Axis" of the local coordinate system
     //! also defines the origin of the parameter of the conic.
-    public class Geom_Conic : Geom_Curve
+    public abstract class Geom_Conic : Geom_Curve
     {
         public override Geom_Geometry Copy()
         {
@@ -33,6 +34,17 @@ namespace TKG3d
         }
 
         protected gp_Ax2 pos;
+
+        //! Returns the eccentricity value of the conic e.
+        //! e = 0 for a circle
+        //! 0 < e < 1 for an ellipse  (e = 0 if MajorRadius = MinorRadius)
+        //! e > 1 for a hyperbola
+        //! e = 1 for a parabola
+        //! Exceptions
+        //! Standard_DomainError in the case of a hyperbola if
+        //! its major radius is null.
+        public abstract double Eccentricity();
+
 
         public override void D0(double U, ref gp_Pnt P)
         {

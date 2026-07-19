@@ -127,7 +127,7 @@ namespace TKG3d
             {
                 mySurface = S;
                 //  myNestedEvaluator.Nullify();
-                //myBSplineSurface.Nullify();
+                // myBSplineSurface.Nullify();
 
                 var TheType = S.DynamicType();
                 if (TheType == typeof(Geom_RectangularTrimmedSurface))
@@ -138,25 +138,25 @@ namespace TKG3d
                 else if (TheType == typeof(Geom_Plane))
                     mySurfaceType = GeomAbs_SurfaceType.GeomAbs_Plane;
                 else if (TheType == typeof(Geom_CylindricalSurface))
-                    mySurfaceType = GeomAbs_SurfaceType.GeomAbs_Cylinder;/*
+                    mySurfaceType = GeomAbs_SurfaceType.GeomAbs_Cylinder;
                 else if (TheType == typeof(Geom_ConicalSurface))
-                    mySurfaceType = GeomAbs_SurfaceType.GeomAbs_Cone;
+                    mySurfaceType = GeomAbs_SurfaceType.GeomAbs_Cone;/*
                 else if (TheType == typeof(Geom_SphericalSurface))
                     mySurfaceType = GeomAbs_SurfaceType.GeomAbs_Sphere;
                 else if (TheType == typeof(Geom_ToroidalSurface))
-                    mySurfaceType = GeomAbs_SurfaceType.GeomAbs_Torus;
+                    mySurfaceType = GeomAbs_SurfaceType.GeomAbs_Torus;*/
                 else if (TheType == typeof(Geom_SurfaceOfRevolution))
                 {
-                    mySurfaceType = GeomAbs_SurfaceOfRevolution;
-                    Handle(Geom_SurfaceOfRevolution) myRevSurf =
-                        Handle(Geom_SurfaceOfRevolution)::DownCast(mySurface);
+                    mySurfaceType = GeomAbs_SurfaceType.GeomAbs_SurfaceOfRevolution;
+                    Geom_SurfaceOfRevolution myRevSurf =
+                        (Geom_SurfaceOfRevolution)(mySurface);
                     // Create nested adaptor for base curve
-                    Handle(Geom_Curve) aBaseCurve = myRevSurf->BasisCurve();
-                    Handle(Adaptor3d_Curve) aBaseAdaptor = new GeomAdaptor_Curve(aBaseCurve);
+                    /*Geom_Curve aBaseCurve = myRevSurf.BasisCurve();
+                    Adaptor3d_Curve aBaseAdaptor = new GeomAdaptor_Curve(aBaseCurve);
                     // Create corresponding evaluator
                     myNestedEvaluator =
-                        new GeomEvaluator_SurfaceOfRevolution(aBaseAdaptor, myRevSurf->Direction(), myRevSurf->Location());
-                }
+                        new GeomEvaluator_SurfaceOfRevolution(aBaseAdaptor, myRevSurf.Direction(), myRevSurf.Location());*/
+                }/*
                 else if (TheType == STANDARD_TYPE(Geom_SurfaceOfLinearExtrusion))
                 {
                     mySurfaceType = GeomAbs_SurfaceOfExtrusion;
@@ -318,21 +318,22 @@ namespace TKG3d
                             Res = R3d / (2.0 * R);
                         break;
                     }
-                //case GeomAbs_Cone:
-                //    {
-                //        if (myVLast - myVFirst > 1.e10)
-                //        {
-                //            // Pas vraiment borne => resolution inconnue
-                //            return Precision::Parametric(R3d);
-                //        }
-                //        Handle(Geom_ConicalSurface) S(Handle(Geom_ConicalSurface)::DownCast(mySurface));
-                //        Handle(Geom_Curve) C = S->VIso(myVLast);
-                //        const Standard_Real Rayon1 = Handle(Geom_Circle)::DownCast(C)->Radius();
-                //        C = S->VIso(myVFirst);
-                //        const Standard_Real Rayon2 = Handle(Geom_Circle)::DownCast(C)->Radius();
-                //        const Standard_Real R = (Rayon1 > Rayon2) ? Rayon1 : Rayon2;
-                //        return (R > Precision::Confusion() ? (R3d / R) : 0.);
-                //    }
+                case GeomAbs_SurfaceType.GeomAbs_Cone:
+                    {
+
+                        if (myVLast - myVFirst > 1e10)
+                        {
+                            // Pas vraiment borne => resolution inconnue
+                            return Precision.Parametric(R3d);
+                        }
+                        Geom_ConicalSurface S = ((Geom_ConicalSurface)(mySurface));
+                        Geom_Curve C = S.VIso(myVLast);
+                        double Rayon1 = ((Geom_Circle)(C)).Radius();
+                        C = S.VIso(myVFirst);
+                        double Rayon2 = ((Geom_Circle)(C)).Radius();
+                        double R = (Rayon1 > Rayon2) ? Rayon1 : Rayon2;
+                        return (R > Precision.Confusion() ? (R3d / R) : 0.0);
+                    }
                 case GeomAbs_SurfaceType.GeomAbs_Plane:
                     {
                         return R3d;

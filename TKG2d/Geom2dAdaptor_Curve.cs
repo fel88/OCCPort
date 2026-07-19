@@ -19,6 +19,10 @@ namespace TKG2d
         double myFirst;
         double myLast;
 
+        public override double Period()
+        {
+            return myCurve.LastParameter() - myCurve.FirstParameter();
+        }
         public override gp_Circ2d Circle()
         {
             Exceptions.Standard_NoSuchObject_Raise_if(myTypeCurve != GeomAbs_CurveType.GeomAbs_Circle,

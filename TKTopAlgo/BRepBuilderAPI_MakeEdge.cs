@@ -50,7 +50,16 @@ namespace TKTopAlgo
         {
             return f.Edge();
         }
+        public BRepBuilderAPI_MakeEdge(gp_Circ C)
+        {
+            myMakeEdge =  new(C);
 
+            if (myMakeEdge.IsDone())
+            {
+                Done();
+                myShape = myMakeEdge.Shape();
+            }
+        }
         public TopoDS_Edge Edge()
         {
             return myMakeEdge.Edge();

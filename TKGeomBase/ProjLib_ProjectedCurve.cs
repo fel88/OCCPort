@@ -674,5 +674,10 @@ namespace TKGeomBase
             return myResult.Circle();
 
         }
+
+        public override double Period()
+        {
+            throw new Standard_NotImplemented("ProjLib_ProjectedCurve::Period() - method is not implemented");
+        }
     }
 }

@@ -145,5 +145,10 @@ namespace TKGeomBase
         {
             throw new NotImplementedException();
         }
+
+        public override double Period()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

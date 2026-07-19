@@ -68,5 +68,11 @@
             if (value)
                 throw new Exception(v);
         }
+
+        public static void Standard_DimensionError_Raise_if(bool v1, string v2)
+        {
+            if (v1)
+                throw new Exception(v2);
+        }
     }
 }

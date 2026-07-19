@@ -24,6 +24,7 @@ using TKService;
 using TKTopAlgo;
 using TKV3d;
 using static OpenTK.Graphics.OpenGL.GL;
+using static System.Windows.Forms.DataFormats;
 
 
 namespace OCCPort.Tester
@@ -726,21 +727,35 @@ namespace OCCPort.Tester
 
         private void toolStripButton16_Click(object sender, EventArgs e)
         {
+            gp_Pnt center = new(0.0, 0.0, 0.0);
+            gp_Dir normal = new(0.0, 0.0, 1.0);
+            gp_Circ circle = new(new gp_Ax2(center, normal), 10.0);
 
-            // Define dimensions
-            double radius = 10.0;
-            double height = 50.0;
+            // Convert geometric circle to topological edge and wire
+            TopoDS_Edge edge = new BRepBuilderAPI_MakeEdge(circle);
+            TopoDS_Wire wire = new BRepBuilderAPI_MakeWire(edge);
 
-            // Create the cylinder
-            BRepPrimAPI_MakeCylinder mkCylinder = new BRepPrimAPI_MakeCylinder(radius, height);
-
-            // Get the resulting TopoDS_Shape
-            TopoDS_Shape myCylinder = mkCylinder.Shape();
-            var shape = new AIS_Shape(myCylinder);
-
+            // Generate the planar circular face
+            TopoDS_Face face = new BRepBuilderAPI_MakeFace(wire, true);
+            var shape = new AIS_Shape(face);
             myAISContext.Display(shape, true);
             myAISContext.SetDisplayMode(shape, (int)AIS_DisplayMode.AIS_Shaded, false);
             myAISContext.UpdateCurrentViewer();
+            return;
+            // Define dimensions
+            //double radius = 10.0;
+            //double height = 50.0;
+
+            //// Create the cylinder
+            //BRepPrimAPI_MakeCylinder mkCylinder = new BRepPrimAPI_MakeCylinder(radius, height);
+
+            //// Get the resulting TopoDS_Shape
+            //TopoDS_Shape myCylinder = mkCylinder.Shape();
+            //var shape = new AIS_Shape(myCylinder);
+
+            //myAISContext.Display(shape, true);
+            //myAISContext.SetDisplayMode(shape, (int)AIS_DisplayMode.AIS_Shaded, false);
+            //myAISContext.UpdateCurrentViewer();
         }
 
         private void toolStripButton17_Click(object sender, EventArgs e)

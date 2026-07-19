@@ -1,29 +1,13 @@
 ﻿using System.Collections.Generic;
+using System.Reflection.Metadata;
+using TKernel;
 
 namespace OCCPort
 {
-    public class BRep_ListIteratorOfListOfCurveRepresentation
+    public class BRep_ListIteratorOfListOfCurveRepresentation : NCollection_List<BRep_CurveRepresentation>.Iterator
     {
-
-        BRep_ListOfCurveRepresentation list;
-        public BRep_ListIteratorOfListOfCurveRepresentation(BRep_ListOfCurveRepresentation lcr)
+        public BRep_ListIteratorOfListOfCurveRepresentation(NCollection_List<BRep_CurveRepresentation> aDisplayedObjects) : base(aDisplayedObjects)
         {
-            list = lcr;
-        }
-
-        public bool More()
-        {
-            return index < list.Count ;
-        }
-
-        public void Next()
-        {
-            index++;
-        }
-        int index = 0;
-        public BRep_CurveRepresentation Value()
-        {
-            return list[index];
         }
     }
 }

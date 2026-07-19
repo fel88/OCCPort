@@ -98,7 +98,7 @@ namespace OCCPort
 
             TopTools_MapOfShape vmap = new TopTools_MapOfShape();
             TopoDS_Iterator it = new TopoDS_Iterator(W);
-            TopoDS_Vertex V1 = null, V2 = null;
+            TopoDS_Vertex V1 = new TopoDS_Vertex ()  , V2 = new TopoDS_Vertex ();
 
             while (it.More())
             {
