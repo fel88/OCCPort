@@ -22,11 +22,16 @@ namespace TKMath
             double aY = coord.Y() - aXY.Y();
             return aX * aX + aY * aY;
         }
+
+
+        //! Assigns the given value to the X  coordinate of this point.
+        public void SetX(double theX) { coord.SetX(theX); }
+
         //! For this point returns its two coordinates as a number pair.
         public void Coord(ref double theXp, ref double theYp) { coord.Coord(ref theXp, ref theYp); }
 
         //! For this point, returns its two coordinates as a number pair.
-        public gp_XY Coord()  { return coord; }
+        public gp_XY Coord() { return coord; }
 
         //! For this point, assigns the values theXp and theYp to its two coordinates
         public void SetCoord(double theXp, double theYp) { coord.SetCoord(theXp, theYp); }

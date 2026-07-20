@@ -1,5 +1,4 @@
-﻿using OCCPort;
-using OCCPort.Common;
+﻿using OCCPort.Common;
 using TKMath;
 
 namespace TKGeomBase
@@ -45,6 +44,11 @@ namespace TKGeomBase
             return myType;
         }
 
+
+        public virtual void Project(gp_Circ c)
+        {
+            myType = GeomAbs_CurveType.GeomAbs_OtherCurve;
+        }
 
         public virtual void Project(gp_Lin l)
         {

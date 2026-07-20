@@ -1,5 +1,4 @@
-﻿using OCCPort;
-using OCCPort.Common;
+﻿using OCCPort.Common;
 using TKG2d;
 using TKG3d;
 using TKMath;
@@ -77,8 +76,8 @@ namespace TKGeomBase
                     P.Project(C.Line());
                     break;
                 case GeomAbs_CurveType.GeomAbs_Circle:
-                //P.Project(C.Circle());
-                //break;
+                    P.Project(C.Circle());
+                    break;
                 //case GeomAbs_Ellipse:
                 //    P.Project(C->Ellipse());
                 //    break;
@@ -128,13 +127,13 @@ namespace TKGeomBase
                     }
                     break;
 
-                //case GeomAbs_Cylinder:
-                //	{
-                //		ProjLib_Cylinder P(mySurface->Cylinder());
-                //		Project(P, myCurve);
-                //		myResult = P;
-                //	}
-                //	break;
+                case GeomAbs_SurfaceType.GeomAbs_Cylinder:
+                    {
+                        ProjLib_Cylinder P = new(mySurface.Cylinder());
+                        Project(P, myCurve);
+                        myResult = P;
+                    }
+                    break;
 
 
                 //case GeomAbs_Cone:

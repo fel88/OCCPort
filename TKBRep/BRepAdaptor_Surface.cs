@@ -23,6 +23,10 @@ namespace OCCPort
             return mySurf;
         }
 
+        public override gp_Cylinder Cylinder()
+        {
+            return mySurf.Cylinder().Transformed(myTrsf);
+        }
 
         //! Returns the type of the surface : Plane, Cylinder,
         //! Cone,      Sphere,        Torus,    BezierSurface,

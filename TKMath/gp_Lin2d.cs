@@ -1,13 +1,28 @@
 ﻿using OCCPort.Common;
 using System;
-using TKMath;
 
-namespace OCCPort
+namespace TKMath
 {
+    //! Describes a line in 2D space.
+    //! A line is positioned in the plane with an axis (a gp_Ax2d
+    //! object) which gives the line its origin and unit vector. A
+    //! line and an axis are similar objects, thus, we can convert
+    //! one into the other.
+    //! A line provides direct access to the majority of the edit
+    //! and query functions available on its positioning axis. In
+    //! addition, however, a line has specific functions for
+    //! computing distances and positions.
+    //! See Also
+    //! GccAna and Geom2dGcc packages which provide
+    //! functions for constructing lines defined by geometric
+    //! constraints
+    //! gce_MakeLin2d which provides functions for more
+    //! complex line constructions
+    //! Geom2d_Line which provides additional functions for
+    //! constructing lines and works, in particular, with the
+    //! parametric equations of lines
     public class gp_Lin2d
     {
-
-
         //! Creates a line located with theA.
         public gp_Lin2d(gp_Ax2d theA)
 
@@ -28,7 +43,7 @@ namespace OCCPort
         public double Distance(gp_Pnt2d theP)
         {
             gp_XY aCoord = theP.XY();
-            aCoord.Subtract((pos.Location()).XY());
+            aCoord.Subtract(pos.Location().XY());
             double aVal = aCoord.Crossed(pos.Direction().XY());
             if (aVal < 0)
             {

@@ -31,6 +31,13 @@ namespace TKG3d
             return aValue;
         }
 
+        public override gp_Cylinder Cylinder()
+        {
+            if (mySurfaceType != GeomAbs_SurfaceType.GeomAbs_Cylinder)
+                throw new Standard_NoSuchObject("GeomAdaptor_Surface::Cylinder");
+            return ((Geom_CylindricalSurface)(mySurface)).Cylinder();
+        }
+
         public override Adaptor3d_Surface BasisSurface()
         {
             if (mySurfaceType != GeomAbs_SurfaceType.GeomAbs_OffsetSurface)

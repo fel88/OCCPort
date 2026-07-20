@@ -727,35 +727,48 @@ namespace OCCPort.Tester
 
         private void toolStripButton16_Click(object sender, EventArgs e)
         {
-            gp_Pnt center = new(0.0, 0.0, 0.0);
-            gp_Dir normal = new(0.0, 0.0, 1.0);
-            gp_Circ circle = new(new gp_Ax2(center, normal), 10.0);
+            var d = AutoDialog.DialogHelpers.StartDialog();
+            d.AddDouble("radius", "Radius", 10, 1, 1000);
+            d.AddDouble("h", "Height", 50, 1, 1000);
+            d.AddBoolField("2d", "2D");
 
-            // Convert geometric circle to topological edge and wire
-            TopoDS_Edge edge = new BRepBuilderAPI_MakeEdge(circle);
-            TopoDS_Wire wire = new BRepBuilderAPI_MakeWire(edge);
+            if (!d.ShowDialog())
+                return;
 
-            // Generate the planar circular face
-            TopoDS_Face face = new BRepBuilderAPI_MakeFace(wire, true);
-            var shape = new AIS_Shape(face);
-            myAISContext.Display(shape, true);
-            myAISContext.SetDisplayMode(shape, (int)AIS_DisplayMode.AIS_Shaded, false);
-            myAISContext.UpdateCurrentViewer();
-            return;
-            // Define dimensions
-            //double radius = 10.0;
-            //double height = 50.0;
+            var radius = d.GetDouble("radius");
+            var h = d.GetDouble("h");
+            var flat = d.GetBoolField("2d");
+            if (flat)
+            {
+                gp_Pnt center = new(0.0, 0.0, 0.0);
+                gp_Dir normal = new(0.0, 0.0, 1.0);
+                gp_Circ circle = new(new gp_Ax2(center, normal), radius);
 
-            //// Create the cylinder
-            //BRepPrimAPI_MakeCylinder mkCylinder = new BRepPrimAPI_MakeCylinder(radius, height);
+                // Convert geometric circle to topological edge and wire
+                TopoDS_Edge edge = new BRepBuilderAPI_MakeEdge(circle);
+                TopoDS_Wire wire = new BRepBuilderAPI_MakeWire(edge);
 
-            //// Get the resulting TopoDS_Shape
-            //TopoDS_Shape myCylinder = mkCylinder.Shape();
-            //var shape = new AIS_Shape(myCylinder);
+                // Generate the planar circular face
+                TopoDS_Face face = new BRepBuilderAPI_MakeFace(wire, true);
+                var shape = new AIS_Shape(face);
+                myAISContext.Display(shape, true);
+                myAISContext.SetDisplayMode(shape, (int)AIS_DisplayMode.AIS_Shaded, false);
+                myAISContext.UpdateCurrentViewer();
+            }
+            else
+            {
+                // Create the cylinder
+                BRepPrimAPI_MakeCylinder mkCylinder = new BRepPrimAPI_MakeCylinder(radius, h);
 
-            //myAISContext.Display(shape, true);
-            //myAISContext.SetDisplayMode(shape, (int)AIS_DisplayMode.AIS_Shaded, false);
-            //myAISContext.UpdateCurrentViewer();
+                // Get the resulting TopoDS_Shape
+                TopoDS_Shape myCylinder = mkCylinder.Shape();
+                var shape = new AIS_Shape(myCylinder);
+
+                myAISContext.Display(shape, true);
+                myAISContext.SetDisplayMode(shape, (int)AIS_DisplayMode.AIS_Shaded, false);
+                myAISContext.UpdateCurrentViewer();
+            }
+
         }
 
         private void toolStripButton17_Click(object sender, EventArgs e)

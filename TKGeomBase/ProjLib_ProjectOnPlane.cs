@@ -321,7 +321,7 @@ namespace TKGeomBase
                                         GeomCirclePtr = new Geom_Circle(Circ1);
                                         //  Modified by Sergey KHROMOV - Tue Jan 29 16:57:29 2002 Begin
                                         GeomAdaptor_Curve aGACurve = new(GeomCirclePtr);
-                                        //myResult = new GeomAdaptor_Curve(aGACurve);
+                                        myResult = new GeomAdaptor_Curve(aGACurve);
                                         //  Modified by Sergey KHROMOV - Tue Jan 29 16:57:30 2002 End
                                     }
                                     else if (Major > Minor)

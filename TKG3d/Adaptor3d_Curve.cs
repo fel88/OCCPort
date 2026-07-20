@@ -49,6 +49,7 @@ namespace TKG3d
         public abstract double Resolution(double R3d);
         public abstract bool IsPeriodic();
 
+        [NotOrigin]
         public abstract GeomAbs_CurveType _GetType();
         //=======================================================================
         //function : Line

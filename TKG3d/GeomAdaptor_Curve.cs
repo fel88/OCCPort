@@ -66,6 +66,17 @@ namespace TKG3d
             Load(theCurve, theUFirst, theULast);
         }
 
+        [NotOrigin]
+        public GeomAdaptor_Curve(GeomAdaptor_Curve aGACurve)
+        {
+            myCurve = aGACurve.myCurve;
+            myBSplineCurve = aGACurve.myBSplineCurve;
+            myFirst = aGACurve.myFirst;
+            myLast = aGACurve.myLast;
+            myNestedEvaluator = aGACurve.myNestedEvaluator;
+            myTypeCurve = aGACurve.myTypeCurve;
+        }
+
         GeomAbs_CurveType myTypeCurve;
 
         //! Standard_ConstructionError is raised if theUFirst>theULast
@@ -246,14 +257,44 @@ namespace TKG3d
             }
         }
 
-        public override double Resolution(double R3d)
+        public override double Resolution(double R3D)
         {
-            throw new NotImplementedException();
+            switch (myTypeCurve)
+            {
+                case GeomAbs_CurveType.GeomAbs_Line:
+                    return R3D;
+                case GeomAbs_CurveType.GeomAbs_Circle:
+                    {
+                        double R = ((Geom_Circle)(myCurve)).Circ().Radius();
+                        if (R > R3D / 2.0 )
+                            return 2 * Math.Asin(R3D / (2 * R));
+                        else
+                            return 2 * Math.PI;
+                    }
+                //case GeomAbs_Ellipse:
+                //    {
+                //        return R3D / Handle(Geom_Ellipse)::DownCast(myCurve)->MajorRadius();
+                //    }
+                //case GeomAbs_BezierCurve:
+                //    {
+                //        Standard_Real res;
+                //        Handle(Geom_BezierCurve)::DownCast(myCurve)->Resolution(R3D, res);
+                //        return res;
+                //    }
+                //case GeomAbs_BSplineCurve:
+                //    {
+                //        Standard_Real res;
+                //        myBSplineCurve->Resolution(R3D, res);
+                //        return res;
+                //    }
+                default:
+                    return Precision.Parametric(R3D);
+            }
         }
 
         public override bool IsPeriodic()
         {
-            throw new NotImplementedException();
+            return myCurve.IsPeriodic();            
         }
 
         public override int NbIntervals(GeomAbs_Shape S)

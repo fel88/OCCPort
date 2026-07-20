@@ -1,5 +1,4 @@
-﻿using OCCPort;
-using OCCPort.Common;
+﻿using OCCPort.Common;
 
 namespace TKMath
 {
@@ -176,10 +175,9 @@ namespace TKMath
             return ElCLib.LineValue(U, L.Position());
         }
 
-        public static gp_Pnt Value(double u, gp_Circ myCirc)
-        {
-            throw new NotImplementedException();
-            //return ElCLib.CircleValue(U, C.Position(), C.Radius());
+        public static gp_Pnt Value(double U, gp_Circ C)
+        {            
+            return ElCLib.CircleValue(U, C.Position(), C.Radius());
         }
 
 

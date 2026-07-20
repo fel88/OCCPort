@@ -37,6 +37,11 @@ namespace TKMath
             radius = Standard_Real.RealLast();
         }
 
+        //! Returns the main axis of the circle.
+        //! It is the axis perpendicular to the plane of the circle,
+        //! passing through the "Location" point (center) of the circle.
+        public  gp_Ax1 Axis() { return pos.Axis(); }
+
         //! Returns the position of the circle.
         //! It is the local coordinate system of the circle.
         public gp_Ax2 Position() { return pos; }

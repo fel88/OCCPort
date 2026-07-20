@@ -1,4 +1,6 @@
-﻿namespace TKMath
+﻿using OCCPort.Common;
+
+namespace TKMath
 {
     //! Describes a coordinate system in a plane (2D space).
     //! A coordinate system is defined by:
@@ -19,6 +21,29 @@
     //! respectively, as their unit vectors.
     public class gp_Ax22d
     {
+
+        //! Creates a coordinate system with origin theP and where:
+        //! -   theVx is the "X Direction", and
+        //! -   the "Y Direction" is orthogonal to theVx and
+        //! oriented so that the cross products theVx^"Y
+        //! Direction" and theVx^theVy have the same sign.
+        //! Raises ConstructionError if theVx and theVy are parallel (same or opposite orientation).
+        public gp_Ax22d(gp_Pnt2d theP, gp_Dir2d theVx, gp_Dir2d theVy)
+        {
+            point = (theP);
+            vydir = (theVy);
+            vxdir = (theVx);
+
+            double aValue = theVx.Crossed(theVy);
+            if (aValue >= 0.0)
+            {
+                vydir.SetCoord(-vxdir.Y(), vxdir.X());
+            }
+            else
+            {
+                vydir.SetCoord(vxdir.Y(), -vxdir.X());
+            }
+        }
 
         //! Returns the "Location" point (origin) of <me>.
         public gp_Pnt2d Location() { return point; }

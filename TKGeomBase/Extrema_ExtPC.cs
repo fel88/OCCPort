@@ -1,34 +1,21 @@
-﻿
+﻿using OCCPort.Common;
 using TKG3d;
 using TKMath;
 
 namespace TKGeomBase
 {
-    public class Extrema_ExtPC
+    public interface IExtrema_ExtPC
     {
-        public Extrema_ExtPC(gp_Pnt point, GeomAdaptor_Curve aGAC)
-        {
-        }
+        int NbExt();
+        bool IsDone();
 
-        internal bool IsDone()
-        {
-            throw new NotImplementedException();
-        }
-
-        internal int NbExt()
-        {
-            throw new NotImplementedException();
-        }
+        double SquareDistance(int i);
 
         //! Returns the point of the <N>th extremum distance.
-        internal Extrema_POnCurv Point(int N)
-        {
-            throw new NotImplementedException();
-        }
+         Extrema_POnCurv Point( int N) ;
 
-        internal double SquareDistance(int i)
-        {
-            throw new NotImplementedException();
-        }
+
     }
+
+    
 }

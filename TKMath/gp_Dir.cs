@@ -29,7 +29,25 @@ namespace TKMath
             aV.coord.Divide(aD);
             return aV;
         }
+        public double AngleWithRef(gp_Dir Other,
+                     gp_Dir Vref)
+        {
+            double  Ang;
+            gp_XYZ XYZ = coord.Crossed(Other.coord);
+            double  Cosinus = coord.Dot(Other.coord);
+            double Sinus = XYZ.Modulus();
+            if (Cosinus > -0.70710678118655 && Cosinus < 0.70710678118655)
+                Ang = Math.Acos(Cosinus);
+            else
+            {
+                if (Cosinus < 0.0) Ang = Math.PI - Math.Asin(Sinus);
+                else Ang = Math.Asin(Sinus);
+            }
+            if (XYZ.Dot(Vref.coord) >= 0.0)
+                return Ang;
 
+            else return -Ang;
+        }
         public override string ToString()
         {
             return $"gp_Dir: X:{coord.X()} Y:{coord.Y()} Z:{coord.Z()}";
@@ -311,5 +329,5 @@ namespace TKMath
         {
         }
     }
-    }
+}
 

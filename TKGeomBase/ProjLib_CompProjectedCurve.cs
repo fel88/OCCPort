@@ -1,5 +1,4 @@
-﻿using OCCPort;
-using OCCPort.Common;
+﻿using OCCPort.Common;
 using TKernel;
 using TKG2d;
 using TKG3d;

@@ -25,6 +25,12 @@ namespace TKG3d
         }
         double radius;
 
+        //! returns a non transient cylinder with the same geometric properties as <me>.
+        public gp_Cylinder Cylinder()
+        {
+            return new gp_Cylinder(pos, radius);
+        }
+
         public override Geom_Geometry Copy()
         {
             Geom_CylindricalSurface Cs = new Geom_CylindricalSurface(pos, radius);

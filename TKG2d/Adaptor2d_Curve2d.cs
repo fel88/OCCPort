@@ -1,5 +1,4 @@
-﻿using OCCPort;
-using OCCPort.Common;
+﻿using OCCPort.Common;
 using TKMath;
 
 namespace TKG2d

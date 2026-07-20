@@ -35,7 +35,8 @@ namespace TKGeomBase
             double aTol = MaxDist * MaxDist;
             //
             GeomAdaptor_Curve aGAC = new(Curve);
-            Extrema_ExtPC extrema = new(Point, aGAC);
+            //Extrema_ExtPC extrema = new(Point, aGAC);
+            IExtrema_ExtPC extrema = new Extrema_GExtPC(Point, aGAC);
             //
             if (!extrema.IsDone()) return false;
             //

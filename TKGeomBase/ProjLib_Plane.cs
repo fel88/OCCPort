@@ -28,6 +28,20 @@ namespace TKGeomBase
             isDone = true;
         }
 
+        public override void Project(gp_Circ C)
+        {            
+            myType = GeomAbs_CurveType.GeomAbs_Circle;
+
+            gp_Pnt2d P2d = EvalPnt2d(C.Location(), myPlane);
+            gp_Dir2d X2d = EvalDir2d(C.Position().XDirection(), myPlane);
+            gp_Dir2d Y2d = EvalDir2d(C.Position().YDirection(), myPlane);
+            gp_Ax22d Ax = new(P2d, X2d, Y2d);
+
+            myCirc = new gp_Circ2d(Ax, C.Radius());
+            myIsPeriodic = true;
+            isDone = true;
+        }
+
         public static gp_Dir2d EvalDir2d(gp_Dir D, gp_Pln Pl)
         {
             return new gp_Dir2d(D.Dot(Pl.Position().XDirection()),
