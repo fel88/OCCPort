@@ -89,6 +89,12 @@ namespace TKG3d
             SetBasisCurve(C);
         }
 
+        //! Changes the revolved curve of the surface.
+        //! Warnings :
+        //! It is not checked that the curve C is planar and that the
+        //! surface axis is in the plane of the curve.
+        //! It is not checked that the revolved curve C doesn't
+        //! self-intersects.
         public void SetBasisCurve(Geom_Curve C)
         {
             basisCurve = (Geom_Curve)(C.Copy());
@@ -96,6 +102,56 @@ namespace TKG3d
             myEvaluator = new GeomEvaluator_SurfaceOfRevolution(basisCurve, direction, loc);
         }
 
+        public override Geom_Curve UIso(double U)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Geom_Curve VIso(double V)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool IsUClosed()
+        {
+            return true;
+        }
+
+        public override bool IsVClosed()
+        {
+            return basisCurve.IsClosed();
+        }
+
+        public override void D1(double U, double V, out gp_Pnt P, out gp_Vec D1U, out gp_Vec D1V)
+        {
+            myEvaluator.D1(U, V, out P, out D1U, out D1V);            
+        }
+
+        public override void D2(double U, double V, out gp_Pnt P, out gp_Vec D1U, out gp_Vec D1V, out gp_Vec D2U, out gp_Vec D2V, out gp_Vec D2UV)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool IsUPeriodic()
+        {
+            return true;
+        }
+
+        public override bool IsVPeriodic()
+        {
+            return basisCurve.IsPeriodic();
+
+        }
+
+        public override void Transform(gp_Trsf t)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Geom_Geometry Copy()
+        {
+            throw new NotImplementedException();
+        }
 
         GeomEvaluator_SurfaceOfRevolution myEvaluator;
 

@@ -265,6 +265,11 @@ namespace OCCPort
                 return myConSurf.Period();
             }
         }
+
+        public override void D1(double d, out gp_Pnt p, out gp_Vec v)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
 

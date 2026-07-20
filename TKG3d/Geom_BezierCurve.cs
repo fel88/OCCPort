@@ -68,9 +68,19 @@ namespace TKG3d
             throw new System.NotImplementedException();
         }
 
+        public override void D1(double U, out gp_Pnt P, out gp_Vec V1)
+        {
+            throw new NotImplementedException();
+        }
+
         public override double FirstParameter()
         {
             throw new System.NotImplementedException();
+        }
+
+        public override bool IsClosed()
+        {
+            throw new NotImplementedException();
         }
 
         public override bool IsPeriodic()

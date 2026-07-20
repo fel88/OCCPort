@@ -1,4 +1,5 @@
-﻿using TKMath;
+﻿using OCCPort.Common;
+using TKMath;
 
 namespace TKG3d
 {
@@ -31,6 +32,16 @@ namespace TKG3d
         public abstract void Reverse();
 
 
+        //! Returns true if the curve is closed.
+        //! Some curves such as circle are always closed, others such as line
+        //! are never closed (by definition).
+        //! Some Curves such as OffsetCurve can be closed or not. These curves
+        //! are considered as closed if the distance between the first point
+        //! and the last point of the curve is lower or equal to the Resolution
+        //! from package gp which is a fixed criterion independent of the
+        //! application.
+        public abstract bool IsClosed();
+
         //! It is the global continuity of the curve
         //! C0 : only geometric continuity,
         //! C1 : continuity of the first derivative all along the Curve,
@@ -39,7 +50,7 @@ namespace TKG3d
         //! G1 : tangency continuity all along the Curve,
         //! G2 : curvature continuity all along the Curve,
         //! CN : the order of continuity is infinite.
-        public  abstract GeomAbs_Shape Continuity();
+        public abstract GeomAbs_Shape Continuity();
 
 
 
@@ -73,6 +84,11 @@ namespace TKG3d
         //! derivative on the basis curve and the offset direction
         //! are parallel.
         public abstract void D0(double U, ref gp_Pnt P);
+
+
+        //! Returns the point P of parameter U and the first derivative V1.
+        //! Raised if the continuity of the curve is not C1.
+        public abstract void D1(double U, out gp_Pnt P, out gp_Vec V1);
 
         //! Computes the point of parameter U on <me>.
         //! If the curve is periodic  then the returned point is P(U) with

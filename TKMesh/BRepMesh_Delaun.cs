@@ -2316,22 +2316,22 @@ namespace TKMesh
             (double, double) aDelta = theRangeSplitter.GetDelta();
 
             int aCellsCountU = 0, aCellsCountV = 0;
-            //if (aType == GeomAbs_SurfaceType.GeomAbs_Torus)
-            //{
+            if (aType == GeomAbs_SurfaceType.GeomAbs_Torus)
+            {
             //    aCellsCountU = (Standard_Integer)Ceiling(Pow(2, Log10(
             //      (aRangeU.second - aRangeU.first) / aDelta.first)));
             //    aCellsCountV = (Standard_Integer)Ceiling(Pow(2, Log10(
             //      (aRangeV.second - aRangeV.first) / aDelta.second)));
-            //}
-            //else if (aType == GeomAbs_Cylinder)
-            //{
-            //    aCellsCountU = (Standard_Integer)Ceiling(Pow(2, Log10(
-            //      (aRangeU.second - aRangeU.first) / aDelta.first /
-            //      (aRangeV.second - aRangeV.first))));
-            //    aCellsCountV = (Standard_Integer)Ceiling(Pow(2, Log10(
-            //      (aRangeV.second - aRangeV.first) / anErrFactorV)));
-            //}
-            //else
+            }
+            else if (aType ==GeomAbs_SurfaceType. GeomAbs_Cylinder)
+            {
+                aCellsCountU = (int)Math.Ceiling(Math.Pow(2, Math.Log10(
+                  (aRangeU.Item2 - aRangeU.Item1) / aDelta.Item1 /
+                  (aRangeV.Item2 - aRangeV.Item1))));
+                aCellsCountV = (int)Math.Ceiling(Math.Pow(2, Math.Log10(
+                  (aRangeV.Item2 - aRangeV.Item1) / anErrFactorV)));
+            }
+            else
             {
                 aCellsCountU = (int)Math.Ceiling(Math.Pow(2, Math.Log10(
                   (aRangeU.Item2 - aRangeU.Item1) / aDelta.Item1 / anErrFactorU)));
@@ -2554,10 +2554,10 @@ namespace TKMesh
             {
                 theCellsCountU = theCellsCountV = (int)Math.Ceiling(Math.Pow(2, Math.Log10(aSqNbVert)));
             }
-            //else if (aType == GeomAbs_SurfaceType.GeomAbs_Cylinder || aType == GeomAbs_SurfaceType.GeomAbs_Cone)
-            //{
-            //    theCellsCountV = (Standard_Integer)Ceiling(Pow(2, Log10(aSqNbVert)));
-            //}
+            else if (aType == GeomAbs_SurfaceType.GeomAbs_Cylinder || aType == GeomAbs_SurfaceType.GeomAbs_Cone)
+            {
+                theCellsCountV = (int)Math.Ceiling(Math.Pow(2, Math.Log10(aSqNbVert)));
+            }
             //else if (aType == GeomAbs_SurfaceType.GeomAbs_SurfaceOfExtrusion || aType == GeomAbs_SurfaceType.GeomAbs_SurfaceOfRevolution)
             //{
             //    Handle(Adaptor3d_Curve) aCurve = theFace->BasisCurve();

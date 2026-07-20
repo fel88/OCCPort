@@ -162,6 +162,18 @@ namespace TKMath
 
         }
 
+        public static void LineD1(double U,
+              gp_Ax1 Pos,
+           ref  gp_Pnt P,
+           ref  gp_Vec V1)
+        {
+            gp_XYZ Coord = Pos.Direction().XYZ();
+            V1.SetXYZ(Coord);
+            Coord.SetLinearForm(U, Coord, Pos.Location().XYZ());
+            P.SetXYZ(Coord);
+        }
+
+
         public static void LineD1(double U, gp_Ax2d Pos, ref gp_Pnt2d P, ref gp_Vec2d V1)
         {
             gp_XY Coord = Pos.Direction().XY();
@@ -176,7 +188,7 @@ namespace TKMath
         }
 
         public static gp_Pnt Value(double U, gp_Circ C)
-        {            
+        {
             return ElCLib.CircleValue(U, C.Position(), C.Radius());
         }
 
@@ -210,7 +222,7 @@ namespace TKMath
                 return theU;
             }
 
-            double  aPeriod = theULast - theUFirst;
+            double aPeriod = theULast - theUFirst;
 
             if (aPeriod < Epsilon(theULast))
                 return theU;

@@ -126,6 +126,36 @@ namespace TKG3d
             throw new NotImplementedException();
         }
 
+        static gp_Circ to3d(gp_Pln Pl, gp_Circ2d C)
+        {
+            return new gp_Circ(to3d(Pl, C.Axis()), C.Radius());
+        }
+
+        static gp_Vec to3d(gp_Pln Pl, gp_Vec2d V)
+        {
+            gp_Vec Vx = Pl.XAxis().Direction();
+            gp_Vec Vy = Pl.YAxis().Direction();
+            Vx.Multiply(V.X());
+            Vy.Multiply(V.Y());
+            Vx.Add(Vy);
+            return Vx;
+        }
+
+
+
+        static gp_Ax2 to3d(gp_Pln Pl, gp_Ax22d A)
+        {
+            gp_Pnt P = to3d(Pl, A.Location());
+            gp_Vec VX = to3d(Pl, new gp_Vec2d(A.XAxis().Direction()));
+            gp_Vec VY = to3d(Pl, new gp_Vec2d(A.YAxis().Direction()));
+            return new gp_Ax2(P, VX.Crossed(VY), VX);
+        }
+
+        static gp_Pnt to3d(gp_Pln Pl, gp_Pnt2d P)
+        {
+            return ElSLib.Value(P.X(), P.Y(), Pl);
+        }
+
         void EvalKPart()
         {
             myType = GeomAbs_CurveType.GeomAbs_OtherCurve;
@@ -135,9 +165,9 @@ namespace TKG3d
             if (STy == GeomAbs_SurfaceType.GeomAbs_Plane)
             {
                 myType = CTy;
-                /*if (myType ==GeomAbs_CurveType. GeomAbs_Circle)
+                if (myType == GeomAbs_CurveType.GeomAbs_Circle)
                     myCirc = to3d(mySurface.Plane(), myCurve.Circle());
-                else */
+                else
                 if (myType == GeomAbs_CurveType.GeomAbs_Line)
                 {
                     gp_Pnt P;
@@ -151,174 +181,175 @@ namespace TKG3d
                     myLin = new gp_Lin(P, V);
                 }
             }
-            //else
-            //{
-            //    if (CTy ==GeomAbs_CurveType. GeomAbs_Line)
-            //    {
-            //        gp_Dir2d D = myCurve->Line().Direction();
-            //        if (D.IsParallel(gp::DX2d(), Precision::Angular()))
-            //        { // Iso V.
-            //            if (STy == GeomAbs_Sphere)
-            //            {
-            //                gp_Pnt2d P = myCurve->Line().Location();
-            //                if (Abs(Abs(P.Y()) - M_PI / 2. ) >= Precision::PConfusion())
-            //                {
-            //                    myType = GeomAbs_Circle;
-            //                    gp_Sphere Sph = mySurface->Sphere();
-            //                    gp_Ax3 Axis = Sph.Position();
-            //                    myCirc = ElSLib::SphereVIso(Axis,
-            //                                  Sph.Radius(),
-            //                                  P.Y());
-            //                    gp_Dir DRev = Axis.XDirection().Crossed(Axis.YDirection());
-            //                    gp_Ax1 AxeRev(Axis.Location(), DRev);
-            //                    myCirc.Rotate(AxeRev, P.X());
-            //                    if (D.IsOpposite(gp::DX2d(), Precision::Angular()))
-            //                    {
-            //                        gp_Ax2 Ax = myCirc.Position();
-            //                        Ax.SetDirection(Ax.Direction().Reversed());
-            //                        myCirc.SetPosition(Ax);
-            //                    }
-            //                }
-            //            }
-            //            else if (STy == GeomAbs_Cylinder)
-            //            {
-            //                myType = GeomAbs_Circle;
-            //                gp_Cylinder Cyl = mySurface->Cylinder();
-            //                gp_Pnt2d P = myCurve->Line().Location();
-            //                gp_Ax3 Axis = Cyl.Position();
-            //                myCirc = ElSLib::CylinderVIso(Axis,
-            //                                    Cyl.Radius(),
-            //                                    P.Y());
-            //                gp_Dir DRev = Axis.XDirection().Crossed(Axis.YDirection());
-            //                gp_Ax1 AxeRev(Axis.Location(), DRev);
-            //                myCirc.Rotate(AxeRev, P.X());
-            //                if (D.IsOpposite(gp::DX2d(), Precision::Angular()))
-            //                {
-            //                    gp_Ax2 Ax = myCirc.Position();
-            //                    Ax.SetDirection(Ax.Direction().Reversed());
-            //                    myCirc.SetPosition(Ax);
-            //                }
-            //            }
-            //            else if (STy == GeomAbs_Cone)
-            //            {
-            //                myType = GeomAbs_Circle;
-            //                gp_Cone Cone = mySurface->Cone();
-            //                gp_Pnt2d P = myCurve->Line().Location();
-            //                gp_Ax3 Axis = Cone.Position();
-            //                myCirc = ElSLib::ConeVIso(Axis,
-            //                                 Cone.RefRadius(),
-            //                                 Cone.SemiAngle(),
-            //                                 P.Y());
-            //                gp_Dir DRev = Axis.XDirection().Crossed(Axis.YDirection());
-            //                gp_Ax1 AxeRev(Axis.Location(), DRev);
-            //                myCirc.Rotate(AxeRev, P.X());
-            //                if (D.IsOpposite(gp::DX2d(), Precision::Angular()))
-            //                {
-            //                    gp_Ax2 Ax = myCirc.Position();
-            //                    Ax.SetDirection(Ax.Direction().Reversed());
-            //                    myCirc.SetPosition(Ax);
-            //                }
-            //            }
-            //            else if (STy == GeomAbs_Torus)
-            //            {
-            //                myType = GeomAbs_Circle;
-            //                gp_Torus Tore = mySurface->Torus();
-            //                gp_Pnt2d P = myCurve->Line().Location();
-            //                gp_Ax3 Axis = Tore.Position();
-            //                myCirc = ElSLib::TorusVIso(Axis,
-            //                                  Tore.MajorRadius(),
-            //                                  Tore.MinorRadius(),
-            //                                  P.Y());
-            //                gp_Dir DRev = Axis.XDirection().Crossed(Axis.YDirection());
-            //                gp_Ax1 AxeRev(Axis.Location(), DRev);
-            //                myCirc.Rotate(AxeRev, P.X());
-            //                if (D.IsOpposite(gp::DX2d(), Precision::Angular()))
-            //                {
-            //                    gp_Ax2 Ax = myCirc.Position();
-            //                    Ax.SetDirection(Ax.Direction().Reversed());
-            //                    myCirc.SetPosition(Ax);
-            //                }
-            //            }
-            //        }
-            //        else if (D.IsParallel(gp::DY2d(), Precision::Angular()))
-            //        { // Iso U.
-            //            if (STy == GeomAbs_Sphere)
-            //            {
-            //                myType = GeomAbs_Circle;
-            //                gp_Sphere Sph = mySurface->Sphere();
-            //                gp_Pnt2d P = myCurve->Line().Location();
-            //                gp_Ax3 Axis = Sph.Position();
-            //                // calcul de l'iso 0.
-            //                myCirc = ElSLib::SphereUIso(Axis, Sph.Radius(), 0.);
+            else
+            {
+                if (CTy == GeomAbs_CurveType.GeomAbs_Line)
+                {
+                    gp_Dir2d D = myCurve.Line().Direction();
+                    if (D.IsParallel(gp.DX2d(), Precision.Angular()))
+                    {
+                        // Iso V.
+                        if (STy == GeomAbs_SurfaceType.GeomAbs_Sphere)
+                        {
+                            //                gp_Pnt2d P = myCurve->Line().Location();
+                            //                if (Abs(Abs(P.Y()) - M_PI / 2. ) >= Precision::PConfusion())
+                            //                {
+                            //                    myType = GeomAbs_Circle;
+                            //                    gp_Sphere Sph = mySurface->Sphere();
+                            //                    gp_Ax3 Axis = Sph.Position();
+                            //                    myCirc = ElSLib::SphereVIso(Axis,
+                            //                                  Sph.Radius(),
+                            //                                  P.Y());
+                            //                    gp_Dir DRev = Axis.XDirection().Crossed(Axis.YDirection());
+                            //                    gp_Ax1 AxeRev(Axis.Location(), DRev);
+                            //                    myCirc.Rotate(AxeRev, P.X());
+                            //                    if (D.IsOpposite(gp::DX2d(), Precision::Angular()))
+                            //                    {
+                            //                        gp_Ax2 Ax = myCirc.Position();
+                            //                        Ax.SetDirection(Ax.Direction().Reversed());
+                            //                        myCirc.SetPosition(Ax);
+                            //                    }
+                            //                }
+                        }
+                        else if (STy == GeomAbs_SurfaceType.GeomAbs_Cylinder)
+                        {
+                            //                myType = GeomAbs_Circle;
+                            //                gp_Cylinder Cyl = mySurface->Cylinder();
+                            //                gp_Pnt2d P = myCurve->Line().Location();
+                            //                gp_Ax3 Axis = Cyl.Position();
+                            //                myCirc = ElSLib::CylinderVIso(Axis,
+                            //                                    Cyl.Radius(),
+                            //                                    P.Y());
+                            //                gp_Dir DRev = Axis.XDirection().Crossed(Axis.YDirection());
+                            //                gp_Ax1 AxeRev(Axis.Location(), DRev);
+                            //                myCirc.Rotate(AxeRev, P.X());
+                            //                if (D.IsOpposite(gp::DX2d(), Precision::Angular()))
+                            //                {
+                            //                    gp_Ax2 Ax = myCirc.Position();
+                            //                    Ax.SetDirection(Ax.Direction().Reversed());
+                            //                    myCirc.SetPosition(Ax);
+                            //                }
+                        }
+                        else if (STy == GeomAbs_SurfaceType.GeomAbs_Cone)
+                        {
+                            //                myType = GeomAbs_Circle;
+                            //                gp_Cone Cone = mySurface->Cone();
+                            //                gp_Pnt2d P = myCurve->Line().Location();
+                            //                gp_Ax3 Axis = Cone.Position();
+                            //                myCirc = ElSLib::ConeVIso(Axis,
+                            //                                 Cone.RefRadius(),
+                            //                                 Cone.SemiAngle(),
+                            //                                 P.Y());
+                            //                gp_Dir DRev = Axis.XDirection().Crossed(Axis.YDirection());
+                            //                gp_Ax1 AxeRev(Axis.Location(), DRev);
+                            //                myCirc.Rotate(AxeRev, P.X());
+                            //                if (D.IsOpposite(gp::DX2d(), Precision::Angular()))
+                            //                {
+                            //                    gp_Ax2 Ax = myCirc.Position();
+                            //                    Ax.SetDirection(Ax.Direction().Reversed());
+                            //                    myCirc.SetPosition(Ax);
+                            //                }
+                        }
+                        else if (STy == GeomAbs_SurfaceType.GeomAbs_Torus)
+                        {
+                            //                myType = GeomAbs_Circle;
+                            //                gp_Torus Tore = mySurface->Torus();
+                            //                gp_Pnt2d P = myCurve->Line().Location();
+                            //                gp_Ax3 Axis = Tore.Position();
+                            //                myCirc = ElSLib::TorusVIso(Axis,
+                            //                                  Tore.MajorRadius(),
+                            //                                  Tore.MinorRadius(),
+                            //                                  P.Y());
+                            //                gp_Dir DRev = Axis.XDirection().Crossed(Axis.YDirection());
+                            //                gp_Ax1 AxeRev(Axis.Location(), DRev);
+                            //                myCirc.Rotate(AxeRev, P.X());
+                            //                if (D.IsOpposite(gp::DX2d(), Precision::Angular()))
+                            //                {
+                            //                    gp_Ax2 Ax = myCirc.Position();
+                            //                    Ax.SetDirection(Ax.Direction().Reversed());
+                            //                    myCirc.SetPosition(Ax);
+                        }
+                    }
+                    else if (D.IsParallel(gp.DY2d(), Precision.Angular()))
+                    { // Iso U.
+                      //            if (STy == GeomAbs_Sphere)
+                      //            {
+                      //                myType = GeomAbs_Circle;
+                      //                gp_Sphere Sph = mySurface->Sphere();
+                      //                gp_Pnt2d P = myCurve->Line().Location();
+                      //                gp_Ax3 Axis = Sph.Position();
+                      //                // calcul de l'iso 0.
+                      //                myCirc = ElSLib::SphereUIso(Axis, Sph.Radius(), 0.);
 
-            //                // mise a sameparameter (rotation du cercle - decalage du Y)
-            //                gp_Dir DRev = Axis.XDirection().Crossed(Axis.Direction());
-            //                gp_Ax1 AxeRev(Axis.Location(), DRev);
-            //                myCirc.Rotate(AxeRev, P.Y());
+                        //                // mise a sameparameter (rotation du cercle - decalage du Y)
+                        //                gp_Dir DRev = Axis.XDirection().Crossed(Axis.Direction());
+                        //                gp_Ax1 AxeRev(Axis.Location(), DRev);
+                        //                myCirc.Rotate(AxeRev, P.Y());
 
-            //                // transformation en iso U ( = P.X())
-            //                DRev = Axis.XDirection().Crossed(Axis.YDirection());
-            //                AxeRev = gp_Ax1(Axis.Location(), DRev);
-            //                myCirc.Rotate(AxeRev, P.X());
+                        //                // transformation en iso U ( = P.X())
+                        //                DRev = Axis.XDirection().Crossed(Axis.YDirection());
+                        //                AxeRev = gp_Ax1(Axis.Location(), DRev);
+                        //                myCirc.Rotate(AxeRev, P.X());
 
-            //                if (D.IsOpposite(gp::DY2d(), Precision::Angular()))
-            //                {
-            //                    gp_Ax2 Ax = myCirc.Position();
-            //                    Ax.SetDirection(Ax.Direction().Reversed());
-            //                    myCirc.SetPosition(Ax);
-            //                }
-            //            }
-            //            else if (STy == GeomAbs_Cylinder)
-            //            {
-            //                myType = GeomAbs_Line;
-            //                gp_Cylinder Cyl = mySurface->Cylinder();
-            //                gp_Pnt2d P = myCurve->Line().Location();
-            //                myLin = ElSLib::CylinderUIso(Cyl.Position(),
-            //                                   Cyl.Radius(),
-            //                                   P.X());
-            //                gp_Vec Tr(myLin.Direction());
-            //                Tr.Multiply(P.Y());
-            //                myLin.Translate(Tr);
-            //                if (D.IsOpposite(gp::DY2d(), Precision::Angular()))
-            //                    myLin.Reverse();
-            //            }
-            //            else if (STy == GeomAbs_Cone)
-            //            {
-            //                myType = GeomAbs_Line;
-            //                gp_Cone Cone = mySurface->Cone();
-            //                gp_Pnt2d P = myCurve->Line().Location();
-            //                myLin = ElSLib::ConeUIso(Cone.Position(),
-            //                                 Cone.RefRadius(),
-            //                                 Cone.SemiAngle(),
-            //                                 P.X());
-            //                gp_Vec Tr(myLin.Direction());
-            //                Tr.Multiply(P.Y());
-            //                myLin.Translate(Tr);
-            //                if (D.IsOpposite(gp::DY2d(), Precision::Angular()))
-            //                    myLin.Reverse();
-            //            }
-            //            else if (STy == GeomAbs_Torus)
-            //            {
-            //                myType = GeomAbs_Circle;
-            //                gp_Torus Tore = mySurface->Torus();
-            //                gp_Pnt2d P = myCurve->Line().Location();
-            //                gp_Ax3 Axis = Tore.Position();
-            //                myCirc = ElSLib::TorusUIso(Axis,
-            //                                  Tore.MajorRadius(),
-            //                                  Tore.MinorRadius(),
-            //                                  P.X());
-            //                myCirc.Rotate(myCirc.Axis(), P.Y());
+                        //                if (D.IsOpposite(gp::DY2d(), Precision::Angular()))
+                        //                {
+                        //                    gp_Ax2 Ax = myCirc.Position();
+                        //                    Ax.SetDirection(Ax.Direction().Reversed());
+                        //                    myCirc.SetPosition(Ax);
+                        //                }
+                        //            }
+                        //            else if (STy == GeomAbs_Cylinder)
+                        //            {
+                        //                myType = GeomAbs_Line;
+                        //                gp_Cylinder Cyl = mySurface->Cylinder();
+                        //                gp_Pnt2d P = myCurve->Line().Location();
+                        //                myLin = ElSLib::CylinderUIso(Cyl.Position(),
+                        //                                   Cyl.Radius(),
+                        //                                   P.X());
+                        //                gp_Vec Tr(myLin.Direction());
+                        //                Tr.Multiply(P.Y());
+                        //                myLin.Translate(Tr);
+                        //                if (D.IsOpposite(gp::DY2d(), Precision::Angular()))
+                        //                    myLin.Reverse();
+                        //            }
+                        //            else if (STy == GeomAbs_Cone)
+                        //            {
+                        //                myType = GeomAbs_Line;
+                        //                gp_Cone Cone = mySurface->Cone();
+                        //                gp_Pnt2d P = myCurve->Line().Location();
+                        //                myLin = ElSLib::ConeUIso(Cone.Position(),
+                        //                                 Cone.RefRadius(),
+                        //                                 Cone.SemiAngle(),
+                        //                                 P.X());
+                        //                gp_Vec Tr(myLin.Direction());
+                        //                Tr.Multiply(P.Y());
+                        //                myLin.Translate(Tr);
+                        //                if (D.IsOpposite(gp::DY2d(), Precision::Angular()))
+                        //                    myLin.Reverse();
+                        //            }
+                        //            else if (STy == GeomAbs_Torus)
+                        //            {
+                        //                myType = GeomAbs_Circle;
+                        //                gp_Torus Tore = mySurface->Torus();
+                        //                gp_Pnt2d P = myCurve->Line().Location();
+                        //                gp_Ax3 Axis = Tore.Position();
+                        //                myCirc = ElSLib::TorusUIso(Axis,
+                        //                                  Tore.MajorRadius(),
+                        //                                  Tore.MinorRadius(),
+                        //                                  P.X());
+                        //                myCirc.Rotate(myCirc.Axis(), P.Y());
 
-            //                if (D.IsOpposite(gp::DY2d(), Precision::Angular()))
-            //                {
-            //                    gp_Ax2 Ax = myCirc.Position();
-            //                    Ax.SetDirection(Ax.Direction().Reversed());
-            //                    myCirc.SetPosition(Ax);
-            //                }
-            //            }
-            //        }
-            //    }
-            //}
+                        //                if (D.IsOpposite(gp::DY2d(), Precision::Angular()))
+                        //                {
+                        //                    gp_Ax2 Ax = myCirc.Position();
+                        //                    Ax.SetDirection(Ax.Direction().Reversed());
+                        //                    myCirc.SetPosition(Ax);
+                        //                }
+                        //            }
+                        //        }
+                    }
+                }
+            }
         }
         public void Load(Adaptor3d_Surface S)
         {
@@ -378,6 +409,11 @@ namespace TKG3d
                 return (2.0 * Math.PI);
 
             return myCurve.Period();
+        }
+
+        public override void D1(double d, out gp_Pnt p, out gp_Vec v)
+        {
+            throw new NotImplementedException();
         }
     }
 }

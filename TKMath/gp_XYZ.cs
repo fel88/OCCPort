@@ -54,6 +54,20 @@ namespace TKMath
             y = theA1 * theXYZ1.y + theA2 * theXYZ2.y;
             z = theA1 * theXYZ1.z + theA2 * theXYZ2.z;
         }
+
+
+        //! <me> is set to the following linear form :
+        //! @code
+        //! theA1 * theXYZ1 + theXYZ2
+        //! @endcode
+       public  void SetLinearForm( double theA1,  gp_XYZ theXYZ1,
+                       gp_XYZ theXYZ2)
+  {
+    x = theA1* theXYZ1.x + theXYZ2.x;
+        y = theA1* theXYZ1.y + theXYZ2.y;
+        z = theA1* theXYZ1.z + theXYZ2.z;
+  }
+
         //! @code
         //! <me>.X() = <me>.X() + theOther.X()
         //! <me>.Y() = <me>.Y() + theOther.Y()

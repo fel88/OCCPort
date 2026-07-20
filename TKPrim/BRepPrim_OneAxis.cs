@@ -20,7 +20,7 @@ namespace TKPrim
             }
             for (int i = 0; i < myVertices.Length; i++)
             {
-                myVertices[i] = new ();
+                myVertices[i] = new();
             }
             for (int i = 0; i < myFaces.Length; i++)
             {
@@ -284,13 +284,13 @@ namespace TKPrim
 
                 // deduct from others
                 if (MeridianOnAxis(myVMin) && VerticesBuilt[VAXISBOT])
-                    myVertices[VBOTEND] = myVertices[VAXISBOT];
+                    myVertices[VBOTEND] = new TopoDS_Vertex(myVertices[VAXISBOT]);
                 else if ((MeridianOnAxis(myVMin) || !HasSides()) && VerticesBuilt[VBOTSTART])
-                    myVertices[VBOTEND] = myVertices[VBOTSTART];
+                    myVertices[VBOTEND] = new TopoDS_Vertex(myVertices[VBOTSTART]);
                 else if (MeridianClosed() && VerticesBuilt[VTOPEND])
-                    myVertices[VBOTEND] = myVertices[VTOPEND];
+                    myVertices[VBOTEND] = new TopoDS_Vertex(myVertices[VTOPEND]);
                 else if (MeridianClosed() && !HasSides() && VerticesBuilt[VTOPSTART])
-                    myVertices[VBOTEND] = myVertices[VTOPSTART];
+                    myVertices[VBOTEND] = new TopoDS_Vertex(myVertices[VTOPSTART]);
 
                 else
                 {
@@ -320,13 +320,13 @@ namespace TKPrim
 
                 // deduct from others
                 if (MeridianOnAxis(myVMax) && VerticesBuilt[VAXISTOP])
-                    myVertices[VTOPEND] = myVertices[VAXISTOP];
+                    myVertices[VTOPEND] = new TopoDS_Vertex(myVertices[VAXISTOP]);//not origin
                 else if ((MeridianOnAxis(myVMax) || !HasSides()) && VerticesBuilt[VTOPSTART])
-                    myVertices[VTOPEND] = myVertices[VTOPSTART];
+                    myVertices[VTOPEND] = new TopoDS_Vertex(myVertices[VTOPSTART]);
                 else if (MeridianClosed() && VerticesBuilt[VBOTEND])
-                    myVertices[VTOPEND] = myVertices[VBOTEND];
+                    myVertices[VTOPEND] = new TopoDS_Vertex(myVertices[VBOTEND]);
                 else if ((MeridianClosed() && !HasSides()) && VerticesBuilt[VBOTSTART])
-                    myVertices[VTOPEND] = myVertices[VBOTSTART];
+                    myVertices[VTOPEND] = new TopoDS_Vertex(myVertices[VBOTSTART]);
 
                 else
                 {
@@ -657,13 +657,13 @@ namespace TKPrim
 
                 // deduct from others
                 if (MeridianOnAxis(myVMax) && VerticesBuilt[VAXISTOP])
-                    myVertices[VTOPSTART] = myVertices[VAXISTOP];
+                    myVertices[VTOPSTART] = new TopoDS_Vertex(myVertices[VAXISTOP]);
                 else if ((MeridianOnAxis(myVMax) || !HasSides()) && VerticesBuilt[VTOPEND])
-                    myVertices[VTOPSTART] = myVertices[VTOPEND];
+                    myVertices[VTOPSTART] = new TopoDS_Vertex(myVertices[VTOPEND]);
                 else if (MeridianClosed() && VerticesBuilt[VBOTSTART])
-                    myVertices[VTOPSTART] = myVertices[VBOTSTART];
+                    myVertices[VTOPSTART] = new TopoDS_Vertex(myVertices[VBOTSTART]);
                 else if ((MeridianClosed() && !HasSides()) && VerticesBuilt[VBOTEND])
-                    myVertices[VTOPSTART] = myVertices[VBOTEND];
+                    myVertices[VTOPSTART] = new TopoDS_Vertex(myVertices[VBOTEND]);
 
                 else
                 {
@@ -718,13 +718,13 @@ namespace TKPrim
 
                 // deduct from others
                 if (MeridianOnAxis(myVMin) && VerticesBuilt[VAXISBOT])
-                    myVertices[VBOTSTART] = myVertices[VAXISBOT];
+                    myVertices[VBOTSTART] = new TopoDS_Vertex(myVertices[VAXISBOT]);
                 else if ((MeridianOnAxis(myVMin) || !HasSides()) && VerticesBuilt[VBOTEND])
-                    myVertices[VBOTSTART] = myVertices[VBOTEND];
+                    myVertices[VBOTSTART] = new TopoDS_Vertex(myVertices[VBOTEND]);
                 else if (MeridianClosed() && VerticesBuilt[VTOPSTART])
-                    myVertices[VBOTSTART] = myVertices[VTOPSTART];
+                    myVertices[VBOTSTART] = new TopoDS_Vertex(myVertices[VTOPSTART]);
                 else if ((MeridianClosed() && !HasSides()) && VerticesBuilt[VTOPEND])
-                    myVertices[VBOTSTART] = myVertices[VTOPEND];
+                    myVertices[VBOTSTART] = new TopoDS_Vertex(myVertices[VTOPEND]);
 
                 else
                 {
@@ -783,10 +783,10 @@ namespace TKPrim
 
                 // deduct from others
                 if (MeridianOnAxis(myVMin) && VerticesBuilt[VBOTSTART])
-                    myVertices[VAXISBOT] = myVertices[VBOTSTART];
+                    myVertices[VAXISBOT] = new TopoDS_Vertex(myVertices[VBOTSTART]);
 
                 else if (MeridianOnAxis(myVMin) && VerticesBuilt[VBOTEND])
-                    myVertices[VAXISBOT] = myVertices[VBOTEND];
+                    myVertices[VAXISBOT] = new TopoDS_Vertex(myVertices[VBOTEND]);
 
                 else
                 {
@@ -842,10 +842,10 @@ namespace TKPrim
 
                 // deduct from others
                 if (MeridianOnAxis(myVMax) && VerticesBuilt[VTOPSTART])
-                    myVertices[VAXISTOP] = myVertices[VTOPSTART];
+                    myVertices[VAXISTOP] = new TopoDS_Vertex(myVertices[VTOPSTART]);
 
                 else if (MeridianOnAxis(myVMax) && VerticesBuilt[VTOPEND])
-                    myVertices[VAXISTOP] = myVertices[VTOPEND];
+                    myVertices[VAXISTOP] = new TopoDS_Vertex(myVertices[VTOPEND]);
 
                 else
                 {

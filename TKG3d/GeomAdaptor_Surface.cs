@@ -23,6 +23,9 @@ namespace TKG3d
             myTolV = (0.0);
             mySurfaceType = GeomAbs_SurfaceType.GeomAbs_OtherSurface;
         }
+
+        GeomEvaluator_Surface myNestedEvaluator; ///< Calculates values of nested complex surfaces (offset surface, surface of extrusion or revolution)
+
         public gp_Pnt Value(double U,
                                  double V)
         {
@@ -233,12 +236,12 @@ namespace TKG3d
 
             switch (mySurfaceType)
             {
-                //case GeomAbs_SurfaceType. GeomAbs_SurfaceOfRevolution:
-                //    {
-                //        GeomAdaptor_Curve myBasisCurve
-                //          (Handle(Geom_SurfaceOfRevolution)::DownCast(mySurface)->BasisCurve(),myUFirst,myULast);
-                //        return myBasisCurve.Resolution(R3d);
-                //    }
+                case GeomAbs_SurfaceType.GeomAbs_SurfaceOfRevolution:
+                    {
+                        GeomAdaptor_Curve myBasisCurve = new(
+                          ((Geom_SurfaceOfRevolution)mySurface).BasisCurve(), myUFirst, myULast);
+                        return myBasisCurve.Resolution(R3d);
+                    }
                 case GeomAbs_SurfaceType.GeomAbs_Torus:
                     {
                         Geom_ToroidalSurface S = (Geom_ToroidalSurface)mySurface;
@@ -401,12 +404,12 @@ namespace TKG3d
                 //    }
 
                 //case GeomAbs_SurfaceOfExtrusion:
-                //case GeomAbs_SurfaceOfRevolution:
-                //case GeomAbs_OffsetSurface:
-                //    Standard_NoSuchObject_Raise_if(myNestedEvaluator.IsNull(),
-                //        "GeomAdaptor_Surface::D1: evaluator is not initialized");
-                //    myNestedEvaluator->D1(u, v, P, D1U, D1V);
-                //    break;
+                case GeomAbs_SurfaceType.GeomAbs_SurfaceOfRevolution:
+                    //case GeomAbs_OffsetSurface:
+                    Exceptions.Standard_NoSuchObject_Raise_if(myNestedEvaluator == null,
+                            "GeomAdaptor_Surface::D1: evaluator is not initialized");
+                    myNestedEvaluator.D1(u, v, out P, out D1U, out D1V);
+                    break;
 
                 default:
                     mySurface.D1(u, v, out P, out D1U, out D1V);

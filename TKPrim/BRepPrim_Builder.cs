@@ -126,6 +126,7 @@ namespace TKPrim
         {
             myBuilder.MakeWire(W);
         }
+
         public void AddEdgeVertex(TopoDS_Edge E,
 
                           TopoDS_Vertex V,
@@ -133,9 +134,11 @@ namespace TKPrim
 
                           double P2)
         {
-            TopoDS_Vertex VV = V;
+            TopoDS_Vertex VV = new TopoDS_Vertex(V);//not origin
             VV.Orientation(TopAbs_Orientation.TopAbs_FORWARD);
-            myBuilder.Add(E, VV);
+            myBuilder.Add(E, VV);  
+            
+            VV = new TopoDS_Vertex(V);//not origin, but logical
             VV.Orientation(TopAbs_Orientation.TopAbs_REVERSED);
             myBuilder.Add(E, VV);
             myBuilder.Range(E, P1, P2);

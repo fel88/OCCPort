@@ -1,4 +1,5 @@
 ﻿using OCCPort.Common;
+using System.Threading;
 
 namespace TKMath
 {
@@ -37,10 +38,20 @@ namespace TKMath
             radius = Standard_Real.RealLast();
         }
 
+        //! A2 locates the circle and gives its orientation in 3D space.
+        //! Warnings :
+        //! It is not forbidden to create a circle with theRadius = 0.0  Raises ConstructionError if theRadius < 0.0
+        public gp_Circ(gp_Ax2 theA2, double theRadius)
+        {
+            pos = (theA2);
+            radius = theRadius;
+            Exceptions.Standard_ConstructionError_Raise_if(theRadius < 0.0, "gp_Circ() - radius should be positive number");
+        }
+
         //! Returns the main axis of the circle.
         //! It is the axis perpendicular to the plane of the circle,
         //! passing through the "Location" point (center) of the circle.
-        public  gp_Ax1 Axis() { return pos.Axis(); }
+        public gp_Ax1 Axis() { return pos.Axis(); }
 
         //! Returns the position of the circle.
         //! It is the local coordinate system of the circle.
@@ -49,16 +60,6 @@ namespace TKMath
         //! Returns the radius of this circle.
         public double Radius() { return radius; }
 
-        //! A2 locates the circle and gives its orientation in 3D space.
-        //! Warnings :
-        //! It is not forbidden to create a circle with theRadius = 0.0  Raises ConstructionError if theRadius < 0.0
-        public gp_Circ(gp_Ax2 theA2, double theRadius)
-        {
-            pos = theA2;
-            radius = theRadius;
-
-            Exceptions.Standard_ConstructionError_Raise_if(theRadius < 0.0, "gp_Circ() - radius should be positive number");
-        }
         gp_Ax2 pos;
         double radius;
         public void Transform(gp_Trsf theT)

@@ -16,6 +16,33 @@ namespace TKG3d
             myBaseCurve = (theBase);
             myRotAxis = new(theRevolLoc, theRevolDir);
         }
+
+
+        public void D1(
+       double theU, double theV,
+      out gp_Pnt theValue, out gp_Vec theD1U, out gp_Vec theD1V)
+        {
+            
+            if (myBaseAdaptor != null)
+                myBaseAdaptor.D1(theV, out theValue, out theD1V);
+            else
+                myBaseCurve.D1(theV, out theValue, out theD1V);
+
+            // vector from center of rotation to the point on rotated curve
+            gp_XYZ aCQ = theValue.XYZ() - myRotAxis.Location().XYZ();
+            theD1U = new gp_Vec(myRotAxis.Direction().XYZ().Crossed(aCQ));
+            // If the point is placed on the axis of revolution then derivatives on U are undefined.
+            // Manually set them to zero.
+            if (theD1U.SquareMagnitude() < Precision.SquareConfusion())
+                theD1U.SetCoord(0.0, 0.0, 0.0);
+
+            gp_Trsf aRotation = new gp_Trsf();
+            aRotation.SetRotation(myRotAxis, theU);
+            theValue.Transform(aRotation);
+            theD1U.Transform(aRotation);
+            theD1V.Transform(aRotation);
+        }
+
         public void D0(
      double theU, double theV,
     out gp_Pnt theValue)

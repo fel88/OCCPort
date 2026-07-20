@@ -45,6 +45,22 @@ namespace TKMath
             }
         }
 
+        //! Returns an axis, for which
+        //! -   the origin is that of this coordinate system, and
+        //! -   the unit vector is either the "X Direction"  of this coordinate system.
+        //! Note: the result is the "X Axis" of this coordinate system.
+        public gp_Ax2d XAxis() { return new gp_Ax2d(point, vxdir); }
+
+        //! Returns an axis, for which
+        //! -   the origin is that of this coordinate system, and
+        //! - the unit vector is either the  "Y Direction" of this coordinate system.
+        //! Note: the result is the "Y Axis" of this coordinate system.
+        public gp_Ax2d YAxis()
+        {
+            return new gp_Ax2d(point, vydir);
+        }
+
+
         //! Returns the "Location" point (origin) of <me>.
         public gp_Pnt2d Location() { return point; }
 

@@ -743,5 +743,10 @@ namespace TKG3d
                                   "GeomAdaptor_Curve::Circle() - curve is not a Circle");
             return ((Geom_Circle)(myCurve)).Circ();
         }
+
+        public override void D1(double d, out gp_Pnt p, out gp_Vec v)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

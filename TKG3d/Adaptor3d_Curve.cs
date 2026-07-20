@@ -72,5 +72,6 @@ namespace TKG3d
 
         //void Adaptor3d_Curve::D0(const Standard_Real U, gp_Pnt& P) const 
         public abstract void D0(double d, ref gp_Pnt p);
+        public abstract void D1(double d, out gp_Pnt p, out gp_Vec v);
     }
 }

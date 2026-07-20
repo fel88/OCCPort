@@ -13,6 +13,17 @@ namespace TKMath
             return aV;
         }
 
+        //! Assigns the three coordinates of theCoord to this vector.
+       public  void SetXYZ( gp_XYZ theCoord) { coord = theCoord; }
+
+        public void Transform(gp_Trsf T)
+        {
+            if (T.Form() == gp_TrsfForm.gp_Identity || T.Form() == gp_TrsfForm.gp_Translation) { }
+            else if (T.Form() == gp_TrsfForm.gp_PntMirror) { coord.Reverse(); }
+            else if (T.Form() == gp_TrsfForm.gp_Scale) { coord.Multiply(T.ScaleFactor()); }
+            else { coord.Multiply(T.VectorialPart()); }
+        }
+
         public static implicit operator gp_Dir(gp_Vec f)
         {
             return new gp_Dir(f);

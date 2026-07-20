@@ -1,4 +1,6 @@
-﻿namespace TKMath
+﻿using OCCPort.Common;
+
+namespace TKMath
 {
     //! Provides functions for basic geometric computation on
     //! elementary surfaces.
@@ -21,14 +23,42 @@
     public class ElSLib
     {
 
+        public static gp_Pnt Value(double U, double V, gp_Pln Pl)
+        {
+            return ElSLib.PlaneValue(U, V, Pl.Position());
+        }
+
+        static double PIPI = Math.PI + Math.PI;
+        public static void CylinderParameters(gp_Ax3 Pos,
+                   double dd,
+                   gp_Pnt P,
+                  double U,
+                  double V)
+        {
+            gp_Trsf T = new gp_Trsf();
+            T.SetTransformation(Pos);
+            gp_Pnt Ploc = P.Transformed(T);
+            U = Math.Atan2(Ploc.Y(), Ploc.X());
+            if (U < -1e-16) U += PIPI;
+            else if (U < 0) U = 0;
+            V = Ploc.Z();
+        }
+
+
         public static void Parameters(gp_Pln Pl,
                     gp_Pnt P,
                    ref double U,
                  ref double V)
         {
-
             PlaneParameters(Pl.Position(), P, ref U, ref V);
+        }
 
+        //! parametrization
+        //! P (U, V) = Location + V * ZDirection +
+        //! Radius * (Cos(U) * XDirection + Sin (U) * YDirection)
+        public static void Parameters(gp_Cylinder C, gp_Pnt P, ref double U, ref double V)
+        {
+            ElSLib.CylinderParameters(C.Position(), C.Radius(), P, U, V);
         }
 
         public static void PlaneD1(double U, double V, gp_Ax3 Pos, ref gp_Pnt P, ref gp_Vec Vu, ref gp_Vec Vv)

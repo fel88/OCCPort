@@ -282,12 +282,12 @@ namespace TKGeomBase
                             ElSLib.Parameters(Plane, P3d, ref u, ref v);
                             break;
                         }
-                    //case GeomAbs_Cylinder:
-                    //    {
-                    //        gp_Cylinder Cylinder = S->Cylinder();
-                    //        ElSLib::Parameters(Cylinder, P3d, u, v);
-                    //        break;
-                    //    }
+                    case GeomAbs_SurfaceType.GeomAbs_Cylinder:
+                        {
+                            gp_Cylinder Cylinder = S.Cylinder();
+                            ElSLib.Parameters(Cylinder, P3d, ref u,ref v);
+                            break;
+                        }
                     //case GeomAbs_Cone:
                     //    {
                     //        gp_Cone Cone = S->Cone();

@@ -32,6 +32,10 @@ namespace TKMesh
                         new BaseMeshAlgo::Type);*/
 
                     break;
+                case GeomAbs_SurfaceType.GeomAbs_SurfaceOfRevolution:
+                    return new BRepMesh_DelaunayDeflectionControlMeshAlgo<BRepMesh_BoundaryParamsRangeSplitter>();
+                    break;
+
             }
             return null;
         }

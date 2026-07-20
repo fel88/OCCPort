@@ -1,4 +1,6 @@
-﻿namespace TKG3d
+﻿using TKMath;
+
+namespace TKG3d
 {
     //! Describes an ellipse in 3D space.
     //! An ellipse is defined by its major and minor radii and,
@@ -32,7 +34,17 @@
     //! is 2.*Pi and the parameter range is [ 0, 2.*Pi [.
     public class Geom_Ellipse : Geom_Conic
     {
+        public override void D1(double U, out gp_Pnt P, out gp_Vec V1)
+        {
+            throw new NotImplementedException();
+        }
+
         public override double Eccentricity()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool IsClosed()
         {
             throw new NotImplementedException();
         }

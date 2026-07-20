@@ -27,6 +27,13 @@ namespace TKMath
 
         }
 
+        //! Creates a unitary vector from a direction theV.
+        public gp_Vec2d(gp_Dir2d theV)
+        {
+            coord = theV.XY();
+        }
+
+
         //! Creates a vector with a doublet of coordinates.
         public gp_Vec2d(gp_XY theCoord)
         {

@@ -92,5 +92,15 @@ namespace TKG3d
         {
             return 0;
         }
+
+        public override void D1(double U, out gp_Pnt P, out gp_Vec V1)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool IsClosed()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

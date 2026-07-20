@@ -25,23 +25,21 @@ namespace TKPrim
             myCylinder = new BRepPrim_Cylinder(gp.XOY(), R, H);
         }
 
-        public override object OneAxis()
-        {
-            return myCylinder;
-        }
-
-
         //! Make a cylinder (part cylinder).
         //! @param R     [in] cylinder radius
         //! @param H     [in] cylinder height
         //! @param Angle [in] defines the missing portion of the cylinder
-        public BRepPrimAPI_MakeCylinder(double R,
+        public BRepPrimAPI_MakeCylinder( double R,
                         double H,
                         double Angle)
-
         {
-            myCylinder = new BRepPrim_Cylinder(R, H);
+            myCylinder = new(R, H);        
             myCylinder.Angle(Angle);
+        }
+
+        public override object OneAxis()
+        {
+            return myCylinder;
         }
 
 

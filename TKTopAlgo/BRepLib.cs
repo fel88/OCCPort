@@ -46,11 +46,11 @@ namespace TKTopAlgo
                                 LPlan.Append(F);
                                 break;
                             }
-                            //case GeomAbs_Cylinder:
-                            //    {
-                            //        LCyl.Append(F);
-                            //        break;
-                            //    }
+                        case GeomAbs_SurfaceType.GeomAbs_Cylinder:
+                            {
+                                LCyl.Append(F);
+                                break;
+                            }
                             //case GeomAbs_Cone:
                             //    {
                             //        LCon.Append(F);
@@ -66,8 +66,9 @@ namespace TKTopAlgo
                             //        LTor.Append(F);
                             //        break;
                             //    }
-                            //default:
-                            //    LOther.Append(F);
+                            default:
+                                LOther.Append(F);
+                            break;
                     }
                 }
                 else LTri.Append(F);
@@ -562,7 +563,7 @@ bool IsVerifyTolerance, bool IsMutableInput, BRepTools_ReShape theReshaper)
         //#endif
 
     }
-    
+
     //! Provides Constructors with a Face.
     public class BRepClass_FaceClassifier : BRepClass_FClassifier
     {
@@ -594,11 +595,11 @@ bool IsVerifyTolerance, bool IsMutableInput, BRepTools_ReShape theReshaper)
 
     public class TColgp_SequenceOfPnt2d : NCollection_Sequence<gp_Pnt2d>
     {
-        
+
     }
-    
+
     internal class BRepTopAdaptor_SeqOfPtr : NCollection_Sequence<object>
     {
-        
+
     }
 }

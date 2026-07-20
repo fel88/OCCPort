@@ -76,14 +76,13 @@ namespace TKMesh
                     //    }
                     //    break;
 
-                    //case GeomAbs_SurfaceOfRevolution:
-                    //    {
-                    //        DeflectionControlMeshAlgo<BRepMesh_BoundaryParamsRangeSplitter>::Type* aMeshAlgo =
-                    //          new DeflectionControlMeshAlgo<BRepMesh_BoundaryParamsRangeSplitter>::Type;
-                    //        aMeshAlgo->SetPreProcessSurfaceNodes(Standard_True);
-                    //        return aMeshAlgo;
-                    //    }
-                    //    break;
+                    case GeomAbs_SurfaceType.GeomAbs_SurfaceOfRevolution:
+                        {
+                            BRepMesh_DelaunayDeflectionControlMeshAlgo<BRepMesh_BoundaryParamsRangeSplitter>
+                                aMeshAlgo = new();
+                            aMeshAlgo.SetPreProcessSurfaceNodes(true);
+                            return aMeshAlgo;
+                        }                        
 
                     default:
                         {
@@ -511,6 +510,24 @@ namespace TKMesh
     }
 
     public class VectorOfBoolean : NCollection_Vector<bool>
+    {
+    }
+
+
+    //! Auxiliary class extending UV range splitter in order to generate
+    //! internal nodes for NURBS surface.
+    public class BRepMesh_BoundaryParamsRangeSplitter : BRepMesh_NURBSRangeSplitter
+    {
+    }
+
+    //! Auxiliary class extending UV range splitter in order to generate
+    //! internal nodes for NURBS surface.
+    public class BRepMesh_NURBSRangeSplitter : BRepMesh_UVParamRangeSplitter
+    {
+    }
+
+    //! Intended to generate internal mesh nodes using UV parameters of boundary discrete points.
+    public class BRepMesh_UVParamRangeSplitter : BRepMesh_DefaultRangeSplitter
     {
     }
 }

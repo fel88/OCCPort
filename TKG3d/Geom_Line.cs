@@ -1,4 +1,5 @@
-﻿using TKMath;
+﻿using OCCPort.Common;
+using TKMath;
 
 namespace TKG3d
 {
@@ -16,7 +17,7 @@ namespace TKG3d
     public class Geom_Line : Geom_Curve
     {
 
-        gp_Ax1 pos;
+        gp_Ax1 pos = new gp_Ax1();
         public override double FirstParameter()
         { return -Precision.Infinite(); }
 
@@ -24,6 +25,13 @@ namespace TKG3d
         //function : LastParameter
         //purpose  : 
         //=======================================================================
+
+        public override void D1(double U, out gp_Pnt P, out gp_Vec V1)
+        {
+            P = new gp_Pnt();
+            V1 = new gp_Vec();
+            ElCLib.LineD1(U, pos, ref  P, ref V1);
+        }
 
         public override double LastParameter()
         { return Precision.Infinite(); }
@@ -65,6 +73,11 @@ namespace TKG3d
         public override GeomAbs_Shape Continuity()
         {
             return GeomAbs_Shape.GeomAbs_CN;
+        }
+
+        public override bool IsClosed()
+        {
+            return false;
         }
 
         public Geom_Line(gp_Ax1 A) { pos = (A); }
