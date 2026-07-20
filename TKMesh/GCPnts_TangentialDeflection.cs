@@ -1,6 +1,7 @@
-﻿global using TColgp_SequenceOfPnt=TKernel.NCollection_Sequence<TKMath.gp_Pnt> ;
+﻿global using TColgp_SequenceOfPnt = TKernel.NCollection_Sequence<TKMath.gp_Pnt>;
 
 using OCCPort.Common;
+using System.Linq;
 using TKernel;
 using TKG2d;
 using TKG3d;
@@ -56,6 +57,32 @@ namespace TKMesh
             myFirstu = 0.0;
 
         }
+
+        public static double ArcAngularStep(
+    double theRadius,
+    double theLinearDeflection,
+    double theAngularDeflection,
+    double theMinLength)
+        {
+            Exceptions.Standard_ConstructionError_Raise_if(theRadius < 0.0, "Negative radius");
+
+            double aPrecision = Precision.Confusion();
+
+            double Du = 0.0, aMinSizeAng = 0.0;
+            if (theRadius > aPrecision)
+            {
+                Du = Math.Max(1.0 - (theLinearDeflection / theRadius), 0.0);
+
+                // It is not suitable to consider min size greater than 1/4 arc len.
+                if (theMinLength > aPrecision)
+                    aMinSizeAng = Math.Min(theMinLength / theRadius, Math.PI / 2);
+            }
+            Du = 2.0 * Math.Acos(Du);
+            Du = Math.Max(Math.Min(Du, theAngularDeflection), aMinSizeAng);
+            return Du;
+        }
+
+
         public gp_Pnt Value(int I)
         {
             return myPoints.Value(I);
@@ -108,7 +135,8 @@ namespace TKMesh
         double myMinLen;
         double myLastU;
         double myFirstu;
-        public void initialize(dynamic theC,
+
+        public void initialize(Adaptor3d_Curve theC,
                                               double theFirstParameter,
                                               double theLastParameter,
                                               double theAngularDeflection,
@@ -144,11 +172,11 @@ namespace TKMesh
                         PerformLinear(theC);
                         break;
                     }
-                //case GeomAbs_Circle:
-                //    {
-                //        PerformCircular(theC);
-                //        break;
-                //    }
+                case GeomAbs_CurveType.GeomAbs_Circle:
+                    {
+                        PerformCircular(theC);
+                        break;
+                    }
                 //case GeomAbs_BSplineCurve:
                 //    {
                 //        Handle(typename GCPnts_TCurveTypes < TheCurve >::BSplineCurve) aBS = theC.BSpline();
@@ -169,6 +197,33 @@ namespace TKMesh
                         break;
                     }
             }
+        }
+
+        public void PerformCircular(dynamic theC)
+        {
+            // akm 8/01/02 : check the radius before divide by it
+            double dfR = theC.Circle().Radius();
+            double Du = GCPnts_TangentialDeflection.ArcAngularStep(dfR, myCurvatureDeflection, myAngularDeflection, myMinLen);
+
+            double aDiff = myLastU - myFirstu;
+            // Round up number of points to satisfy curvatureDeflection more precisely
+            int NbPoints = (int)Math.Min(Math.Ceiling(aDiff / Du), 1.0e+6);
+            NbPoints = Math.Max(NbPoints, myMinNbPnts - 1);
+            Du = aDiff / NbPoints;
+
+            gp_Pnt P = new gp_Pnt();
+            double U = myFirstu;
+            for (int i = 1; i <= NbPoints; i++)
+            {
+                D0(theC, U, ref P);
+                myParameters.Append(U);
+                myPoints.Append(P);
+                U += Du;
+            }
+
+            D0(theC, myLastU, ref P);
+            myParameters.Append(myLastU);
+            myPoints.Append(P);
         }
 
         void PerformCurve(dynamic theC)

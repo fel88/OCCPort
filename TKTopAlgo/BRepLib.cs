@@ -592,19 +592,13 @@ bool IsVerifyTolerance, bool IsMutableInput, BRepTools_ReShape theReshaper)
 
     }
 
-    public class TColgp_SequenceOfPnt2d : List<gp_Pnt2d>
+    public class TColgp_SequenceOfPnt2d : NCollection_Sequence<gp_Pnt2d>
     {
-        public void Append(gp_Pnt2d item)
-        {
-            Add(item);
-        }
+        
     }
     
     internal class BRepTopAdaptor_SeqOfPtr : NCollection_Sequence<object>
     {
-        public int Length()
-        {
-            return base.Count;
-        }
+        
     }
 }

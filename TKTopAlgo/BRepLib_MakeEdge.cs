@@ -191,12 +191,21 @@ namespace TKTopAlgo
                 if (V1.IsNull() && V2.IsNull())
                 {
                     B.MakeVertex(V1, P1, preci);
-                    V2 = V1;
+                    //V2 = V1;
+                    V2 = new TopoDS_Vertex(V1);//not origin
                 }
                 else if (V1.IsNull())
-                    V1 = V2;
+                {
+                    //   V1 = V2;
+                    V1 = new TopoDS_Vertex(V2);//not origin
+
+                }
                 else if (V2.IsNull())
-                    V2 = V1;
+                {
+                    // V2 = V1;
+                    V2 = new TopoDS_Vertex(V1);//not origin
+
+                }
                 else
                 {
                     if (!V1.IsSame(V2))

@@ -32,6 +32,9 @@ namespace TKBRep
                 && myLocation == theOther.myLocation;
         }
 
+        [Aux]
+        public object Tag;
+
         //! Returns True if two shapes are equal, i.e. if they
         //! share the same TShape with  the same Locations and
         //! Orientations.
