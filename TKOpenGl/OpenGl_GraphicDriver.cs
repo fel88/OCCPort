@@ -69,7 +69,7 @@ namespace TKOpenGl
         public override Graphic3d_CStructure CreateStructure(Graphic3d_StructureManager theManager)
         {
             OpenGl_Structure aStructure = new OpenGl_Structure(theManager);
-            myMapOfStructure.Add(aStructure.Identification(), aStructure);
+            myMapOfStructure.Bind(aStructure.Identification(), aStructure);
             return aStructure;
 
         }
@@ -119,9 +119,9 @@ namespace TKOpenGl
                 return TheNullGlCtx;
             }
 
-            foreach (var aViewIter in myMapOfView)
+            for (NCollection_Map<OpenGl_View>.Iterator aViewIter = new(myMapOfView); aViewIter.More(); aViewIter.Next())
             {
-                OpenGl_Window aWindow = aViewIter.GlWindow();
+                OpenGl_Window aWindow = aViewIter.Value().GlWindow();
                 if (aWindow != null)
                 {
                     if (!theBound)
@@ -144,12 +144,12 @@ namespace TKOpenGl
         internal void setDeviceLost()
         {
             if (myMapOfStructure.IsEmpty())
-            {
                 return;
-            }
 
-            foreach (var aView in myMapOfView)
+            for (NCollection_Map<OpenGl_View>.Iterator aViewIter = new(myMapOfView); aViewIter.More(); aViewIter.Next())
             {
+                OpenGl_View aView = aViewIter.Value();
+
                 if (aView.myWasRedrawnGL)
                 {
                     aView.StructureManager().SetDeviceLost();

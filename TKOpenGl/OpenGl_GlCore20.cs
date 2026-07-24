@@ -1,9 +1,10 @@
-﻿using OpenTK.Graphics.OpenGL;
+﻿using OCCPort.Common;
+using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
 using System;
-using OCCPort.Common;
-using TKService;
+using TKernel;
 using TKOpenGl;
+using TKService;
 
 namespace OCCPort.OpenGL
 {
@@ -190,11 +191,8 @@ namespace OCCPort.OpenGL
             GL.VertexAttribPointer((int)index, (int)size, (VertexAttribPointerType)type, normalized, stride, pointer);
         }
     }
-    internal class MyMapOfView : List<OpenGl_View>
+    internal class MyMapOfView : NCollection_Map<OpenGl_View>
     {
-        public bool IsEmpty()
-        {
-            return Count == 0;
-        }
+        
     }
 }

@@ -33,4 +33,18 @@ namespace OCCPort.Common
             return ((theValue & theMask) % theUpperBound + 1);
         }
     }
+
+    public static class Standard_Size
+    {
+        public static int HashCode(int theValue, int theUpperBound)
+        {
+            int aKey = ~theValue + (theValue << 18);
+            aKey ^= (aKey >> 31);
+            aKey *= 21;
+            aKey ^= (aKey >> 11);
+            aKey += (aKey << 6);
+            aKey ^= (aKey >> 22);
+            return Standard_Integer. IntegerHashCode(aKey, Standard_Integer.IntegerLast(), theUpperBound);
+        }
+    }
 }

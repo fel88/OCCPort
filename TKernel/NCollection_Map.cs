@@ -61,11 +61,12 @@ namespace TKernel
         public new class Iterator : NCollection_BaseMap.Iterator
         {
             //! Constructor
-           public  Iterator( NCollection_Map<T> theMap) :
-      base(theMap) {
+            public Iterator(NCollection_Map<T> theMap) :
+       base(theMap)
+            {
             }
-        //! Query if the end of collection is reached by iterator
-        public bool More()
+            //! Query if the end of collection is reached by iterator
+            public bool More()
             {
                 return PMore();
             }
@@ -246,6 +247,11 @@ namespace TKernel
         {
             return myValue;
         }
+
+        //! Variable value access
+        public TheItemType ChangeValue() { return myValue; }
+        public void ChangeValue(TheItemType v) { myValue = v; }
+
 
         TheItemType myValue; //!< The item stored in the node
 

@@ -522,7 +522,7 @@ namespace OCCPort.OpenGL
             Graphic3d_LightSet aLights = myLightSourceState.LightSources();
             if (aLights == null)
             {
-                if (!myMapOfLightPrograms.Find("unlit", out myLightPrograms))
+                if (!myMapOfLightPrograms.Find("unlit", ref myLightPrograms))
                 {
                     myLightPrograms = new OpenGl_SetOfShaderPrograms(myUnlitPrograms);
                     myMapOfLightPrograms.Bind("unlit", myLightPrograms);
@@ -531,7 +531,7 @@ namespace OCCPort.OpenGL
             }
 
             string aKey = genLightKey(aLights, myLightSourceState.HasShadowMaps());
-            if (!myMapOfLightPrograms.Find(aKey, out myLightPrograms))
+            if (!myMapOfLightPrograms.Find(aKey, ref myLightPrograms))
             {
                 myLightPrograms = new OpenGl_SetOfShaderPrograms();
                 myMapOfLightPrograms.Bind(aKey, myLightPrograms);

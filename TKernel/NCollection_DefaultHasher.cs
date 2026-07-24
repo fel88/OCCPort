@@ -18,9 +18,15 @@ namespace TKernel
 
         public int HashCode(T theValue, int theUpperBound)
         {
+            int hash = 0;
+            if (theValue is IHashCode hashCode)
+            {
+                hash = hashCode.HashCode(theUpperBound);
+            }
+            else { hash = theValue.GetHashCode(); }
             var mask = Standard_Integer.IntegerLast();
             //return static_cast<Standard_Integer> ((theValue & theMask) % theUpperBound + 1);
-            return (theValue.GetHashCode() & mask) % theUpperBound + 1;
+            return (hash & mask) % theUpperBound + 1;
         }
 
         public bool IsEqual(T theKeyType, T theKey1)

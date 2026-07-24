@@ -73,8 +73,8 @@ namespace TKService
         public void RegisterObject(object theObject,
                                                           Graphic3d_ViewAffinity theAffinity)
         {
-            Graphic3d_ViewAffinity aResult;
-            if (myRegisteredObjects.Find(theObject, out aResult)
+            Graphic3d_ViewAffinity aResult = null;
+            if (myRegisteredObjects.Find(theObject, ref aResult)
              && aResult == theAffinity)
             {
                 return;

@@ -834,14 +834,14 @@ namespace TKV3d
             if (theKind == AIS_KindOfInteractive.AIS_KindOfInteractive_None
    && theSign == -1)
             {
-                for (AIS_DataMapIteratorOfDataMapOfIOStatus anObjIter = new NCollection_DataMap<AIS_InteractiveObject, AIS_GlobalStatus, NCollection_DefaultHasher<object>>.Iterator(myObjects); anObjIter.More(); anObjIter.Next())
+                for (AIS_DataMapIteratorOfDataMapOfIOStatus anObjIter = new NCollection_DataMap<AIS_InteractiveObject, AIS_GlobalStatus, NCollection_DefaultHasher<AIS_InteractiveObject>>.Iterator(myObjects); anObjIter.More(); anObjIter.Next())
                 {
                     theListOfIO.Append(anObjIter.Key());
                 }
                 return;
             }
 
-            for (AIS_DataMapIteratorOfDataMapOfIOStatus anObjIter = new NCollection_DataMap<AIS_InteractiveObject, AIS_GlobalStatus, NCollection_DefaultHasher<object>>.Iterator(myObjects); anObjIter.More(); anObjIter.Next())
+            for (AIS_DataMapIteratorOfDataMapOfIOStatus anObjIter = new NCollection_DataMap<AIS_InteractiveObject, AIS_GlobalStatus, NCollection_DefaultHasher<AIS_InteractiveObject>>.Iterator(myObjects); anObjIter.More(); anObjIter.Next())
             {
                 if (anObjIter.Key().Type() != theKind)
                 {
@@ -915,7 +915,7 @@ namespace TKV3d
         {
             AIS_GlobalStatus aStatus = null;
             if (theIObj == null
-            || !myObjects.Find(theIObj, out aStatus))
+            || !myObjects.Find(theIObj, ref aStatus))
             {
                 // for cases when reference shape of connected interactives was not displayed
                 // but its selection primitives were calculated
@@ -1359,7 +1359,7 @@ namespace TKV3d
                 return;
             }
 
-            for (AIS_DataMapIteratorOfDataMapOfIOStatus anObjIter = new NCollection_DataMap<AIS_InteractiveObject, AIS_GlobalStatus, NCollection_DefaultHasher<object>>.Iterator(myObjects); anObjIter.More(); anObjIter.Next())
+            for (AIS_DataMapIteratorOfDataMapOfIOStatus anObjIter = new(myObjects); anObjIter.More(); anObjIter.Next())
             {
                 AIS_InteractiveObject anObj = anObjIter.Key();
                 bool toProcess = anObj is AIS_Shape

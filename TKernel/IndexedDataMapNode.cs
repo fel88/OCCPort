@@ -6,8 +6,7 @@
         public TKey myKey1;
         public int myIndex;
 
-
-        public TValue myValue; //!< The item stored in the node
+                
 
         //! Constructor with 'Next'
         public IndexedDataMapNode(TKey theKey1,

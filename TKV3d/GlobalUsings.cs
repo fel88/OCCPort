@@ -1,4 +1,4 @@
-﻿global using AIS_DataMapIteratorOfDataMapOfIOStatus = TKernel.NCollection_DataMap<TKV3d.AIS_InteractiveObject, TKV3d.AIS_GlobalStatus, TKernel.NCollection_DefaultHasher<object>>.Iterator;
+﻿global using AIS_DataMapIteratorOfDataMapOfIOStatus = TKernel.NCollection_DataMap<TKV3d.AIS_InteractiveObject, TKV3d.AIS_GlobalStatus, TKernel.NCollection_DefaultHasher<TKV3d.AIS_InteractiveObject>>.Iterator;
 global using AIS_ListOfInteractive = TKernel.NCollection_List<TKV3d.AIS_InteractiveObject>;
 global using Graphic3d_Vec2i = TKernel.NCollection_Vec2<int>;
 global using Graphic3d_Vec3 = TKernel.NCollection_Vec3<float>;

@@ -294,21 +294,13 @@ namespace TKMesh
 
         }
     }
-    public class VectorOfElements : List<BRepMesh_Triangle>
+    public class VectorOfElements : NCollection_Vector<BRepMesh_Triangle>
     {
-        public VectorOfElements(int capacity, NCollection_IncAllocator myAllocator) : base(capacity)
+        public VectorOfElements(int capacity, NCollection_IncAllocator myAllocator) : base()
         {
         }
 
-        internal void Append(BRepMesh_Triangle theElement)
-        {
-            Add(theElement);
-        }
-
-        internal int Size()
-        {
-            return Count;
-        }
+        
     }
 
     internal class DMapOfIntegerListOfInteger : NCollection_DataMap<int, ListOfInteger>    

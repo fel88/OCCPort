@@ -19,14 +19,14 @@ namespace TKernel
         public void ChangeFromIndex(int theIndex, T2 v)
         {
             Exceptions.Standard_OutOfRange_Raise_if(theIndex < 1 || theIndex > Extent(), "NCollection_IndexedDataMap::ChangeFromIndex");
-            ((IndexedDataMapNode<TheKeyType, T2>)myData2[theIndex - 1]).myValue = v;
+            ((IndexedDataMapNode<TheKeyType, T2>)myData2[theIndex - 1]).ChangeValue( v);
 
         }
         public class Iterator
         {
-            public Iterator(NCollection_IndexedDataMap<TheKeyType, T2, Hasher> aMapOfPCurves)
+            public Iterator(NCollection_IndexedDataMap<TheKeyType, T2, Hasher> theMap)
             {
-                myMap = aMapOfPCurves;
+                myMap = theMap;
                 myIndex = 1;
             }
             NCollection_IndexedDataMap<TheKeyType, T2, Hasher> myMap;   //!< Pointer to current node
@@ -61,7 +61,7 @@ namespace TKernel
             public void ChangeValue(T2 v)
             {
                 Exceptions.Standard_NoSuchObject_Raise_if(!More(), "NCollection_IndexedDataMap::Iterator::Value");
-                ((IndexedDataMapNode<TheKeyType, T2>)myMap.myData2[myIndex - 1]).myValue = v;
+                ((IndexedDataMapNode<TheKeyType, T2>)myMap.myData2[myIndex - 1]).ChangeValue( v);
             }
         }
 
@@ -251,7 +251,7 @@ namespace TKernel
                                                     "Attempt to substitute existing key");
                     }
                     p.myKey1 = theKey1;
-                    p.myValue = theItem;
+                    p.ChangeValue( theItem);
                     return;
                 }
                 p = (IndexedDataMapNode<TheKeyType, T2>)p.Next();
@@ -274,7 +274,7 @@ namespace TKernel
 
             // update the node
             p.myKey1 = theKey1;
-            p.myValue = theItem;
+            p.ChangeValue(theItem);
             p.Next( myData1[iK1]);
             myData1[iK1] = p;
         }

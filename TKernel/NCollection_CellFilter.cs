@@ -1,4 +1,5 @@
 ﻿using OCCPort.Common;
+using System;
 
 namespace TKernel
 {
@@ -303,7 +304,7 @@ namespace TKernel
    * Cells are stored in the map, each cell contains list of objects 
    * that belong to that cell.
    */
-    public class Cell
+    public class Cell : IHashCode
     {
         public double GetCoord(int ind, gp_XY p)
         {
@@ -317,7 +318,7 @@ namespace TKernel
         //! Copy constructor: ensure that list is not deleted twice
         public Cell(Cell theOther)
         {
-            index = new int[ theOther.index.Length];
+            index = new int[theOther.index.Length];
             Assign(theOther);
             //Objects = new ListNode(theOther.Objects);//clone?
         }
@@ -351,6 +352,28 @@ namespace TKernel
             }
         }
 
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
+        //! Returns hash code for this cell, in the range [1, theUpperBound]
+        //! @param theUpperBound the upper bound of the range a computing hash code must be within
+        //! @return a computed hash code, in the range [1, theUpperBound]
+        public int HashCode(int theUpperBound)
+        {
+            // number of bits per each dimension in the hash code
+            var aDim = index.Length;
+            var aShiftBits = (8 * sizeof(int) - 1) / aDim;
+            int aCode = 0;
+
+            for (int i = 0; i < aDim; ++i)
+            {
+                aCode = (aCode << aShiftBits) ^ (int)(index[i]);
+            }
+
+            return Standard_Size.HashCode(aCode, theUpperBound);
+        }
         private double fmod(double aVal, double iNT_MAX)
         {
             return aVal % iNT_MAX;
@@ -407,5 +430,10 @@ namespace TKernel
         public ListNode()
         {
         }
+    }
+
+    public interface IHashCode
+    {
+        int HashCode(int upperBound);
     }
 }
