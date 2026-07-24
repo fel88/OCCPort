@@ -348,12 +348,12 @@ namespace TKService
         public abstract void Invalidate();
 
 
-
+        //! Returns the set of structures displayed in this view.
         public void DisplayedStructures(Graphic3d_MapOfStructure aSetOfStructures)
         {
-            foreach (var item in myStructsDisplayed)
+            for (Graphic3d_MapOfStructure.Iterator aStructIter = new NCollection_Map<Graphic3d_Structure, NCollection_DefaultHasher<Graphic3d_Structure>>.Iterator(myStructsDisplayed); aStructIter.More(); aStructIter.Next())
             {
-                aSetOfStructures.Add(item);
+                aSetOfStructures.Add(aStructIter.Key());
             }
 
         }
@@ -589,8 +589,9 @@ namespace TKService
             myIsInComputedMode = theMode;
             if (!myIsInComputedMode)
             {
-                foreach (var aStruct in myStructsDisplayed)
+                for (Graphic3d_MapOfStructure.Iterator aStructIter = new NCollection_Map<Graphic3d_Structure, NCollection_DefaultHasher<Graphic3d_Structure>>.Iterator(myStructsDisplayed); aStructIter.More(); aStructIter.Next())
                 {
+                    Graphic3d_Structure aStruct = aStructIter.Key();
                     Graphic3d_TypeOfAnswer anAnswer = acceptDisplay(aStruct.Visual());
                     if (anAnswer != Graphic3d_TypeOfAnswer.Graphic3d_TOA_COMPUTE)
                         continue;
@@ -685,10 +686,9 @@ namespace TKService
                 // displayed and if the view accepts it in its context.
                 Graphic3d_MapOfStructure aDisplayedStructs = new Graphic3d_MapOfStructure();
                 myStructureManager.DisplayedStructures(ref aDisplayedStructs);
-                //for (Graphic3d_MapIteratorOfMapOfStructure aStructIter (aDisplayedStructs); aStructIter.More(); aStructIter.Next())
-                foreach (var aStruct in aDisplayedStructs)
+                for (Graphic3d_MapOfStructure.Iterator aStructIter = new Graphic3d_MapOfStructure.Iterator(aDisplayedStructs); aStructIter.More(); aStructIter.Next())
                 {
-                    //Graphic3d_Structure aStruct = aStructIter.Key();
+                    Graphic3d_Structure aStruct = aStructIter.Key();
                     if (IsDisplayed(aStruct))
                     {
                         continue;
@@ -779,12 +779,12 @@ namespace TKService
             // Remove structures that were calculated for the previous orientation.
             // Recalculation of new structures.
             List<Graphic3d_Structure> aStructsSeq = new List<Graphic3d_Structure>();
-            foreach (var aStructIter in myStructsDisplayed)
+            for (Graphic3d_MapOfStructure.Iterator aStructIter = new NCollection_Map<Graphic3d_Structure, NCollection_DefaultHasher<Graphic3d_Structure>>.Iterator(myStructsDisplayed); aStructIter.More(); aStructIter.Next())
             {
-                Graphic3d_TypeOfAnswer anAnswer = acceptDisplay(aStructIter.Visual());
+                Graphic3d_TypeOfAnswer anAnswer = acceptDisplay(aStructIter.Key().Visual());
                 if (anAnswer == Graphic3d_TypeOfAnswer.Graphic3d_TOA_COMPUTE)
                 {
-                    aStructsSeq.Add(aStructIter); // if the structure was calculated, it is recalculated
+                    aStructsSeq.Add(aStructIter.Key()); // if the structure was calculated, it is recalculated
                 }
             }
             foreach (var aStructIter in aStructsSeq)

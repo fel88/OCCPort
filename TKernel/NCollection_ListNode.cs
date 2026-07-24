@@ -6,16 +6,20 @@
      */
     public class NCollection_ListNode
     {
-        object val;
-        NCollection_ListNode next;
+        //! The only constructor
+        public NCollection_ListNode(NCollection_ListNode theNext)
+        {
+            myNext = (theNext);
+        }
+        protected NCollection_ListNode myNext;
         internal NCollection_ListNode Next()
         {
-            return next;
+            return myNext;
+        }
+        internal void Next(NCollection_ListNode next)
+        {
+            myNext = next;
         }
 
-        internal object Value()
-        {
-            return val;
-        }
     }
 }

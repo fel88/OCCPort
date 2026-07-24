@@ -321,7 +321,7 @@ namespace TKMesh
 
         
     }
-    internal class IDMapOfLink : NCollection_IndexedDataMap<BRepMesh_Edge, BRepMesh_PairOfIndex, NCollection_DefaultHasher<object>>
+    internal class IDMapOfLink : NCollection_IndexedDataMap<BRepMesh_Edge, BRepMesh_PairOfIndex, NCollection_DefaultHasher<BRepMesh_Edge>>
     {
         public IDMapOfLink(int v, NCollection_IncAllocator myAllocator)
         {

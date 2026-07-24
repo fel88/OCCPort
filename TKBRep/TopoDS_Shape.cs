@@ -79,9 +79,9 @@ namespace TKBRep
         public int HashCode(int theUpperBound)
         {
             // PKV
-            int aHS = myTShape.GetHashCode() % theUpperBound;
-            int aHL = myLocation.GetHashCode() % theUpperBound;
-            return (aHS ^ aHL) % theUpperBound;
+            int aHS = OCCPort.Common.Standard_Integer.HashCode(myTShape.GetHashCode(), theUpperBound);
+            int aHL = myLocation.HashCode( theUpperBound);
+            return  OCCPort.Common.Standard_Integer.HashCode (aHS ^ aHL, theUpperBound);
         }
 
         //! Returns the checked flag.

@@ -473,7 +473,7 @@ namespace TKV3d
 
         }
     }
-    internal class SelectMgr_IndexedDataMapOfOwnerCriterion : NCollection_IndexedDataMap<SelectMgr_EntityOwner, SelectMgr_SortCriterion, TColStd_MapTransientHasher>
+    internal class SelectMgr_IndexedDataMapOfOwnerCriterion : NCollection_IndexedDataMap<SelectMgr_EntityOwner, SelectMgr_SortCriterion, NCollection_DefaultHasher<SelectMgr_EntityOwner>>
     {
 
     }

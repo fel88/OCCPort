@@ -925,13 +925,12 @@ namespace TKV3d
             myView.DisplayedStructures(aSetOfStructures);
 
             bool hasSelection = false;
-            //for (Graphic3d_MapOfStructure.Iterator aStructIter=new Graphic3d_MapOfStructure.Iterator  (aSetOfStructures);
-            // aStructIter.More(); aStructIter.Next())
-            //  {
-            foreach (var aStructIter in aSetOfStructures)
+            for (Graphic3d_MapOfStructure.Iterator aStructIter = new Graphic3d_MapOfStructure.Iterator(aSetOfStructures);
+             aStructIter.More(); aStructIter.Next())
             {
-                if (aStructIter.IsHighlighted()
-                 && aStructIter.IsVisible())
+
+                if (aStructIter.Key().IsHighlighted()
+                 && aStructIter.Key().IsVisible())
                 {
                     hasSelection = true;
                     break;
@@ -941,9 +940,10 @@ namespace TKV3d
             double Xmin, Ymin, Zmin, Xmax, Ymax, Zmax;
             int aNbPoints = 0;
             gp_XYZ aResult = new gp_XYZ(0.0, 0.0, 0.0);
-            foreach (var aStructIter in aSetOfStructures)
-            {
-                var aStruct = aStructIter;
+            for (Graphic3d_MapOfStructure.Iterator aStructIter = new Graphic3d_MapOfStructure.Iterator(aSetOfStructures);
+         aStructIter.More(); aStructIter.Next())
+            {                
+                var aStruct = aStructIter.Key();
                 if (!aStruct.IsVisible()
                   || aStruct.IsInfinite()
                   || (hasSelection && !aStruct.IsHighlighted()))

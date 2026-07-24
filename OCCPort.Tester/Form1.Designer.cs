@@ -52,7 +52,10 @@
             toolStripButton15 = new System.Windows.Forms.ToolStripButton();
             toolStripButton16 = new System.Windows.Forms.ToolStripButton();
             toolStripButton17 = new System.Windows.Forms.ToolStripButton();
+            statusStrip1 = new System.Windows.Forms.StatusStrip();
+            toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             toolStrip1.SuspendLayout();
+            statusStrip1.SuspendLayout();
             SuspendLayout();
             // 
             // timer1
@@ -255,12 +258,28 @@
             toolStripButton17.Text = "bool";
             toolStripButton17.Click += toolStripButton17_Click;
             // 
+            // statusStrip1
+            // 
+            statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { toolStripStatusLabel1 });
+            statusStrip1.Location = new System.Drawing.Point(0, 569);
+            statusStrip1.Name = "statusStrip1";
+            statusStrip1.Size = new System.Drawing.Size(1190, 22);
+            statusStrip1.TabIndex = 1;
+            statusStrip1.Text = "statusStrip1";
+            // 
+            // toolStripStatusLabel1
+            // 
+            toolStripStatusLabel1.Name = "toolStripStatusLabel1";
+            toolStripStatusLabel1.Size = new System.Drawing.Size(13, 17);
+            toolStripStatusLabel1.Text = "..";
+            // 
             // Form1
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             ClientSize = new System.Drawing.Size(1190, 591);
             Controls.Add(toolStrip1);
+            Controls.Add(statusStrip1);
             Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             Name = "Form1";
             StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -268,6 +287,8 @@
             Load += Form1_Load;
             toolStrip1.ResumeLayout(false);
             toolStrip1.PerformLayout();
+            statusStrip1.ResumeLayout(false);
+            statusStrip1.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
 
@@ -297,6 +318,8 @@
         private System.Windows.Forms.ToolStripButton toolStripButton15;
         private System.Windows.Forms.ToolStripButton toolStripButton16;
         private System.Windows.Forms.ToolStripButton toolStripButton17;
+        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
     }
 }
 

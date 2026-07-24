@@ -10,18 +10,7 @@ namespace TKService
 
         }
 
-        public class Iterator
-        {
-            public bool More()
-            {
-                throw new NotImplementedException();
-            }
-
-            public object Next()
-            {
-                throw new NotImplementedException();
-            }
-        }
+        
     }
 
 }

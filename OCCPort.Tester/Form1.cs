@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -386,10 +387,15 @@ namespace OCCPort.Tester
             //auto hn = GetHandle(*shape);
             //hh->FromObjHandle(hn);
         }
+
         List<AIS_Shape> shapes = new List<AIS_Shape>();
         private void toolStripButton7_Click(object sender, EventArgs e)
         {
+            var sw = Stopwatch.StartNew();
             AddBox();
+            sw.Stop();
+            var ms = sw.ElapsedMilliseconds;
+            toolStripStatusLabel1.Text = $"time: {ms}ms";
         }
 
         private void toolStripButton8_Click(object sender, EventArgs e)
@@ -738,6 +744,7 @@ namespace OCCPort.Tester
             var radius = d.GetDouble("radius");
             var h = d.GetDouble("h");
             var flat = d.GetBoolField("2d");
+            var sw = Stopwatch.StartNew();
             if (flat)
             {
                 gp_Pnt center = new(0.0, 0.0, 0.0);
@@ -768,7 +775,9 @@ namespace OCCPort.Tester
                 myAISContext.SetDisplayMode(shape, (int)AIS_DisplayMode.AIS_Shaded, false);
                 myAISContext.UpdateCurrentViewer();
             }
-
+            sw.Stop();
+            var ms = sw.ElapsedMilliseconds;
+            toolStripStatusLabel1.Text = $"time: {ms}ms";
         }
 
         private void toolStripButton17_Click(object sender, EventArgs e)

@@ -1,4 +1,6 @@
-﻿namespace TKMath
+﻿using OCCPort.Common;
+
+namespace TKMath
 {
     //! A Location is a composite transition. It comprises a
     //! series of elementary reference coordinates, i.e.
@@ -24,7 +26,7 @@
             TopLoc_Datum3D D = new TopLoc_Datum3D(T);
             myItems.Construct(new TopLoc_ItemLocation(D, 1));
         }
-        
+
 
         public static double ScalePrec()
         {
@@ -48,7 +50,34 @@
         {
             return a.Multiplied(Other);
         }
+        public int HashCode(int theUpperBound)
+        {
+            // the HashCode computed for a Location is the bitwise exclusive or
+            // of values computed for each element of the list
+            // to compute this value, the depth of the element is computed 
+            // the depth is the position of the element in the list
+            // this depth is multiplied by 3
+            // each element is an elementary Datum raised to a Power
+            // the Power is bitwise left shifted by depth
+            // this is added to the HashCode of the Datum
+            // this value is biwise rotated by depth
+            // the use of depth avoids getting the same result for two permutated lists.
 
+            int depth = 0;
+            uint h = 0;
+            TopLoc_SListOfItemLocation items = myItems;
+            while (items.More())
+            {
+                depth += 3;
+                uint i = (uint)Standard_Integer.HashCode(items.Value().myDatum.GetHashCode(), theUpperBound);
+                int aClampedDepth = depth % 32;
+                uint j = (uint)((i + items.Value().myPower) << aClampedDepth);
+                j = j >> (32 - aClampedDepth) | j << aClampedDepth;
+                h ^= j;
+                items.Next();
+            }
+            return Standard_Integer.HashCode((int)h, theUpperBound);
+        }
         private TopLoc_Location Multiplied(TopLoc_Location Other)
         {
             // prepend the chain Other in front of this

@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using TKBRep;
+using TKernel;
 
 namespace OCCPort
 {
     //! Hash tool, used for generating maps of shapes in topology.
-    public class TopTools_ShapeMapHasher : IEqualityComparer<TopoDS_Shape>
+    public class TopTools_ShapeMapHasher : IHasher<TopoDS_Shape>
     {
 
         //! Computes a hash code for the given shape, in the range [1, theUpperBound]
@@ -34,6 +35,16 @@ namespace OCCPort
         {
             return HashCode(obj, int.MaxValue);
             //return obj.GetHashCode();
+        }
+
+        int IHasher<TopoDS_Shape>.HashCode(TopoDS_Shape theValue, int theUpperBound)
+        {
+            return HashCode(theValue, theUpperBound);
+        }
+
+        bool IHasher<TopoDS_Shape>.IsEqual(TopoDS_Shape theKeyType, TopoDS_Shape theKey1)
+        {
+            return IsEqual(theKeyType, theKey1);
         }
     }
 

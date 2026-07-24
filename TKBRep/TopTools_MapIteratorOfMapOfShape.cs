@@ -1,36 +1,13 @@
 ﻿using System;
 using TKBRep;
+using TKernel;
 
 namespace OCCPort
 {
-    public class TopTools_MapIteratorOfMapOfShape
+    public class TopTools_MapIteratorOfMapOfShape : NCollection_Map<TopoDS_Shape, TopTools_ShapeMapHasher>.Iterator
     {
-        public TopTools_MapIteratorOfMapOfShape(TopTools_MapOfShape vmap)
+        public TopTools_MapIteratorOfMapOfShape(NCollection_Map<TopoDS_Shape> theMap) : base(theMap)
         {
-            list = vmap;
-        }
-
-        TopTools_MapOfShape list = null;
-        int index = 0;
-        public void Initialize(TopTools_MapOfShape vmap)
-        {
-            list = vmap;
-            index = 0;
-        }
-
-        public TopoDS_Shape Key()
-        {
-            return list[index];
-        }
-
-        public bool More()
-        {
-            return index < list.Count;
-        }
-
-        public void Next()
-        {
-            index++;
         }
     }
 }

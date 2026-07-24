@@ -146,9 +146,9 @@ namespace TKService
 
         public void RecomputeStructures(NCollection_Map<Graphic3d_Structure> theStructures)
         {
-            foreach (var anIter in theStructures)
-            {
-                Graphic3d_Structure aStruct = anIter;
+            for (NCollection_Map<Graphic3d_Structure>.Iterator anIter=new NCollection_Map<Graphic3d_Structure, NCollection_DefaultHasher<Graphic3d_Structure>>.Iterator  (theStructures); anIter.More(); anIter.Next()) 
+            {    
+                Graphic3d_Structure aStruct = anIter.Key();
                 aStruct.Clear();
                 aStruct.Compute();
             }
@@ -160,9 +160,11 @@ namespace TKService
 
             // Go through all unique structures including child (connected) ones and ensure that they are computed.
             NCollection_Map<Graphic3d_Structure> aStructNetwork = new NCollection_Map<Graphic3d_Structure>();
-            foreach (var anIter in myDisplayedStructure)
+            //foreach (var anIter in myDisplayedStructure)
+            // {
+            for (Graphic3d_MapOfStructure.Iterator anIter=new NCollection_Map<Graphic3d_Structure, NCollection_DefaultHasher<Graphic3d_Structure>>.Iterator (myDisplayedStructure); anIter.More(); anIter.Next())
             {
-                Graphic3d_Structure.Network(anIter, Graphic3d_TypeOfConnection.Graphic3d_TOC_DESCENDANT, aStructNetwork);
+                Graphic3d_Structure.Network(anIter.Key(), Graphic3d_TypeOfConnection.Graphic3d_TOC_DESCENDANT, aStructNetwork);
             }
             /*
             for (Graphic3d_MapIteratorOfMapOfStructure anIter(myDisplayedStructure); anIter.More(); anIter.Next())
