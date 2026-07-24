@@ -6,7 +6,7 @@ namespace OCCPort
 {
     public class TopTools_MapIteratorOfMapOfShape : NCollection_Map<TopoDS_Shape, TopTools_ShapeMapHasher>.Iterator
     {
-        public TopTools_MapIteratorOfMapOfShape(NCollection_Map<TopoDS_Shape> theMap) : base(theMap)
+        public TopTools_MapIteratorOfMapOfShape(NCollection_Map<TopoDS_Shape, TopTools_ShapeMapHasher> theMap) : base(theMap)
         {
         }
     }

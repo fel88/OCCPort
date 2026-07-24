@@ -4,7 +4,7 @@ using TKernel;
 
 namespace OCCPort
 {
-    public class TopTools_MapOfShape : NCollection_Map<TopoDS_Shape>//NCollection_Map<TopoDS_Shape,TopTools_ShapeMapHasher> 
+    public class TopTools_MapOfShape : NCollection_Map<TopoDS_Shape, TopTools_ShapeMapHasher>//NCollection_Map<TopoDS_Shape,TopTools_ShapeMapHasher> 
     {
         
     }

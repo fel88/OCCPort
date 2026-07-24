@@ -61,7 +61,7 @@ namespace TKernel
         public new class Iterator : NCollection_BaseMap.Iterator
         {
             //! Constructor
-            public Iterator(NCollection_Map<T> theMap) :
+            public Iterator(NCollection_Map<T, Hasher> theMap) :
        base(theMap)
             {
             }

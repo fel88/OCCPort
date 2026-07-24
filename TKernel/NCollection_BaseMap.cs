@@ -28,20 +28,20 @@ namespace TKernel
         }
 
 
-    public     void Destroy(Action fDel,
-                                    bool doReleaseMemory)
+        public void Destroy(Action fDel,
+                                        bool doReleaseMemory)
         {
             if (!IsEmpty())
             {
                 int i;
                 var data = myData1;
-                NCollection_ListNode p,q;
+                NCollection_ListNode p, q;
                 for (i = 0; i <= NbBuckets(); i++)
                 {
-                    if (data[i]!=null)
+                    if (data[i] != null)
                     {
                         p = data[i];
-                        while (p!=null)
+                        while (p != null)
                         {
                             q = (NCollection_ListNode)p.Next();
                             //fDel(p, myAllocator);
@@ -94,7 +94,7 @@ namespace TKernel
                         if (myBucket > myNbBuckets)
                             return;
                         myNode = myBuckets[myBucket];
-                    } while (myNode != null);
+                    } while (myNode == null);
             }
             //! Initialize
             public void Initialize(NCollection_BaseMap theMap)
@@ -123,15 +123,16 @@ namespace TKernel
             //! PNext
             protected void PNext()
             {
-                if (myBuckets != null)
+                if (myBuckets == null)
                     return;
+
                 if (myNode != null)
                 {
                     myNode = myNode.Next();
                     if (myNode != null)
                         return;
                 }
-                while (myNode != null)
+                while (myNode == null)
                 {
                     myBucket++;
                     if (myBucket > myNbBuckets)
